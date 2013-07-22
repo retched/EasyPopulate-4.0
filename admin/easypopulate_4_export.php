@@ -93,6 +93,9 @@ switch ($ep_dltype) { // chadd - changed to use $EXPORT_FILE
 	case 'SBA_detailed'; // mc12345678 - added 07-18-2013 to support Stock By Attributes
 	$EXPORT_FILE = 'SBA-Detailed-EP';
 	break;
+	case 'SBA_basic'; // mc12345678 - added 07-20-2013 to support adding new Stock by Attributes
+	$EXPORT_FILE = 'SBA-Basic-EP';
+	break;
 	case 'attrib_basic':
 	$EXPORT_FILE = 'Attrib-Basic-EP';
 	break;
