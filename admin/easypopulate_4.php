@@ -388,10 +388,10 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
     <br><b>Attribute Export/Import Options</b><br>
     <a href="easypopulate_4.php?export=attrib_basic"><b>Basic Products Attributes</b> (basic single-line)</a><br /> 
     <a href="easypopulate_4.php?export=attrib_detailed"><b>Detailed Products Attributes</b> (detailed multi-line)</a><br />
-<?php if (ep_4_SBA1Exists() == true) { ?>
+<?php /* Begin SBA1 addition */ if (ep_4_SBA1Exists() == true) { ?>
     <a href="easypopulate_4.php?export=SBA_basic"><b>Basic Stock By Attributes Data</b> (basic single-line)</a><br />
     <a href="easypopulate_4.php?export=SBA_detailed"><b>Detailed Stock By Attributes Data</b> (detailed multi-line)</a><br />
-<?php } ?>
+<?php } /* End SBA1 Addition */?>
     
     <br>DIAGNOSTIC EXPORTS - Note: NOT FOR IMPORTING ATTRIBUTES!<br>
     <a href="easypopulate_4.php?export=options"><b>Attribute Options Names</b></a><br />

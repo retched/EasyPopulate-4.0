@@ -63,6 +63,117 @@ if (isset($_POST['ep_status_filter'])) {
 $filelayout = array();
 $filelayout_sql = '';
 $filelayout = ep_4_set_filelayout($ep_dltype, $filelayout_sql, $sql_filter, $langcode, $ep_supported_mods, $custom_fields);
+
+// Need to identify the extent of the array to make the SBA_basic table.
+if ($ep_dltype == 'SBA_basic') {
+	// these variablels are for the Attrib_Basic Export
+	$active_products_id = ""; // start empty
+	$active_options_id = ""; // start empty
+	$active_language_id = ""; // start empty
+	$active_row = array(); // empty array
+	$last_products_id = "";
+
+	$result7 = ep_4_query($filelayout_sql);
+	$NumProducts = 0;
+	$Values= 0;
+	$MaxValues = 0;
+	$Options = 0;
+	$MaxOptions = 0;
+	$SBABasicArray = array();
+	$SBABasicArray['NumProducts'] = $NumProducts;
+	
+	while ($row = mysql_fetch_array($result7)) {
+		if ($row['v_products_id'] == $active_products_id) {
+			if ($row['v_options_id'] == $active_options_id) { //On a given Option but new value.
+				$Values++;
+				if ($Values > $MaxValues) {
+					$MaxValues = $Values;
+				}
+				//Set Number of Values +1 for current Value of Current Option of a Product (ProdXOpYNumVals)
+				$SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals'] ++;
+//				echo 'Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals' . ' 1<br />';
+				//Set Value Name for current Value of Current Option of a Product (ProdXOpYValZ = Value)
+				$SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals']] = $row['v_products_options_values_name'];
+//				echo 'Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals'] . ' 2<br />';
+				$active_row['v_products_options_name_' /*. $l_id*/] = $row['v_products_options_name'];
+				$active_row['v_products_options_values_name_' /*. $l_id*/] .= "," . $row['v_products_options_values_name'];
+				$active_row['v_products_options_type'] = $row['v_products_options_type'];
+				continue;
+			} else { // same product, new Option  - only executes once on new option
+				// Clean the texts that could break CSV file formatting
+				$Options++;
+				if ($Options > $MaxOptions) {
+					$MaxOptions = $Options;
+				}
+				$ep_export_count++;
+
+				//Set NumOptions to 0 for current product (ProdXNumOps)
+				$SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] ++;
+//				echo 'Prod' . $SBABasicArray['NumProducts'] . 'NumOps' . ' 1<br />';
+				//Set Option Name for current Option of a Product (ProdXOpY = Option)
+				$SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps']] = $row['v_products_options_name'];
+				//Set Option Type for current Option of a Product (ProdXOpYType = Option Type)
+				$SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Type'] = $row['v_products_options_type'];				//Set Value Name for current Value of Current Option of a Product (ProdXOpYValZ = Value)
+				$SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals']] = $row['v_products_options_values_name'];
+				$active_options_id = $row['v_options_id'];
+//				$active_language_id = $row['v_language_id'];
+//				$l_id = $row['v_language_id'];
+				$active_row['v_products_options_name_' /*. $l_id*/] = $row['v_products_options_name'];
+				$active_row['v_products_options_values_name_' /*. $l_id*/] = $row['v_products_options_values_name'];
+				$active_row['v_products_options_type'] = $row['v_products_options_type'];
+				continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
+			}
+		} else { // new combo or different product or first time through while-loop
+			if ($active_row['v_products_model'] <> $last_products_id) {
+				if ($ep_export_count > 0) {
+					$SBABasicArray['NumProducts'] ++;
+					$Products ++;
+				} 
+				$ep_export_count++;
+				$last_products_id = $active_row['v_products_model'];
+			} elseif ($active_row['v_prodcuts_model'] == "" && $ep_export_count == 0) {
+				$Products ++;
+				$SBABasicArray['NumProducts'] ++;
+				$ep_export_count++;
+			}
+			
+			//Set NumOptions to 1 for current product (ProdXNumOps)
+			$SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] = 1;
+			//Set Product ID to current product ('ProdXName' = products_id)
+			$SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'ID'] = $row['v_products_id'];
+			//Set Product Model to current product ('ProdXName' = products_id)
+			$SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Model'] = $row['v_products_model'];
+			$Options = 1;
+			//Set Option Name for current Option of a Product (ProdXOpY = Option)
+			$SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps']] = $row['v_products_options_name'];
+			//Set Option Type for current Option of a Product (ProdXOpYType = Option Type)
+			$SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Type'] = $row['v_products_options_type'];
+			//Set Number of Values to 1 for current Value of Current Option of a Product (ProdXOpYNumVals)
+			$SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals'] = 1;
+			$Values = 1;
+			//Set Value Name for current Value of Current Option of a Product (ProdXOpYValZ = Value)
+			$SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals']] = $row['v_products_options_values_name'];
+			// get current row of data
+			$active_products_id = $row['v_products_id'];
+			$active_options_id = $row['v_options_id'];
+			$active_language_id = $row['v_language_id'];
+
+			$active_row['v_products_model'] = $row['v_products_model'];
+			$active_row['v_products_options_type'] = $row['v_products_options_type'];
+
+//			$l_id = $row['v_language_id'];
+			$active_row['v_products_options_name_' /*. $l_id*/] = $row['v_products_options_name'];
+			$active_row['v_products_options_values_name_' /*. $l_id*/] = $row['v_products_options_values_name'];
+		} // end of special case 'attrib_basic'
+	}
+	//Add the applicable headers to the file layout
+	for ($i = 1; $i <= $MaxOptions; $i++){
+		$filelayout[] =	'v_products_options_type_' . $i; // 0-drop down, 1=text , 2=radio , 3=checkbox, 4=file, 5=read only 
+		$filelayout[] =	'v_products_options_name_' . $i; // (Actually want to add these in as the highest order of the options is identified and then also the values
+		$filelayout[] =	'v_products_options_values_name_' . $i;
+	}
+}
+
 $filelayout = array_flip($filelayout);
 // END: File Download Layouts
 // Create export file name
@@ -137,75 +248,6 @@ $active_row = array(); // empty array
 $last_products_id = "";
 
 $result = ep_4_query($filelayout_sql);
-
-// Need to identify the extent of the array to make the SBA_basic table.
-if ($ep_dltype == 'SBA_basic') {
-	$result7 = ep_4_query($filelayout_sql);
-	$Products = 0;
-	$Values= 0;
-	$MaxValues = 0;
-	$Options = 0;
-	$MaxOptions = 0;
-	
-	while ($row = mysql_fetch_array($result7)) {
-		if ($row['v_products_id'] == $active_products_id) {
-			if ($row['v_options_id'] == $active_options_id) {
-				$Values++;
-				if ($Values > $MaxValues) {
-					$MaxValues = $Values;
-				}
-				$active_row['v_products_options_name_' /*. $l_id*/] = $row['v_products_options_name'];
-				$active_row['v_products_options_values_name_' /*. $l_id*/] .= "," . $row['v_products_options_values_name'];
-				$active_row['v_products_options_type'] = $row['v_products_options_type'];
-				continue;
-			} else { // same product, new Option  - only executes once on new option
-				// Clean the texts that could break CSV file formatting
-				$Options++;
-				if ($Options > $MaxOptions) {
-					$MaxOptions = $Options;
-				}
-				$ep_export_count++;
-
-				$active_options_id = $row['v_options_id'];
-//				$active_language_id = $row['v_language_id'];
-//				$l_id = $row['v_language_id'];
-				$active_row['v_products_options_name_' /*. $l_id*/] = $row['v_products_options_name'];
-				$active_row['v_products_options_values_name_' /*. $l_id*/] = $row['v_products_options_values_name'];
-				$active_row['v_products_options_type'] = $row['v_products_options_type'];
-				continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
-			}
-		} else { // new combo or different product or first time through while-loop
-			if ($active_row['v_products_model'] <> $last_products_id) {
-				// Clean the texts that could break CSV file formatting
-				if ($ep_export_count > 0) {
-					$Products ++;
-				} 
-				
-				$ep_export_count++;
-				$last_products_id = $active_row['v_products_model'];
-			} elseif ($active_row['v_prodcuts_model'] == "" && $ep_export_count == 0) {
-				$Products ++;
-				$ep_export_count++;
-			}
-
-			$Options = 0;
-			$Values = 0;
-			// get current row of data
-			$active_products_id = $row['v_products_id'];
-			$active_options_id = $row['v_options_id'];
-			$active_language_id = $row['v_language_id'];
-
-			$active_row['v_products_model'] = $row['v_products_model'];
-			$active_row['v_products_options_type'] = $row['v_products_options_type'];
-
-//			$l_id = $row['v_language_id'];
-			$active_row['v_products_options_name_' /*. $l_id*/] = $row['v_products_options_name'];
-			$active_row['v_products_options_values_name_' /*. $l_id*/] = $row['v_products_options_values_name'];
-		} // end of special case 'attrib_basic'
-	}
-}
-
-echo 'Number of Products: ' . $Products . ' Number of Options: ' . $Options . ' Number of Values: ' . $Values . '<br />';
 
 while ($row = mysql_fetch_array($result)) {
 
@@ -333,7 +375,7 @@ while ($row = mysql_fetch_array($result)) {
 						$dataRowtoWrite .= '"' . str_replace('"', '""', $thetext) . '"' . $csv_delimiter;
 					}
 					// Remove trailing tab, then append the end-of-line
-					$dataRow[] = rtrim($dataRowtoWrite, $csv_delimiter) . "\n";
+//					$dataRow = rtrim($dataRowtoWrite, $csv_delimiter) . "\n";
 //Need to identify new 					fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
 					$ep_export_count++;
 
@@ -359,7 +401,7 @@ while ($row = mysql_fetch_array($result)) {
 						$dataRowtoWrite .= '"' . str_replace('"', '""', $thetext) . '"' . $csv_delimiter;
 					}
 					// Remove trailing tab, then append the end-of-line
-					$dataRow[] = rtrim($dataRowtoWrite, $csv_delimiter) . "\n";
+//					$dataRow = rtrim($dataRowtoWrite, $csv_delimiter) . "\n";
 //Really need to delay file writing until header fully made:					fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
 					$ep_export_count++;
 					$last_products_id = $active_row['v_products_model'];
@@ -600,6 +642,121 @@ while ($row = mysql_fetch_array($result)) {
 		$ep_export_count++;
 	} // if 
 } // while ($row)
+
+//Start SBA1 addresses writing to the file
+if ($ep_dltype == 'SBA_basic') {
+	$SBATree = array();
+	$MaxArray = array();
+	$CurValOp = array();
+	/* Here is the pseudo code to accomplish the SBA Basic writing to file:
+	 *X For each product
+	 *X	Set the Number of options for that product
+	 *X	For each option of product
+	 *X		MaxArray(Option) = numvals for option of product
+	 *X		CurrentValofOp(Option) = 1
+	 *X	End for loop of option
+	 *X	DO
+	 *X		for each option of product
+	 *X			OptionName get from prod number and option number combo
+	 *X			Optionvalue get from value of option of product from currentvalofop(option)
+	 *X		end for each option loop
+	 *X	get other data for the row
+	 *X	Write the row of data
+	 *X	increase currentvalofoption(numofOptions (This is the total # of options)) ++
+	 *X	For j = numofoptions to 2 step -1
+	 *X		if currentvalofoption(j) > max(j)
+	 *X			currentvalofoption(j) = 1
+	 *X			currentvalofoption(j-1) ++
+	 *X		end if
+	 *X	next j
+	 *X while currentvalofop(1) <= maxarray(1)
+	 */
+	for ($i = 1;$i<= $SBABasicArray['NumProducts']; $i++) {
+		$NumOptions = $SBABasicArray['Prod' . $i . 'NumOps'];
+		for ($j = 1; $j <= $NumOptions; $j++) {
+			$MaxArray[$j] = $SBABasicArray['Prod' . $i . 'Op' . $j . 'NumVals'];
+			$CurValOp[$j] = 1;
+		}
+		
+		do {
+			for ($k = 1; $k <= $NumOptions; $k++) {
+	 /*			OptionName get from prod number and option number combo
+	  * 			Optionvalue get from value of option of product from currentvalofop(option)
+	  */
+				$active_row['v_products_options_name_' . $k] = $SBABasicArray['Prod' . $i . 'Op' . $k]; // (Actually want to add these in as the highest order of the options is identified and then also the values
+				$active_row['v_products_options_values_name_' . $k] = $SBABasicArray['Prod' . $i . 'Op' . $k . 'Val' . $CurValOp[$k]];
+				$active_row['v_products_options_type_' . $k] = $SBABasicArray['Prod' . $i . 'Op' . $k . 'Type'];
+			}
+			//Obtain additional data for the row;
+			$active_row['v_products_model'] = $SBABasicArray['Prod' . $i . 'Model'];
+			
+			//Write the Row Data
+			$dataRow = '';
+			$problem_chars = array("\r", "\n", "\t"); // carriage return, newline, tab
+			foreach ($filelayout as $key => $value) {
+				$thetext = $active_row[$key];
+				// remove carriage returns, newlines, and tabs - needs review
+				$thetext = str_replace($problem_chars, ' ', $thetext);
+				// encapsulate data in quotes, and escape embedded quotes in data
+				$dataRow .= '"' . str_replace('"', '""', $thetext) . '"' . $csv_delimiter;
+			}
+			// Remove trailing tab, then append the end-of-line
+			$dataRow = rtrim($dataRow, $csv_delimiter) . "\n";
+			fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+			$ep_export_count++;
+			
+			$CurValOp[$NumOptions]++;
+			
+			for ($j = $NumOptions;$j >= 2;$j--){
+				if ($CurValOp[$j] > $MaxArray[$j]){
+					$CurValOp[$j] = 1;
+					$CurValOp[$j - 1]++;
+				}
+			}
+			
+		} while ($CurValOp[1] <= $MaxArray[1]);
+	}
+}
+		//Write all values
+		//If Last Value + 1 is greater than number of values then {reset last value, Back down to previous Level
+		//
+		//Increment Last value by 1
+		
+	/*	$m = $SBABasicArray['Prod' . $i . 'NumOps'];
+		while ($n < $SBATree[$SBABasicArray['Prod' . $i . 'NumOps']]) {
+			
+			$n++;
+		}
+		while ($SBATree[1] < $SBABasicArray['Prod' . $i . 'Op1NumVars']) {
+		}
+		for ($k = 1; $k <= $SBABasicArray['Prod' . $i . 'Op' . $j . 'NumVals']; $k++) {
+				
+		}*/
+	
+//	Prod1;Prod1Op1;Prod1Op1Val1;Prod1Op2;Prod1Op2Val1;
+//	Prod1;Prod1Op1;Prod1Op1Val1;Prod1Op2;Prod1Op2Val2;
+//	Prod1;Prod1Op1;Prod1Op1Val2;Prod1Op2;Prod1Op2Val1;
+//   Prod1;Prod1Op1;Prod1Op1Val2;Prod1Op2;Prod1Op2Val2;
+//	Prod1;Prod1Op1;Prod1Op1Val3;Prod1Op2;Prod1Op2Val1;
+//	Prod1;Prod1Op1;Prod1Op1Val3;Prod1Op2;Prod1Op2Val2;
+	
+/*	
+	$dataRow = '';
+	$problem_chars = array("\r", "\n", "\t"); // carriage return, newline, tab
+	foreach ($filelayout as $key => $value) {
+		$thetext = $active_row[$key];
+		// remove carriage returns, newlines, and tabs - needs review
+		$thetext = str_replace($problem_chars, ' ', $thetext);
+		// encapsulate data in quotes, and escape embedded quotes in data
+		$dataRow .= '"' . str_replace('"', '""', $thetext) . '"' . $csv_delimiter;
+ * 
+ */
+/*	}
+	// Remove trailing tab, then append the end-of-line
+	$dataRow = rtrim($dataRow, $csv_delimiter) . "\n";
+	fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+	
+}*/
 
 if ($ep_dltype == 'attrib_basic') { // must write last record
 	// Clean the texts that could break CSV file formatting

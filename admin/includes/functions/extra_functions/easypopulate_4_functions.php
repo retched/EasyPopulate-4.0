@@ -554,14 +554,10 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			o.language_id       = v.language_id ORDER BY a.products_id, a.options_id, v.language_id, v.products_options_values_id';
  		break;
 
-	case 'sba_basic': // simplified sinlge-line attributes ... eventually!
+	case 'SBA_basic': // simplified sinlge-line attributes ... eventually!
 		// $filelayout[] =	'v_products_attributes_id';
 		// $filelayout[] =	'v_products_id';
 		$filelayout[] =	'v_products_model'; // product model from table PRODUCTS
-		$filelayout[] =	'v_products_options_type'; // 0-drop down, 1=text , 2=radio , 3=checkbox, 4=file, 5=read only 
-/*		$filelayout[] = 'v_products_options_name_1'; // (Actually want to add these in as the highest order of the options is identified and then also the values
-		$filelayout[] = 'v_products_options_values_name_1';
-*/		// a = table PRODUCTS_ATTRIBUTES
 		// p = table PRODUCTS
 		// o = table PRODUCTS_OPTIONS
 		// v = table PRODUCTS_OPTIONS_VALUES

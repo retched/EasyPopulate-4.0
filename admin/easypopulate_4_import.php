@@ -270,9 +270,9 @@ if ( isset($_GET['import']) ) {
 			if ($row = mysql_fetch_array($result)) {
 				// UPDATE
 				$sql = "UPDATE ".TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK." SET 
-					products_id		              = ".$items[$filelayout['v_products_id']].",
-					stock_attributes                  = '".$items[$filelayout['v_stock_attributes']]."',
-					quantity					    = ".$items[$filelayout['v_quantity']].",
+				" . /*	products_id		              = ".$items[$filelayout['v_products_id']].",
+					stock_attributes                  = '".$items[$filelayout['v_stock_attributes']]."',*/
+					"quantity					    = ".$items[$filelayout['v_quantity']].",
 					sort						    = ".$items[$filelayout['v_sort']]."
 					WHERE (
 					stock_id = ".$items[$filelayout['v_stock_id']]." )";
