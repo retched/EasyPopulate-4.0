@@ -117,10 +117,91 @@ function ep_4_SBA1Exists () {
 	}
 }
 
+function ep_4_CEONURIExists () {
+	// The current thought is to have one of these Exists files for each version of SBA to consider; however, they also all could fall under one SBA_Exists check provided some return is made and a comparison done on the other end about what was returned.  
+	//Check to see if any version of Stock with attributes is installed (If so, and properly programmed, there should be a define for the table associated with the stock.  There may be more than one, and if so, they should all be verified for the particular SBA.
+	if (defined('TABLE_CEON_URI_MAPPINGS')) {
+		//Now that have identified that the table (applicable to mc12345678's store, has been identified as in existence, now need to look at the setup of the table (Number of columns and if each column identified below is in the table, or conversely if the table's column matches the list below.
+		//Columns in table: stock_id, products_id, stock_attributes, quantity, and sort.
+//		echo 'In<br />';
+//		$colsarray = $db->Execute('SHOW COLUMNS FROM ' . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK);
+		$colsarray = ep_4_query('SHOW COLUMNS FROM ' . TABLE_CEON_URI_MAPPINGS);
+//		echo 'After execute<br />';
+		$numCols = mysql_num_rows($colsarray);
+		if ($numCols == 9) {
+			while ($row = mysql_fetch_array($colsarray)){
+				switch ($row['Field']) {
+					case 'uri':
+						break;
+					case 'language_id':
+						break;
+					case 'current_uri':
+						break;
+					case 'main_page':
+						break;
+					case 'query_string_parameters':
+						break;
+					case 'associated_db_id':
+						break;
+					case 'alternate_uri':
+						break;
+					case 'redirection_type_code':
+						break;
+					case 'date_added':
+						break;
+					default:
+						return false;
+						break;
+						
+				}
+//				print_r($row);
+/*				echo '4<br />';
+				if ($row['Field'] == 'stock_id') {
+					echo ' true <br />';
+				} else {
+					echo ' false <br />';
+				}
+				echo '3<br />'; */
+			}
+			return true;
+		} else {
+			return false;
+		}
+//		$returnedcols = mysql_fetch_array($colsarray);
+//		$colnames = array_keys($returnedcols);
+/*		echo 'Num Rows: ' . $numCols . '<br />';
+		if ($returnedcols['Field'] == 'stock_id') {
+			echo 'true <br />';
+		} else {
+			echo 'false <br />';
+		}
+		echo '3<br />';
+		echo $returnedcols . '111<br />';
+		print_r($returnedcols);
+		echo '3<br />'; */
+		
+/*		while ($row = mysql_fetch_array($colsarray)){
+			print_r($row);
+			echo '4<br />';
+		}
+		echo '4<br />';*/
+		//return true;
+	} else {
+		return false;
+	}
+}
+
 function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcode, $ep_supported_mods, $custom_fields) {
 	$filelayout = array();
 	switch($ep_dltype) {
 	case 'full': // FULL products download
+		if (ep_4_CEONURIExists() == true) {
+			$ep4CEONURIDoesExist = true;
+			require(DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_datafiles/ceon_uri_mapping_product_pages.php');
+			//print_r($ceon_uri_mapping_product_pages);
+			//global $ceon_uri_mapping_product_pages;
+		}
+		//global $ceon_uri_mapping_product_pages;
 		// The file layout is dynamically made depending on the number of languages
 		$filelayout[] = 'v_products_model';
 		$filelayout[] = 'v_products_type'; // 4-23-2012
@@ -134,6 +215,18 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			}
 			$filelayout[] = 'v_products_url_'.$l_id;
 		} 
+		if ($ep4CEONURIDoesExist == true) {
+			$filelayout[] =	'v_products_type';
+			$filelayout[] =	'v_uri';
+			$filelayout[] =	'v_language_id';
+//			$filelayout[] =	'v_current_uri';
+			$filelayout[] =	'v_categories_id';
+			$filelayout[] =	'v_main_page';
+			$filelayout[] =	'v_query_string_parameters';
+			$filelayout[] =	'v_associated_db_id';
+			$filelayout[] =	'v_master_categories_id';
+		}
+		
 		$filelayout[] = 'v_specials_price';
 		$filelayout[] = 'v_specials_date_avail';
 		$filelayout[] = 'v_specials_expires_date';
@@ -242,6 +335,17 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		if ($ep_supported_mods['excl'] == true) { // Custom Mode for Exclusive Products Status VARCHAR(32)
 			$filelayout_sql .=  'p.products_exclusive as v_products_exclusive,';
 		}
+		if ($ep4CEONURIDoesExist == true) {
+			$filelayout_sql .=	'c.uri as v_uri,';
+			$filelayout_sql .=	'c.language_id as v_language_id,';
+/*			$filelayout_sql .=	'c.current_uri as v_current_uri,';*/
+			$filelayout_sql .=	'c.main_page as v_main_page,';
+			$filelayout_sql .=	'c.query_string_parameters as v_query_string_parameters,';
+			$filelayout_sql .=	'c.associated_db_id as v_associated_db_id,';
+			$filelayout_sql .=	'p.master_categories_id as v_master_categories_id,';
+			$filelayout_sql .=  'ptoc.categories_id as v_categories_id,';
+			//$filelayout_sql .=	'c.products_type as v_products_type,';
+		}
 		if (count($custom_fields) > 0) { // User Defined Products Fields
 			foreach ($custom_fields as $field) {
 				$filelayout_sql .= 'p.'.$field.' as v_'.$field.',';
@@ -267,12 +371,21 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			p.metatags_price_status         as v_metatags_price_status,
 			p.metatags_title_tagline_status as v_metatags_title_tagline_status 
 			FROM '
-			.TABLE_PRODUCTS.' as p,'
-			.TABLE_CATEGORIES.' as subc,'
-			.TABLE_PRODUCTS_TO_CATEGORIES.' as ptoc
-			WHERE
+			.TABLE_CATEGORIES.' as subc, '
+			.TABLE_PRODUCTS_TO_CATEGORIES.' as ptoc, '
+			.TABLE_PRODUCTS.' as p '; 
+			if ($ep4CEONURIDoesExist == true) { 
+				$filenamelist = implode("','", $ceon_uri_mapping_product_pages);
+				$filelayout_sql .= 'LEFT JOIN '.TABLE_CEON_URI_MAPPINGS.' as c 
+				ON 
+				p.products_id = c.associated_db_id AND
+				c.main_page IN (\''.$filenamelist.'\') AND
+				c.current_uri = \'1\' ';
+			}
+			$filelayout_sql .= 'WHERE 
 			p.products_id = ptoc.products_id AND
-			ptoc.categories_id = subc.categories_id '.$sql_filter;
+			ptoc.categories_id = subc.categories_id 
+			'.$sql_filter;
 		break;
 
 	case 'featured': // added 5-2-2012
@@ -302,6 +415,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 	
 	case 'priceqty':
 		$filelayout[] = 'v_products_model';
+		$filelayout[] = 'v_products_name';
 		$filelayout[] = 'v_status'; // 11-23-2010 added product status to price quantity option
 		$filelayout[] = 'v_specials_price';
 		$filelayout[] = 'v_specials_date_avail';
@@ -316,6 +430,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		$filelayout[] = 'v_products_quantity';
 		$filelayout_sql = 'SELECT
 			p.products_id     as v_products_id,
+			d.products_name   as v_products_name,
 			p.products_status as v_status,
 			p.products_model  as v_products_model,
 			p.products_price  as v_products_price,
@@ -328,10 +443,12 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			p.products_quantity as v_products_quantity
 			FROM '		
 			.TABLE_PRODUCTS.' as p,'
+			.TABLE_PRODUCTS_DESCRIPTION.' as d,'
 			.TABLE_CATEGORIES.' as subc,'
 			.TABLE_PRODUCTS_TO_CATEGORIES.' as ptoc
 			WHERE
 			p.products_id = ptoc.products_id AND
+			d.products_id = p.products_id AND
 			ptoc.categories_id = subc.categories_id '.$sql_filter; // added filter 4-13-2012	
 		break;
 		
@@ -512,7 +629,6 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			o.language_id       = 1 ORDER BY a.products_id, a.options_id, v.products_options_values_id';
  		break;
 
-
 	case 'attrib_basic': // simplified sinlge-line attributes ... eventually!
 		// $filelayout[] =	'v_products_attributes_id';
 		// $filelayout[] =	'v_products_id';
@@ -584,7 +700,6 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			a.options_values_id = v.products_options_values_id AND
 			o.language_id       = v.language_id ORDER BY a.products_id, a.options_id, v.language_id, v.products_options_values_id';
  		break;
-
 		
 	case 'SBA_detailed':
 		$filelayout[] =	'v_stock_id'; // stock id from SBA table
@@ -694,6 +809,39 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			ORDER BY a.products_id, a.options_id, v.products_options_values_id';
  		break;
 
+	case 'CEON_URI_active_all':
+		$filelayout[] =	'v_uri';
+		$filelayout[] =	'v_language_id';
+		$filelayout[] =	'v_current_uri';
+		$filelayout[] =	'v_main_page';
+		$filelayout[] =	'v_query_string_parameters';
+		$filelayout[] =	'v_associated_db_id';
+		$filelayout[] =	'v_date_added';
+		$filelayout[] =	'v_products_model'; // product model from table PRODUCTS translated from I think v_associated_db_id
+		// p = table PRODUCTS
+		// c = table CEON_URI_MAPPINGS
+		// o = table PRODUCTS_OPTIONS
+		// v = table PRODUCTS_OPTIONS_VALUES
+		$filelayout_sql = 'SELECT
+			c.uri						 as v_uri,
+			c.language_id					 as v_language_id,
+			c.current_uri					 as v_current_uri,
+			c.main_page					 as v_main_page,
+			c.query_string_parameters		 as v_query_string_parameters,
+			c.associated_db_id				 as v_associated_db_id,
+			c.date_added					 as v_date_added ' . /*
+			p.products_model				 as v_products_model */'
+			FROM '
+			.TABLE_CEON_URI_MAPPINGS.	  ' as c
+			 WHERE
+			c.current_uri		= 1 
+			ORDER BY c.main_page, c.associated_db_id, c.date_added'; 
+			   /*AND
+			a.products_id       = p.products_id AND
+			a.options_id        = o.products_options_id AND
+			a.options_values_id = v.products_options_values_id AND
+			o.language_id       = v.language_id ORDER BY a.products_id, a.options_id, v.language_id, v.products_options_values_id'; */
+		break;
 		
 	case 'options':
 		$filelayout[] =	'v_products_options_id';
