@@ -1254,6 +1254,7 @@ if ( isset($_GET['import']) ) {
 							$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT_FAIL, $v_products_model);
 							$ep_error_count++;
 						}
+
 					}
 
 					// START: Product MetaTags
