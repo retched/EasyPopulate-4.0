@@ -179,7 +179,10 @@ $langcode = ep_4_get_languages(); // array of currently used language codes ( 1,
 if ( isset($_GET['export2']) ) { // working on attributes export 
 	include_once('easypopulate_4_export2.php'); // this file contains all data import code
 } */
-
+$ep4CEONURIDoesExist = false;
+if (ep_4_CEONURIExists() == true) {
+	$ep4CEONURIDoesExist = true;
+}
 if ( isset($_POST['export']) OR isset($_GET['export'])  ) {
 	include_once('easypopulate_4_export.php'); // this file contains all data export code
 }
@@ -392,6 +395,10 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
     <a href="easypopulate_4.php?export=SBA_basic"><b>Basic Stock By Attributes Data</b> (basic single-line)</a><br />
     <a href="easypopulate_4.php?export=SBA_detailed"><b>Detailed Stock By Attributes Data</b> (detailed multi-line)</a><br />
 <?php } /* End SBA1 Addition */?>
+<?php /* Begin CEON URI addition */ if ($ep4CEONURIDoesExist == true) { ?>    <br><b>CEON URI Export/Import Options</b><br>
+    <a href="easypopulate_4.php?export=CEON_URI_active_all"><b>CEON URI Active Data Table</b> (basic single-line)</a><br />
+    <a href="easypopulate_4.php?export=CEON_detailed"><b>Detailed CEON URI Data</b> (detailed multi-line)</a><br />
+<?php } else { ?>CEON URI Doesn't Exist <br /><?php } /* End CEON URI Addition */?>
     
     <br>DIAGNOSTIC EXPORTS - Note: NOT FOR IMPORTING ATTRIBUTES!<br>
     <a href="easypopulate_4.php?export=options"><b>Attribute Options Names</b></a><br />
