@@ -379,9 +379,10 @@ if ( isset($_GET['import']) ) {
 		//Will process other file types (ie. full)
 		if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolower(substr($file['name'],0,7)) <> "attrib-") && ( strtolower(substr($file['name'],0,4)) <> "sba-" /*&& ep_4_SBA1Exists() == true*/)) { //  temporary solution here... 12-06-2010
 			
+if (ep_4_CEONURIExists() == true) {
 			//Order of calls:
 			//collect_info
-	require_once(DIR_WS_CLASSES . 'class.CeonURIMappingAdminProductPages.php');
+	require_once(DIR_WS_CLASSES . 'class.EP4CeonURIMappingAdminProductPages.php');
     
 	$ceon_uri_mapping_admin = new EP4CeonURIMappingAdminProductPages();
     
@@ -430,7 +431,7 @@ if ( isset($_GET['import']) ) {
 			
 
 	   
-			
+}			
 			// Main IMPORT loop For Product Related Data. v_products_id is the main key
 			while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // read 1 line of data
 

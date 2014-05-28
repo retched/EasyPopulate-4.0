@@ -484,7 +484,7 @@ while ($row = mysql_fetch_array($result)) {
 			$row['v_current_uri'] = $ceon_uri_mapping_admin->_uri_mappings; // $filalayout['v_current_uri'];
 			$row['v_main_page'] = $row['v_main_page'];
 			$row['v_query_string_parameters'] = $row['v_query_string_parameters'];
-			$row['v_associated_db_id'] = $row['v_associated_db_id'];
+			$row['v_associated_db_id'] = $pID;//  $row['v_associated_db_id'];
 			$row['v_date_added'] = $row['v_date_added'];
 			$row['v_products_model'] = $row['v_products_model'];
 			} // End of CEON Insert for Export
