@@ -222,7 +222,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 //			$filelayout[] =	'v_current_uri';
 			$filelayout[] =	'v_categories_id';
 			$filelayout[] =	'v_main_page';
-//Don't need for product			$filelayout[] =	'v_query_string_parameters';
+			$filelayout[] =	'v_query_string_parameters';
 			$filelayout[] =	'v_associated_db_id';
 			$filelayout[] =	'v_master_categories_id';
 		}
@@ -340,7 +340,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			$filelayout_sql .=	'c.language_id as v_language_id,';
 /*			$filelayout_sql .=	'c.current_uri as v_current_uri,';*/
 			$filelayout_sql .=	'c.main_page as v_main_page,';
-// Don't need for product			$filelayout_sql .=	'c.query_string_parameters as v_query_string_parameters,';
+			$filelayout_sql .=	'c.query_string_parameters as v_query_string_parameters,';
 			$filelayout_sql .=	'c.associated_db_id as v_associated_db_id,';
 			$filelayout_sql .=	'p.master_categories_id as v_master_categories_id,';
 			$filelayout_sql .=  'ptoc.categories_id as v_categories_id,';
