@@ -26,6 +26,7 @@ $ep_curly_quotes  = (int)EASYPOPULATE_4_CONFIG_CURLY_QUOTES;
 $ep_char_92       = (int)EASYPOPULATE_4_CONFIG_CHAR_92;
 $ep_metatags      = (int)EASYPOPULATE_4_CONFIG_META_DATA; // 0-Disable, 1-Enable
 $ep_music         = (int)EASYPOPULATE_4_CONFIG_MUSIC_DATA; // 0-Disable, 1-Enable
+$ep_uses_mysqli   = (PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR == '1.5.3' ? true : false);
 
 @set_time_limit($ep_execution);  // executin limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
 
@@ -133,8 +134,11 @@ $music_genre_name_max_len = zen_field_length(TABLE_MUSIC_GENRE, 'music_genre_nam
 
 $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
 
-$collation = mysql_client_encoding(); // should be either latin1 or utf8
-
+if ($ep_uses_mysqli) {
+	$collation = mysqli_character_set_name($db->link); // should be either latin1 or utf8
+} else {
+	$collation = mysql_client_encoding(); // should be either latin1 or utf8
+}
 if ($collation == 'utf8') {
 	mb_internal_encoding("UTF-8");
 }
@@ -164,11 +168,18 @@ if ( ($collation == 'utf8') && ((substr($project,0,5) == "1.3.8") || (substr($pr
 // default langauage should not be important since all installed languages are used $langcode[]
 // and we should iterate through that array (even if only 1 stored value)
 // $epdlanguage_id is used only in categories generation code since the products import code doesn't support multi-language categories
+/* @var $epdlanguage_query type array */
+//$epdlanguage_query = $db->Execute("SELECT languages_id, name FROM ".TABLE_LANGUAGES." WHERE code = '".DEFAULT_LANGUAGE."'");
+
 $epdlanguage_query = ep_4_query("SELECT languages_id, name FROM ".TABLE_LANGUAGES." WHERE code = '".DEFAULT_LANGUAGE."'");
-if (mysql_num_rows($epdlanguage_query)) {
+if ($ep_uses_mysqli && mysqli_num_rows($epdlanguage_query)) {
+	$epdlanguage = mysqli_fetch_array($epdlanguage_query);
+	$epdlanguage_id   = $epdlanguage->fields['languages_id'];
+	$epdlanguage_name = $epdlanguage->fields['name'];
+} elseif (mysql_num_rows($epdlanguage_query)) {
 	$epdlanguage = mysql_fetch_array($epdlanguage_query);
-	$epdlanguage_id   = $epdlanguage['languages_id'];
-	$epdlanguage_name = $epdlanguage['name'];
+	$epdlanguage_id   = $epdlanguage->fields['languages_id'];
+	$epdlanguage_name = $epdlanguage->fields['name'];
 } else {
 	exit("EP4 FATAL ERROR: No default language set."); // this should never happen
 }
@@ -356,9 +367,17 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
 		<?php	
 		$manufacturers_array = array();
 		$manufacturers_array[] = array( "id" => '', 'text' => "Manufacturers" );
-		$manufacturers_query = mysql_query("SELECT manufacturers_id, manufacturers_name FROM " . TABLE_MANUFACTURERS . " ORDER BY manufacturers_name");
-		while ($manufacturers = mysql_fetch_array($manufacturers_query)) {
-			$manufacturers_array[] = array( "id" => $manufacturers['manufacturers_id'], 'text' => $manufacturers['manufacturers_name'] );
+		if ($ep_uses_mysqli) {
+			$manufacturers_query = mysqli_query($db->link,"SELECT manufacturers_id, manufacturers_name FROM " . TABLE_MANUFACTURERS . " ORDER BY manufacturers_name");
+			while ($manufacturers = mysqli_fetch_array($manufacturers_query)) {
+				$manufacturers_array[] = array( "id" => $manufacturers['manufacturers_id'], 'text' => $manufacturers['manufacturers_name'] );
+			}
+			
+		} else{
+			$manufacturers_query = mysql_query("SELECT manufacturers_id, manufacturers_name FROM " . TABLE_MANUFACTURERS . " ORDER BY manufacturers_name");
+			while ($manufacturers = mysql_fetch_array($manufacturers_query)) {
+				$manufacturers_array[] = array( "id" => $manufacturers['manufacturers_id'], 'text' => $manufacturers['manufacturers_name'] );
+			}
 		}
 		$status_array = array(array( "id" => '1', 'text' => "Status" ),array( "id" => '1', 'text' => "active" ),array( "id" => '0', 'text' => "inactive" ),array( "id" => '3', 'text' => "all" ));
 		$export_type_array  = array(array( "id" => '0', 'text' => "Download Type" ),
