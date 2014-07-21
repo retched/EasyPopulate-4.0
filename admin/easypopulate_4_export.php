@@ -63,7 +63,6 @@ if (isset($_POST['ep_status_filter'])) {
 if ($ep_dltype == 'SBAStockProdFilter') {
 	$ep_dltype = 'SBAStock';
 	$sql_filter = 'p.products_id = p.products_id ORDER BY p.products_id ASC';
-	
 }
 
 //$filelayout = array(); //Commented out because ep_4_set_filelayout sets $filelayout as an array.
