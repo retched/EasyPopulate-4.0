@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4_functions.php, v4.0.21 06-01-2012 chadderuski $
+// $Id: easypopulate_4_functions.php, v4.0.23 07-13-2014 mc12345678 $
 
 function ep_4_curly_quotes($curly_text) {
 	$ep_curly_quotes = (int)EASYPOPULATE_4_CONFIG_CURLY_QUOTES;
@@ -204,6 +204,43 @@ function ep_4_CEONURIExists () {
 function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcode, $ep_supported_mods, $custom_fields) {
 	$filelayout = array();
 	switch($ep_dltype) {
+	case 'SBAStock';
+		$filelayout[] = 'v_products_model';
+		$filelayout[] = 'v_status';
+		foreach ($langcode as $key => $lang) { // create variables for each language id
+			$l_id = $lang['id'];
+			$filelayout[] = 'v_products_name_'.$l_id;
+			$filelayout[] = 'v_products_description_'.$l_id;
+			if ($ep_supported_mods['psd'] == true) { // products short description mod
+				$filelayout[] = 'v_products_short_desc_'.$l_id;
+			}
+		} 
+		//$filelayout[] =	'v_products_options_values_name'; // options values name from table PRODUCTS_OPTIONS_VALUES
+		$filelayout[] = 'v_SBA_tracked';
+		$filelayout[] = 'v_table_tracker';
+		$filelayout[] = 'v_products_attributes'; // options name from table 
+		$filelayout[] = 'v_products_quantity';
+		
+		$filelayout_sql = 'SELECT
+			p.products_id					as v_products_id,
+			p.products_model				as v_products_model,';
+		if (count($custom_fields) > 0) { // User Defined Products Fields
+			foreach ($custom_fields as $field) {
+				$filelayout_sql .= 'p.'.$field.' as v_'.$field.',';
+			}
+		}
+		$filelayout_sql .= '
+			p.products_quantity				as v_products_quantity,
+			p.products_status				as v_status 
+			FROM '
+			.TABLE_PRODUCTS.' as p '
+			//.TABLE_CATEGORIES.' as subc,'
+			//.TABLE_PRODUCTS_TO_CATEGORIES.' as ptoc
+			. ($sql_filter <> '' ? 'WHERE '. $sql_filter : '');
+			//p.products_id = ptoc.products_id AND
+			/*ptoc.categories_id = subc.categories_id '.$sql_filter;*/
+		break;
+		
 	case 'full': // FULL products download
 		if (ep_4_CEONURIExists() == true) {
 			$ep4CEONURIDoesExist = true;
@@ -992,8 +1029,6 @@ function ep_4_get_tax_class_rate($tax_class_id) {
 			$tax_multiplier += $tax['tax_rate'];
 		}
 	}
-	
-		
 	return $tax_multiplier;
 }
 
@@ -1035,9 +1070,11 @@ function smart_tags_4($string,$tags,$crsub,$doit) {
 
 function ep_4_check_table_column($table_name,$column_name) {
 	global $db;
+	$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
+	$ep_uses_mysqli = (substr($project, 0, 5) == "1.5.3");
 	$sql = "SHOW COLUMNS FROM ".$table_name;
 	$result = ep_4_query($sql);
-	while ($row = mysqli_fetch_array($result)) {
+	while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
 		$column = $row['Field'];
 		if ($column == $column_name) {
 			return true;
@@ -1132,17 +1169,15 @@ function ep_4_query($query) {
 	global $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error, $db;
 	$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
 	$ep_uses_mysqli = (substr($project, 0, 5) == "1.5.3");
-	//$db.prepare_input($query);
-	//$result = $db->Execute($query);
 	$result = ($ep_uses_mysqli ? mysqli_query($db->link, $query) : mysql_query($query));
 	if (($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno())) {
 		$ep_stack_sql_error = true;
 		if ($ep_debug_logging == true) {
-			$string = "MySQLi error ".($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno()).": ".($ep_uses_mysqli ? mysqli_error($db->link) : $mysql_error())."\nWhen executing:\n$query\n";
+			$string = ($ep_uses_mysqli ? "MySQLi" : "MySQL") . " error ".($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno() ) . ": ".($ep_uses_mysqli ? mysqli_error($db->link) : $mysql_error())."\nWhen executing:\n$query\n";
 			write_debug_log_4($string);
 		}
 	} elseif ($ep_debug_logging_all == true) {
-		$string = "MySQLi PASSED\nWhen executing:\n$query\n";
+		$string = ($ep_uses_mysqli ? "MySQLi" : "MySQL") . " PASSED\nWhen executing:\n$query\n";
 		write_debug_log_4($string);
 	}
 	return $result;
@@ -1172,7 +1207,9 @@ function install_easypopulate_4() {
 			('Convert Character 0x92',             'EASYPOPULATE_4_CONFIG_CHAR_92', '1', 'Convert Character 0x92 characters in Product Names &amp; Descriptions (default 1).<br><br>0=No Change<br>1=Replace with Standard Single Quote<br>2=Replace with HMTL equivalant', ".$group_id.", '15', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
 			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '16', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
 			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '17', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
-			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '18', NULL, now(), NULL, NULL)
+			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '18', NULL, now(), NULL, NULL),
+			('AutoCreate URL For CEON When Doesn\'t Exist','EP4_AUTOCREATE_FROM_BLANK','true','Enable Autogeneration of URIs with CEON (When it is installed) if a URI does not currently exist for the product upon export of the database?',".$group_id.", '19', NULL, now(), NULL, 'zen_cfg_select_option(array(array(''id''=>''true'',''text''=>''Yes''),array(''id''=>''false'',''text''=>''No'')))'), 
+			('AutoCreate URL For CEON - All Products','EP4_AUTORECREATE_EXISTING','false','Enable Autogeneration of URIs with CEON (When it is installed) for all products on export?',".$group_id.", '20', NULL, now(), NULL, 'zen_cfg_select_option(array(array(''id''=>''true'',''text''=>''Yes''),array(''id''=>''false'',''text''=>''No'')))') 
 		");
 	} elseif (substr($project,0,3) == "1.5") {
 		$db->Execute("INSERT INTO ".TABLE_CONFIGURATION_GROUP." (configuration_group_title, configuration_group_description, sort_order, visible) VALUES ('Easy Populate 4', 'Configuration Options for Easy Populate 4', '1', '1')");
@@ -1201,7 +1238,9 @@ function install_easypopulate_4() {
 			('Convert Character 0x92',             'EASYPOPULATE_4_CONFIG_CHAR_92', '1', 'Convert Character 0x92 characters in Product Names &amp; Descriptions (default 1).<br><br>0=No Change<br>1=Replace with Standard Single Quote<br>2=Replace with HMTL equivalant', ".$group_id.", '15', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
 			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '16', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
 			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '17', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
-			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '18', NULL, now(), NULL, NULL)
+			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '18', NULL, now(), NULL, NULL),
+			('AutoCreate URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_FROM_BLANK','1','Enable Autogeneration of URIs with CEON (When it is installed) if a URI does not currently exist for the product upon export of the database?',".$group_id.", '19', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate URL For CEON - All Products','EP4_AUTORECREATE_EXISTING','0','Enable Autogeneration of URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alterate products based on this setting.<br /><br />Yes - Assign all products the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for products already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br />',".$group_id.", '20', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'); 
 		");
 	} else { // unsupported version 
 		// i should do something here!

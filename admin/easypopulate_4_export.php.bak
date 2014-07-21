@@ -82,7 +82,7 @@ if ($ep_dltype == 'SBA_basic') {
 	$SBABasicArray = array();
 	$SBABasicArray['NumProducts'] = $NumProducts;
 	
-	while ($row = mysql_fetch_array($result7)) {
+	while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result7) : mysql_fetch_array($result7))) {
 		if ($row['v_products_id'] == $active_products_id) {
 			if ($row['v_options_id'] == $active_options_id) { //On a given Option but new value.
 				$Values++;
@@ -253,11 +253,12 @@ $last_products_id = "";
 $result = ep_4_query($filelayout_sql);
 
 if (ep_4_CEONURIExists() == true) {
+	$ep4CEONURIDoesExist = true;
 	require_once(DIR_FS_ADMIN . 'includes/classes/class.EP4CeonURIMappingAdminProductPages.php');
 	require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.CeonURIMappingAdmin.php');
 }
 
-while ($row = mysql_fetch_array($result)) {
+while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_array($result))) {
 
 	if ($ep_dltype == 'attrib_basic') { // special case 'attrib_basic'
 		if ($row['v_products_id'] == $active_products_id) {
@@ -336,8 +337,8 @@ while ($row = mysql_fetch_array($result)) {
 			if (isset($filelayout['v_products_attributes_filename'])) {
 				$sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . ' WHERE products_attributes_id = ' . $row['v_products_attributes_id'] . ' LIMIT 1';
 				$result2 = ep_4_query($sql2);
-				$row2 = mysql_fetch_array($result2);
-				if (mysql_num_rows($result2)) {
+				$row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+				if (($ep_uses_mysqli ? mysqli_num_rows($result2) : mysql_num_rows($result2))) {
 					$row['v_products_attributes_filename'] = $row2['products_attributes_filename'];
 					$row['v_products_attributes_maxdays'] = $row2['products_attributes_maxdays'];
 					$row['v_products_attributes_maxcount'] = $row2['products_attributes_maxcount'];
@@ -351,8 +352,8 @@ while ($row = mysql_fetch_array($result)) {
 			if (isset($filelayout['v_products_attributes_filename'])) /* Believe this should be an SBA filename; however, need to look at the filename assignment function to see how this works.  */ {
 				$sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . ' WHERE products_attributes_id = ' . $row['v_products_attributes_id'] . ' LIMIT 1';
 				$result2 = ep_4_query($sql2);
-				$row2 = mysql_fetch_array($result2);
-				if (mysql_num_rows($result2)) {
+				$row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+				if (($ep_uses_mysqli ? mysqli_num_rows($result2) : mysql_num_rows($result2))) {
 					$row['v_products_attributes_filename'] = $row2['products_attributes_filename'];
 					$row['v_products_attributes_maxdays'] = $row2['products_attributes_maxdays'];
 					$row['v_products_attributes_maxcount'] = $row2['products_attributes_maxcount'];
@@ -442,7 +443,7 @@ while ($row = mysql_fetch_array($result)) {
 			// metaData start
 			$sqlMeta = 'SELECT * FROM ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . ' WHERE products_id = ' . $row['v_products_id'] . ' AND language_id = ' . $lid . ' LIMIT 1 ';
 			$resultMeta = ep_4_query($sqlMeta);
-			$rowMeta = mysql_fetch_array($resultMeta);
+			$rowMeta = ($ep_uses_mysqli ? mysqli_fetch_array($resultMeta) : mysql_fetch_array($resultMeta));
 			$row['v_metatags_title_' . $lid] = $rowMeta['metatags_title'];
 			$row['v_metatags_keywords_' . $lid] = $rowMeta['metatags_keywords'];
 			$row['v_metatags_description_' . $lid] = $rowMeta['metatags_description'];
@@ -450,7 +451,7 @@ while ($row = mysql_fetch_array($result)) {
 			// for each language, get the description and set the vals
 			$sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_DESCRIPTION . ' WHERE products_id = ' . $row['v_products_id'] . ' AND language_id = ' . $lid . ' LIMIT 1 ';
 			$result2 = ep_4_query($sql2);
-			$row2 = mysql_fetch_array($result2);
+			$row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
 			$row['v_products_name_' . $lid] = $row2['products_name'];
 			$row['v_products_description_' . $lid] = $row2['products_description'];
 			if ($ep_supported_mods['psd'] == true) { // products short descriptions mod
@@ -458,33 +459,62 @@ while ($row = mysql_fetch_array($result)) {
 			}
 			$row['v_products_url_' . $lid] = $row2['products_url'];
 			
-			if (ep_4_CEONURIExists() == true) {
-			$ceon_uri_mapping_admin = new EP4CeonURIMappingAdminProductPages();
+			if ($ep4CEONURIDoesExist == true) {
+				$ceon_uri_mapping_admin = new EP4CeonURIMappingAdminProductPages();
+			}
 
 			//$prev_uri_mappings should = $uri_mappings, because previous mappings appears to be used to undo the new $uri_mappings.  These two values would be gathered from above.  $uri_mapping_autogen is used to automatically create a new mapping and is likely to be associated with an admin Constant.  Ideally, if the fields are present then if there is a value in the field will not auto create, if there is null then would want to autocreate.  If the fields are not present, then probably want a flag that says to autocreate the path assuming that it does not already exist.  $pID is the product id which should be gathered from above. "All" mappings need to be posted, ie, if there is more than one language, and only one mapping is passed in then the other mapping should be set to NULL at least eventually if there is nothing already there/rules of import... 
 			// isset($pID) && (!isset($prev_uri_mappings) or !isset($uri_mappings) or !isset($uri_mapping_autogen)) This will 
-			$prev_uri_mappings = $row['v_current_uri'];
-			$uri_mappings = $row['v_current_uri'];
-			$uri_mapping_autogen = '1';
+			if ($ep4CEONURIDoesExist == true) { 
+				if ($row['v_uri'] <> '') {
+					$prev_uri_mappings[$lid] = $row['v_uri'];
+					$uri_mappings[$lid] = $row['v_uri'];
+				} else {
+					$prev_uri_mappings = '';
+					$uri_mappings = '';
+				}
+			
+				$uri_mapping_autogen = true;
 			$pID = $row['v_products_id'];
 			$ceon_uri_mapping_admin->collectInfoHandler($prev_uri_mappings, $uri_mappings, $uri_mapping_autogen, $pID);
-			print_r($ceon_uri_mapping_admin);
+				//print_r($ceon_uri_mapping_admin);
 			//This is an unnecessary action essentially, as the data is already above.  That said, there are "controls" in the step that may be applicable later...  echo $ceon_uri_mapping_admin->collectInfoBuildURIMappingFields(); //Posts/sets results from collectInfoBuildURIMappingFields	
 					//product(or document_product or document_general or product_book or product_free_shipping or product_music)/preview_info
-			$products_name = $row2['products_name'];
+			}
+			$products_name[$lid] = $row2['products_name'];
 			$products_model = $row['v_products_model'];
-			$current_category_id = $row['v_category_id'];
-			
+			$current_category_id = $row['v_categories_id'];
+			//$print_r($products_name[$lid] . ' ' . $products_model . ' ' . $current_category_id);
+			//$uri_mapping_autogen = true;
 			 // if information is posted then go through data and collect/interprelate
-			 $Mappings = $ceon_uri_mapping_admin->productPreviewProcessSubmission($current_category_id, $prev_uri_mappings, $uri_mappings, $uri_mapping_autogen, $products_name, $products_model, $master_category, $pID);
-			//print_r($Mappings);
-			//$row['v_uri'] = $filelayout['v_uri'];
+			//$current_category_id, $products_name, $products_model, $master_category = NULL, $pID = NULL, $uri_mapping_autogen = NULL
+			if ($ep4CEONURIDoesExist == true) { 
+				$ceon_uri_mapping_admin->productPreviewProcessSubmission($current_category_id, $products_name, $products_model, $master_category, $pID, $uri_mapping_autogen);
+//				print ('About to display the admin \n');
+//				print_r($ceon_uri_mapping_admin);
+
+				// Check to see if mapping is supposed to be autogenerated from previous data.
+				if (isset($uri_mapping_autogen)) {
+					if ($row['v_uri'] == '') {
+						$prev_uri_mappings = ''; //$ceon_uri_mapping_admin->_prev_uri_mappings;
+						$uri_mappings = $ceon_uri_mapping_admin->_uri_mappings;
+						$row['v_uri'] = $ceon_uri_mapping_admin->_uri_mappings[$lid];
+						$row['v_current_uri'] = $ceon_uri_mapping_admin->_uri_mappings; 
+//						print_r($row['v_uri']);
+							$sqlselectpt = 'SELECT pt.type_handler FROM ' . TABLE_PRODUCT_TYPES . ' as pt INNER JOIN ' . TABLE_PRODUCTS . ' as p ON pt.type_id = p.products_type WHERE p.products_id = ' . $row['v_products_id'] . ';';
+							$resultselectpt = ep_4_query($sqlselectpt);
+							$rowselectpt = ($ep_uses_mysqli ? mysqli_fetch_array($resultselectpt) : mysql_fetch_array($resultselectpt));
+						$row['v_main_page'] = $rowselectpt['type_handler'] . '_info';
+						$row['v_associated_db_id'] = $pID;
+						$ceon_uri_mapping_admin->updateProductHandler($pID, $rowselectpt['type_handler'], $prev_uri_mappings, $uri_mappings);
+					}
+				}
+
 			$row['v_language_id'] = $lid;
 			$row['v_uri'] = $ceon_uri_mapping_admin->_uri_mappings[$lid];
 			$row['v_current_uri'] = $ceon_uri_mapping_admin->_uri_mappings; // $filalayout['v_current_uri'];
 			$row['v_main_page'] = $row['v_main_page'];
-			$row['v_query_string_parameters'] = $row['v_query_string_parameters'];
-			$row['v_associated_db_id'] = $pID;//  $row['v_associated_db_id'];
+				$row['v_associated_db_id'] = $row['v_associated_db_id'];
 			$row['v_date_added'] = $row['v_date_added'];
 			$row['v_products_model'] = $row['v_products_model'];
 			} // End of CEON Insert for Export
@@ -494,8 +524,8 @@ while ($row = mysql_fetch_array($result)) {
 	if (isset($filelayout['v_specials_price'])) {
 		$specials_query = ep_4_query('SELECT specials_new_products_price, specials_date_available, expires_date FROM ' .
 			   TABLE_SPECIALS . ' WHERE products_id = ' . $row['v_products_id']);
-		if (mysql_num_rows($specials_query)) {  // special
-			$ep_specials = mysql_fetch_array($specials_query);
+		if (($ep_uses_mysqli ? mysqli_num_rows($specials_query) : mysql_num_rows($specials_query)) ) {  // special
+			$ep_specials = ($ep_uses_mysqli ? mysqli_fetch_array($specials_query) : mysql_fetch_array($specials_query));
 			$row['v_specials_price'] = $ep_specials['specials_new_products_price'];
 			$row['v_specials_date_avail'] = $ep_specials['specials_date_available'];
 			$row['v_specials_expires_date'] = $ep_specials['expires_date'];
@@ -513,8 +543,8 @@ while ($row = mysql_fetch_array($result)) {
 			$lid = $lang['id'];
 			// metaData start
 			$sqlMeta = 'SELECT * FROM ' . TABLE_METATAGS_CATEGORIES_DESCRIPTION . ' WHERE categories_id = ' . $row['v_categories_id'] . ' AND language_id = ' . $lid . ' LIMIT 1 ';
-			$resultMeta = ep_4_query($sqlMeta) or die(mysql_error());
-			$rowMeta = mysql_fetch_array($resultMeta);
+			$resultMeta = ep_4_query($sqlMeta) or die(($ep_uses_mysqli ? mysqli_error($db->link) : mysql_error()));
+			$rowMeta = ($ep_uses_mysqli ? mysqli_fetch_array($resultMeta) : mysql_fetch_array($resultMeta));
 			$row['v_metatags_title_' . $lid] = $rowMeta['metatags_title'];
 			$row['v_metatags_keywords_' . $lid] = $rowMeta['metatags_keywords'];
 			$row['v_metatags_description_' . $lid] = $rowMeta['metatags_description'];
@@ -522,7 +552,7 @@ while ($row = mysql_fetch_array($result)) {
 			// for each language, get category description and name
 			$sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = ' . $row['v_categories_id'] . ' AND language_id = ' . $lid . ' LIMIT 1 ';
 			$result2 = ep_4_query($sql2);
-			$row2 = mysql_fetch_array($result2);
+			$row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
 			$row['v_categories_name_' . $lid] = $row2['categories_name'];
 			$row['v_categories_description_' . $lid] = $row2['categories_description'];
 		} // foreach
@@ -541,14 +571,14 @@ while ($row = mysql_fetch_array($result)) {
 			// mult-lingual categories start - for each language, get category description and name
 			$sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = ' . $thecategory_id . ' ORDER BY language_id';
 			$result2 = ep_4_query($sql2);
-			while ($row2 = mysql_fetch_array($result2)) {
+			while ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2))) {
 				$lid = $row2['language_id'];
 				$row['v_categories_name_' . $lid] = $row2['categories_name'] . $category_delimiter . $row['v_categories_name_' . $lid];
 			} //while
 			// look for parent categories ID
 			$sql3 = 'SELECT parent_id FROM ' . TABLE_CATEGORIES . ' WHERE categories_id = ' . $thecategory_id;
 			$result3 = ep_4_query($sql3);
-			$row3 = mysql_fetch_array($result3);
+			$row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
 			$theparent_id = $row3['parent_id'];
 			if ($theparent_id != '') { // Found parent ID, set thecategoryid to get the next level
 				$thecategory_id = $theparent_id;
@@ -567,19 +597,19 @@ while ($row = mysql_fetch_array($result)) {
 	if (isset($filelayout['v_artists_name']) && ($row['v_products_type'] == '2')) {
 		$sql_music_extra = 'SELECT * FROM ' . TABLE_PRODUCT_MUSIC_EXTRA . ' WHERE products_id = ' . $row['v_products_id'] . ' LIMIT 1';
 		$result_music_extra = ep_4_query($sql_music_extra);
-		$row_music_extra = mysql_fetch_array($result_music_extra);
+		$row_music_extra = ($ep_uses_mysqli ? mysqli_fetch_array($result_music_extra) : mysql_fetch_array($result_music_extra));
 		// artist
 		if (($row_music_extra['artists_id'] != '0') && ($row_music_extra['artists_id'] != '')) { // '0' is correct, but '' NULL is possible
 			$sql_record_artists = 'SELECT * FROM ' . TABLE_RECORD_ARTISTS . ' WHERE artists_id = ' . $row_music_extra['artists_id'] . ' LIMIT 1';
 			$result_record_artists = ep_4_query($sql_record_artists);
-			$row_record_artists = mysql_fetch_array($result_record_artists);
+			$row_record_artists = ($ep_uses_mysqli ? mysqli_fetch_array($result_record_artists) : mysql_fetch_array($result_record_artists));
 			$row['v_artists_name'] = $row_record_artists['artists_name'];
 			$row['v_artists_image'] = $row_record_artists['artists_image'];
 			foreach ($langcode as $key => $lang) {
 				$lid = $lang['id'];
 				$sql_record_artists_info = 'SELECT * FROM ' . TABLE_RECORD_ARTISTS_INFO . ' WHERE artists_id = ' . $row_music_extra['artists_id'] . ' AND languages_id = ' . $lid . ' LIMIT 1';
 				$result_record_artists_info = ep_4_query($sql_record_artists_info);
-				$row_record_artists_info = mysql_fetch_array($result_record_artists_info);
+				$row_record_artists_info = ($ep_uses_mysqli ? mysqli_fetch_array($result_record_artists_info) : mysql_fetch_array($result_record_artists_info));
 				$row['v_artists_url_' . $lid] = $row_record_artists_info['artists_url'];
 			}
 		} else {
@@ -594,14 +624,14 @@ while ($row = mysql_fetch_array($result)) {
 		if (($row_music_extra['record_company_id'] != '0') && ($row_music_extra['record_company_id'] != '')) { // '0' is correct, but '' NULL is possible
 			$sql_record_company = 'SELECT * FROM ' . TABLE_RECORD_COMPANY . ' WHERE record_company_id = ' . $row_music_extra['record_company_id'] . ' LIMIT 1';
 			$result_record_company = ep_4_query($sql_record_company);
-			$row_record_company = mysql_fetch_array($result_record_company);
+			$row_record_company = ($ep_uses_mysqli ? mysqli_fetch_array($result_record_company) : mysql_fetch_array($result_record_company));
 			$row['v_record_company_name'] = $row_record_company['record_company_name'];
 			$row['v_record_company_image'] = $row_record_company['record_company_image'];
 			foreach ($langcode as $key => $lang) {
 				$lid = $lang['id'];
 				$sql_record_company_info = 'SELECT * FROM ' . TABLE_RECORD_COMPANY_INFO . ' WHERE record_company_id = ' . $row_music_extra['record_company_id'] . ' AND languages_id = ' . $lid . ' LIMIT 1';
 				$result_record_company_info = ep_4_query($sql_record_company_info);
-				$row_record_company_info = mysql_fetch_array($result_record_company_info);
+				$row_record_company_info = ($ep_uses_mysqli ? mysqli_fetch_array($result_record_company_info) : mysql_fetch_array($result_record_company_info));
 				$row['v_record_company_url_' . $lid] = $row_record_company_info['record_company_url'];
 			}
 		} else {
@@ -612,7 +642,7 @@ while ($row = mysql_fetch_array($result)) {
 		if (($row_music_extra['music_genre_id'] != '0') && ($row_music_extra['music_genre_id'] != '')) { // '0' is correct, but '' NULL is possible
 			$sql_music_genre = 'SELECT * FROM ' . TABLE_MUSIC_GENRE . ' WHERE music_genre_id = ' . $row_music_extra['music_genre_id'] . ' LIMIT 1';
 			$result_music_genre = ep_4_query($sql_music_genre);
-			$row_music_genre = mysql_fetch_array($result_music_genre);
+			$row_music_genre = ($ep_uses_mysqli ? mysqli_fetch_array($result_music_genre) : mysql_fetch_array($result_music_genre));
 			$row['v_music_genre_name'] = $row_music_genre['music_genre_name'];
 		} else {
 			$row['v_music_genre_name'] = '';
@@ -626,7 +656,7 @@ while ($row = mysql_fetch_array($result)) {
 		if (($row['v_manufacturers_id'] != '0') && ($row['v_manufacturers_id'] != '')) { // '0' is correct, but '' NULL is possible
 			$sql2 = 'SELECT manufacturers_name FROM ' . TABLE_MANUFACTURERS . ' WHERE manufacturers_id = ' . $row['v_manufacturers_id'];
 			$result2 = ep_4_query($sql2);
-			$row2 = mysql_fetch_array($result2);
+			$row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
 			$row['v_manufacturers_name'] = $row2['manufacturers_name'];
 		} else {  // this is to fix the error on manufacturers name
 			// $row['v_manufacturers_id'] = '0';  blank name mean 0 id - right? chadd 4-7-09
@@ -642,7 +672,7 @@ while ($row = mysql_fetch_array($result)) {
 				   TABLE_PRODUCTS_DISCOUNT_QUANTITY . ' WHERE products_id = ' .
 				   $row['v_products_id'] . ' AND discount_id=' . $discount_index;
 			$result2 = ep_4_query($sql2);
-			$row2 = mysql_fetch_array($result2);
+			$row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
 			$row['v_discount_price_' . $discount_index] = $row2['discount_price'];
 			$row['v_discount_qty_' . $discount_index] = $row2['discount_qty'];
 		}

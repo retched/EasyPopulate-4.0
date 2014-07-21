@@ -1,0 +1,118 @@
+body {/*th, td required here also due to use of incomplete DOCTYPE */
+	font-size: 8pt;
+	font-family: Verdana, Helvetica, Arial, sans-serif;
+	background-color: #CCC;
+	margin:10px;
+}
+
+table {border-collapse:collapse;font-size: 9pt;}
+table,th, td {border: 1px solid #CCC;padding: 5px;}
+table ul {list-style-type: none; margin:5px; padding:0;}
+
+ul.tabs {
+margin: 0;
+padding: 0;
+float: left;
+list-style: none;
+height: 32px; /*--Set height of tabs--*/
+border-bottom: 1px solid #999;
+border-left: 1px solid #999;
+width: 850px; 
+}
+
+ul.tabs li {
+float: left;
+margin: 0;
+padding: 0;
+height: 31px; /*--Subtract 1px from the height of the unordered list--*/
+line-height: 31px; /*--Vertically aligns the text within the tab--*/
+border: 1px solid #999;
+border-left: none;
+margin-bottom: -1px; /*--Pull the list item down 1px--*/
+overflow: hidden;
+position: relative;
+background: #e0e0e0;
+}
+
+ul.tabs li a {
+text-decoration: none;
+color: #000;
+display: block;
+font-size: 1.2em;
+padding: 0 10px;
+border: 1px solid #fff; /*--Gives the bevel look with a 1px white border inside the list item--*/
+outline: none;
+}
+
+ul.tabs li a:hover {
+background: #ccc;
+}
+
+html ul.tabs li.active, html ul.tabs li.active a:hover  { /*--Makes sure that the active tab does not listen to the hover properties--*/
+background: #fff;
+border-bottom: 1px solid #fff; /*--Makes the active tab look like it's connected with its content--*/
+}
+
+.tab_wrapper {
+border: 1px solid #999;
+border-top: none;
+overflow: hidden;
+clear: both;
+float: left; width: 850px;
+background: #fff;
+}
+
+.tab_content {
+padding: 20px;
+font-size: 1.2em;
+color:#333;
+}
+
+h1, h2, h3, h4, h5, h6, pre, blockquote, form, fieldset, table, ul {
+	margin: 1em 0;
+	
+		margin-top: 0;
+	margin-bottom: 0.8em;
+	line-height: 1.3em;
+	
+	
+}
+
+
+
+/* Remove border around linked images */
+a img {
+	border: 0;
+}
+
+hr { 
+	border: 0;
+	color: #777;
+	height: 2px;
+	margin-top: 0.7em;
+	margin-bottom: 0.7em;
+}
+
+
+fieldset {
+	background: #f6f6f8;
+	padding: 0.5em 0.5em 0.5em 0.5em;
+	margin: 0 0 1em 0;
+	border: 1px solid #ccc;
+}
+
+legend {
+	font-family : arial, helvetica, sans-serif;
+}
+
+body {
+	font-family: arial, helvetica, sans-serif;
+	font-size: 75%;
+	line-height: 1.25;
+}
+p {
+	margin-top: 0;
+	margin-bottom: 0.8em;
+	line-height: 1.3em;
+}
+

@@ -1,0 +1,317 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+
+<meta http-equiv="pragma" content="no-cache">  
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">  
+<meta name="author" content="chadderuski">  
+<meta name="description" content="Easy Populate 4 User Manual">
+<meta http-equiv="content-language" content="en"> 
+  
+<title>EasyPopulate 4 for Zen Cart 1.38x/1.39x/1.5x</title>
+
+<link rel="stylesheet" type="text/css" href="includes/css/stylesheet.css">  
+<script type="text/javascript" src="includes/jscript/jquery.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+// Default Action
+$(".tab_content").hide(); // Hide all content
+$("ul.tabs li:first").addClass("active").show(); // Activate first tab
+$(".tab_content:first").show(); // Show first tab content
+// On Click Event
+$("ul.tabs li").click(function() {
+$("ul.tabs li").removeClass("active"); // Remove any "active" class
+$(this).addClass("active"); // Add "active" class to selected tab
+$(".tab_content").hide(); // Hide all tab content
+var activeTab = $(this).find("a").attr("href"); // Find the rel attribute value to identify the active tab + content
+$(activeTab).fadeIn(); // Fade in the active content
+return false;});});
+</script>
+</head>
+
+<body>
+
+<h2>Easy Populate 4.0.x</h2>
+<!-- Main Sections -->
+<ul class="tabs">
+    <li><a href="#tab1">Introduction</a></li>
+    <li><a href="#tab2">Installation</a></li>
+    <li><a href="#tab3">Configuration</a></li>
+    <li><a href="#tab4">Export</a></li>
+    <li><a href="#tab5">Import</a></li>
+    <li><a href="#tab6">Attributes</a></li>
+    <li><a href="#tab7">blank</a></li>
+    <li><a href="#tab8">blank</a></li>    
+    <li><a href="#tab9">blank</a></li>
+    <li><a href="#tab10">Credits</a></li>
+</ul>
+
+<div class="tab_wrapper"><!-- Main wrapper for all tabs -->
+
+    <div id="tab1" class="tab_content">
+    	<h3>EasyPopulate 4 for Zen Cart<sup>&reg;</sup> 1.38x/1.39x/1.5x</h3>
+        
+    <fieldset><legend>Important</legend>
+    	<p>Please read all installation and use documentation before using EP4, and especially follow first run practices
+        so you will have the best experience in using EP4.</p>
+  	</fieldset>
+    
+    <p>Easy Populate 4 (EP4) is an administrative tool for Zen Cart versions 1.38 thru 1.5x which allows you to import and export
+    a wide variety of information from your databases.</p>
+    
+    <p>Easy Populate 4 supports:
+    	<ul>
+        	<li>Multiple Languges
+            <li>Products Data</li>
+            <li>Product Meta Tags</li>
+            <li>Support for extras: Record Artist, Companies and Music Genres
+            <li>Automatic Category creation with multi-lingual support</li>
+            <li>Categories Meta Tags</li>
+            <li>Basic and Detailed Attribute Importing</li>
+            <li>Support for Specials and Featured Products
+            <li>User Defined Products Fields</li>
+        	<li>Filterable Exports</li>
+            <li>File Manager for uploaded CSV files</li>
+        </ul>
+     <hr>
+    </div> <!-- tab1 -->
+
+    <div id="tab2" class="tab_content">
+	    <h3>Installing EasyPopulate 4</h3>
+
+		<fieldset><legend>Prior to Installation</legend>
+    		<p>I highly recommend that you install Dr. Bytes "Backup MySQL" plugin before installing
+            and using EasyPopulate 4. The Backup MySQL plugin will allow you to easily backup and 
+            restore your databases from within the Zen Cart admin.</p>
+			<p>The Backup MySQL plugin can be found in the Plugins section of the Zen Cart website.<p>
+  		</fieldset>
+        
+        <h4>Compatibility</h4>
+        <p>Easy Populate 4 has been written to be indepent from earlier versions including, but not limited to, 
+        EP v1.2.5.4, EP v2.x, and Langer's Easy Populate Advanced 3.0.3. This means that you can install EP4 along 
+        side another version of Easy Populate without conflicts between the two versions.</p>
+        
+        <p>It is important to note that EP4 has been writting with many different features that are NOT compatible with other
+        versions of Easy Populate. This means that you cannot take a file you've exported from an earlier version and import it
+        with EP4 without first modifying the file to be compatible.</p>
+        
+        <h4>Installation</h4>
+        
+        <p><b>1. Copy extra files to your "admin" folder:</b><br>
+        If you are using Zen Cart 1.3x, copy the file/folders in the "zencart 1.3x extra file" folder to the
+        "admin" folder maintaining the same folder structure.</p>
+        <p>Short-Cut:<br>
+        Copy zencart 1.3x extra file > admin > includes > boxes folder to:<br>
+        admin > includes
+        </p>
+        
+        <p>If you are using Zen Cart 1.5x, copy the file/folders in the "zencart 1.5x extra file" folder to the
+        your_admin folder maintaining the same folder structure.</p>
+        <p>Short-Cut:<br>
+		Copy zencart 1.5x extra file > admin > includes > functions > extra_functions > reg_easypopulate_4.php to:<br>
+        admin > includes > functions > extra_functions folder.</p>
+        
+        <p><b>2. Rename your "admin" folder and upload to server:</b><br>
+        In the download package you will see a folder named: <i>admin</i>. This folder needs to be renamed to match the 
+        name of your admin folder on your server, and uploaded to the same location.</p>
+        
+        <p><b>3. Upload temporary files folder:</b><br>
+        In the download package you will see a folder named: <i>ep4_temp</i>. This is a temporary working folder that EP4
+        will use for importing and exporting your data files.</p>
+        
+        <p>By default, EP4 will look for this folder in the root of your website.</p>
+        
+        <fieldset><legend>Folder Permissions</legend>Depending on your server's configuration, you may need to change this folder's read/write
+        permissions. This will usally be either 755 or 777.</fieldset>
+        
+        <h4>Optional: Securing Your Uploads Folder</h4>
+        Moving your temporary working folder into your admin folder can provide added security for your data.
+        <p>For Zencart 1.5x, you will need to edit the .htaccess file (the one inside your admin folder, be sure
+        to edit the correct one!)
+        
+<fieldset><legend>On or about line 27 of your .htaccess file find:</legend>
+<pre><code>    # but now allow just *certain* necessary files:
+    &lt;FilesMatch &#34;(^$|^favicon.ico$|.*\.(php|js|css|jpg|gif|png)$)&#34;&gt;
+      Order Allow,Deny
+      Allow from all
+    &lt;/FilesMatch></code></pre>
+</fieldset>
+
+<fieldset><legend>and change to:</legend>
+<pre><code>    # but now allow just *certain* necessary files:
+    &lt;FilesMatch &#34;(^$|^favicon.ico$|.*\.(php|js|css|jpg|gif|png|csv|txt|log)$)&#34;&gt;
+      Order Allow,Deny
+      Allow from all
+    &lt;/FilesMatch&gt;</code></pre>
+</fieldset>
+
+        <p><b>4. Log in to your store admin and run the installer:</b><br>
+        Log into your store admin and navigate to: Tools > Easy Populate 4
+        
+        <p>It is normal to receive two warnings when first installing EP4:
+        
+        <fieldset><b>Easy Populate "Uploads Folder" missing!</b>
+		<br>Your uploads folder is missing. Your configuration indicates that your uploads folder is named <b>EASYPOPULATE_4_CONFIG_TEMP_DIR/</b>, and is located in <b>/home/your_site/public_html/</b>.
+		<br><b>Easy Populate Configuration Missing.</b> Please install your configuration by 
+        clicking <span style="color:blue">Install EP4</span></fieldset>
+        
+        <p>Click the <span style="color:blue">Install EP4</span> link to install the Configuration variables for EP4.</p>
+        
+        <p>EP4 is now ready for use with default configuration settings. Click the Configuration tab of this document to review 
+        configuration options.
+    </div> <!-- tab2 -->
+
+    <div id="tab3" class="tab_content">
+		<h3>Configuring Easy Populate 4</h3>
+        From with your Zen Cart admin, navigate to Configuration > Easy Populate 4
+    	<table width="80%" border="0">
+
+<table width="100%" border="1">
+  <tr>
+    <th scope="col">Setting&nbsp;</th>
+    <th scope="col">Default&nbsp;</th>
+    <th scope="col">Notes&nbsp;</th>
+  </tr>
+  <tr>
+    <td>Uploads Directory&nbsp;</td>
+    <td>ep4_temp/&nbsp;</td>
+    <td>Name of temporary workingdirectory for your uploads. Be sure to include traily slash "/" character.&nbsp;</td>
+  </tr>
+  <tr>
+    <td>Upload File Date Format&nbsp;</td>
+    <td>m-d-y&nbsp;</td>
+    <td>Note: This value is not currently implemented. Use the default raw date format YYYY-MM-DD, eg: 2005-09-26 09:00:00&nbsp;</td>
+  </tr>
+  <tr>
+    <td>Default Raw Time&nbsp;</td>
+    <td>09:00:00&nbsp;</td>
+    <td>Note: This value is not currently implemented.&nbsp;</td>
+  </tr>
+  <tr>
+    <td>Upload/Download Prices Include Tax&nbsp;</td>
+    <td>false&nbsp;</td>
+    <td>(Legacy Code) Choose to include or exclude tax, depending on how you manage prices outside of Zen Cart.<br>NOTE:
+    I do not see the purpose or usefulness of this setting and it may be removed in furture updates.&nbsp;</td>
+  </tr>  
+  <tr>
+    <td>Verbose Feedback&nbsp;</td>
+    <td>true&nbsp;</td>
+    <td>When importing, report all messages. Set to false for only warnings and errors.<br>NOTE: I recommend setting
+    to false for large file imports as this will conserve memory and increase script performance.&nbsp;</td>
+  </tr>  
+  <tr>
+    <td>Set Zero Quantity Products Inactive&nbsp;</td>
+    <td>false&nbsp;</td>
+    <td>When uploading, make the status Inactive for products with zero quantity, i.e. v_products_quantity = 0&nbsp;</td>
+  </tr>
+  <tr>
+    <td>Replace Newlines&nbsp;</td>
+    <td>false&nbsp;</td>
+    <td>Replace newline and/or carriage returns within description fields with HTML line-breaks at import.&nbsp;</td>
+  </tr>  
+  <tr>
+    <td>Debug Logging&nbsp;</td>
+    <td>true&nbsp;</td>
+    <td>Allow Easy Populate to generate an error log on errors only.&nbsp;</td>
+  </tr> 
+  
+  <tr>
+    <td>Maximum Quantity Discounts&nbsp;</td>
+    <td>3&nbsp;</td>
+    <td>Maximum number of quantity discounts (price breaks). Is the number of discount columns in download file&nbsp;</td>
+  </tr>
+  
+  <tr>
+    <td>Split On Number of Records&nbsp;</td>
+    <td>2000&nbsp;</td>
+    <td>Number of records to split csv files. Used to break large import files into smaller files. 
+    Useful on servers with limited resourses.&nbsp;</td>
+  </tr> 
+  <tr>
+    <td>Script Execution Time&nbsp;</td>
+    <td>60&nbsp;</td>
+    <td>Number of seconds for script to run before timeout. May not work on some servers.<br>
+    NOTE: This does not work on all server configuration as the hosting environment may either
+    limit or disable the ablility to set timeout.&nbsp;</td>
+  </tr> 
+  <tr>
+    <td>Convert Curly Quotes, etc.&nbsp;</td>
+    <td>0 (no change)&nbsp;</td>
+    <td>Convert Curly Quotes, Em-Dash, En-Dash and Ellipsis characters in Products Description.
+<ul><li>0=No Change
+<li>1=Replace with Basic Characters
+<li>2=Replace with HMTL equivalants</ul></td>
+  </tr> 
+  
+  <tr>
+    <td>Convert Character 0x92&nbsp;</td>
+    <td>1 (enabled)&nbsp;</td>
+    <td>Convert Character 0x92 characters in Product Names and Descriptions.
+<ul><li>0=No Change
+<li>1=Replace with Standard Single Quote
+<li>2=Replace with HMTL equivalant</ul></td>
+  </tr> 
+  
+  <tr>
+    <td>Enable Products Meta Tags Data&nbsp;</td>
+    <td>1 (enabled)&nbsp;</td>
+    <td>Enable Products Meta Data Columns&nbsp;</td>
+  </tr> 
+  <tr>
+    <td>Enable Products Music Data&nbsp;</td>
+    <td>0 (disabled)&nbsp;</td>
+    <td>Enable Products Music Data Columns&nbsp;</td>
+  </tr> 
+  <tr>
+    <td>User Defined Products Fields&nbsp;</td>
+    <td>blank&nbsp;</td>
+    <td>User Defined Products Table Fields (comma delimited, no spaces)<br>
+    NOTE: These are the actual FIELD names in the PRODUCT table only. Other tables
+    are not supported at this time. Be sure to use the actual field name in the table,
+    not the column header, ie products_upc (not v_products_upc)&nbsp;</td>
+  </tr> 
+</table>
+    </div> <!-- tab3 -->
+
+    <div id="tab4" class="tab_content">
+		<h3>Exporting Data</h3>
+		<p></p>
+    </div> <!-- tab4 -->
+
+	<div id="tab5" class="tab_content">
+		<h3>Importing Data</h3>
+        <p></p>
+	</div> <!-- tab5 -->
+
+    <div id="tab6" class="tab_content">
+		<h3>Working with Attributes</h3>
+		<p></p>  
+    </div> <!-- tab6 -->
+
+    <div id="tab7" class="tab_content">
+       <h3>Tab 7 Content</h3>
+       <p></p>
+    </div> <!-- tab7 -->
+    
+    <div id="tab8" class="tab_content">
+       <h3>Tab 8 Content</h3>
+       <p></p>
+    </div> <!-- tab8 -->
+
+    <div id="tab9" class="tab_content">
+       <h3>Tab 9 Content</h3>
+       <p></p>
+    </div> <!-- tab9 -->
+    
+    <div id="tab10" class="tab_content">
+       <h3>Credits</h3>
+       <p>EasyPopulate 4 is an amalgamation of code and ideas from earlier versions of EP, and my own customizations and ideas. 
+       	All due recognition is given to these earlier works and those author's efforts:<br>
+		Langer for bringing us 1.2.5.4 from OsCommerce, Phazie for his efforts to move to CSV, 
+        jbcholdings for his ideas in Attributr, and all the forum participation over 
+        the years from users ... Scrat, Elkbow, Schoolboy... too many to mention!</p>
+    </div> <!-- tab10 -->
+
+</div>
+</body>
+</html>
