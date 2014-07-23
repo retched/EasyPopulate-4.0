@@ -265,7 +265,7 @@ $result = ep_4_query($filelayout_sql);
 
 if (ep_4_CEONURIExists() == true) {
 	$ep4CEONURIDoesExist = true;
-	require_once(DIR_FS_ADMIN . 'includes/classes/class.EP4CeonURIMappingAdminProductPages.php');
+	require_once(DIR_FS_ADMIN . DIR_WS_CLASSES . 'class.EP4CeonURIMappingAdminProductPages.php');
 	require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.CeonURIMappingAdmin.php');
 }
 
@@ -477,7 +477,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			//$prev_uri_mappings should = $uri_mappings, because previous mappings appears to be used to undo the new $uri_mappings.  These two values would be gathered from above.  $uri_mapping_autogen is used to automatically create a new mapping and is likely to be associated with an admin Constant.  Ideally, if the fields are present then if there is a value in the field will not auto create, if there is null then would want to autocreate.  If the fields are not present, then probably want a flag that says to autocreate the path assuming that it does not already exist.  $pID is the product id which should be gathered from above. "All" mappings need to be posted, ie, if there is more than one language, and only one mapping is passed in then the other mapping should be set to NULL at least eventually if there is nothing already there/rules of import... 
 			// isset($pID) && (!isset($prev_uri_mappings) or !isset($uri_mappings) or !isset($uri_mapping_autogen)) This will 
 			if ($ep4CEONURIDoesExist == true) { 
-				if ($row['v_uri'] <> '') {
+				if (zen_not_null($row['v_uri'])) {
 					$prev_uri_mappings[$lid] = $row['v_uri'];
 					$uri_mappings[$lid] = $row['v_uri'];
 				} else {
@@ -485,8 +485,8 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 					$uri_mappings = '';
 				}
 			
-				$uri_mapping_autogen = (((!($row['v_uri'] <> '') && EP4_AUTOCREATE_FROM_BLANK == '1') || EP4_AUTORECREATE_EXISTING == '1' || (EP4_AUTORECREATE_EXISTING == '2' && (EP4_AUTOCREATE_FROM_BLANK == '1' || (EP4_AUTOCREATE_FROM_BLANK == '0' && $row['v_uri'] != '')))) ? true : false);
-				print('uri_mapping: ' . ($uri_mapping_autogen? 'true': 'false') . '<br />');
+				$uri_mapping_autogen = ((!zen_not_null($row['v_uri']) && EP4_AUTOCREATE_FROM_BLANK == '1') || EP4_AUTORECREATE_EXISTING == '1' || (EP4_AUTORECREATE_EXISTING == '2' && (EP4_AUTOCREATE_FROM_BLANK == '1' || (EP4_AUTOCREATE_FROM_BLANK == '0' && zen_not_null($row['v_uri'])))));
+//				print('uri_mapping: ' . ($uri_mapping_autogen? 'true': 'false') . '<br />');
 				$pID = $row['v_products_id'];
 				$ceon_uri_mapping_admin->collectInfoHandler($prev_uri_mappings, $uri_mappings, $uri_mapping_autogen, $pID);
 				//print_r($ceon_uri_mapping_admin);
@@ -496,6 +496,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			$products_name[$lid] = $row2['products_name'];
 			$products_model = $row['v_products_model'];
 			$current_category_id = $row['v_categories_id'];
+			$master_category = $row['v_master_categories_id']; //mastercategory($pID);
 			//$print_r($products_name[$lid] . ' ' . $products_model . ' ' . $current_category_id);
 			//$uri_mapping_autogen = true;
 			 // if information is posted then go through data and collect/interprelate
@@ -510,27 +511,28 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 					//Write to error file.
 					write_debug_log_4($ceon_uri_mapping_admin->_autogeneration_errors[$lid]);
 				}
-				if (isset($uri_mapping_autogen) && !isset($ceon_uri_mapping_admin->_autogeneration_errors[$lid])) {
-					if ($row['v_uri'] == '') {
-						$prev_uri_mappings = ''; //$ceon_uri_mapping_admin->_prev_uri_mappings;
+//				print ('errors: '. (isset($ceon_uri_mapping_admin->_autogeneration_errors[$lid]) ? 'true': 'false'). '<br />');
+				if ($uri_mapping_autogen && !isset($ceon_uri_mapping_admin->_autogeneration_errors[$lid])) {
+//					if ($row['v_uri'] == '') { // Autogenerate uris as necessary.
+						$prev_uri_mappings = $ceon_uri_mapping_admin->_prev_uri_mappings; //''; //$ceon_uri_mapping_admin->_prev_uri_mappings;
 						$uri_mappings = $ceon_uri_mapping_admin->_uri_mappings;
-						$row['v_uri'] = $ceon_uri_mapping_admin->_uri_mappings[$lid];
-						$row['v_current_uri'] = $ceon_uri_mapping_admin->_uri_mappings; 
+/*Captured Below*///						$row['v_uri'] = $ceon_uri_mapping_admin->_uri_mappings[$lid];
+/*Captured Below*///						$row['v_current_uri'] = $ceon_uri_mapping_admin->_uri_mappings; 
 //						print_r($row['v_uri']);
 							$sqlselectpt = 'SELECT pt.type_handler FROM ' . TABLE_PRODUCT_TYPES . ' as pt INNER JOIN ' . TABLE_PRODUCTS . ' as p ON pt.type_id = p.products_type WHERE p.products_id = ' . $row['v_products_id'] . ';';
 							$resultselectpt = ep_4_query($sqlselectpt);
 							$rowselectpt = ($ep_uses_mysqli ? mysqli_fetch_array($resultselectpt) : mysql_fetch_array($resultselectpt));
-						$row['v_main_page'] = $rowselectpt['type_handler'] . '_info';
-						$row['v_associated_db_id'] = $pID;
+/*Captured Below*///						$row['v_main_page'] = $rowselectpt['type_handler'] . '_info';
+/*Captured Below*///						$row['v_associated_db_id'] = $pID;
 						$ceon_uri_mapping_admin->updateProductHandler($pID, $rowselectpt['type_handler'], $prev_uri_mappings, $uri_mappings);
-					}
+//					} // autogenerate if supposed to autogenerate.
 				}
-
+				//Populate the output with the autogenerated data.
 			$row['v_language_id'] = $lid;
 			$row['v_uri'] = $ceon_uri_mapping_admin->_uri_mappings[$lid];
 			$row['v_current_uri'] = $ceon_uri_mapping_admin->_uri_mappings; // $filalayout['v_current_uri'];
-			$row['v_main_page'] = $row['v_main_page'];
-				$row['v_associated_db_id'] = $row['v_associated_db_id'];
+			$row['v_main_page'] = $rowselectpt['type_handler'] . '_info';
+				$row['v_associated_db_id'] = $pID;
 			$row['v_date_added'] = $row['v_date_added'];
 			$row['v_products_model'] = $row['v_products_model'];
 			} // End of CEON Insert for Export
