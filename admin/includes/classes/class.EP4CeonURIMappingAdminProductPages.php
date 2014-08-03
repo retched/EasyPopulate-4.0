@@ -89,11 +89,11 @@ class EP4CeonURIMappingAdminProductPages extends CeonURIMappingAdminProducts
 	// {{{ Class Constructor
 	
 	/**
-	 * Creates a new instance of the CeonURIMappingAdminProductPages class.
+	 * Creates a new instance of the EP4CeonURIMappingAdminProductPages class.
 	 * 
 	 * @access  public
 	 */
-	function CeonURIMappingAdminProductPages()
+	function EP4CeonURIMappingAdminProductPages()
 	{
 		// Load the language definition file for the current language
 		@include_once(DIR_WS_LANGUAGES . $_SESSION['language'] . '/' . 'ceon_uri_mapping_product_pages.php');
