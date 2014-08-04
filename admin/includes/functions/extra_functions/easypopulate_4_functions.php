@@ -268,7 +268,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 				$l_id = $lang['id'];
 				$filelayout[] =	'v_uri_' . $l_id;
 			}
-//			$filelayout[] =	'v_uri';
+			$filelayout[] =	'v_uri';
 			$filelayout[] =	'v_language_id';
 //			$filelayout[] =	'v_current_uri';
 			$filelayout[] =	'v_categories_id';
