@@ -487,61 +487,39 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			}
 
 			//$prev_uri_mappings should = $uri_mappings, because previous mappings appears to be used to undo the new $uri_mappings.  These two values would be gathered from above.  $uri_mapping_autogen is used to automatically create a new mapping and is likely to be associated with an admin Constant.  Ideally, if the fields are present then if there is a value in the field will not auto create, if there is null then would want to autocreate.  If the fields are not present, then probably want a flag that says to autocreate the path assuming that it does not already exist.  $pID is the product id which should be gathered from above. "All" mappings need to be posted, ie, if there is more than one language, and only one mapping is passed in then the other mapping should be set to NULL at least eventually if there is nothing already there/rules of import... 
-			// isset($pID) && (!isset($prev_uri_mappings) or !isset($uri_mappings) or !isset($uri_mapping_autogen)) This will 
 			if ($ep4CEONURIDoesExist == true) { 
-				/*if (zen_not_null($row['v_uri'])) {
-					$prev_uri_mappings[$lid] = $row['v_uri'];
-					$uri_mappings[$lid] = $row['v_uri'];
-					write_debug_log_4("uri Exists: ");
 
-					write_debug_log_4($row['v_uri'] . "\n");
-				} else { */
-//					$prev_uri_mappings[$lid] = '';
-//					$uri_mappings[$lid] = '';
-//					unset($prev_uri_mapping);
-//					unset($uri_mappings);
-
-					if (sizeof($langcode) > 0) {
-						foreach ($langcode as $key2 => $lang2) {
-							$lid2 = $lang2['id'];
-							$prev_uri_mappings[$lid2] = NULL;
-							$uri_mappings[$lid2] = NULL;
-							$ceon_uri_mapping_admin->_prev_uri_mappings[$lid2] = $prev_uri_mappings[$lid2];
-							$ceon_uri_mapping_admin->_uri_mappings[$lid2] = $uri_mappings[$lid2];
-							write_debug_log_4("A Languages: " . $row['v_products_id'] . " ". $lid2 . " \n");
-						} //Cycle through Languages
-					} else {
-						$prev_uri_mappings = NULL;
-						write_debug_log_4("No Lnaguage: " . $row['v_products_id'] . " ". $lid . " \n");
-					} // Assign the one language as NULL.
+				if (sizeof($langcode) > 0) {
+					foreach ($langcode as $key2 => $lang2) {
+						$lid2 = $lang2['id'];
+						$prev_uri_mappings[$lid2] = NULL;
+						$uri_mappings[$lid2] = NULL;
+						$ceon_uri_mapping_admin->_prev_uri_mappings[$lid2] = $prev_uri_mappings[$lid2];
+						$ceon_uri_mapping_admin->_uri_mappings[$lid2] = $uri_mappings[$lid2];
+						write_debug_log_4("A Language: " . $row['v_products_id'] . " ". $lid2 . " \n");
+					} //Cycle through Languages
+				} else {
+					$prev_uri_mappings = NULL;
+					write_debug_log_4("No Language: " . $row['v_products_id'] . " ". $lid . " \n");
+				} // Assign the one language as NULL.
 						
-//					$uri_mappings[$lid] = NULL;
-//					write_debug_log_4("uri Does not Exist: " . $row['v_products_id'] . " ". $lid . " \n");
-				//}
-			
-//				$ceon_uri_mapping_admin->_prev_uri_mappings = $prev_uri_mappings;
-//				$ceon_uri_mapping_admin->_urimappings = $uri_mappings;
-				
-//				print('uri_mapping: ' . ($uri_mapping_autogen? 'true': 'false') . '<br />');
 				$pID = $row['v_products_id'];
-				$ceon_uri_mapping_admin->collectInfoHandler($prev_uri_mappings, $uri_mappings, NULL /*$uri_mapping_autogen*/, $pID); // Automatically pulls the most recent information from the database Regardless of other settings.  This will return dta for a product that has already had a uri rewritten.
+				$ceon_uri_mapping_admin->collectInfoHandler($prev_uri_mappings, $uri_mappings, NULL, $pID); // Automatically pulls the most recent information from the database regardless of other settings.  This will return data for a product that has already had a uri rewritten.
 				$uri_mapping_autogen = ((!zen_not_null($ceon_uri_mapping_admin->_uri_mappings[$lid]) && EP4_AUTOCREATE_FROM_BLANK == '1') || EP4_AUTORECREATE_EXISTING == '1' || (EP4_AUTORECREATE_EXISTING == '2' && (EP4_AUTOCREATE_FROM_BLANK == '1' || (EP4_AUTOCREATE_FROM_BLANK == '0' && zen_not_null($ceon_uri_mapping_admin->_uri_mappings[$lid])))));
-				write_debug_log_4("Collect Info: " . ($uri_mapping_autogen ? "true" : "false"));
+				write_debug_log_4("Collect Info prev then URI: " . ($uri_mapping_autogen ? "true" : "false"));
 
 				write_debug_log_4(print_r($ceon_uri_mapping_admin->_prev_uri_mappings,true));
+				write_debug_log_4(print_r($ceon_uri_mapping_admin->_uri_mappings,true));
 				
-				//print_r($ceon_uri_mapping_admin);
 			//This is an unnecessary action essentially, as the data is already above.  That said, there are "controls" in the step that may be applicable later...  echo $ceon_uri_mapping_admin->collectInfoBuildURIMappingFields(); //Posts/sets results from collectInfoBuildURIMappingFields	
 					//product(or document_product or document_general or product_book or product_free_shipping or product_music)/preview_info
 			} //End if CEON Installed
 			
 
-//			$products_name[$lid] = $row2['products_name'];
-//			$products_name[$lid] = $row['v_products_name_' . $lid];
 			$products_model = $row['v_products_model'];
 			$current_category_id = $row['v_categories_id'];
 			$master_category = $row['v_master_categories_id']; //mastercategory($pID);
-			//$print_r($products_name[$lid] . ' ' . $products_model . ' ' . $current_category_id);
+
 			//$uri_mapping_autogen = true;
 			 // if information is posted then go through data and collect/interprelate
 			//$current_category_id, $products_name, $products_model, $master_category = NULL, $pID = NULL, $uri_mapping_autogen = NULL
@@ -551,30 +529,52 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 				write_debug_log_4("Current Cat: " . $current_category_id . " products Name: " . $products_name[$lid] . " Products Model: " . $products_model . " Master Cat: " . $master_category . " Prod ID: " . $pID . " AutoGen: " . ($uri_mapping_autogen ? "true" :"false") . "\n");
 				$ceon_uri_mapping_admin->_uri_mapping_autogen = $uri_mapping_autogen;
 				$returned = $ceon_uri_mapping_admin->productPreviewProcessSubmission($current_category_id, $products_name, $products_model, $master_category, $pID/*, $uri_mapping_autogen*/);  // This returns a rewritten URI if it is to be rewritten which includes all languages being rewritten.
-				write_debug_log_4("Preview Info: ");
+				write_debug_log_4("Preview Info \$returned: ");
 
 				write_debug_log_4(print_r($returned, true));
-//				print ('About to display the admin \n');
-//				print_r($ceon_uri_mapping_admin);
 
 				// Check to see if mapping is supposed to be autogenerated from previous data.
 //				write_debug_log_4(sizeof($ceon_uri_mapping_admin->_autogeneration_errors[$lid]));
 /*				if ($returned[$lid] == $ceon_uri_mapping_admin->_prev_uri_mappings[$lid]) {
-					write_debug_log_4("Stop<br />");
+					write_debug_log_4("Stop\n");
 				}*/
 				if ($returned == $ceon_uri_mapping_admin->_prev_uri_mappings) {
 					//Write to error file.
+					write_debug_log_4("returned == prev Heres prev: \n");
 					write_debug_log_4(print_r($ceon_uri_mapping_admin->_prev_uri_mappings,true));
+					write_debug_log_4("returned == prev Heres URI: \n");
+					write_debug_log_4(print_r($ceon_uri_mapping_admin->_uri_mappings,true));
 					$epNewCounter++;
 //					print("pregen error<br />");
+				} else {
+					write_debug_log_4("returned != prev Heres prev: \n");
+					write_debug_log_4(print_r($ceon_uri_mapping_admin->_prev_uri_mappings,true));
+					write_debug_log_4("returned != prev Heres URI: \n");
+					write_debug_log_4(print_r($ceon_uri_mapping_admin->_uri_mappings,true));
 				}
-				//write_debug_log_4("Counter: ". $epNewCounter . "\n\r");
-//				print ('errors: '. (isset($ceon_uri_mapping_admin->_autogeneration_errors[$lid]) ? 'true': 'false'). '<br />');
 //				if ($uri_mapping_autogen && ($returned != $ceon_uri_mapping_admin->_prev_uri_mappings)) {
 //					if ($row['v_uri'] == '') { // Autogenerate uris as necessary.
+				
+				// The below values are what are sent on to be updated.  These values must be what is desired to go forward if an update is to occur.
 						$prev_uri_mappings = $ceon_uri_mapping_admin->_prev_uri_mappings; //''; //$ceon_uri_mapping_admin->_prev_uri_mappings;
 						$uri_mappings = $ceon_uri_mapping_admin->_uri_mappings;
 
+//						((!zen_not_null($ceon_uri_mapping_admin->_uri_mappings[$lid]) && EP4_AUTOCREATE_FROM_BLANK == '1') || EP4_AUTORECREATE_EXISTING == '1' || (EP4_AUTORECREATE_EXISTING == '2' && (EP4_AUTOCREATE_FROM_BLANK == '1' || (EP4_AUTOCREATE_FROM_BLANK == '0' && zen_not_null($ceon_uri_mapping_admin->_uri_mappings[$lid])))))
+						
+						if (EP4_AUTOCREATE_FROM_BLANK == '1') {
+							//Cycle through languages, where previous is not blank, current = previous
+							foreach ($langcode as $key2 => $lang2) {
+								$lid2 = $lang2['id'];
+								if (zen_not_null($prev_uri_mappings[$lid2])) {
+									$uri_mappings[$lid2] = $prev_uri_mappings[$lid2];
+								}
+//								$prev_uri_mappings[$lid2] = NULL;
+//								$uri_mappings[$lid2] = NULL;
+//								$ceon_uri_mapping_admin->_prev_uri_mappings[$lid2] = $prev_uri_mappings[$lid2];
+//								$ceon_uri_mapping_admin->_uri_mappings[$lid2] = $uri_mappings[$lid2];
+//								write_debug_log_4("A Language: " . $row['v_products_id'] . " ". $lid2 . " \n");
+							} //Cycle through Languages
+						}
 						//Goal of the below is to omit a previously or to be rewritten url from being addressed in the rewrites, this should address the multiple languages
 						for ($increment=0, $n = sizeof($languages);$increment < $n;$increment++){
 							if ($languages[$increment]['id'] != $lid) {
@@ -586,9 +586,10 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 //								$ceon_uri_mapping_admin->_uri_mappings = $uri_mappings;
 							}
 						} //end for loop of languages
-				write_debug_log_4("PreUpdate Info: ");
+				write_debug_log_4("PreUpdate Info Prev: ");
 
 				write_debug_log_4(print_r($prev_uri_mappings, true));
+				write_debug_log_4("PreUpdate Info URI: ");
 				write_debug_log_4(print_r($uri_mappings, true));
 //						print_r($row['v_uri']);
 							$sqlselectpt = 'SELECT pt.type_handler FROM ' . TABLE_PRODUCT_TYPES . ' as pt INNER JOIN ' . TABLE_PRODUCTS . ' as p ON pt.type_id = p.products_type WHERE p.products_id = ' . $row['v_products_id'] . ';';
@@ -599,21 +600,25 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 /*Captured Below*///						$row['v_current_uri'] = $ceon_uri_mapping_admin->_uri_mappings; 
 /*Captured Below*///						$row['v_main_page'] = $rowselectpt['type_handler'] . '_info';
 /*Captured Below*///						$row['v_associated_db_id'] = $pID;
+//
+//
+				//Effective desire: if the option is to autogenerate data, and
+				// there is data to be updated then send it through.
 				if ($uri_mapping_autogen && ($returned != $ceon_uri_mapping_admin->_prev_uri_mappings)) {
 						$ceon_uri_mapping_admin->updateProductHandler($pID, $rowselectpt['type_handler'], $prev_uri_mappings, $uri_mappings);
-					} // autogenerate if supposed to autogenerate.
-					else {
+				} // autogenerate if supposed to autogenerate.
+				else {
 //						$prev_uri_mappings = NULL; //$ceon_uri_mapping_admin->_prev_uri_mappings; //''; //$ceon_uri_mapping_admin->_prev_uri_mappings;
 //						$uri_mappings = NULL; //$ceon_uri_mapping_admin->_uri_mappings;
 //						unset($prev_uri_mappings);
 //						unset($uri_mappings);
-					}
+				}
 //						unset($prev_uri_mappings);
 //						unset($uri_mappings);
 //						$ceon_uri_mapping_admin->_prev_uri_mappings = NULL;
 //						$ceon_uri_mapping_admin->_uri_mappings = NULL;
-						unset($ceon_uri_mapping_admin);
-						$ceon_uri_mapping_admin = new EP4CeonURIMappingAdminProductPages();
+//						unset($ceon_uri_mapping_admin);
+//						$ceon_uri_mapping_admin = new EP4CeonURIMappingAdminProductPages();
 				//}
 				//Populate the output with the autogenerated data.
 				//May need to add a switch to not update the exported data to show the new record(s).  This should be opposite or different than the switch above that would export the pre-autogeneration data.  Now, if the record is not autogenerated then this below should probably also be run, but if the item is not autogenerated then would want to export the below.  So this set of code could 

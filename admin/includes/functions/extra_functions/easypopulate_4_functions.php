@@ -244,11 +244,8 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 	case 'full': // FULL products download
 		if (ep_4_CEONURIExists() == true) {
 			$ep4CEONURIDoesExist = true;
-			require(DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_datafiles/ceon_uri_mapping_product_pages.php');
-			//print_r($ceon_uri_mapping_product_pages);
-			//global $ceon_uri_mapping_product_pages;
+			require(DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_datafiles/ceon_uri_mapping_product_pages.php');  // Brings in extra variables to support product page types.
 		}
-		//global $ceon_uri_mapping_product_pages;
 		// The file layout is dynamically made depending on the number of languages
 		$filelayout[] = 'v_products_model';
 		$filelayout[] = 'v_products_type'; // 4-23-2012
@@ -268,8 +265,8 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 				$l_id = $lang['id'];
 				$filelayout[] =	'v_uri_' . $l_id;
 			}
-			$filelayout[] =	'v_uri';
-			$filelayout[] =	'v_language_id';
+//			$filelayout[] =	'v_uri';
+//			$filelayout[] =	'v_language_id';
 //			$filelayout[] =	'v_current_uri';
 			$filelayout[] =	'v_categories_id';
 			$filelayout[] =	'v_main_page';
@@ -359,7 +356,8 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			}
 			$filelayout[] = 'v_music_genre_name';
 		}
-		$filelayout_sql = 'SELECT
+		$filelayout_sql = 'SELECT ' . ($ep4CEONURIDoesExist ? 'DISTINCT' : '' ) .
+'			   
 			p.products_id					as v_products_id,
 			p.products_model				as v_products_model,
 			p.products_type					as v_products_type,
@@ -387,9 +385,9 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			$filelayout_sql .=  'p.products_exclusive as v_products_exclusive,';
 		}
 		if ($ep4CEONURIDoesExist == true) {
-			$filelayout_sql .=	'c.uri as v_uri,';
+/*			$filelayout_sql .=	'c.uri as v_uri,';
 			$filelayout_sql .=	'c.language_id as v_language_id,';
-/*			$filelayout_sql .=	'c.current_uri as v_current_uri,';*/
+			$filelayout_sql .=	'c.current_uri as v_current_uri,';*/
 			$filelayout_sql .=	'c.main_page as v_main_page,';
 // Don't need for product			$filelayout_sql .=	'c.query_string_parameters as v_query_string_parameters,';
 			$filelayout_sql .=	'c.associated_db_id as v_associated_db_id,';
