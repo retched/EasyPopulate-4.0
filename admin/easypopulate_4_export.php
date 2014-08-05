@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4_export.php, v4.0.23 07-13-2014 mc12345678 $
+// $Id: easypopulate_4_export.php, v4.0.24CEON 08-04-2014 mc12345678 $
 
 // get download type
 $ep_dltype = (isset($_POST['export'])) ? $_POST['export'] : $ep_dltype;
@@ -568,6 +568,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 				}
 			} // End of CEON Insert for Export mc12345678
 		} // foreach
+		$messageStack->reset();
 	} // if($ep_dltype == 'full')
 	// BEGIN: Specials
 	if (isset($filelayout['v_specials_price'])) {

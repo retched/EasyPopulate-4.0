@@ -5,14 +5,16 @@
  *
  * This file contains a class which handles the functionality for category pages within the Zen Cart admin.
  *
- * @package     ceon_uri_mapping
+ * @package     ceon_uri_mapping with EasyPopulate Version 4
  * @author      Conor Kerr <zen-cart.uri-mapping@ceon.net>
+ * @modifier	 mc12345678
  * @copyright   Copyright 2008-2012 Ceon
  * @copyright   Copyright 2003-2007 Zen Cart Development Team
  * @copyright   Portions Copyright 2003 osCommerce
+ * @copyright	 mc12345678
  * @link        http://ceon.net/software/business/zen-cart/uri-mapping
  * @license     http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version     $Id: class.CeonURIMappingAdminCategoryPages.php 1054 2012-09-22 15:45:15Z conor $
+ * @version     $Id: class.CeonURIMappingAdminCategoryPages.php 1054 2014-08-04 15:45:15Z mc12345678 EP4.0.24CEON $
  */
 
 if (!defined('IS_ADMIN_FLAG')) {
@@ -30,13 +32,19 @@ require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.CeonURIMappingAdminCategor
 /**
  * Handles the functionality for category pages within the Zen Cart admin.
  *
- * @package     ceon_uri_mapping
+ * @package     ceon_uri_mapping with EasyPopulate Version 4
  * @author      Conor Kerr <zen-cart.uri-mapping@ceon.net>
+ * @modifier	 mc12345678
  * @copyright   Copyright 2008-2012 Ceon
  * @copyright   Copyright 2003-2007 Zen Cart Development Team
  * @copyright   Portions Copyright 2003 osCommerce
+ * @copyright	 Copyright 2013-2014 mc12345678
  * @link        http://ceon.net/software/business/zen-cart/uri-mapping
+ * @link2		 http://mc12345678.weebly.com
  * @license     http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
+ * @merged	 This product has been modified to work with EasyPopulate Version 4
+ * @merged	 Usage of this requires installation of the standard product.
+ * @merged	 Version this was first merged with was EP4 V4.0.24CEON
  */
 class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 {
