@@ -17,6 +17,7 @@ if ( isset($_GET['import']) ) {
 	$ep4CEONURIDoesExist = false;
 	if (ep_4_CEONURIExists() == true) {
 		$ep4CEONURIDoesExist = true;
+		require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.CeonURIMappingAdmin.php');
 		require(DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_datafiles/ceon_uri_mapping_product_pages.php');
 	}
 	
@@ -457,7 +458,7 @@ if ( isset($_GET['import']) ) {
 		
 if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolower(substr($file['name'],0,7)) <> "attrib-") && (ep_4_SBA1Exists() == true ? ( strtolower(substr($file['name'],0,4)) <> "sba-") : true )) { //  temporary solution here... 12-06-2010
 			
-if (ep_4_CEONURIExists() == true) {
+if ($ep4CEONURIDoesExist == true) {
 			//Order of calls:
 			//collect_info
 	require_once(DIR_WS_CLASSES . 'class.EP4CeonURIMappingAdminProductPages.php');
