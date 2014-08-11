@@ -55,7 +55,7 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 	 * 
 	 * @access  public
 	 */
-	function CeonURIMappingAdminCategoryPages()
+	function EP4CeonURIMappingAdminCategoryPages()
 	{
 		// Load the language definition file for the current language
 		@include_once(DIR_WS_LANGUAGES . $_SESSION['language'] . '/' . 'ceon_uri_mapping_category_pages.php');
@@ -80,6 +80,7 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 	 * @param   integer   $category_id   The ID of the category.
 	 * @param   integer   $current_category_id   The ID of the category's parent category.
 	 * @return  none
+	 * Called by update_category in categories.php
 	 */
 	function insertUpdateHandler($category_id, $current_category_id, $prev_uri_mappings, $uri_mappings, $categories_name, $uri_mapping_autogen = NULL)
 	{
@@ -94,6 +95,19 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 			if ($uri_mapping_autogen) {
 				$uri_mapping = $this->autogenCategoryURIMapping((int) $category_id, $current_category_id,
 					$categories_name[$languages[$i]['id']], $languages[$i]['code'], $languages[$i]['id']);
+				
+				//Need to test autogen rules against database switches.  And reassign $uri_mapping as applicable.
+				$uri_mapping_autogen = ((!zen_not_null($uri_mapping) && EP4_AUTOCREATE_CAT_FROM_BLANK == '1') || EP4_AUTORECREATE_CAT_EXISTING == '1' || (EP4_AUTORECREATE_CAT_EXISTING == '2' && (EP4_AUTOCREATE_CAT_FROM_BLANK == '1' || (EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && zen_not_null($uri_mapping)))));
+
+				if (EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && (EP4_AUTORECREATE_CAT_EXISTING == '2') && !zen_not_null($prev_uri_mapping)) {
+					//Cycle through languages, where previous is not blank, current = previous
+					$uri_mapping = $prev_uri_mapping;
+				}
+
+				if (EP4_AUTOCREATE_CAT_FROM_BLANK == '1' && (EP4_AUTORECREATE_CAT_EXISTING == '0') && zen_not_null($prev_uri_mapping)) {
+					//Cycle through languages, where previous is not blank, current = previous
+					$uri_mapping = $prev_uri_mapping;
+				}
 				
 				if ($uri_mapping == CEON_URI_MAPPING_GENERATION_ATTEMPT_FOR_CATEGORY_WITH_NO_NAME ||
 						$uri_mapping == CEON_URI_MAPPING_GENERATION_ATTEMPT_FOR_CATEGORY_PATH_PART_WITH_NO_NAME) {
@@ -197,6 +211,7 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 	 *
 	 * @access  public
 	 * @return  none
+	 * new_category calls this in categories.php
 	 */
 	function addURIMappingFieldsToAddCategoryFieldsArray()
 	{
@@ -222,6 +237,8 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 	 * @access  public
 	 * @param   integer   $category_id   The ID of the category.
 	 * @return  none
+	 * 
+	 * edit_category from categories.php calls this.
 	 */
 	function addURIMappingFieldsToEditCategoryFieldsArray($category_id)
 	{
@@ -250,9 +267,10 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 			$prev_uri_mappings_result->MoveNext();
 		}
 		
-		$uri_mapping_input_fields = $this->buildCategoryURIMappingFields($prev_uri_mappings);
+		$uri_mapping_input_fields = $this->buildCategoryURIMappingFields($prev_uri_mappings); //Should be able to copy this, or perhaps it needs to be returned? At this point $uri_mapping_input_fields will equal $prev_uri_mappings, either all blank, or will have the previous mappings.
 		
-		$contents[] = array('text' => $uri_mapping_input_fields);
+		return $uri_mapping_input_fields;
+		//$contents[] = array('text' => $uri_mapping_input_fields);
 	}
 	
 	// }}}
@@ -266,6 +284,8 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 	 * @access  public
 	 * @param   array     $prev_uri_mappings   An array of the current values for the URI mappings, if any.
 	 * @return  string    The html source for the input fields. (Need to revise to be the arrays of strings for the data.
+	 * 
+	 * this function in the categories.php file is called by this file only. 
 	 */
 	function buildCategoryURIMappingFields($prev_uri_mappings /* The following fields need to be added to the array being returned:  $uri_mappings, $autogen_selected, $num_prev_uri_mappings*/ )
 	{
@@ -285,6 +305,7 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 			$uri_mappings[$languages[$i]['id']] = $prev_uri_mappings[$languages[$i]['id']];
 		}
 		
+		// Not sure that this section really does anything necessary..
 		if ($this->_autogenEnabled()) {
 			if ($num_languages == 1) {
 				$autogen_message = CEON_URI_MAPPING_TEXT_CATEGORY_URI_AUTOGEN;
@@ -297,19 +318,19 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 			} else {
 				$autogen_selected = false;
 				
-				if ($num_prev_uri_mappings == 1) {
+				/*if ($num_prev_uri_mappings == 1) {
 					$autogen_message[] .= '<br />' . CEON_URI_MAPPING_TEXT_URI_AUTOGEN_ONE_EXISTING_MAPPING;
 				} else if ($num_prev_uri_mappings == $num_languages) {
 					$autogen_message[] .= '<br />' . CEON_URI_MAPPING_TEXT_URI_AUTOGEN_ALL_EXISTING_MAPPINGS;
 				} else {
 					$autogen_message[] .= '<br />' . CEON_URI_MAPPING_TEXT_URI_AUTOGEN_SOME_EXISTING_MAPPINGS;
-				}
+				}*/ // Not interested in knowing if one, or more mappings previously existed at least not via text.  Will determine this based on other actions/information.
 			}
 			
-			$uri_mapping_input_fields[] .= zen_draw_checkbox_field('uri-mapping-autogen', '1', $autogen_selected) .
-				' ' . $autogen_message;
+			//$uri_mapping_input_fields[] .= zen_draw_checkbox_field('uri-mapping-autogen', '1', $autogen_selected) .
+			//	' ' . $autogen_message;
 		} else {
-			$uri_mapping_input_fields[] .= CEON_URI_MAPPING_TEXT_URI_AUTOGEN_DISABLED;
+			//$uri_mapping_input_fields[] .= CEON_URI_MAPPING_TEXT_URI_AUTOGEN_DISABLED;
 		}
 		
 //		$uri_mapping_input_fields .= "</p>";

@@ -266,8 +266,10 @@ $result = ep_4_query($filelayout_sql);
 //Start CEON modification - mc12345678
 if (ep_4_CEONURIExists() == true) {
 	$ep4CEONURIDoesExist = true;
+	//May need to limit these loadings so that applicable to action being taken instead of loading them all.. (Memory hog if all loaded all the time and may have some sort of conflict).  Could use if statements here to load them.
 	require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.CeonURIMappingAdmin.php');
 	require_once(DIR_FS_ADMIN . DIR_WS_CLASSES . 'class.EP4CeonURIMappingAdminProductPages.php');
+	require_once(DIR_FS_ADMIN . DIR_WS_CLASSES . 'class.EP4CeonURIMappingAdminCategoryPages.php');
 } //End CEON modification - mc12345678
 
 while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_array($result))) {
@@ -573,7 +575,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 	// BEGIN: Specials
 	if (isset($filelayout['v_specials_price'])) {
 		$specials_query = ep_4_query('SELECT specials_new_products_price, specials_date_available, expires_date FROM ' .
-			   TABLE_SPECIALS . ' WHERE products_id = ' . $row['v_products_id']);
+ 			   TABLE_SPECIALS . ' WHERE products_id = ' . $row['v_products_id']);
 		if (($ep_uses_mysqli ? mysqli_num_rows($specials_query) : mysql_num_rows($specials_query)) ) {  // special
 			$ep_specials = ($ep_uses_mysqli ? mysqli_fetch_array($specials_query) : mysql_fetch_array($specials_query));
 			$row['v_specials_price'] = $ep_specials['specials_new_products_price'];
@@ -606,30 +608,50 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			$row['v_categories_name_' . $lid] = $row2['categories_name'];
 			$row['v_categories_description_' . $lid] = $row2['categories_description'];
 		} // foreach
-	} // if ($ep_dltype ...
+	} // if ($ep_dltype categorymeta...
 		
 	// CATEGORIES EXPORT
 	// chadd - 12-13-2010 - logic change. $max_categories no longer required. better to loop back to root category and 
 	// concatenate the entire categories path into one string with $category_delimiter for separater.
 	if (($ep_dltype == 'full') || ($ep_dltype == 'category')) { // chadd - 12-02-2010 fixed error: missing parenthesis
+		
 		// NEW While-loop for unlimited category depth			
-		$category_delimiter = "^";
+		$category_delimiter = "^"; //Need to move this to the admin panel
 		$thecategory_id = $row['v_categories_id']; // starting category_id
 		// $fullcategory = array(); // this will have the entire category path separated by $category_delimiter
-		// if parent_id is not null ('0'), then follow it up.
+		if ($ep4CEONURIDoesExist == true) {
+			$ceon_uri_cat_mapping = new EP4CeonURIMappingAdminCategoryPages();
+		}
+		// if parent_id is not null ('0'), then follow it up.  Perhaps this could be replaced by Zen's zen_not_null() function?
 		while (!empty($thecategory_id)) {
 			// mult-lingual categories start - for each language, get category description and name
+			if ($ep4CEONURIDoesExist == true) {
+				$uri_mappings = $ceon_uri_cat_mapping->addURIMappingFieldsToEditCategoryFieldsArray ($thecategory_id);
+				$prev_uri_mappings = $uri_mappings;
+				foreach ($langcode as $key2 => $lang2) {
+					$categories_name[$lang2['id']] = '';
+				}
+			}
+			
 			$sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = ' . $thecategory_id . ' ORDER BY language_id';
 			$result2 = ep_4_query($sql2);
 			while ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2))) {
 				$lid = $row2['language_id'];
 				$row['v_categories_name_' . $lid] = $row2['categories_name'] . $category_delimiter . $row['v_categories_name_' . $lid];
+				$categories_name[$lid] = $row2['categories_name'];
 			} //while
 			// look for parent categories ID
 			$sql3 = 'SELECT parent_id FROM ' . TABLE_CATEGORIES . ' WHERE categories_id = ' . $thecategory_id;
 			$result3 = ep_4_query($sql3);
 			$row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
-			$theparent_id = $row3['parent_id'];
+
+			if ($ep4CEONURIDoesExist == true) {
+				$theparent_id = $row3['parent_id'];
+
+				$ceon_uri_cat_mapping->insertUpdateHandler($thecategory_id, $theparent_id, $prev_uri_mappings, $uri_mappings, $categories_name, true);
+			}
+			
+			
 			if ($theparent_id != '') { // Found parent ID, set thecategoryid to get the next level
 				$thecategory_id = $theparent_id;
 			} else { // Category Root Found
@@ -642,6 +664,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			$lid = $lang['id'];
 			$row['v_categories_name_' . $lid] = rtrim($row['v_categories_name_' . $lid], "^");
 		} // foreach
+		
 	} // if() delimited categories path
 		
 		//This will do all of the special work to provide the remaining row data:
@@ -929,7 +952,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			// $row['v_manufacturers_id'] = '0';  blank name mean 0 id - right? chadd 4-7-09
 			$row['v_manufacturers_name'] = ''; // no manufacturer name
 		}
-	}
+	} //End if isset v_manufacturers_name
 
 	// Price/Qty/Discounts
 	$discount_index = 1;
@@ -942,9 +965,9 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			$row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
 			$row['v_discount_price_' . $discount_index] = $row2['discount_price'];
 			$row['v_discount_qty_' . $discount_index] = $row2['discount_qty'];
-		}
+		} //end if v_products_discount_type == 0 then there are no quantity breaks
 		$discount_index++;
-	}
+	} // End While isset v_discount_qty
 
 	// We check the value of tax class and title instead of the id
 	// Then we add the tax to price if $price_with_tax is set to 1

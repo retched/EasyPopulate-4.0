@@ -189,7 +189,9 @@ if ( isset($_GET['export2']) ) { // working on attributes export
 $ep4CEONURIDoesExist = false;
 if (ep_4_CEONURIExists() == true) {
 	$ep4CEONURIDoesExist = true;
-	$languages = zen_get_languages();
+	if (!sizeof($languages)) {
+		$languages = zen_get_languages();
+	}
 }
 if ( isset($_POST['export']) OR isset($_GET['export'])  ) {
 	include_once('easypopulate_4_export.php'); // this file contains all data export code
