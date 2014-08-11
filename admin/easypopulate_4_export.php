@@ -621,16 +621,18 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 		// $fullcategory = array(); // this will have the entire category path separated by $category_delimiter
 		if ($ep4CEONURIDoesExist == true && $ep_dltype == 'category') {
 			$ceon_uri_cat_mapping = new EP4CeonURIMappingAdminCategoryPages();
+			foreach ($langcode as $key2 => $lang2) {
+				$categories_name[$lang2['id']] = '';
+				$cat_prev_uri_mappings[$lang2['id']] = NULL;
+				$cat_uri_mappings[$lang2['id']] = NULL;
+			}
 		}
 		// if parent_id is not null ('0'), then follow it up.  Perhaps this could be replaced by Zen's zen_not_null() function?
 		while (!empty($thecategory_id)) {
 			// mult-lingual categories start - for each language, get category description and name
 			if ($ep4CEONURIDoesExist == true && $ep_dltype == 'category') {
-				$uri_mappings = $ceon_uri_cat_mapping->addURIMappingFieldsToEditCategoryFieldsArray ($thecategory_id);
-				$prev_uri_mappings = $uri_mappings;
-				foreach ($langcode as $key2 => $lang2) {
-					$categories_name[$lang2['id']] = '';
-				}
+				$cat_uri_mappings = $ceon_uri_cat_mapping->addURIMappingFieldsToEditCategoryFieldsArray ($thecategory_id);
+				$cat_prev_uri_mappings = $cat_uri_mappings;
 			}
 			
 			$sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = ' . $thecategory_id . ' ORDER BY language_id';
@@ -648,7 +650,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			if ($ep4CEONURIDoesExist == true && $ep_dltype == 'category') {
 				$theparent_id = $row3['parent_id'];
 
-				$row['v_uri_' . $lid] = $ceon_uri_cat_mapping->insertUpdateHandler($thecategory_id, $theparent_id, $prev_uri_mappings, $uri_mappings, $categories_name, true);
+				$row['v_uri_' . $lid] = $ceon_uri_cat_mapping->insertUpdateHandler($thecategory_id, $theparent_id, $cat_prev_uri_mappings, $cat_uri_mappings, $categories_name, true);
 			}
 			
 			
