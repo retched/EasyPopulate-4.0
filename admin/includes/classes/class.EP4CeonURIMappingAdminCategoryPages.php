@@ -79,6 +79,7 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 	 * @access  public
 	 * @param   integer   $category_id   The ID of the category.
 	 * @param   integer   $current_category_id   The ID of the category's parent category.
+	 * @param	  array(string) $categories_name	The name of the category being added.
 	 * @return  none
 	 * Called by update_category in categories.php
 	 */
@@ -92,12 +93,12 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 			$prev_uri_mapping = trim($prev_uri_mappings[$languages[$i]['id']]);
 			
 			// Auto-generate the URI if requested
-			if ($uri_mapping_autogen) {
+			if (true /*$uri_mapping_autogen*/) {
 				$uri_mapping = $this->autogenCategoryURIMapping((int) $category_id, $current_category_id,
 					$categories_name[$languages[$i]['id']], $languages[$i]['code'], $languages[$i]['id']);
 				
 				//Need to test autogen rules against database switches.  And reassign $uri_mapping as applicable.
-				$uri_mapping_autogen = ((!zen_not_null($uri_mapping) && EP4_AUTOCREATE_CAT_FROM_BLANK == '1') || EP4_AUTORECREATE_CAT_EXISTING == '1' || (EP4_AUTORECREATE_CAT_EXISTING == '2' && (EP4_AUTOCREATE_CAT_FROM_BLANK == '1' || (EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && zen_not_null($uri_mapping)))));
+				$uri_mapping_autogen = ((!zen_not_null($prev_uri_mapping) && EP4_AUTOCREATE_CAT_FROM_BLANK == '1') || EP4_AUTORECREATE_CAT_EXISTING == '1' || (EP4_AUTORECREATE_CAT_EXISTING == '2' && (EP4_AUTOCREATE_CAT_FROM_BLANK == '1' || (EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && zen_not_null($prev_uri_mapping)))));
 
 				if (EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && (EP4_AUTORECREATE_CAT_EXISTING == '2') && !zen_not_null($prev_uri_mapping)) {
 					//Cycle through languages, where previous is not blank, current = previous
@@ -306,7 +307,7 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 		}
 		
 		// Not sure that this section really does anything necessary..
-		if ($this->_autogenEnabled()) {
+		/*if ($this->_autogenEnabled()) {
 			if ($num_languages == 1) {
 				$autogen_message = CEON_URI_MAPPING_TEXT_CATEGORY_URI_AUTOGEN;
 			} else {
@@ -318,20 +319,20 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 			} else {
 				$autogen_selected = false;
 				
-				/*if ($num_prev_uri_mappings == 1) {
+				*/ /*if ($num_prev_uri_mappings == 1) {
 					$autogen_message[] .= '<br />' . CEON_URI_MAPPING_TEXT_URI_AUTOGEN_ONE_EXISTING_MAPPING;
 				} else if ($num_prev_uri_mappings == $num_languages) {
 					$autogen_message[] .= '<br />' . CEON_URI_MAPPING_TEXT_URI_AUTOGEN_ALL_EXISTING_MAPPINGS;
 				} else {
 					$autogen_message[] .= '<br />' . CEON_URI_MAPPING_TEXT_URI_AUTOGEN_SOME_EXISTING_MAPPINGS;
 				}*/ // Not interested in knowing if one, or more mappings previously existed at least not via text.  Will determine this based on other actions/information.
-			}
+//			}
 			
 			//$uri_mapping_input_fields[] .= zen_draw_checkbox_field('uri-mapping-autogen', '1', $autogen_selected) .
 			//	' ' . $autogen_message;
-		} else {
+//		} else {
 			//$uri_mapping_input_fields[] .= CEON_URI_MAPPING_TEXT_URI_AUTOGEN_DISABLED;
-		}
+//		}
 		
 //		$uri_mapping_input_fields .= "</p>";
 		
@@ -339,7 +340,7 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 		
 //		$uri_mapping_input_fields .= zen_draw_separator('pixel_black.gif', '100%', '2');
 		
-		return $uri_mapping_input_fields[];
+		return $uri_mapping_input_fields;
 	}
 	
 	/// }}}

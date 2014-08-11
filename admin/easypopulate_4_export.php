@@ -619,13 +619,13 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 		$category_delimiter = "^"; //Need to move this to the admin panel
 		$thecategory_id = $row['v_categories_id']; // starting category_id
 		// $fullcategory = array(); // this will have the entire category path separated by $category_delimiter
-		if ($ep4CEONURIDoesExist == true) {
+		if ($ep4CEONURIDoesExist == true && $ep_dltype == 'category') {
 			$ceon_uri_cat_mapping = new EP4CeonURIMappingAdminCategoryPages();
 		}
 		// if parent_id is not null ('0'), then follow it up.  Perhaps this could be replaced by Zen's zen_not_null() function?
 		while (!empty($thecategory_id)) {
 			// mult-lingual categories start - for each language, get category description and name
-			if ($ep4CEONURIDoesExist == true) {
+			if ($ep4CEONURIDoesExist == true && $ep_dltype == 'category') {
 				$uri_mappings = $ceon_uri_cat_mapping->addURIMappingFieldsToEditCategoryFieldsArray ($thecategory_id);
 				$prev_uri_mappings = $uri_mappings;
 				foreach ($langcode as $key2 => $lang2) {
@@ -645,10 +645,10 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			$result3 = ep_4_query($sql3);
 			$row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
 
-			if ($ep4CEONURIDoesExist == true) {
+			if ($ep4CEONURIDoesExist == true && $ep_dltype == 'category') {
 				$theparent_id = $row3['parent_id'];
 
-				$ceon_uri_cat_mapping->insertUpdateHandler($thecategory_id, $theparent_id, $prev_uri_mappings, $uri_mappings, $categories_name, true);
+				$row['v_uri_' . $lid] = $ceon_uri_cat_mapping->insertUpdateHandler($thecategory_id, $theparent_id, $prev_uri_mappings, $uri_mappings, $categories_name, true);
 			}
 			
 			
