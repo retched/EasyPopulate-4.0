@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4_export.php, v4.0.24CEON 08-04-2014 mc12345678 $
+// $Id: easypopulate_4_export.php, v4.0.24CEON.1 08-12-2014 mc12345678 $
 
 // get download type
 $ep_dltype = (isset($_POST['export'])) ? $_POST['export'] : $ep_dltype;
@@ -591,6 +591,41 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 	// Multi-Lingual Categories, Categories Meta, Categories Descriptions
 	if ($ep_dltype == 'categorymeta') {
 		// names and descriptions require that we loop thru all languages that are turned on in the store
+		if ($ep4CEONURIDoesExist == true) {
+			$thecategory_id = $row['v_categories_id']; // starting category_id
+			$ceon_uri_cat_mapping = new EP4CeonURIMappingAdminCategoryPages();
+			foreach ($langcode as $key2 => $lang2) {
+				$categories_name[$lang2['id']] = '';
+				$cat_prev_uri_mappings[$lang2['id']] = NULL;
+				$cat_uri_mappings[$lang2['id']] = NULL;
+			}
+
+			$cat_uri_mappings = $ceon_uri_cat_mapping->addURIMappingFieldsToEditCategoryFieldsArray ($thecategory_id);
+			$cat_prev_uri_mappings = $cat_uri_mappings;
+
+			$sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = ' . $thecategory_id . ' ORDER BY language_id';
+			$result2 = ep_4_query($sql2);
+			while ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2))) {
+				$categories_name[$row2['language_id']] = $row2['categories_name'];
+			} //while
+			$sql3 = 'SELECT parent_id FROM ' . TABLE_CATEGORIES . ' WHERE categories_id = ' . $thecategory_id;
+			$result3 = ep_4_query($sql3);
+			$row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
+			$theparent_id = $row3['parent_id'];
+
+
+			$cat_uri_mappings = $ceon_uri_cat_mapping->insertUpdateHandler($thecategory_id, $theparent_id, $cat_prev_uri_mappings, $cat_uri_mappings, $categories_name, true);
+
+			if (true /*Write to file*/) {
+				foreach ($langcode as $key2 => $lang2) {
+					$row['v_uri_' . $lang2['id']] = $cat_uri_mappings[$lang2['id']];
+				}
+				$row['v_main_page'] = FILENAME_DEFAULT;
+				$row['v_associated_db'] = NULL;
+				$row['v_master_categories_id'] = $theparent_id;
+			}
+
+		}
 		foreach ($langcode as $key => $lang) {
 			$lid = $lang['id'];
 			// metaData start
@@ -626,13 +661,39 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 				$cat_prev_uri_mappings[$lang2['id']] = NULL;
 				$cat_uri_mappings[$lang2['id']] = NULL;
 			}
+
+			$cat_uri_mappings = $ceon_uri_cat_mapping->addURIMappingFieldsToEditCategoryFieldsArray ($thecategory_id);
+			$cat_prev_uri_mappings = $cat_uri_mappings;
+
+			$sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = ' . $thecategory_id . ' ORDER BY language_id';
+			$result2 = ep_4_query($sql2);
+			while ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2))) {
+				$categories_name[$row2['language_id']] = $row2['categories_name'];
+			} //while
+			$sql3 = 'SELECT parent_id FROM ' . TABLE_CATEGORIES . ' WHERE categories_id = ' . $thecategory_id;
+			$result3 = ep_4_query($sql3);
+			$row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
+			$theparent_id = $row3['parent_id'];
+
+
+			$cat_uri_mappings = $ceon_uri_cat_mapping->insertUpdateHandler($thecategory_id, $theparent_id, $cat_prev_uri_mappings, $cat_uri_mappings, $categories_name, true);
+
+			if (true /*Write to file*/) {
+				foreach ($langcode as $key2 => $lang2) {
+					$row['v_uri_' . $lang2['id']] = $cat_uri_mappings[$lang2['id']];
+				}
+				$row['v_main_page'] = FILENAME_DEFAULT;
+				$row['v_associated_db'] = NULL;
+				$row['v_master_categories_id'] = $theparent_id;
+			}
+
 		}
 		// if parent_id is not null ('0'), then follow it up.  Perhaps this could be replaced by Zen's zen_not_null() function?
 		while (!empty($thecategory_id)) {
 			// mult-lingual categories start - for each language, get category description and name
 			if ($ep4CEONURIDoesExist == true && $ep_dltype == 'category') {
-				$cat_uri_mappings = $ceon_uri_cat_mapping->addURIMappingFieldsToEditCategoryFieldsArray ($thecategory_id);
-				$cat_prev_uri_mappings = $cat_uri_mappings;
+//				$cat_uri_mappings = $ceon_uri_cat_mapping->addURIMappingFieldsToEditCategoryFieldsArray ($thecategory_id);
+//				$cat_prev_uri_mappings = $cat_uri_mappings;
 			}
 			
 			$sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = ' . $thecategory_id . ' ORDER BY language_id';
@@ -640,17 +701,22 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			while ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2))) {
 				$lid = $row2['language_id'];
 				$row['v_categories_name_' . $lid] = $row2['categories_name'] . $category_delimiter . $row['v_categories_name_' . $lid];
-				$categories_name[$lid] = $row2['categories_name'];
+//				$categories_name[$lid] = $row2['categories_name'];
 			} //while
 			// look for parent categories ID
 			$sql3 = 'SELECT parent_id FROM ' . TABLE_CATEGORIES . ' WHERE categories_id = ' . $thecategory_id;
 			$result3 = ep_4_query($sql3);
 			$row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
+			$theparent_id = $row3['parent_id'];
 
 			if ($ep4CEONURIDoesExist == true && $ep_dltype == 'category') {
-				$theparent_id = $row3['parent_id'];
+//				$theparent_id = $row3['parent_id'];
 
-				$row['v_uri_' . $lid] = $ceon_uri_cat_mapping->insertUpdateHandler($thecategory_id, $theparent_id, $cat_prev_uri_mappings, $cat_uri_mappings, $categories_name, true);
+//				$cat_uri_mappings = $ceon_uri_cat_mapping->insertUpdateHandler($thecategory_id, $theparent_id, $cat_prev_uri_mappings, $cat_uri_mappings, $categories_name, true);
+				foreach ($langcode as $key2 => $lang2) {
+//					$row['v_uri_' . $lang2['id']] = $cat_uri_mappings[$lang2['id']];
+				}
+				
 			}
 			
 			
@@ -664,7 +730,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 		// trim off trailing category delimiter '^'
 		foreach ($langcode as $key => $lang) {
 			$lid = $lang['id'];
-			$row['v_categories_name_' . $lid] = rtrim($row['v_categories_name_' . $lid], "^");
+			$row['v_categories_name_' . $lid] = rtrim($row['v_categories_name_' . $lid], $category_delimiter);
 		} // foreach
 		
 	} // if() delimited categories path
