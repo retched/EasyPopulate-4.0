@@ -213,6 +213,9 @@ switch ($ep_dltype) { // chadd - changed to use $EXPORT_FILE
 	case 'CEON_URI_active_all'; // mc12345678 - Added to export CEON URIs.
 		$EXPORT_FILE = 'CEON-URI-aa-EP';
 		break;
+	case 'CEON_EZPages'; //mc12345678 - Added to export EZ Pages for CEON URIs.
+		$EXPORT_FILE = 'CEON-URI-ez-EP';
+		break;
 	case 'SBAStock'; // mc12345678 - added 02-22-2014 to support providing a stock export when SBA is installed.
 	$EXPORT_FILE = 'SBA-Stock-EP';
 	break;

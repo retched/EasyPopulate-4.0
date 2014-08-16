@@ -170,7 +170,11 @@ if ( ($collation == 'utf8') && ((substr($project,0,5) == "1.3.8") || (substr($pr
 // $epdlanguage_id is used only in categories generation code since the products import code doesn't support multi-language categories
 /* @var $epdlanguage_query type array */
 //$epdlanguage_query = $db->Execute("SELECT languages_id, name FROM ".TABLE_LANGUAGES." WHERE code = '".DEFAULT_LANGUAGE."'");
-
+if (!defined(DEFAULT_LANGUAGE)) {
+	$epdlanguage_query = ep_4_query("SELECT languages_id, code FROM ".TABLE_LANGUAGES." ORDER BY languages_id LIMIT 1");
+	$epdlanguage = ($ep_uses_mysqli ? mysqli_fetch_array($epdlanguage_query) : mysql_fetch_array($epdlanguage_query));
+	define('DEFAULT_LANGUAGE', $epdlanguage['code']);
+}
 $epdlanguage_query = ep_4_query("SELECT languages_id, name FROM ".TABLE_LANGUAGES." WHERE code = '".DEFAULT_LANGUAGE."'");
 if (($ep_uses_mysqli ? mysqli_num_rows($epdlanguage_query) : mysql_num_rows($epdlanguage_query))) {
 	$epdlanguage = ($ep_uses_mysqli ? mysqli_fetch_array($epdlanguage_query) : mysql_fetch_array($epdlanguage_query));
@@ -426,7 +430,8 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
 <?php /* Begin CEON URI addition */ if ($ep4CEONURIDoesExist == true) { ?>    <br><b>CEON URI Export/Import Options</b><br>
     <a href="easypopulate_4.php?export=CEON_URI_active_all"><b>CEON URI Active Data Table</b> (basic single-line)</a><br />
     <a href="easypopulate_4.php?export=CEON_detailed"><b>Detailed CEON URI Data</b> (detailed multi-line)</a><br />
-<?php } else { ?>CEON URI Doesn't Exist <br /><?php } /* End CEON URI Addition */?>
+    <a href="easypopulate_4.php?export=CEON_EZPages"><b>EZ Pages CEON Data</b> (Export)</a><br />
+<?php } else { ?>CEON URI Mapping is not Installed. <br /><?php } /* End CEON URI Addition */?>
     
     <br>DIAGNOSTIC EXPORTS - Note: NOT FOR IMPORTING ATTRIBUTES!<br>
     <a href="easypopulate_4.php?export=options"><b>Attribute Options Names</b></a><br />
