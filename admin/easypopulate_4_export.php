@@ -136,7 +136,7 @@ if ($ep_dltype == 'SBA_basic') {
 				} 
 				$ep_export_count++;
 				$last_products_id = $active_row['v_products_model'];
-			} elseif ($active_row['v_prodcuts_model'] == "" && $ep_export_count == 0) {
+			} elseif ($active_row['v_products_model'] == "" && $ep_export_count == 0) {
 				$Products ++;
 				$SBABasicArray['NumProducts'] ++;
 				$ep_export_count++;
@@ -273,6 +273,7 @@ if (ep_4_CEONURIExists() == true) {
 	require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.CeonURIMappingAdmin.php');
 	require_once(DIR_FS_ADMIN . DIR_WS_CLASSES . 'class.EP4CeonURIMappingAdminProductPages.php');
 	require_once(DIR_FS_ADMIN . DIR_WS_CLASSES . 'class.EP4CeonURIMappingAdminCategoryPages.php');
+	require_once(DIR_FS_ADMIN . DIR_WS_CLASSES . 'class.EP4CeonURIMappingAdminEZPagePages.php');
 } //End CEON modification - mc12345678
 
 while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_array($result))) {
@@ -591,6 +592,75 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 		}
 	} // END: Specials
 		
+
+	// EZ-Pages - mc12345678
+	if ($ep_dltype = 'CEON_EZPages'){
+		if ($ep4CEONURIDoesExist == true) { 
+			$EZ_prev_uri_mappings = array();
+			$EZ_uri_mappings = array();
+		}
+
+//		foreach ($langcode as $key2 => $lang2) {
+//			$lid2 = $lang2['id'];
+		
+//			$sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_DESCRIPTION . ' WHERE products_id = ' . $row['v_products_id'] . ' AND language_id = ' . $lid2 . ' LIMIT 1 ';
+//			$result2 = ep_4_query($sql2);
+//			$row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+//			$row['v_products_name_' . $lid2] = $row2['products_name'];
+//			$products_name[$lid2] = $row['v_products_name_' . $lid2];
+//		} // End modification for CEON URI Rewriter mc12345678
+
+			if ($ep4CEONURIDoesExist == true) {
+				$ceon_uri_EZmapping_admin = new EP4CeonURIMappingAdminEZPagePages();
+
+				foreach ($langcode as $key2 => $lang2) {
+					$lid2 = $lang2['id'];
+					$EZ_prev_uri_mappings[$lid2] = NULL;
+					$EZ_uri_mappings[$lid2] = NULL;
+					$ceon_uri_EZmapping_admin->_prev_uri_mappings[$lid2] = $EZ_prev_uri_mappings[$lid2];
+					$ceon_uri_EZmapping_admin->_uri_mappings[$lid2] = $EZ_uri_mappings[$lid2];
+				} //Cycle through Languages
+						
+				$ezID = $row['v_pages_id'];
+
+ 				$EZ_uri_mappings = $ceon_uri_EZmapping_admin->configureEnvironment($ezID, $EZ_prev_uri_mappings, $EZ_uri_mappings); // Populates past
+//				$EZ_prev_uri_mappings = $ceon_uri_EZmapping_admin->$_prev_uri_mappings;
+//				$EZ_uri_mappings = $ceon_uri_EZmapping_admin->$_uri_mappings;
+				$EZ_prev_uri_mappings = $EZ_uri_mappings;
+				
+				$page_title = $row['v_pages_title'];
+				
+				/* $page_titles_array; // Need to populate this/identify how to... */
+				$page_titles_array = NULL;
+				
+				$EZ_uri_mappings = $ceon_uri_EZmapping_admin->insertUpdateHandler($ezID, $page_title, $EZ_prev_uri_mappings, $EZ_uri_mappings, $page_titles_array);
+
+				
+				if (true /* Write to file*/){
+					foreach ($langcode as $key2 => $lang2) {
+						$row['v_uri_' . $lang2['id']] = $EZ_uri_mappings[$lang2['id']];
+					}
+					$row['v_main_page'] = FILENAME_EZPAGES;
+					$row['v_associated_db'] = $ezID;
+					$row['v_alternate_url'] = (zen_not_null($row['v_alternate_url']) ? $row['v_alt_url'] : $row['v_alt_url_external']);
+					$row['v_redirection_type_code'] = $row['v_redirection_type_code'];
+					$row['v_date_added'] = $row['v_date_added'];
+				}
+				
+
+				/*if (!(EP4_EXPORT_ONLY) && $uri_mapping_autogen && ($returned != $ceon_uri_EZmapping_admin->_prev_uri_mappings)) {
+					$ceon_uri_EZmapping_admin->updateProductHandler($pID, $rowselectpt['type_handler'], $prev_uri_mappings, $uri_mappings);
+				} // autogenerate if supposed to autogenerate.
+
+				$row['v_main_page'] = FILENAME_EZPAGES;
+				$row['v_associated_db_id'] = $ezID;
+				$row['v_date_added'] = $row['v_date_added'];
+//				$row['v_products_model'] = $row['v_products_model'];*/
+
+			} // End of CEON Insert for Export mc12345678
+		
+	} //End EZ-Pages - mc12345678
+	
 	// Multi-Lingual Categories, Categories Meta, Categories Descriptions
 	if ($ep_dltype == 'categorymeta') {
 		// names and descriptions require that we loop thru all languages that are turned on in the store
