@@ -84,9 +84,9 @@ if ( isset($_GET['import']) ) {
 	$file_location = DIR_FS_CATALOG.$tempdir.$file['name'];
 	// Error Checking
 	if (!file_exists($file_location)) {
-		$display_output .='<font color="red"><b>ERROR: Import file does not exist:'.$file_location.'</b></font><br>';
+		$display_output .='<font color="red"><b>ERROR: Import file does not exist:'.$file_location.'</b></font><br />';
 	} else if ( !($handle = fopen($file_location, "r"))) {
-		$display_output .= '<font color="red"><b>ERROR: Cannot open import file:'.$file_location.'</b></font><br>';
+		$display_output .= '<font color="red"><b>ERROR: Cannot open import file:'.$file_location.'</b></font><br />';
 	}
 	
 	// Read Column Headers
@@ -1565,18 +1565,18 @@ if ($ep4CEONURIDoesExist == true) {
 	
 		$display_output .= '<h3>Finished Processing Import File</h3>';
 
-		$display_output .= '<br>Updated records: '.$ep_update_count;
-		$display_output .= '<br>New Imported records: '.$ep_import_count;
-		$display_output .= '<br>Errors Detected: '.$ep_error_count;
-		$display_output .= '<br>Warnings Detected: '.$ep_warning_count;
+		$display_output .= '<br />Updated records: '.$ep_update_count;
+		$display_output .= '<br />New Imported records: '.$ep_import_count;
+		$display_output .= '<br />Errors Detected: '.$ep_error_count;
+		$display_output .= '<br />Warnings Detected: '.$ep_warning_count;
 
-		$display_output .= '<br>Memory Usage: '.memory_get_usage(); 
-		$display_output .= '<br>Memory Peak: '.memory_get_peak_usage();
+		$display_output .= '<br />Memory Usage: '.memory_get_usage(); 
+		$display_output .= '<br />Memory Peak: '.memory_get_peak_usage();
 
 		// benchmarking
 		$time_end = microtime(true);
 		$time = $time_end - $time_start;	
-		$display_output .= '<br>Execution Time: '. $time . ' seconds.';
+		$display_output .= '<br />Execution Time: '. $time . ' seconds.';
 	}	
 	
 	// specials status = 0 if date_expires is past.

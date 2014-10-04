@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4.php, v4.0.24CEON.1 08-12-2014 mc12345678 $
+// $Id: easypopulate_4.php, v4.0.24CEONc 08-18-2014 mc12345678 $
 
 // CSV VARIABLES - need to make this configurable in the ADMIN
 // $csv_delimiter = "\t"; // "\t" = tab AND "," = COMMA
@@ -47,7 +47,7 @@ $ep_debug_logging_all = false; // do not comment out.. make false instead
 /* Test area end */
 
 // Current EP Version - Modded by Chadd
-$curver              = '4.0.24CEON.1 - Beta 8-04-2014';
+$curver              = '4.0.24CEONc - Beta 8-18-2014';
 $display_output      = ''; // results of import displayed after script run
 $ep_dltype           = NULL;
 $ep_stack_sql_error  = false; // function returns true on any 1 error, and notifies user of an error
@@ -271,11 +271,11 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
     
 	<div style="text-align:right; float:right; width:25%"><a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'epinstaller=remove') ?>">Un-Install EP4</a>
     <?php
-		echo '<br><b><u>Configuration Settings</u></b><br>';
-		echo 'Upload Directory: <b>'.$tempdir.'</b><br>'; 
-		echo 'Verbose Feedback: '.(($ep_feedback) ? '<font color="green">TRUE</font>':"FALSE").'<br>';
-		echo 'Split Records: '.$ep_split_records.'<br>';
-		echo 'Execution Time: '.$ep_execution.'<br>';
+		echo '<br /><b><u>Configuration Settings</u></b><br />';
+		echo 'Upload Directory: <b>'.$tempdir.'</b><br />'; 
+		echo 'Verbose Feedback: '.(($ep_feedback) ? '<font color="green">TRUE</font>':"FALSE").'<br />';
+		echo 'Split Records: '.$ep_split_records.'<br />';
+		echo 'Execution Time: '.$ep_execution.'<br />';
 		switch ($ep_curly_quotes) {
 			case 0:
 			$ep_curly_text = "No Change";
@@ -298,49 +298,49 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
 			$ep_char92_text = "HTML";
 			break;
 		}
-		echo 'Convert Curly Quotes: '.$ep_curly_text.'<br>';
-		echo 'Convert Char 0x92: '.$ep_char92_text.'<br>';
-		echo 'Enable Products Metatags: '.$ep_metatags.'<br>';
-		echo 'Enable Products Music: '.$ep_music.'<br>';
+		echo 'Convert Curly Quotes: '.$ep_curly_text.'<br />';
+		echo 'Convert Char 0x92: '.$ep_char92_text.'<br />';
+		echo 'Enable Products Metatags: '.$ep_metatags.'<br />';
+		echo 'Enable Products Music: '.$ep_music.'<br />';
 			
-		echo '<br><b><u>Custom Products Fields</u></b><br>';
-		echo 'Product Short Descriptions: '.(($ep_supported_mods['psd']) ? '<font color="green">TRUE</font>':"FALSE").'<br>';
-		echo 'Product Unit of Measure: '.(($ep_supported_mods['uom']) ? '<font color="green">TRUE</font>':"FALSE").'<br>';
-		echo 'Product UPC Code: '.(($ep_supported_mods['upc']) ? '<font color="green">TRUE</font>':"FALSE").'<br>';
+		echo '<br /><b><u>Custom Products Fields</u></b><br />';
+		echo 'Product Short Descriptions: '.(($ep_supported_mods['psd']) ? '<font color="green">TRUE</font>':"FALSE").'<br />';
+		echo 'Product Unit of Measure: '.(($ep_supported_mods['uom']) ? '<font color="green">TRUE</font>':"FALSE").'<br />';
+		echo 'Product UPC Code: '.(($ep_supported_mods['upc']) ? '<font color="green">TRUE</font>':"FALSE").'<br />';
 		// Google Product Category for Google Merchant Center
-		echo 'Google Product Category: '.(($ep_supported_mods['gpc']) ? '<font color="green">TRUE</font>':"FALSE").'<br>';
-		echo "Manufacturer's Suggested Retail Price: ".(($ep_supported_mods['msrp']) ? '<font color="green">TRUE</font>':"FALSE").'<br>';
-		echo "Group Pricing Per Item: ".(($ep_supported_mods['gppi']) ? '<font color="green">TRUE</font>':"FALSE").'<br>';
-		echo "Exclusive Products Mod: ".(($ep_supported_mods['excl']) ? '<font color="green">TRUE</font>':"FALSE").'<br>';
+		echo 'Google Product Category: '.(($ep_supported_mods['gpc']) ? '<font color="green">TRUE</font>':"FALSE").'<br />';
+		echo "Manufacturer's Suggested Retail Price: ".(($ep_supported_mods['msrp']) ? '<font color="green">TRUE</font>':"FALSE").'<br />';
+		echo "Group Pricing Per Item: ".(($ep_supported_mods['gppi']) ? '<font color="green">TRUE</font>':"FALSE").'<br />';
+		echo "Exclusive Products Mod: ".(($ep_supported_mods['excl']) ? '<font color="green">TRUE</font>':"FALSE").'<br />';
 
-		echo "<br><b><u>User Defined Products Fields: </b></u><br>";
+		echo "<br /><b><u>User Defined Products Fields: </b></u><br />";
 		$i = 0;
 		foreach ($custom_field_names as $field) {
-			echo $field.': '.(($custom_field_check[$i]) ? '<font color="green">TRUE</font>':"FALSE").'<br>';
+			echo $field.': '.(($custom_field_check[$i]) ? '<font color="green">TRUE</font>':"FALSE").'<br />';
 			$i++;
 		}
 		
-		echo '<br><b><u>Installed Languages</u></b> <br>';
+		echo '<br /><b><u>Installed Languages</u></b> <br />';
 		foreach ($langcode as $key => $lang) {
-			echo $lang['id'].'-'.$lang['code'].': '.$lang['name'].'<br>';
+			echo $lang['id'].'-'.$lang['code'].': '.$lang['name'].'<br />';
 		}
-		echo 'Default Language: '.	$epdlanguage_id .'-'. $epdlanguage_name.'<br>';
-		echo 'Internal Character Encoding: '.mb_internal_encoding().'<br>';
-		echo 'DB Collation: '.$collation.'<br>';
+		echo 'Default Language: '.	$epdlanguage_id .'-'. $epdlanguage_name.'<br />';
+		echo 'Internal Character Encoding: '.mb_internal_encoding().'<br />';
+		echo 'DB Collation: '.$collation.'<br />';
 		
-		echo '<br><b><u>Database Field Lengths</u></b><br>';
-		echo 'categories_name:'.$categories_name_max_len.'<br>';
-		echo 'manufacturers_name:'.$manufacturers_name_max_len.'<br>';
-		echo 'products_model:'.$products_model_max_len.'<br>';
-		echo 'products_name:'.$products_name_max_len.'<br>';
+		echo '<br /><b><u>Database Field Lengths</u></b><br />';
+		echo 'categories_name:'.$categories_name_max_len.'<br />';
+		echo 'manufacturers_name:'.$manufacturers_name_max_len.'<br />';
+		echo 'products_model:'.$products_model_max_len.'<br />';
+		echo 'products_name:'.$products_name_max_len.'<br />';
 	
 	/*  // some error checking
-		echo '<br><br>Problem Data: '. mysql_num_rows($ajeh_result);
+		echo '<br /><br>Problem Data: '. mysql_num_rows($ajeh_result);
 		echo '<br>Memory Usage: '.memory_get_usage(); 
 		echo '<br>Memory Peak: '.memory_get_peak_usage();
-		echo '<br><br>';
+		echo '<br /><br />';
 		print_r($langcode);
-		echo '<br><br>code: '.$langcode[1]['id'];
+		echo '<br /><br>code: '.$langcode[1]['id'];
 	*/
 		//register_globals_vars_check_4(); // testing
 	
@@ -357,7 +357,7 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
             <input TYPE="hidden" name="MAX_FILE_SIZE" value="<?php echo $upload_max_filesize; ?>">
             <input name="uploadfile" type="file" size="50">
             <input type="submit" name="buttoninsert" value="Upload File">
-            <br /><br><br>
+            <br /><br /><br />
         </div>
     </form>
 
@@ -388,7 +388,7 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
 			array( "id" => '1', 'text' => "Model/Price/Qty" ),
 			array( "id" => '2', 'text' => "Model/Price/Breaks" ));
 		
-		echo "<b>Filterable Exports:</b><br>";
+		echo "<b>Filterable Exports:</b><br />";
 		
 		echo zen_draw_pull_down_menu('ep_export_type', $export_type_array) . ' ';
 		echo ' ' . zen_draw_pull_down_menu('ep_category_filter', array_merge(array( 0 => array( "id" => '', 'text' => "Categories" )), zen_get_category_tree())) . ' ';
@@ -396,7 +396,7 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
 		echo ' ' . zen_draw_pull_down_menu('ep_status_filter', $status_array) . ' ';
 		echo zen_draw_input_field('export', 'Export', ' style="padding: 0px"', false, 'submit');
 		?>				
-    <br /><br>
+    <br /><br />
     </div>
 
     <b>Product &amp; Pricing Export/Import Options:</b><br />
@@ -406,11 +406,11 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
     <a href="easypopulate_4.php?export=pricebreaks"><b>Model/Price/Breaks</b></a><br />
     <a href="easypopulate_4.php?export=featured"><b>Featured Products</b></a><br />
     
-    <br><b>Category Export/Import Options</b><br>
+    <br /><b>Category Export/Import Options</b><br />
     <a href="easypopulate_4.php?export=category"><b>Model/Category</b></a><br />
     <a href="easypopulate_4.php?export=categorymeta"><b>Categories Only</b> (with Metatags)</a><br />
     
-    <br><b>Attribute Export/Import Options</b><br>
+    <br /><b>Attribute Export/Import Options</b><br />
     <a href="easypopulate_4.php?export=attrib_basic"><b>Basic Products Attributes</b> (basic single-line)</a><br /> 
     <a href="easypopulate_4.php?export=attrib_detailed"><b>Detailed Products Attributes</b> (detailed multi-line)</a><br />
 <?php 
@@ -427,13 +427,13 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
 
 <?php } ?>
 <?php /*}*/ /* End SBA1 Addition */?>
-<?php /* Begin CEON URI addition */ if ($ep4CEONURIDoesExist == true) { ?>    <br><b>CEON URI Export/Import Options</b><br>
+<?php /* Begin CEON URI addition */ if ($ep4CEONURIDoesExist == true) { ?>    <br /><b>CEON URI Export/Import Options</b><br />
     <a href="easypopulate_4.php?export=CEON_URI_active_all"><b>CEON URI Active Data Table</b> (basic single-line)</a><br />
     <a href="easypopulate_4.php?export=CEON_detailed"><b>Detailed CEON URI Data</b> (detailed multi-line)</a><br />
     <a href="easypopulate_4.php?export=CEON_EZPages"><b>EZ Pages CEON Data</b> (Export)</a><br />
 <?php } else { ?>CEON URI Mapping is not Installed. <br /><?php } /* End CEON URI Addition */?>
     
-    <br>DIAGNOSTIC EXPORTS - Note: NOT FOR IMPORTING ATTRIBUTES!<br>
+    <br />DIAGNOSTIC EXPORTS - Note: NOT FOR IMPORTING ATTRIBUTES!<br />
     <a href="easypopulate_4.php?export=options"><b>Attribute Options Names</b></a><br />
     <a href="easypopulate_4.php?export=values"><b>Attribute Options Values</b></a><br />
     <a href="easypopulate_4.php?export=optionvalues"><b>Attribute Options-Names-to-Values</b></a><br />
@@ -441,7 +441,7 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
 	<?php   
     // List uploaded files in multifile mode
 	// Table header
-	echo '<br><br>';
+	echo '<br /><br />';
 	echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
 	echo "<tr><th>File Name</th><th>Size</th><th>Date &amp; Time</th><th>Type</th><th>Split</th><th>Import</th><th>Delete</th><th>Download</th>\n";
     // $upload_dir = DIR_FS_CATALOG.$tempdir; // defined above
@@ -512,11 +512,11 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
 	echo "<div>";
 		$test_string = "Πλαστικά^Εξαρτήματα";
 		$test_array1 = explode("^", $test_string);
-		echo "<br>Using explode() with: ".$test_string."<br>";
+		echo "<br>Using explode() with: ".$test_string."<br />";
 		print_r($test_array1);
 		
 		$test_array2 = mb_split('\x5e', $test_string);
-		echo "<br><br>Using mb_split() with: ".$test_string."<br>";
+		echo "<br /><br>Using mb_split() with: ".$test_string."<br />";
 		print_r($test_array2);
 	echo "</div>";
 	*/

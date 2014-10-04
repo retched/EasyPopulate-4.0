@@ -14,7 +14,7 @@
  * @copyright	 mc12345678
  * @link        http://ceon.net/software/business/zen-cart/uri-mapping
  * @license     http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version     $Id: class.CeonURIMappingAdminCategoryPages.php 1054 2014-08-12 15:45:15Z mc12345678 EP4.0.24CEON.1 $
+ * @version     $Id: class.CeonURIMappingAdminCategoryPages.php 1054 2014-08-12 15:45:15Z mc12345678 EP4.0.24CEONb $
  */
 
 if (!defined('IS_ADMIN_FLAG')) {

@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4_export.php, v4.0.24CEON.1 08-12-2014 mc12345678 $
+// $Id: easypopulate_4_export.php, v4.0.24CEONc 08-18-2014 mc12345678 $
 
 // get download type
 $ep_dltype = (isset($_POST['export'])) ? $_POST['export'] : $ep_dltype;
@@ -594,7 +594,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 		
 
 	// EZ-Pages - mc12345678
-	if ($ep_dltype = 'CEON_EZPages'){
+	if ($ep_dltype == 'CEON_EZPages'){
 		if ($ep4CEONURIDoesExist == true) { 
 			$EZ_prev_uri_mappings = array();
 			$EZ_uri_mappings = array();
