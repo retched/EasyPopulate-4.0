@@ -3,15 +3,15 @@ EasyPopulate 4.0 Beta SBA_Stock
 There is a Zen-cart.com Support Thread located here:
 http://www.zen-cart.com/forum/showthread.php?t=190417
 
-I recommend that you first enter a couple Categories and Products through the normal Zencart Admin. This will help you understand the exported file formats.
+I recommend that you first enter a couple Categories and Products through the normal Zencart Admin. This will help you understand the exported file formats and how to import.
 
-Things of Import:
+Things of Importance:
 
 1) EP4 works only with CSV data files, and for best cross platform compatibility please use OpenOffice to Export your CSV file.
 You should select the Comma as your field delimiter, and the Double Quote as your text delimiter. You may not get proper results using Excel.
 
 2) You MUST use products_models to distinguish your products for import. Any record with a blank v_products_model entry will be skipped.
-   Also note that is you enter the same products_model twice, the latest record entry will over-write any previous entries. The exception
+   Also note that if you enter the same products_model twice, the latest record entry will over-write any previous entries. The exception
    here is if you enter a different category; this will result in a linked product. "Duplicate" products with the same products_model number
    is not supported. If you have these entries in your database, you may get unpredictable results.
 
@@ -23,25 +23,30 @@ names are separated by the Carat "^" symbol. For Example: Bar Supplies^Glass Was
 
 Be careful when creating your category names. "Bar Supplies" is not equal to "BAR Supplies" ... this will result in TWO category entries.
 
-As of 4.0.17, your lowest defined language (by language id) is needed to when creating categories. In the future I'll change this to the defined default language, but that
+As of 4.0.17, your lowest defined language (by language id) is needed to be used when creating categories. In the future I'll change this to the defined default language, but that
 will take some additional work.
 
-4) Work flow is somewhat different than other version of EP. With EP4 you first upload your file, then click on Import. Optionally you can also Split an import file if it is too large. You can set the number of records to split on in the configuration settings. Default is 2000. If you have a powerful server, you can up this significantly. Testing on a VPS with an import file of 900,000 records, I broke into 50,000 record segments. Import of each 50,000 records took about 250 seconds.
+4) Work flow is somewhat different than other versions of EP. With EP4 you first upload your file, then click on Import. Optionally you can also Split an import file if it is too large. You can set the number of records to split on in the configuration settings. Default is 2000. If you have a powerful server, you can increase this significantly. Testing on a VPS with an import file of 900,000 records, I broke the file into 50,000 record segments. Import of each 50,000 records took about 250 seconds.
 
-Also NO streaming upload or download support. Sorry if you liked this feature. A lot of effort has been put into improving the code's performance and streaming the data was a real memory hog. To download your exported file, you will need to "right-click, save-as". You may be able to set your browser to automatically download CSV files. I'll come up with a better solution in due time. 
+Also there is NO streaming upload or download support. Sorry if you liked this feature. A lot of effort has been put into improving the code's performance and streaming the data was a real memory hog. To download your exported file, you will need to "right-click, save-as". You may be able to set your browser to automatically download csv/CSV files. I'll come up with a better solution in due time. 
 
-5) File names act as a switch inside the script for Importing. Namely: PriceBreaks-EP, CategoryMeta-EP, Featured-EP, and Attrib-Basic-EP/Attrib-Detailed-EP ... these import files must have names that start with these string.
+5) File names act as a switch inside the script for Importing. Namely: PriceBreaks-EP, CategoryMeta-EP, Featured-EP, SBA-Stock-EP, and Attrib-Basic-EP/Attrib-Detailed-EP ... these import files must have names that start with this string.
 
 6) Basic Attribute Import. Please read the notes below carefully for how to use this feature which is still in development. Currently, you can at Import create your products_options_name (your attribute name, ie. color) , products_options_type (checkbox, dropdown, etc) and, products_options_values_name (red, green, blue).
 
-Be sure to backup you data before importing your files. Remember, this is still "beta". I have made every attempt to make this a solid bug free product, but it does require more testing. I have added a lot of error trapping, but I'm sure I've missed things.
+7) CEON URI support. At this time, Updating of URI rewriting is provided on an export basis only. (After importing new unmapped products, simply export the database and the URIs will be updated/inserted as identified in the configuration settings.)  Support is being developed to "reverse" the process and to populate the applicable database information with uploaded URIs.  The current "concern" or delay is determining the method(s) to provide users to perform the upload(s).  Should a single file for upload include all active (current) and inactive (historical) URIs? Should a file be provided to upload only inactive URIs that if an inactive is currently active to also have an admin config switch on how to address (ignore or make active inactive?), should an individual active file be provided to verify/modify the URIs...  Too many "uncontrolled" options though "flexible" could result in database chaos and a broken site.  Ideally controls would be in place such that certain EP4 actions would not be possible.
+
+So, what to do?  With CEON URI Mapping installed, EP4 with URI support can be added to the system without affecting the existing CEON URI Mapping installation, and for that matter it adds functionality to your existing EP4 installation if it is already installed or brings you into the world of EP4 and rapid site updating if you have not used it.  Upon installation of this version of EP4 the settings will automatically support autocreating information that does not currently exist in the database as the applicable export is performed.  This will not overwrite any existing URIs that may have been personalized. Other options include an export only of the uri rewriting results and various options for overwriting all existing URIs: (overwrite all uris or possibly overwrite only existing uris, say if there was a change of some type that necessitated existing URIs to be rewritten).  The rewrite is with what would be a "default" URI when autogenerated (for example if an initial product were added to the database, and the URI had been manually entered to something other than what would be considered the auto-generated URI, then when "all" URIs are overwritten, that product will have a current URI of the "standard" rewritten URI, and still have a historical mapping that would work as well or if incorrectly stated, this will follow the process of changing a URI as if in the product page the new URI were typed and the product saved.)  The settings for the autogeneration format are in the CEON URI mapping settings and are not controlled by this module.  See existing instruction for that plugin for settings and options.
+
+
+LASTLY but definitely not LEAST and applicable to all of EP4: Be sure to backup your data before importing your files. Remember, this is still "beta". I have made every attempt to make this a solid bug free product, but it does require more testing. I have added a lot of error trapping, but I'm sure I've missed things.
 
 
 IMPORTING ATTRIBUTES
 Including sample attribute input file.
 
 I am currently able to correctly import basic attributes, and assign 
-the options to an associated products model. It is possible to create
+the options to an associated product's model. It is possible to create
 multiple sets of Option Names / Option Values and assign to a single 
 product, say "Size" and "Color".
 
@@ -59,26 +64,28 @@ CSV file currently has 4 column:
 		3 - Check Box
 		4 - File Upload
 		5 - Read Only
-	b) for a giving option_name (say "Color"), do not change the products_option_type
+	b) for a given option_name (say "Color"), do not change the products_option_type
 	   on subsequent entries, doing so will not give the results you want.
 	c) If you need a "Color" with both a drop down box and check box, you will need
 	   to define two unique Options Names.
 
 3) v_products_options_name_1
-	a) The option name you want to create
+	a) The option name you want to create or use
 	b) It is important to note that Zen Cart will allow you to create
 	   from within the admin two identical Options names, and assign 
-	   uniques options values to each. For example:
-		"Color" with "red,green,blue" 
-		"Color" with "cyan,magenta,yellow"
-	   Internally, Zen Cart knows these are two distinct options, 
+	   unique options values to each. For example:
+		"Color" with "red,green,blue" as one option name/value pair
+		"Color" with "cyan,magenta,yellow" as another option name/value pair
+	   Internally, Zen Cart knows these are two distinct options names, 
 	   but this info is not available to the user. (It would have been
 	   better to have a unique Options Name, and associated Options Display Name
 	   which in turn could be language specific).
 	c) For this reason, the products_options_name_1 must be unique, meaning
-	   you CAN have "Colors" but the assiated options_values set will be
-	   the sum of the example above: { red,green,blue,cyan,magenta,yellow }.
-
+	   you CAN have "Colors" but the associated options_values set will be
+	   the sum of the example above: { red,green,blue,cyan,magenta,yellow }.  
+	   (This is information in the database. The product will still only show 
+	   the attributes assigned.)
+	   
 4) v_products_options_values_names_1
 	a) these are the values names that are assigned to the products_options_name
 	b) enter the values_names, delimited with a comma
@@ -89,9 +96,9 @@ IMPORTANT NOTE:
 When creating your CSV file, please use Open Office (it's free!). When you save 
 CSV files from OO, it will properly encapsulate all fields. Excel will not 
 necessarily do this, depending on your data, and the export CSV option 
-you pick from within Excel.
+you pick from within Excel, also dates and date formats may be revised by Excel.
 
-In the /examples directory is an sample input files: Attrib-Basic-EP-examples.csv
+In the /examples directory is an sample input file: Attrib-Basic-EP-examples.csv
 
 The "Detailed Products Attributes" shows all attribute details assigned to a given products_model,
 with one line per option_name. So a product with a dropbox of 3 colors will result in 3 lines of
@@ -108,15 +115,19 @@ The two primary characteristics to consider when using EP4 are the columns (head
 2. Status (product enabled or disabled)
 3. Product Name in each language entered shifting the remaining columns to the right.
 4. Product Description without html tags (no <br/>, <p>, etc.) (In each language entered shifting the remaining columns to the right.)
-5. Whether the item listed in the row is tracked by Stock by Attributes (SBA) using a marker if yes and leaving the row's field blank if no.
-6. A unique identifier associated with the data type of item in the row.
-7. The attributes associated with the item in the row (if any exist) put together in the format OptionName1: OptionValue1; OptionName2: OptionValue2; etc... OptionName1 may be the same as OptionName2 and still will be listed as shown.
-8. The quantity of the item in the row.
+5. If potteryhouse's version of SBA is installed (or the customid field exists in addition to some other fields) then this column will have the customid, otherwise, all of the columns below will move left to replace what would be in this column.
+6. Whether the item listed in the row is tracked by Stock by Attributes (SBA) using a marker if yes and leaving the row's field blank if no.
+7. A unique identifier associated with the data type of item in the row.
+8. The attributes associated with the item in the row (if any exist) put together in the format OptionName1: OptionValue1; OptionName2: OptionValue2; etc... OptionName1 may be the same as OptionName2 and still will be listed as shown.
+9. The quantity of the item in the row.
 
 On upload/import, the only field that will change in the Zen Cart database with this report is the quantity associated with the row's data.
 
-Item 6 of the list was abbreviated to simplify the explanation. For an entry displayed that shows the total quantity associated with a product, the value in that column is the products_id taken from the products table of the database. For a row that contains SBA information, the value is the stock_id taken from the products_with_attributes_stock table. These values are provided to support import of the data and for normal operation, they should not be revised. The position of the column was chosen to not place it adjacent to a field that is likely to be changed by the user. (Technically for EP4 to import this new file, the only two columns important for the import are the ones located in items 5, 6 and 8, all of the other columns were provided to help the individual performing the stock inventory identify the product(s).) Ideally, column 6 would not exist and instead the program would determine the appropriate value for that column based on other information in the table so that the spreadsheet would not be dependent on the current database but could be applied to any database at any time.  This will require a revision to accomplish.
-This brings us to the arrangement of the rows. Every row of data has the potential of having attributes associated with the product, but every product has a quantity associated with it.  On export, every product will be listed, whether an active product or not. If a product is tracked by SBA, then the product's data will be provided first, followed by the SBA associated data. So if a product has two option values (green and blue) for a single option name (Color) but is not tracked by SBA then in the row for that product the attributes column (item 7 of above) and if there were 70 of this product (item 8 of above) will show as:
+Item 7 of the list was abbreviated to simplify the explanation. For an entry displayed that shows the total quantity associated with a product, the value in that column is the products_id taken from the products table of the database. For a row that contains SBA information, the value is the stock_id taken from the products_with_attributes_stock table. These values are provided to support import of the data and they should not be revised for normal operation. The position of the column was chosen to not place it adjacent to a field that is likely to be changed by the user. (Technically for EP4 to import this new file, the only two columns important for the import are the ones located in items 6, 7 and 9, all of the other columns were provided to help the individual performing the stock inventory identify the product(s).) Ideally, column 7 would not exist and instead the program would determine the appropriate value for that column based on other information in the table so that the spreadsheet would not be dependent on the current database but could be applied to any database at any time.  This will require a revision to accomplish.
+
+This brings us to the arrangement of the rows. Every row of data has the potential of having attributes associated with the product, but every product has a quantity associated with it.  Below are two examples 1) of a product without attributes, the other with attributes as described. 
+
+On export, every product will be listed, whether an active product or not. If a product is tracked by SBA, then the product's data will be provided as the first row for that product, followed by rows of the SBA associated data. So if a product has two option values (green and blue) for a single option name (Color) but is not tracked by SBA then in the row for that product the attributes column (item 7 of above) and quantity (item 8 of above) assuming 70 of this product will show as:
 
 Product has no attributes:
 | Attribute(s)              | Quantity

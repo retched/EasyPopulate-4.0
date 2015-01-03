@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4_export.php, v4.0.24CEONc 08-18-2014 mc12345678 $
+// $Id: easypopulate_4_export.php, v4.0.27URI 01-03-2015 mc12345678 $
 
 // get download type
 $ep_dltype = (isset($_POST['export'])) ? $_POST['export'] : $ep_dltype;
@@ -14,7 +14,7 @@ if (isset($_GET['export'])) {
 }
 
 if ($ep_dltype == '') {
-	die("error: no export type set - press backspace to return."); // need better handler
+   die("error: no export type set - press backspace to return."); // need better handler
 }
 
 $ep_export_count = 0;
@@ -23,6 +23,7 @@ $ep_export_count = 0;
 // depending on the type of the download the user wanted, create a file layout for it.
 $time_start = microtime(true); // benchmarking
 // build export filters
+
 // override for $ep_dltype
 if (isset($_POST['ep_export_type'])) {
 	if ($_POST['ep_export_type'] == '0') {
@@ -63,12 +64,17 @@ if (isset($_POST['ep_status_filter'])) {
 if ($ep_dltype == 'SBAStockProdFilter') {
 	$ep_dltype = 'SBAStock';
 	$sql_filter = 'p.products_id = p.products_id ORDER BY p.products_id ASC';
+	
 }
 
-//$filelayout = array(); //Commented out because ep_4_set_filelayout sets $filelayout as an array.
+$filelayout = array();
 $filelayout_sql = '';
 $filelayout = ep_4_set_filelayout($ep_dltype, $filelayout_sql, $sql_filter, $langcode, $ep_supported_mods, $custom_fields);
 
+if (($ep_dltype == 'full' || $ep_dltype == 'categorymeta') && EASYPOPULATE_4_CONFIG_EXPORT_URI != '0') {
+  //require_once(DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'functions_categories.php');
+  $filelayout[] = 'v_html_uri';
+}
 // Need to identify the extent of the array to make the SBA_basic table.
 if ($ep_dltype == 'SBA_basic') {
 	// these variablels are for the Attrib_Basic Export
@@ -181,6 +187,7 @@ if ($ep_dltype == 'SBA_basic') {
 
 $filelayout = array_flip($filelayout);
 // END: File Download Layouts
+
 // Create export file name
 switch ($ep_dltype) { // chadd - changed to use $EXPORT_FILE
 	case 'full':
@@ -236,6 +243,7 @@ switch ($ep_dltype) { // chadd - changed to use $EXPORT_FILE
 		break;
 }
 $EXPORT_FILE .= strftime('%Y%b%d-%H%M%S'); // chadd - changed for hour.minute.second
+
 // create file name and path and prepare for writing
 $tmpfpath = DIR_FS_CATALOG . '' . $tempdir . "$EXPORT_FILE" . (($csv_delimiter == ",") ? ".csv" : ".txt");
 $fp = fopen($tmpfpath, "w+");
@@ -279,6 +287,8 @@ if (ep_4_CEONURIExists() == true) {
 while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_array($result))) {
 
 	if ($ep_dltype == 'attrib_basic') { // special case 'attrib_basic'
+
+
 		if ($row['v_products_id'] == $active_products_id) {
 			if ($row['v_options_id'] == $active_options_id) {
 				// collect the products_options_values_name
@@ -350,7 +360,9 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			$active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
 			$active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
 		} // end of special case 'attrib_basic'
+	
 	} else { // standard export processing
+
 		if ($ep_dltype == 'attrib_detailed') {
 			if (isset($filelayout['v_products_attributes_filename'])) {
 				$sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . ' WHERE products_attributes_id = ' . $row['v_products_attributes_id'] . ' LIMIT 1';
@@ -716,6 +728,11 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			$row['v_categories_name_' . $lid] = $row2['categories_name'];
 			$row['v_categories_description_' . $lid] = $row2['categories_description'];
 		} // foreach
+
+      if (EASYPOPULATE_4_CONFIG_EXPORT_URI != '0') {
+        $row['v_html_uri'] = zen_catalog_href_link(FILENAME_DEFAULT, 'cPath=' . zen_get_path($row['v_categories_id']),'NONSSL');
+      }
+
 	} // if ($ep_dltype categorymeta...
 		
 	// CATEGORIES EXPORT
@@ -726,6 +743,15 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 		// NEW While-loop for unlimited category depth			
 		$category_delimiter = "^"; //Need to move this to the admin panel
 		$thecategory_id = $row['v_categories_id']; // starting category_id
+
+      if ($ep_dltype == 'full' && EASYPOPULATE_4_CONFIG_EXPORT_URI != '0'){
+        $sql_type = "SELECT type_handler FROM " . TABLE_PRODUCT_TYPES . " WHERE type_id = " . (int)zen_get_products_type($row['v_products_id']);
+        $sql_typename = $db->Execute($sql_type);
+//        $row['v_html_uri'] = zen_href_link(FILENAME_DEFAULT, 'main_page=' . $sql_typename->fields['type_handler'] . '_info&cPath=' . zen_get_generated_category_path_ids($row['v_master_categories_id']) . '&products_id=' . $row['v_products_id'],'NONSSL', false, true, false, true); //This generates an admin folder like link/reference not a catalog version.
+        $row['v_html_uri'] = zen_catalog_href_link($sql_typename->fields['type_handler'] . '_info', 'cPath=' . zen_get_generated_category_path_ids($row['v_master_categories_id']) . '&products_id=' . $row['v_products_id'],'NONSSL');
+//zen_catalog_href_link($page = '', $parameters = '', $connection = 'NONSSL')        //FILENAME_DEFAULT . '?main_page=' . zen_get_products_type($row['products_id'])
+        //function zen_href_link($page = '', $parameters = '', $connection = 'NONSSL', $add_session_id = true, $search_engine_safe = true, $static = false, $use_dir_ws_catalog = true) 
+      }
 		// $fullcategory = array(); // this will have the entire category path separated by $category_delimiter
 		if ($ep4CEONURIDoesExist == true && $ep_dltype == 'category') {
 			$ceon_uri_cat_mapping = new EP4CeonURIMappingAdminCategoryPages();
@@ -881,10 +907,10 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 				o.language_id       = 1 ORDER BY p.products_id ASC';/*, a.options_id, v.products_options_values_id';*/
 			
 			$resultAttrib = ep_4_query($sqlAttrib);
-			$resultAttribCount = mysql_num_rows($resultAttrib);
+			$resultAttribCount = ($ep_uses_mysqli ? mysqli_num_rows($resultAttrib) : mysql_num_rows($resultAttrib));
 			
 			if ($resultAttribCount !== false) {
-				while ($rowAttrib = mysql_fetch_assoc($resultAttrib)){
+				while ($rowAttrib = ($ep_uses_mysqli ? mysqli_fetch_assoc($resultAttrib) : mysql_fetch_assoc($resultAttrib))) {
 					$row['v_products_attributes'] .= $rowAttrib['v_products_options_name'] . ': ' . $rowAttrib['v_products_options_values_name'] . '; ';
 				}
 			}
@@ -899,15 +925,16 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 				s.products_id				as v_products_id, 
 				s.stock_id					 as v_stock_id,
 				s.stock_attributes				 as v_stock_attributes,
-				s.quantity					 as v_quantity 
-				FROM '
+				s.quantity					 as v_quantity' . ( $ep_4_SBAEnabled == '2' ? ',
+        s.customid            as v_customid ' : ' ') .
+				'FROM '
 				.TABLE_PRODUCTS.                ' as p,'
 				.TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK. ' as s
 				WHERE 
 				s.products_id		= p.products_id AND
 				p.products_id = \''. $row['v_products_id'] . '\'';
 			$resultSBA = ep_4_query($sqlSBA);
-			$resultSBACount = mysql_num_rows($resultSBA);
+			$resultSBACount = ($ep_uses_mysqli ? mysqli_num_rows($resultSBA) : mysql_num_rows($resultSBA));
 			
 			if ($resultSBACount !== false && $resultSBACount > 0) {
 				//If product is tracked by SBA
@@ -948,7 +975,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 				//  clean the data then
 				//  Store the data.
 				$resultSBACounter = 1;
-				while ($rowSBA = mysql_fetch_assoc($resultSBA)){
+				while ($rowSBA = ($ep_uses_mysqli ? mysqli_fetch_assoc($resultSBA) : mysql_fetch_assoc($resultSBA))){
 //					print_r($rowSBA);
 					//$rowSBA    = mysql_fetch_array($resultSBA);
 					//  get the attribute and quantity data from the SBA table
@@ -971,7 +998,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 							v.products_options_values_id = a.options_values_id AND
 							a.products_attributes_id = \''. trim($currentAttrib) . '\'';
 						$resultSBAAttributes = ep_4_query($sqlSBAAttributes);
-						$resultSBACountAttributes = mysql_fetch_assoc($resultSBAAttributes);
+						$resultSBACountAttributes = ($ep_uses_mysqli ? mysqli_fetch_assoc($resultSBAAttributes) : mysql_fetch_assoc($resultSBAAttributes));
 
 						$row['v_products_attributes'] .= (is_null($resultSBACountAttributes['v_SBA_value_name']) ? 'Option Does Not Exist' : $resultSBACountAttributes['v_SBA_option_name']) . ': ' . (is_null($resultSBACountAttributes['v_SBA_value_name']) ? 'Value Does Not Exist' : $resultSBACountAttributes['v_SBA_value_name']) . '; ';
 					}
@@ -979,6 +1006,9 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 					$row['v_products_quantity'] = $rowSBA['v_quantity'];
 					$row['v_SBA_tracked'] = 'X';
 					$row['v_table_tracker'] = $rowSBA['v_stock_id'];
+          if ($ep_4_SBAEnabled == '2') {
+            $row['v_customid'] = $rowSBA['v_customid'];
+          }
 					// loop through the SBA data until one before the end
 					// While not at the one before end
 					//  get the attribute and quantity data from the SBA table
@@ -1126,6 +1156,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 		// $thetext = str_replace("\r",' ',$thetext);
 		// $thetext = str_replace("\n",' ',$thetext);
 		// $thetext = str_replace("\t",' ',$thetext);
+			
 		// encapsulate data in quotes, and escape embedded quotes in data
 		$dataRow .= '"' . str_replace('"', '""', $thetext) . '"' . $csv_delimiter;
 		/*
@@ -1144,7 +1175,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 	fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
 	$ep_export_count++;
 	//} // if 
-} // while ($row)
+} // while ($row) or is it if?
 
 //Start SBA1 addresses writing to the file
 if ($ep_dltype == 'SBA_basic') {

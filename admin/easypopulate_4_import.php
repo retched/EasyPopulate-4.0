@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4_import.php, v4.0.24CEON 08-04-2014 mc12345678 $
+// $Id: easypopulate_4_import.php, v4.0.26URI 01-03-2015 mc12345678 $
 
 // BEGIN: Data Import Module
 if ( isset($_GET['import']) ) {
@@ -84,9 +84,9 @@ if ( isset($_GET['import']) ) {
 	$file_location = DIR_FS_CATALOG.$tempdir.$file['name'];
 	// Error Checking
 	if (!file_exists($file_location)) {
-		$display_output .='<font color="red"><b>ERROR: Import file does not exist:'.$file_location.'</b></font><br />';
+		$display_output .='<font color="red"><b>ERROR: Import file does not exist:'.$file_location.'</b></font><br/>';
 	} else if ( !($handle = fopen($file_location, "r"))) {
-		$display_output .= '<font color="red"><b>ERROR: Cannot open import file:'.$file_location.'</b></font><br />';
+		$display_output .= '<font color="red"><b>ERROR: Cannot open import file:'.$file_location.'</b></font><br/>';
 	}
 	
 	// Read Column Headers
@@ -258,7 +258,7 @@ if ( isset($_GET['import']) ) {
 		} // if Detailed Attributes Import
 
 		// Detailed Attributes Import
-		if ( strtolower(substr($file['name'],0,15)) == "sba-detailed-ep" && ep_4_SBA1Exists() == true) {
+	if ( strtolower(substr($file['name'],0,15)) == "sba-detailed-ep" && $ep_4_SBAEnabled != false) {
 			while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // read 1 line of data
 				$sql = 'SELECT * FROM '.TABLE_PRODUCTS_ATTRIBUTES.' 
 					WHERE (
@@ -281,7 +281,9 @@ if ( isset($_GET['import']) ) {
 						products_id		              = ".$items[$filelayout['v_products_id']].",
 						stock_attributes                  = '".$items[$filelayout['v_stock_attributes']]."',
 						quantity					    = ".$items[$filelayout['v_quantity']].",
-						sort						    = ".$items[$filelayout['v_sort']]."
+					sort						    = ".$items[$filelayout['v_sort']]. ( $ep_4_SBAEnabled == '2' ? ",
+          customid            = ".$items[$filelayout['v_customid']] : " ") .
+				"
 						WHERE (
 						stock_id = ".$items[$filelayout['v_stock_id']]." )";
 					$result = ep_4_query($sql);
@@ -325,7 +327,7 @@ if ( isset($_GET['import']) ) {
 	//			$stock->update_parent_products_stock((int)$_GET['products_id']);
 	//		$messageStack->add_session('Parent Product Quantity Updated', 'success');
 
-	if ( strtolower(substr($file['name'],0,12)) == "sba-stock-ep" && ep_4_SBA1Exists() == true) {
+	if ( strtolower(substr($file['name'],0,12)) == "sba-stock-ep" && $ep_4_SBAEnabled != false) {
 		$sync = false;
 		if (isset($_GET['sync']) && $_GET['sync'] == '1') {
 			$query = array();
@@ -339,7 +341,7 @@ if ( isset($_GET['import']) ) {
 			//IF STANDARD STOCK, then Update the standard stock
 			if ($items[$filelayout['v_SBA_tracked']] == '') {
 				$sql = "UPDATE ".TABLE_PRODUCTS." SET 
-					products_quantity					    = ".$items[(int)$filelayout['v_products_quantity']]."
+					products_quantity					    = " . $items[(int)$filelayout['v_products_quantity']] . "
 					WHERE (
 					products_id = ".$items[(int)$filelayout['v_table_tracker']]." )";
 				if ($sync) {
@@ -356,11 +358,11 @@ if ( isset($_GET['import']) ) {
 				}
 			} elseif ($items[(int)$filelayout['v_SBA_tracked']] == "X") {
 				$sql = "UPDATE ".TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK." SET 
-					quantity					    = ".$items[(int)$filelayout['v_products_quantity']]."
+					quantity					    = ".$items[(int)$filelayout['v_products_quantity']] . ($ep_4_SBAEnabled == '2' ? ", customid  = '" . $items[(string)$filelayout['v_customid']] . "' " : "") . "
 					WHERE (
 					stock_id = ".$items[$filelayout['v_table_tracker']]." )";
 				if ($result = ep_4_query($sql)) {
-					$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT, $items[(int)$filelayout['v_products_model']]) . $items[(int)$filelayout['v_products_quantity']];
+					$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT, $items[(int)$filelayout['v_products_model']]) . $items[(int)$filelayout['v_products_quantity']] . ($ep_4_SBAEnabled == '2' ? " " . $items[(string)$filelayout['v_customid']] : "");
 					$ep_update_count++;			
 					if ($sync) {
 						$stock->update_parent_products_stock((int)$query[$items[(int)$filelayout['v_products_model']]][(int)$filelayout['v_table_tracker']]);
@@ -368,7 +370,7 @@ if ( isset($_GET['import']) ) {
 						unset($query[$items[(int)$filelayout['v_products_model']]]);						
 					}
 				} else { // error Attribute entry not found - needs work!
-					$display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - SBA Tracked Quantity on Model: </b>%s - Not Found!</font>', $items[(int)$filelayout['v_products_model']]);
+					$display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - SBA Tracked Quantity '. ($ep_4_SBAEnabled == '2' ? 'and CustomID ' : '') . 'on Model: </b>%s - Not Found!</font>', $items[(int)$filelayout['v_products_model']]);
 					$ep_error_count++;
 				} // if 
 
@@ -408,7 +410,7 @@ if ( isset($_GET['import']) ) {
 					// UPDATE
 					$sql = "UPDATE ".TABLE_CATEGORIES." SET 
 						categories_image = '".addslashes($items[$filelayout['v_categories_image']])."',
-						last_modified    = CURRENT_TIMESTAMP 
+					last_modified    = CURRENT_TIMESTAMP " . (array_key_exists('v_sort_order', $filelayout)  ? ", sort_order = " . $items[$filelayout['v_sort_order']] : "" ) . "
 						WHERE (categories_id = ".$items[$filelayout['v_categories_id']].")";
 					$result = ep_4_query($sql);
 					foreach ($langcode as $key => $lang) {
@@ -456,7 +458,7 @@ if ( isset($_GET['import']) ) {
 			} // while
 		} // if
 		
-if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolower(substr($file['name'],0,7)) <> "attrib-") && (ep_4_SBA1Exists() == true ? ( strtolower(substr($file['name'],0,4)) <> "sba-") : true )) { //  temporary solution here... 12-06-2010
+if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolower(substr($file['name'],0,7)) <> "attrib-") && ($ep_4_SBAEnabled != false ? ( strtolower(substr($file['name'],0,4)) <> "sba-") : true )) { //  temporary solution here... 12-06-2010
 			
 if ($ep4CEONURIDoesExist == true) {
 			//Order of calls:
@@ -1565,18 +1567,18 @@ if ($ep4CEONURIDoesExist == true) {
 	
 		$display_output .= '<h3>Finished Processing Import File</h3>';
 
-		$display_output .= '<br />Updated records: '.$ep_update_count;
-		$display_output .= '<br />New Imported records: '.$ep_import_count;
-		$display_output .= '<br />Errors Detected: '.$ep_error_count;
-		$display_output .= '<br />Warnings Detected: '.$ep_warning_count;
+		$display_output .= '<br/>Updated records: '.$ep_update_count;
+		$display_output .= '<br/>New Imported records: '.$ep_import_count;
+		$display_output .= '<br/>Errors Detected: '.$ep_error_count;
+		$display_output .= '<br/>Warnings Detected: '.$ep_warning_count;
 
-		$display_output .= '<br />Memory Usage: '.memory_get_usage(); 
-		$display_output .= '<br />Memory Peak: '.memory_get_peak_usage();
+		$display_output .= '<br/>Memory Usage: '.memory_get_usage(); 
+		$display_output .= '<br/>Memory Peak: '.memory_get_peak_usage();
 
 		// benchmarking
 		$time_end = microtime(true);
 		$time = $time_end - $time_start;	
-		$display_output .= '<br />Execution Time: '. $time . ' seconds.';
+		$display_output .= '<br/>Execution Time: '. $time . ' seconds.';
 	}	
 	
 	// specials status = 0 if date_expires is past.

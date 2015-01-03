@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4_functions.php, v4.0.24CEONc 08-18-2014 mc12345678 $
+// $Id: easypopulate_4_functions.php, v4.0.27URI 01-03-2015 mc12345678 $
 
 function ep_4_curly_quotes($curly_text) {
 	$ep_curly_quotes = (int)EASYPOPULATE_4_CONFIG_CURLY_QUOTES;
@@ -97,10 +97,43 @@ function ep_4_SBA1Exists () {
 				}
 				echo '3<br />'; */
 			}
-			return true;
+			return '1';
+		} elseif ($numCols >= 6) {
+      $desired = 0;
+      $addToList = array();
+			while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($colsarray) : mysql_fetch_array($colsarray))){
+				switch ($row['Field']) {
+					case 'stock_id':
+            $desired++;
+            break;
+					case 'products_id':
+            $desired++;
+						break;
+					case 'stock_attributes':
+            $desired++;
+						break;
+					case 'quantity':
+            $desired++;
+						break;
+					case 'sort':
+            $desired++;
+						break;
+          case 'customid';
+            $desired++;
+            break;
+          default:
+            $addToList = $row['Field'];
+            break;
+				}
+      }
+      if ($desired >= 6) {
+        return '2';
+      } else {
+        return false;
+      }
 		} else {
-			return false;
-		}
+      return false;
+    }
 //		$returnedcols = mysql_fetch_array($colsarray);
 //		$colnames = array_keys($returnedcols);
 /*		echo 'Num Rows: ' . $numCols . '<br />';
@@ -164,14 +197,6 @@ function ep_4_CEONURIExists () {
 						break;
 						
 				}
-//				print_r($row);
-/*				echo '4<br />';
-				if ($row['Field'] == 'stock_id') {
-					echo ' true <br />';
-				} else {
-					echo ' false <br />';
-				}
-				echo '3<br />'; */
 			}
 			return true;
 		} else {
@@ -214,7 +239,11 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			if ($ep_supported_mods['psd'] == true) { // products short description mod
 				$filelayout[] = 'v_products_short_desc_'.$l_id;
 			}
-		} 
+		}
+   	$ep_4_SBAEnabled = ep_4_SBA1Exists();
+    if ($ep_4_SBAEnabled == '2') {
+      $filelayout[] = 'v_customid';
+    }
 		//$filelayout[] =	'v_products_options_values_name'; // options values name from table PRODUCTS_OPTIONS_VALUES
 		$filelayout[] = 'v_SBA_tracked';
 		$filelayout[] = 'v_table_tracker';
@@ -585,8 +614,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		$filelayout = array();
 		$filelayout[] = 'v_categories_id';
 		$filelayout[] = 'v_categories_image';
-
-		foreach ($langcode as $key => $lang) { // create categories variables for each language id
+    foreach ($langcode as $key => $lang) { // create categories variables for each language id
 			$l_id = $lang['id'];
 			$filelayout[] = 'v_categories_name_'.$l_id;
 			$filelayout[] = 'v_categories_description_'.$l_id;
@@ -605,9 +633,11 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			$filelayout[]   = 'v_metatags_keywords_'.$l_id;
 			$filelayout[]   = 'v_metatags_description_'.$l_id;
 		} 
+    $filelayout[] = 'v_sort_order';
 		$filelayout_sql = 'SELECT
 			c.categories_id    AS v_categories_id,
-			c.categories_image AS v_categories_image
+			c.categories_image AS v_categories_image,
+      c.sort_order    as v_sort_order
 			FROM '
 			.TABLE_CATEGORIES.' AS c';
 		break;
@@ -789,6 +819,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			o.language_id       = 1 ORDER BY a.products_id, a.options_id, v.products_options_values_id';
  		break;
 
+
 	case 'attrib_basic': // simplified sinlge-line attributes ... eventually!
 		// $filelayout[] =	'v_products_attributes_id';
 		// $filelayout[] =	'v_products_id';
@@ -867,8 +898,12 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		$filelayout[] =	'v_stock_attributes'; 
 		$filelayout[] =	'v_products_model'; // product model from table PRODUCTS
 		$filelayout[] =	'v_quantity';
+   	$ep_4_SBAEnabled = ep_4_SBA1Exists();
+    if ($ep_4_SBAEnabled == '2') {
+      $filelayout[] = 'v_customid';
+    }
 		$filelayout[] =	'v_sort';
-		$filelayout[] =	'v_products_name'; // product model from table PRODUCTS
+		$filelayout[] =	'v_products_name'; // product name from table PRODUCTS
 		$filelayout[] =	'v_products_options_name'; // options name from table PRODUCTS_OPTIONS
 		$filelayout[] =	'v_products_options_values_name'; // options values name from table PRODUCTS_OPTIONS_VALUES
 		$filelayout[] =	'v_products_attributes_id';
@@ -949,8 +984,9 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			s.stock_attributes				 as v_stock_attributes,
 			s.quantity					 as v_quantity,
 			s.sort						 as v_sort,
-			pd.products_name				 as v_products_name
-			FROM '
+			pd.products_name				 as v_products_name' . ( $ep_4_SBAEnabled == '2' ? ',
+        s.customid            as v_customid ' : ' ') .
+				'FROM '
 			.TABLE_PRODUCTS_ATTRIBUTES.     ' as a,'
 			.TABLE_PRODUCTS.                ' as p,'
 			.TABLE_PRODUCTS_OPTIONS.        ' as o,'
@@ -1321,15 +1357,16 @@ function install_easypopulate_4() {
 			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '16', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
 			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '17', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
 			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '18', NULL, now(), NULL, NULL),
-			('AutoCreate URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_FROM_BLANK','1','Enable Autogeneration of URIs with CEON (When it is installed) if a URI does not currently exist for the product upon export of the database?',".$group_id.", '19', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate URL For CEON - All Products','EP4_AUTORECREATE_EXISTING','0','Enable Autogeneration of URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter products based on this setting.<br /><br />Yes - Assign all products the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for products already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br />',".$group_id.", '20', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
-			('Export URL Information From CEON - All Products','EP4_EXPORT_ONLY','0','Export CEON URI autogenerated URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br />',".$group_id.", '25', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'),
-			('AutoCreate Category URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_CAT_FROM_BLANK','1','Enable Autogeneration of Category URIs with CEON (When it is installed) if a URI does not currently exist for the category upon export of the database?',".$group_id.", '29', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate Category URL For CEON - All Categories','EP4_AUTORECREATE_CAT_EXISTING','0','Enable Autogeneration of Category URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter categories based on this setting.<br /><br />Yes - Assign all categories the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for categories already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br />',".$group_id.", '30', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
-			('Export URL Information From CEON - All Categories','EP4_EXPORT_CAT_ONLY','0','Export CEON URI autogenerated category URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the Category URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br />',".$group_id.", '35', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'),
-			('AutoCreate EZ-Page URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_EZ_FROM_BLANK','1','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) if a URI does not currently exist for the EZ-Page upon export of the database?',".$group_id.", '39', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate EZ-Page URL For CEON - All EZ-Pages','EP4_AUTORECREATE_EZ_EXISTING','0','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) for all EZ-Pages on export?<br /><br />No - Do not alter EZ-Pages based on this setting.<br /><br />Yes - Assign all EZ-Pages the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for EZ-Pages already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br />',".$group_id.", '40', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
-			('Export URL Information From CEON - All EZ-Pages','EP4_EXPORT_EZ_ONLY','0','Export CEON URI autogenerated EZ-Page URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the EZ-Page URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br />',".$group_id.", '45', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),')
+			('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '19', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+			('AutoCreate URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_FROM_BLANK','1','Enable Autogeneration of URIs with CEON (When it is installed) if a URI does not currently exist for the product upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '20', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate URL For CEON - All Products','EP4_AUTORECREATE_EXISTING','0','Enable Autogeneration of URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter products based on this setting.<br /><br />Yes - Assign all products the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for products already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '21', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
+			('Export URL Information From CEON - All Products','EP4_EXPORT_ONLY','0','Export CEON URI autogenerated URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/>(Default - No)',".$group_id.", '25', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'),
+			('AutoCreate Category URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_CAT_FROM_BLANK','1','Enable Autogeneration of Category URIs with CEON (When it is installed) if a URI does not currently exist for the category upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '29', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate Category URL For CEON - All Categories','EP4_AUTORECREATE_CAT_EXISTING','0','Enable Autogeneration of Category URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter categories based on this setting.<br /><br />Yes - Assign all categories the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for categories already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '30', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
+			('Export URL Information From CEON - All Categories','EP4_EXPORT_CAT_ONLY','0','Export CEON URI autogenerated category URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the Category URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/>(Default - No)',".$group_id.", '35', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'),
+			('AutoCreate EZ-Page URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_EZ_FROM_BLANK','1','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) if a URI does not currently exist for the EZ-Page upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '39', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate EZ-Page URL For CEON - All EZ-Pages','EP4_AUTORECREATE_EZ_EXISTING','0','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) for all EZ-Pages on export?<br /><br />No - Do not alter EZ-Pages based on this setting.<br /><br />Yes - Assign all EZ-Pages the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for EZ-Pages already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '40', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
+			('Export URL Information From CEON - All EZ-Pages','EP4_EXPORT_EZ_ONLY','0','Export CEON URI autogenerated EZ-Page URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the EZ-Page URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/><br/>(Default - No)',".$group_id.", '45', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),')
 		");
 	} elseif (substr($project,0,3) == "1.5") {
 		$db->Execute("INSERT INTO ".TABLE_CONFIGURATION_GROUP." (configuration_group_title, configuration_group_description, sort_order, visible) VALUES ('Easy Populate 4', 'Configuration Options for Easy Populate 4', '1', '1')");
@@ -1359,15 +1396,16 @@ function install_easypopulate_4() {
 			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '16', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
 			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '17', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
 			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '18', NULL, now(), NULL, NULL),
-			('AutoCreate URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_FROM_BLANK','1','Enable Autogeneration of URIs with CEON (When it is installed) if a URI does not currently exist for the product upon export of the database?',".$group_id.", '19', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate URL For CEON - All Products','EP4_AUTORECREATE_EXISTING','0','Enable Autogeneration of URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter products based on this setting.<br /><br />Yes - Assign all products the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for products already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br />',".$group_id.", '20', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
-			('Export URL Information From CEON - All Products','EP4_EXPORT_ONLY','0','Export CEON URI autogenerated URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br />',".$group_id.", '25', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate Category URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_CAT_FROM_BLANK','1','Enable Autogeneration of Category URIs with CEON (When it is installed) if a URI does not currently exist for the category upon export of the database?',".$group_id.", '29', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate Category URL For CEON - All Categories','EP4_AUTORECREATE_CAT_EXISTING','0','Enable Autogeneration of Category URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter categories based on this setting.<br /><br />Yes - Assign all categories the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for categories already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br />',".$group_id.", '30', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
-			('Export URL Information From CEON - All Categories','EP4_EXPORT_CAT_ONLY','0','Export CEON URI autogenerated category URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the Category URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br />',".$group_id.", '35', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'),
-			('AutoCreate EZ-Page URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_EZ_FROM_BLANK','1','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) if a URI does not currently exist for the EZ-Page upon export of the database?',".$group_id.", '39', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate EZ-Page URL For CEON - All EZ-Pages','EP4_AUTORECREATE_EZ_EXISTING','0','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) for all EZ-Pages on export?<br /><br />No - Do not alter EZ-Pages based on this setting.<br /><br />Yes - Assign all EZ-Pages the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for EZ-Pages already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br />',".$group_id.", '40', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
-			('Export URL Information From CEON - All EZ-Pages','EP4_EXPORT_EZ_ONLY','0','Export CEON URI autogenerated EZ-Page URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the EZ-Page URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br />',".$group_id.", '45', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),') 
+			('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '19', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+			('AutoCreate URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_FROM_BLANK','1','Enable Autogeneration of URIs with CEON (When it is installed) if a URI does not currently exist for the product upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '20', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate URL For CEON - All Products','EP4_AUTORECREATE_EXISTING','0','Enable Autogeneration of URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter products based on this setting.<br /><br />Yes - Assign all products the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for products already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '21', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
+			('Export URL Information From CEON - All Products','EP4_EXPORT_ONLY','0','Export CEON URI autogenerated URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/>(Default - No)',".$group_id.", '25', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate Category URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_CAT_FROM_BLANK','1','Enable Autogeneration of Category URIs with CEON (When it is installed) if a URI does not currently exist for the category upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '29', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate Category URL For CEON - All Categories','EP4_AUTORECREATE_CAT_EXISTING','0','Enable Autogeneration of Category URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter categories based on this setting.<br /><br />Yes - Assign all categories the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for categories already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '30', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
+			('Export URL Information From CEON - All Categories','EP4_EXPORT_CAT_ONLY','0','Export CEON URI autogenerated category URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the Category URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/>(Default - No)',".$group_id.", '35', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'),
+			('AutoCreate EZ-Page URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_EZ_FROM_BLANK','1','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) if a URI does not currently exist for the EZ-Page upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '39', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate EZ-Page URL For CEON - All EZ-Pages','EP4_AUTORECREATE_EZ_EXISTING','0','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) for all EZ-Pages on export?<br /><br />No - Do not alter EZ-Pages based on this setting.<br /><br />Yes - Assign all EZ-Pages the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for EZ-Pages already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '40', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
+			('Export URL Information From CEON - All EZ-Pages','EP4_EXPORT_EZ_ONLY','0','Export CEON URI autogenerated EZ-Page URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the EZ-Page URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/><br/>(Default - No)',".$group_id.", '45', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),') 
 		");
 	} else { // unsupported version 
 		// i should do something here!
