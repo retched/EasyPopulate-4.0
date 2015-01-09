@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4_import.php, v4.0.26URI 01-03-2015 mc12345678 $
+// $Id: easypopulate_4_import.php, v4.0.28URI 01-03-2015 mc12345678 $
 
 // BEGIN: Data Import Module
 if ( isset($_GET['import']) ) {
@@ -139,6 +139,9 @@ if ( isset($_GET['import']) ) {
 							WHERE (
 							featured_id = '".$v_featured_id."')";
 						$result = ep_4_query($sql);
+            if ($result) {
+              zen_record_admin_activity('Updated featured product with featured_id ' . (int)$v_featured_id . ' via EP4.', 'info');
+            }
 						$ep_update_count++;
 					} else {
 						// add featured product
@@ -170,7 +173,10 @@ if ( isset($_GET['import']) ) {
 							status                  = ".(int)$v_status.",
 							featured_date_available = '".$v_featured_date_available."'";
 						$result = ep_4_query($sql);
-						$ep_update_count++;
+            if ($result) {
+              zen_record_admin_activity('Inserted product ' . (int)$v_products_id . ' via EP4 into featured table.', 'info');
+            }
+            $ep_update_count++;
 					}
 				} else { // ERROR: This products_model doen't exist!
 					$display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Model: </b>%s - Not Found!</font>', $items[$filelayout['v_products_model']]);
@@ -227,6 +233,9 @@ if ( isset($_GET['import']) ) {
 						options_id = ".$items[$filelayout['v_options_id']]." AND 
 						options_values_id = ".$items[$filelayout['v_options_values_id']].")";
 					$result = ep_4_query($sql);
+          if ($result) {
+            zen_record_admin_activity('Updated products attributes ' . (int)$items[$filelayout['v_products_attributes_id']] . ' of product ' . $items[$filelayout['v_products_id']] . ' having option ' . $items[$filelayout['v_options_id']] . ' and option value ' . $items[$filelayout['v_options_values_id']] . ' via EP4.', 'info');
+          }
 
 					if ($items[$filelayout['v_products_attributes_filename']] <> '') { // download file name
 						$sql = 'SELECT * FROM '.TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD.' 
@@ -240,6 +249,9 @@ if ( isset($_GET['import']) ) {
 								WHERE ( 
 								products_attributes_id = ".$items[$filelayout['v_products_attributes_id']].")";
 							$result = ep_4_query($sql);
+              if ($result) {
+                zen_record_admin_activity('Downloads-manager details updated by EP4 for ' . $items[$filelayout['v_products_attributes_id']], 'info');
+              }
 						} else { // insert
 							$sql = "INSERT INTO ".TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD." SET 
 								products_attributes_id       = '".$items[$filelayout['v_products_attributes_id']]."',
@@ -247,6 +259,9 @@ if ( isset($_GET['import']) ) {
 								products_attributes_maxdays  = '".$items[$filelayout['v_products_attributes_maxdays']]."',
 								products_attributes_maxcount = '".$items[$filelayout['v_products_attributes_maxcount']]."'";
 							$result = ep_4_query($sql);
+              if ($result) {
+                zen_record_admin_activity('Downloads-manager details inserted by EP4 for ' . $items[$filelayout['v_products_attributes_id']], 'info');
+              }
 						}				
 					}
 					$ep_update_count++;			
@@ -287,6 +302,9 @@ if ( isset($_GET['import']) ) {
 						WHERE (
 						stock_id = ".$items[$filelayout['v_stock_id']]." )";
 					$result = ep_4_query($sql);
+          if ($result) {
+            zen_record_admin_activity('Updated products with attributes stock ' . (int)$items[$filelayout['v_stock_id']] . ' via EP4.', 'info');
+          }
 
 					if ($items[$filelayout['v_products_attributes_filename']] <> '') { // download file name
 						$sql = 'SELECT * FROM '.TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD.' 
@@ -300,6 +318,9 @@ if ( isset($_GET['import']) ) {
 								WHERE ( 
 								products_attributes_id = ".$items[$filelayout['v_products_attributes_id']].")";
 							$result = ep_4_query($sql);
+              if ($result) {
+                zen_record_admin_activity('Downloads-manager details updated by EP4 for ' . $items[$filelayout['v_products_attributes_id']], 'info');
+              }
 						} else { // insert
 							$sql = "INSERT INTO ".TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD." SET 
 								products_attributes_id       = '".$items[$filelayout['v_products_attributes_id']]."',
@@ -307,6 +328,9 @@ if ( isset($_GET['import']) ) {
 								products_attributes_maxdays  = '".$items[$filelayout['v_products_attributes_maxdays']]."',
 								products_attributes_maxcount = '".$items[$filelayout['v_products_attributes_maxcount']]."'";
 							$result = ep_4_query($sql);
+              if ($result) {
+                zen_record_admin_activity('Downloads-manager details inserted by EP4 for ' . $items[$filelayout['v_products_attributes_id']], 'info');
+              }
 						}				
 					}
 					$ep_update_count++;			
@@ -349,6 +373,7 @@ if ( isset($_GET['import']) ) {
 					//Need to capture all of the product model/product number/quantity counts so that can do a comparison in the SBA section and remove the data point.  Once all done, then cycle through this data and update with it.
 				} elseif (!$sync) { 
 					if ($result = ep_4_query($sql)) {
+            zen_record_admin_activity('Updated product ' . (int)$items[(int)$filelayout['v_table_tracker']] . ' via EP4.', 'info');
 						$ep_update_count++;			
 						$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT, $items[(int)$filelayout['v_products_model']] ) . $items[(int)$filelayout['v_products_quantity']];
 					} else { // error Attribute entry not found - needs work!
@@ -362,6 +387,7 @@ if ( isset($_GET['import']) ) {
 					WHERE (
 					stock_id = ".$items[$filelayout['v_table_tracker']]." )";
 				if ($result = ep_4_query($sql)) {
+          zen_record_admin_activity('Updated products with attributes stock ' . (int)$items[$filelayout['v_table_tracker']] . ' via EP4.', 'info');
 					$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT, $items[(int)$filelayout['v_products_model']]) . $items[(int)$filelayout['v_products_quantity']] . ($ep_4_SBAEnabled == '2' ? " " . $items[(string)$filelayout['v_customid']] : "");
 					$ep_update_count++;			
 					if ($sync) {
@@ -384,6 +410,7 @@ if ( isset($_GET['import']) ) {
 					WHERE (
 					products_id = ".$items[(int)$filelayout['v_table_tracker']]." )";
 				if ($result = ep_4_query($sql)) {
+          zen_record_admin_activity('Updated product ' . (int)$items[(int)$filelayout['v_table_tracker']] . ' via EP4.', 'info');
 					$ep_update_count++;			
 					$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT, $items[(int)$filelayout['v_products_model']] ) . $items[(int)$filelayout['v_products_quantity']];
 				} else { // error Attribute entry not found - needs work!
@@ -413,6 +440,9 @@ if ( isset($_GET['import']) ) {
 					last_modified    = CURRENT_TIMESTAMP " . (array_key_exists('v_sort_order', $filelayout)  ? ", sort_order = " . $items[$filelayout['v_sort_order']] : "" ) . "
 						WHERE (categories_id = ".$items[$filelayout['v_categories_id']].")";
 					$result = ep_4_query($sql);
+          if ($result) {
+            zen_record_admin_activity('Updated category ' . (int)$items[$filelayout['v_categories_id']] . ' via EP4.', 'info');
+          }
 					foreach ($langcode as $key => $lang) {
 						$lid = $lang['id'];
 						// $items[$filelayout['v_categories_name_'.$lid]];
@@ -423,6 +453,9 @@ if ( isset($_GET['import']) ) {
 							WHERE 
 							(categories_id = ".$items[$filelayout['v_categories_id']]." AND language_id = ".$lid.")";
 						$result = ep_4_query($sql);
+            if ($result) {
+              zen_record_admin_activity('Updated category description ' . (int)$items[$filelayout['v_categories_id']] . ' via EP4.', 'info');
+            }
 
 						// $items[$filelayout['v_metatags_title_'.$lid]];
 						// $items[$filelayout['v_metatags_keywords_'.$lid]];
@@ -449,6 +482,9 @@ if ( isset($_GET['import']) ) {
 								language_id 		 = '".$lid."'";
 						}
 						$result = ep_4_query($sql);
+            if ($result) {
+              zen_record_admin_activity('Inserted/Updated category metatag information ' . (int)$items[(int)$filelayout['v_categories_id']] . ' via EP4.', 'info');
+            }
 						$ep_update_count++;			
 					} 
 				} else { // error Category ID not Found
@@ -866,6 +902,9 @@ if ($ep4CEONURIDoesExist == true) {
 						$sql = "INSERT INTO ".TABLE_MANUFACTURERS." (manufacturers_name, date_added, last_modified)
 							VALUES ('".addslashes($v_manufacturers_name)."', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 						$result = ep_4_query($sql);
+            if ($result) {
+              zen_record_admin_activity('Inserted manufacturer ' . addslashes($v_manufactureres_name) . ' via EP4.', 'info');
+            }
 						$v_manufacturers_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment, so can use this function
 
 						// BUG FIX: TABLE_MANUFACTURERS_INFO need an entry for each installed language! chadd 11-14-2011
@@ -875,6 +914,9 @@ if ($ep4CEONURIDoesExist == true) {
 							$sql = "INSERT INTO ".TABLE_MANUFACTURERS_INFO." (manufacturers_id, languages_id, manufacturers_url)
 								VALUES ('".addslashes($v_manufacturers_id) . "',".(int)$l_id.",'')"; // seems we are skipping manufacturers url
 							$result = ep_4_query($sql);
+              if ($result) {
+                zen_record_admin_activity('Inserted manufacturers info ' . (int)$v_manufacturers_id . ' via EP4.', 'info');
+              }
 						}
 					}
 				} else { // $v_manufacturers_name == '' or name length violation
@@ -974,6 +1016,9 @@ if ($ep4CEONURIDoesExist == true) {
 											categories_id   = '".$thiscategoryid."' AND
 											language_id     = '".$cat_lang_id."'";
 									$result = ep_4_query($sql);
+                  if ($result) {
+                    zen_record_admin_activity('Updated category description ' . (int)$thiscategoryid . ' via EP4.', 'info');
+                  }
 								}
 							}
 						} else { // otherwise add new category
@@ -994,6 +1039,9 @@ if ($ep4CEONURIDoesExist == true) {
 							$current_category_id = $max_category_id;
 							$parent_category_id = $theparent_id;
 							$result = ep_4_query($sql);
+              if ($result) {
+                zen_record_admin_activity('Inserted category ' . (int)$max_category_id . ' via EP4.', 'info');
+              }
 							// TABLE_CATEGORIES_DESCRIPTION has an entry for EACH installed languag
 							// Check for multiple categories language. If a column is not defined, default to the main language:
 							// categories_name = '".addslashes($thiscategoryname)."'";
@@ -1015,6 +1063,9 @@ if ($ep4CEONURIDoesExist == true) {
 										categories_name = '".addslashes(ep_4_curly_quotes($thiscategoryname))."'";
 								}	
 								$result = ep_4_query($sql);
+                if ($result) {
+                  zen_record_admin_activity('Inserted category description ' . (int)$max_category_id . ' via EP4.', 'info');
+                }
 							}
 							$thiscategoryid = $max_category_id;
 						}
@@ -1042,23 +1093,35 @@ if ($ep4CEONURIDoesExist == true) {
 								last_modified = CURRENT_TIMESTAMP
 								WHERE artists_id = '".$v_artists_id."'";
 							$result = ep_4_query($sql);
+              if ($result) {
+                zen_record_admin_activity('Updated record artist ' . (int)$v_artists_id . ' via EP4.', 'info');
+              }
 							foreach ($langcode as $lang) {
 								$l_id = $lang['id'];
 								$sql = "UPDATE ".TABLE_RECORD_ARTISTS_INFO." SET
 									artists_url = '".addslashes($items[$filelayout['v_artists_url_'.$lid]])."'
 									WHERE artists_id = '".$v_artists_id."' AND languages_id = '".$lid."'"; 
 								$result = ep_4_query($sql);
+                if ($result) {
+                  zen_record_admin_activity('Updated record artist info ' . (int)$v_artists_id . ' via EP4.', 'info');
+                }
 							}
 						} else { // It is set to autoincrement, do not need to fetch max id
 							$sql = "INSERT INTO ".TABLE_RECORD_ARTISTS." (artists_name, artists_image, date_added, last_modified)
 								VALUES ('".addslashes(ep_4_curly_quotes($v_artists_name))."', '".addslashes($v_artists_image)."', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 							$result = ep_4_query($sql);
+              if ($result) {
+                zen_record_admin_activity('Inserted record artist ' . $addslashes(ep_4_curly_quotes($v_artists_name)) . ' via EP4.', 'info');
+              }
 							$v_artists_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment, so can use this function
 							foreach ($langcode as $lang) {
 								$l_id = $lang['id'];
 								$sql = "INSERT INTO ".TABLE_RECORD_ARTISTS_INFO." (artists_id, languages_id, artists_url)
 									VALUES ('".addslashes($v_artists_id)."',".(int)$l_id.",'".addslashes($items[$filelayout['v_artists_url_'.$lid]])."')"; // seems we are skipping manufacturers url
 								$result = ep_4_query($sql);
+                if ($result) {
+                  zen_record_admin_activity('Inserted record artists info ' . (int)$v_artists_id . ' via EP4.', 'info');
+                }
 							}
 						}
 					} else { // $v_artists_name == '' or name length violation
@@ -1085,23 +1148,35 @@ if ($ep4CEONURIDoesExist == true) {
 								last_modified = CURRENT_TIMESTAMP
 								WHERE record_company_id = '".$v_record_company_id."'";
 							$result = ep_4_query($sql);
+              if ($result) {
+                zen_record_admin_activity('Updated record company ' . (int)$v_record_company_id . ' via EP4.', 'info');
+              }
 							foreach ($langcode as $lang) {
 								$l_id = $lang['id'];
 								$sql = "UPDATE ".TABLE_RECORD_COMPANY_INFO." SET
 									record_company_url = '".addslashes($items[$filelayout['v_record_company_url_'.$lid]])."'
 									WHERE record_company_id = '".$v_record_company_id."' AND languages_id = '".$lid."'"; 
 								$result = ep_4_query($sql);
+                if ($result) {
+                  zen_record_admin_activity('Updated record company info ' . (int)$v_record_company_id . ' via EP4.', 'info');
+                }
 							}
 						} else { // It is set to autoincrement, do not need to fetch max id
 							$sql = "INSERT INTO ".TABLE_RECORD_COMPANY." (record_company_name, record_company_image, date_added, last_modified)
 								VALUES ('".addslashes(ep_4_curly_quotes($v_record_company_name))."', '".addslashes($v_record_company_image)."', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 							$result = ep_4_query($sql);
+              if ($result) {
+                zen_record_admin_activity('Inserted record company ' . addslashes(ep_4_curly_quotes($v_record_company_name)) . ' via EP4.', 'info');
+              }
 							$v_record_company_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment, so can use this function
 							foreach ($langcode as $lang) {
 								$l_id = $lang['id'];
 								$sql = "INSERT INTO ".TABLE_RECORD_COMPANY_INFO." (record_company_id, languages_id, record_company_url)
 									VALUES ('".addslashes($v_record_company_id)."',".(int)$l_id.",'".addslashes($items[$filelayout['v_record_company_url_'.$lid]])."')"; // seems we are skipping manufacturers url
 								$result = ep_4_query($sql);
+                if ($result) {
+                  zen_record_admin_activity('Inserted record company info ' . (int)$v_record_company_id . ' via EP4.', 'info');
+                }
 							}
 						}
 					} else { // $v_record_company_name == '' or name length violation
@@ -1127,6 +1202,9 @@ if ($ep4CEONURIDoesExist == true) {
 							$sql = "INSERT INTO ".TABLE_MUSIC_GENRE." (music_genre_name, date_added, last_modified)
 								VALUES ('".addslashes($v_music_genre_name)."', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 							$result = ep_4_query($sql);
+              if ($result) {
+                zen_record_admin_activity('Inserted music genre ' . addslashes($v_music_genre_name) . ' via EP4.', 'info');
+              }
 							$v_music_genre_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment
 						}
 					} else { // $v_music_genre_name == '' or name length violation
@@ -1220,6 +1298,8 @@ if ($ep4CEONURIDoesExist == true) {
 						$result = ep_4_query($query);
 						if ($result == true) {
 							// need to change to an log file, this is gobbling up memory! chadd 11-14-2011
+              zen_record_admin_activity('New product ' . (int)$v_products_id . ' added via EP4.', 'info');
+
 							if ($ep_feedback == true) {
 								$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT, $v_products_model);
 							}
@@ -1234,6 +1314,9 @@ if ($ep4CEONURIDoesExist == true) {
 										record_company_id	= '".$v_record_company_id."',
 										music_genre_id		= '".$v_music_genre_id."'";
 									$result = ep_4_query($query);
+                  if ($result) {
+                    zen_record_admin_activity('Inserted product music extra ' . (int)$v_products_id . ' via EP4.', 'info');
+                  }
 								}				
 							}
 						} else {
@@ -1311,6 +1394,8 @@ if ($ep4CEONURIDoesExist == true) {
 
 						$result = ep_4_query($query);
 						if ($result == true) {
+              zen_record_admin_activity('Updated product ' . (int)$v_products_id . ' via EP4.', 'info');
+
 							// needs to go into a log file chadd 11-14-2011
 							if ($ep_feedback == true) {
 							$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT, $v_products_model);
@@ -1329,6 +1414,9 @@ if ($ep4CEONURIDoesExist == true) {
 										music_genre_id		= '".$v_music_genre_id."' 
 										WHERE products_id   = '".$v_products_id."'";
 									$result = ep_4_query($query);
+                  if ($result) {
+                    zen_record_admin_activity('Updated product music extra ' . (int)$v_artists_id . ' via EP4.', 'info');
+                  }
 								}				
 							}					
 							$ep_update_count++;				
@@ -1362,6 +1450,9 @@ if ($ep4CEONURIDoesExist == true) {
 									language_id = '".$key."'";
 							}
 							$result = ep_4_query($sql);
+              if ($result) {
+                zen_record_admin_activity('Updated/inserted meta tags products description ' . (int)$v_products_id . ' via EP4.', 'info');
+              }
 						}
 					} // END: Products MetaTags
 
@@ -1403,6 +1494,9 @@ if ($ep4CEONURIDoesExist == true) {
 										discount_qty   = '".$$v_discount_qty_var."',
 										discount_price = '".$$v_discount_price_var."'";
 									$result = ep_4_query($sql);
+                  if ($result) {
+                    zen_record_admin_activity('Inserted products discount quantity ' . (int)$v_products_id . ' via EP4.', 'info');
+                  }
 								} // end: check for empty price
 								$xxx++; 
 								$v_discount_qty_var   = 'v_discount_qty_'.$xxx;
@@ -1454,6 +1548,9 @@ if ($ep4CEONURIDoesExist == true) {
                         }
                         $sql .= "'" . addslashes($v_products_url[$key]) . "')";
                         $result = ep_4_query($sql);
+                        if ($result) {
+                          zen_record_admin_activity('New product ' . (int)$v_products_id . ' description added via EP4.', 'info');
+                        }
                     } else { // already in the description, update it
                         $sql = "UPDATE ".TABLE_PRODUCTS_DESCRIPTION." SET
        products_name        ='".addslashes($name)."', " .
@@ -1464,6 +1561,10 @@ if ($ep4CEONURIDoesExist == true) {
                         $sql .= " products_url='" . addslashes($v_products_url[$key]) . "'
        WHERE products_id = '" . $v_products_id . "' AND language_id = '" . $key . "'";
                         $result = ep_4_query($sql);
+                        if ($result) {
+                          zen_record_admin_activity('Updated product ' . (int)$v_products_id . ' description via EP4.', 'info');
+                        }
+                        
                     }
                 }
             } // END: Products Descriptions End
@@ -1483,6 +1584,9 @@ if ($ep4CEONURIDoesExist == true) {
 					if (($ep_uses_mysqli ? mysqli_num_rows($result_incategory) : mysql_num_rows($result_incategory)) == 0) { // nope, this is a new category for this product
 						$res1 = ep_4_query('INSERT INTO '.TABLE_PRODUCTS_TO_CATEGORIES.' (products_id, categories_id)
 							VALUES ("'.$v_products_id.'", "'.$v_categories_id.'")');
+            if ($res1) {
+              zen_record_admin_activity('Product ' . (int)$v_products_id . ' copied as link to category ' . (int)$v_categories_id . ' via EP4.', 'info');
+            }
 					} else { // already in this category, nothing to do!
 					}
 				}
@@ -1528,6 +1632,9 @@ if ($ep4CEONURIDoesExist == true) {
 							'".$v_specials_expires_date."',
 							'1')";
 						$result = ep_4_query($sql);
+            if ($result) {
+              zen_record_admin_activity('Inserted special ' . (int)$v_products_id . ' via EP4.', 'info');
+            }
 						$specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_NEW, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price , $v_specials_price);
 					} else { // existing product
 						if ($v_specials_price == '0') { // delete of existing requested
@@ -1543,7 +1650,10 @@ if ($ep4CEONURIDoesExist == true) {
 							expires_date				= '".$v_specials_expires_date."',
 							status						= '1'
 							WHERE products_id			= '".(int)$v_products_id."'";
-						ep_4_query($sql);
+						$result = ep_4_query($sql);
+            if ($result) {
+              zen_record_admin_activity('Updated special ' . (int)$v_products_id . ' via EP4.', 'info');
+            }
 						$specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_UPDATE, $v_products_model, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price , $v_specials_price);
 					} // we still have our special here
 				} // end specials for this product

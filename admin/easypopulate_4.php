@@ -26,7 +26,7 @@ $ep_curly_quotes  = (int)EASYPOPULATE_4_CONFIG_CURLY_QUOTES;
 $ep_char_92       = (int)EASYPOPULATE_4_CONFIG_CHAR_92;
 $ep_metatags      = (int)EASYPOPULATE_4_CONFIG_META_DATA; // 0-Disable, 1-Enable
 $ep_music         = (int)EASYPOPULATE_4_CONFIG_MUSIC_DATA; // 0-Disable, 1-Enable
-$ep_uses_mysqli   = (PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR == '1.5.3' ? true : false);
+$ep_uses_mysqli   = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3' ? true : false);
 
 @set_time_limit($ep_execution);  // executin limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
 
@@ -407,14 +407,14 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
 
     <b>Product &amp; Pricing Export/Import Options:</b><br/>
     <!-- Download file links -->
-    <a href="easypopulate_4.php?export=full"><b>Complete Products</b> (with Metatags)</a><br/>
+    <a href="easypopulate_4.php?export=full"><b>Complete Products</b> (with Metatags<?php if ($ep4CEONURIDoesExist == true) { ?> and CEON export<?php } ?>)</a><br/>
     <a href="easypopulate_4.php?export=priceqty"><b>Model/Price/Qty</b> (with Specials)</a><br/>
     <a href="easypopulate_4.php?export=pricebreaks"><b>Model/Price/Breaks</b></a><br/>
     <a href="easypopulate_4.php?export=featured"><b>Featured Products</b></a><br/>
     
     <br/><b>Category Export/Import Options</b><br/>
     <a href="easypopulate_4.php?export=category"><b>Model/Category</b></a><br/>
-    <a href="easypopulate_4.php?export=categorymeta"><b>Categories Only</b> (with Metatags)</a><br/>
+    <a href="easypopulate_4.php?export=categorymeta"><b>Categories Only</b> (with Metatags<?php if ($ep4CEONURIDoesExist == true) { ?> and CEON export<?php } ?>)</a><br/>
     
     <br/><b>Attribute Export/Import Options</b><br/>
     <a href="easypopulate_4.php?export=attrib_basic"><b>Basic Products Attributes</b> (basic single-line)</a><br/> 
@@ -429,8 +429,7 @@ if (!$error && isset($_REQUEST["delete"]) && $_REQUEST["delete"]!=basename($_SER
 
     <a href="easypopulate_4.php?export=SBAStockProdFilter"><b>Stock of Items with Attributes Including SBA Sorted Ascending</b></a><br/>
 
-<?php } ?>
-<?php /*}*/ /* End SBA1 Addition */?>
+<?php } /* End SBA1 Addition */?>
 <?php /* Begin CEON URI addition */ if ($ep4CEONURIDoesExist == true) { ?>    <br /><b>CEON URI Export/Import Options</b><br />
     <a href="easypopulate_4.php?export=CEON_URI_active_all"><b>CEON URI Active Data Table</b> (basic single-line)</a><br />
     <a href="easypopulate_4.php?export=CEON_detailed"><b>Detailed CEON URI Data</b> (detailed multi-line)</a><br />

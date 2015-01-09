@@ -206,4 +206,6 @@
 					Also modified version check to support ZC 1.5.4 and above.
 					Future versions of ZC may still require this to be revised, but at least
 					this program will not need to be updated merely to support a version check.
-4.0.28URI	01-03-2015	Incorporated latest EP4 file changes from version 4.0.28
+					Incorporated admin logging of database inserts and updates similar (and beyond)
+					those contained in ZC 1.5.4.  Deletions were not incorporated.
+4.0.28URI	01-03-2015	Incorporated latest EP4 file changes from version 4.0.28.
