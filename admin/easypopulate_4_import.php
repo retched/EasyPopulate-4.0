@@ -496,7 +496,7 @@ if ( isset($_GET['import']) ) {
 		
 if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolower(substr($file['name'],0,7)) <> "attrib-") && ($ep_4_SBAEnabled != false ? ( strtolower(substr($file['name'],0,4)) <> "sba-") : true )) { //  temporary solution here... 12-06-2010
 			
-if ($ep4CEONURIDoesExist == true) {
+if ($ep4CEONURIDoesExist == true && false) { // Not sure that this is fully developed yet and if correctly incorporated for use. 
 			//Order of calls:
 			//collect_info
 	require_once(DIR_WS_CLASSES . 'class.EP4CeonURIMappingAdminProductPages.php');
@@ -524,7 +524,7 @@ if ($ep4CEONURIDoesExist == true) {
 	 
 			//update_product
     
-	$ceon_uri_mapping_admin->updateProductHandler($products_id, $zc_products->get_handler($product_type));
+	$ceon_uri_mapping_admin->updateProductHandler($products_id, $zc_products->get_handler($product_type), $prev_uri_mappings, $uri_mappings);
 
 			//Variables that need to be created and code to do so:
 			//New Category being created:
@@ -628,7 +628,7 @@ if ($ep4CEONURIDoesExist == true) {
 					TABLE_PRODUCTS." as p ";
 				if ($ep4CEONURIDoesExist == true) {
 					$filenamelist = implode("','", $ceon_uri_mapping_product_pages);
-					$filelayout_sql .= 'LEFT JOIN '.TABLE_CEON_URI_MAPPINGS.' as c 
+					$sql .= 'LEFT JOIN '.TABLE_CEON_URI_MAPPINGS.' as c 
 						ON 
 						p.products_id = c.associated_db_id AND
 						c.main_page IN (\''.$filenamelist.'\') AND

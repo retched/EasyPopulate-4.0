@@ -285,6 +285,7 @@ if (ep_4_CEONURIExists() == true) {
 } //End CEON modification - mc12345678
 
 while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_array($result))) {
+  @set_time_limit($ep_execution);  // execution limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
 
 	if ($ep_dltype == 'attrib_basic') { // special case 'attrib_basic'
 
@@ -479,8 +480,10 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 		foreach ($langcode as $key2 => $lang2) {
 			$lid2 = $lang2['id'];
 		
-			$sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_DESCRIPTION . ' WHERE products_id = ' . $row['v_products_id'] . ' AND language_id = ' . $lid2 . ' LIMIT 1 ';
-			$result2 = ep_4_query($sql2);
+			$sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_DESCRIPTION . ' WHERE products_id = :products_id: AND language_id = :language_id: LIMIT 1 ';
+      $sql2 = $db->bindVars($sql2, ':products_id:', $row['v_products_id'], 'integer');
+      $sql2 = $db->bindVars($sql2, ':language_id:', $lid2, 'integer');
+      $result2 = ep_4_query($sql2);
 			$row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
 			$row['v_products_name_' . $lid2] = $row2['products_name'];
 			$products_name[$lid2] = $row['v_products_name_' . $lid2];
@@ -489,7 +492,9 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 		foreach ($langcode as $key => $lang) {
 			$lid = $lang['id'];
 			// metaData start
-			$sqlMeta = 'SELECT * FROM ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . ' WHERE products_id = ' . $row['v_products_id'] . ' AND language_id = ' . $lid . ' LIMIT 1 ';
+      $sqlMeta = 'SELECT * FROM ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . ' WHERE products_id = :products_id: AND language_id = :language_id: LIMIT 1 ';
+      $sqlMeta = $db->bindVars($sqlMeta, ':products_id:', $row['v_products_id'], 'integer');
+      $sqlMeta = $db->bindVars($sqlMeta, ':language_id:', $lid, 'integer');
 			$resultMeta = ep_4_query($sqlMeta);
 			$rowMeta = ($ep_uses_mysqli ? mysqli_fetch_array($resultMeta) : mysql_fetch_array($resultMeta));
 			$row['v_metatags_title_' . $lid] = $rowMeta['metatags_title'];
@@ -559,8 +564,9 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 					} //Cycle through Languages
 				}
 
-				$sqlselectpt = 'SELECT pt.type_handler FROM ' . TABLE_PRODUCT_TYPES . ' as pt INNER JOIN ' . TABLE_PRODUCTS . ' as p ON pt.type_id = p.products_type WHERE p.products_id = ' . $row['v_products_id'] . ';';
-				$resultselectpt = ep_4_query($sqlselectpt);
+				$sqlselectpt = 'SELECT pt.type_handler FROM ' . TABLE_PRODUCT_TYPES . ' as pt INNER JOIN ' . TABLE_PRODUCTS . ' as p ON pt.type_id = p.products_type WHERE p.products_id = :products_id:;';
+        $sqlselectpt = $db->bindVars($sqlselectpt, ':products_id:', $row['v_products_id'], 'integer');
+        $resultselectpt = ep_4_query($sqlselectpt);
 				$rowselectpt = ($ep_uses_mysqli ? mysqli_fetch_array($resultselectpt) : mysql_fetch_array($resultselectpt));
 //Capture the data for the record before it is updated.  I guess, it could always be captured here, and then overwritten below if so desired.
 
