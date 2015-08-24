@@ -80,7 +80,7 @@ On the right-hand side of your screen you will see some additional information:
 Supported Mods: These are where you'll find additional fields that have been added to the products table.
 Note that Product Unit of Measure (UOM) and Product UPC Code are two of my own custom mods.
 
-Github will continue to updated github improvements as they come. Once EP4 has passed "beta" it will be submitted 
+Github will continue to be updated with improvements as they come. Once EP4 has passed "beta" it will be submitted 
 to the Zencart team for consideration. Your feedback and testing is greatly appreciated!
 
 Thank you,

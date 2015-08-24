@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4_functions.php, v4.0.28URI 01-03-2015 mc12345678 $
+// $Id: easypopulate_4_functions.php, v4.0.31URI 08-01-2015 mc12345678 $
 
 function ep_4_curly_quotes($curly_text) {
 	$ep_curly_quotes = (int)EASYPOPULATE_4_CONFIG_CURLY_QUOTES;
@@ -322,7 +322,11 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		if ($ep_supported_mods['msrp'] == true) { // Requested Mod Support - Manufacturer's Suggest Retail Price
 			$filelayout[] = 'v_products_msrp'; 
 		}
-		if ($ep_supported_mods['gppi'] == true) { // Requested Mod Support - Group Pricing Per Item
+		if ($ep_supported_mods['map'] == true) { // Requested Mod Support - Manufacturer's Advertised Price
+      $filelayout[] = 'v_map_enabled';
+      $filelayout[] = 'v_map_price';
+    }
+    if ($ep_supported_mods['gppi'] == true) { // Requested Mod Support - Group Pricing Per Item
 			$filelayout[] = 'v_products_group_a_price';
 			$filelayout[] = 'v_products_group_b_price';
 			$filelayout[] = 'v_products_group_c_price';
@@ -406,6 +410,10 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		if ($ep_supported_mods['msrp'] == true) { // Requested Mod Support - Manufacturer's Suggest Retail Price
 			$filelayout_sql .=  'p.products_msrp as v_products_msrp,'; 
 		}	
+		if ($ep_supported_mods['map'] == true) { // Requested Mod Support - Manufacturer's Advertised Price
+      $filelayout_sql .= 'p.map_enabled as v_map_enabled,';
+      $filelayout_sql .= 'p.map_price as v_map_price,';
+    }
 		if ($ep_supported_mods['gppi'] == true) { // Requested Mod Support - Group Pricing Per Item
 			$filelayout_sql .=  'p.products_group_a_price as v_products_group_a_price,';
 			$filelayout_sql .=  'p.products_group_b_price as v_products_group_b_price,';
@@ -442,6 +450,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			p.products_date_added			as v_date_added,
 			p.products_tax_class_id			as v_tax_class_id,
 			p.products_quantity				as v_products_quantity,
+			p.master_categories_id				as v_master_categories_id,
 			p.manufacturers_id				as v_manufacturers_id,
 			subc.categories_id				as v_categories_id,
 			p.products_status				as v_status,
@@ -464,17 +473,20 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			}
 			$filelayout_sql .= 'WHERE 
 			p.products_id = ptoc.products_id AND ';
-            if (sizeof($langcode) > 1 && EP4_AUTOCREATE_FROM_BLANK == 1 && EP4_AUTORECREATE_EXISTING == '0') {
+/*            if (sizeof($langcode) > 1 && (EP4_AUTOCREATE_FROM_BLANK == 1 && EP4_AUTORECREATE_EXISTING == '0' || EP4_REWRITE == '1')) { //Need to speed up processing by having less data to work on.
 			  $filelayout_sql .= '
 			c.uri is null AND ';
-			}
+			} */
 			$filelayout_sql .= '
 			ptoc.categories_id = subc.categories_id '.$sql_filter;
 		break;
 
 	case 'featured': // added 5-2-2012
 		$filelayout[] = 'v_products_model';
-		$filelayout[] = 'v_status';
+    if (EP4_DB_FILTER_KEY === 'products_id' || EP4_DB_FILTER_KEY === 'blank_new') {
+      $filelayout[] = 'v_products_id';
+    }
+    $filelayout[] = 'v_status';
 		$filelayout[] = 'v_featured_date_added';
 		$filelayout[] = 'v_expires_date';
 		$filelayout[] = 'v_date_status_change';
@@ -511,6 +523,10 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		if ($ep_supported_mods['msrp'] == true) { // Manufacturer's Suggested Retail Price
 			$filelayout[] = 'v_products_msrp'; 
 		}
+		if ($ep_supported_mods['map'] == true) { // Requested Mod Support - Manufacturer's Advertised Price
+      $filelayout[] = 'v_map_enabled';
+      $filelayout[] = 'v_map_price';
+    }
 		$filelayout[] = 'v_products_quantity';
 		$filelayout_sql = 'SELECT
 			p.products_id     as v_products_id,
@@ -523,6 +539,13 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		if ($ep_supported_mods['uom'] == true) { // price UOM mod
 			$filelayout_sql .= 'p.products_price_uom as v_products_price_uom,';
 		}
+		if ($ep_supported_mods['msrp'] == true) { // Requested Mod Support - Manufacturer's Suggest Retail Price
+			$filelayout_sql .=  'p.products_msrp as v_products_msrp,'; 
+		}	
+		if ($ep_supported_mods['map'] == true) { // Requested Mod Support - Manufacturer's Advertised Price
+      $filelayout_sql .= 'p.map_enabled as v_map_enabled,';
+      $filelayout_sql .= 'p.map_price as v_map_price,';
+    }
 		$filelayout_sql .= 'p.products_tax_class_id as v_tax_class_id,
 			p.products_quantity as v_products_quantity
 			FROM '		
@@ -547,6 +570,10 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		if ($ep_supported_mods['msrp'] == true) { // Manufacturer's Suggested Retail Price
 			$filelayout[] = 'v_products_msrp'; 
 		}
+		if ($ep_supported_mods['map'] == true) { // Requested Mod Support - Manufacturer's Advertised Price
+      $filelayout[] = 'v_map_enabled';
+      $filelayout[] = 'v_map_price';
+    }
 		$filelayout[] =	'v_products_discount_type';
 		$filelayout[] =	'v_products_discount_type_from';
 		// discount quantities base on $max_qty_discounts	
@@ -566,6 +593,13 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		if ($ep_supported_mods['uom'] == true) { // price UOM mod
 			$filelayout_sql .= 'p.products_price_uom as v_products_price_uom,';
 		}
+		if ($ep_supported_mods['msrp'] == true) { // Requested Mod Support - Manufacturer's Suggest Retail Price
+			$filelayout_sql .=  'p.products_msrp as v_products_msrp,'; 
+		}	
+		if ($ep_supported_mods['map'] == true) { // Requested Mod Support - Manufacturer's Advertised Price
+      $filelayout_sql .= 'p.map_enabled as v_map_enabled,';
+      $filelayout_sql .= 'p.map_price as v_map_price,';
+    }
 		$filelayout_sql .= 'p.products_discount_type as v_products_discount_type,
 			p.products_discount_type_from as v_products_discount_type_from
 			FROM '
@@ -584,7 +618,10 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		}
 		// The file layout is dynamically made depending on the number of languages
 		$filelayout[] = 'v_products_model';
-		// NEW code for unlimited category depth - 1 Category Column for each installed Language
+    if (EP4_DB_FILTER_KEY != 'products_model') {
+      $filelayout[] = 'v_' . (EP4_DB_FILTER_KEY === 'blank_new' ? 'products_id' : EP4_DB_FILTER_KEY);
+    }
+    // NEW code for unlimited category depth - 1 Category Column for each installed Language
 		foreach ($langcode as $key => $lang) { // create categories variables for each language id
 			$l_id = $lang['id'];
 			$filelayout[] = 'v_categories_name_'.$l_id;
@@ -749,6 +786,9 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		$filelayout[] =	'v_options_values_id';
 		$filelayout[] =	'v_products_options_values_name'; // options values name from table PRODUCTS_OPTIONS_VALUES
 		$filelayout[] =	'v_options_values_price';
+    if ($ep_supported_mods['dual']) {
+      $filelayout[] = 'v_options_values_price_w';
+    }
 		$filelayout[] =	'v_price_prefix';
 		$filelayout[] =	'v_products_options_sort_order';
 		$filelayout[] =	'v_product_attribute_is_free';
@@ -793,7 +833,13 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			a.options_values_id                 as v_options_values_id,
 			v.products_options_values_id        as v_products_options_values_id,
 			v.products_options_values_name      as v_products_options_values_name,
-			a.options_values_price              as v_options_values_price,
+			a.options_values_price              as v_options_values_price, ';
+    if ($ep_supported_mods['dual']) {
+$filelayout_sql .= '
+      a.options_values_price_w            as v_options_values_price_w,
+      ';
+    }
+$filelayout_sql .= '
 			a.price_prefix                      as v_price_prefix,
 			a.products_options_sort_order       as v_products_options_sort_order,
 			a.product_attribute_is_free         as v_product_attribute_is_free,
@@ -1116,7 +1162,73 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			otv.products_options_id        = o.products_options_id AND
 			otv.products_options_values_id = v.products_options_values_id'; 
 		break;
+
+  case 'orders_3': // No attributes
+  case 'orders_1': // Export All
+  case 'orders_2': // New Export all
+  case 'orders_4': // Attributes Only
+    // Filelayout is the same for orders_1 and orders_2
+    $filelayout[] =	'v_date_purchased'; 
+    $filelayout[] =	'v_orders_status_name';
+    $filelayout[] =	'v_orders_id' ; 
+    $filelayout[] =	'v_customers_id'; 
+    $filelayout[] =	'v_customers_name'; 
+    $filelayout[] =	'v_customers_company'; 
+    $filelayout[] =	'v_customers_street_address'; 
+    $filelayout[] =	'v_customers_suburb'; 
+    $filelayout[] =	'v_customers_city'; 
+    $filelayout[] =	'v_customers_postcode'; 
+    //'v_customers_state'; 
+    $filelayout[] =	'v_customers_country'; 
+    $filelayout[] =	'v_customers_telephone'; 
+    $filelayout[] =	'v_customers_email_address'; 
+    $filelayout[] =	'v_products_model'; 
+    $filelayout[] =	'v_products_name'; 
+    if ($ep_dltype != 'orders_3') {
+    $filelayout[] =	'v_products_options'; 
+    $filelayout[] =	'v_products_options_values';
+    }
+    $filelayout[] = 'v_products_comments';
+
+    // 'all types of query'
+    $filelayout_sql = "SELECT DISTINCT 
+      zo.orders_id as v_orders_id,
+      zop.products_id as v_products_id,
+      customers_id as v_customers_id,
+      customers_name as v_customers_name,
+      customers_company as v_customers_company,
+      customers_street_address as v_customers_street_address,
+      customers_suburb as v_customers_suburb,
+      customers_city as v_customers_city,
+      customers_postcode as v_customers_postcode,
+      customers_country as v_customers_country,
+      customers_telephone as v_customers_telephone,
+      customers_email_address as v_customers_email_address,
+      date_purchased as v_date_purchased,
+      orders_status_name as v_orders_status_name,
+      products_model as v_products_model,
+      products_name as v_products_name,
+      " . ( $ep_dltype != 'orders_3' ?
+	  "products_options as v_products_options,
+      products_options_values as v_products_options_values,
+	  " : "") . 
+	  "zo.order_total as v_total_cost,
+      osh.comments as V_orders_comments 
+      FROM " . TABLE_ORDERS . " zo, " . ($ep_dltype != 'orders_3' ? TABLE_ORDERS_PRODUCTS_ATTRIBUTES . " opa, " : "") . 
+	  TABLE_ORDERS_PRODUCTS . " zop, " . TABLE_ORDERS_STATUS." zos, " .
+	  TABLE_ORDERS_STATUS_HISTORY . " osh 
+      WHERE zo.orders_id = zop.orders_id AND
+	  osh.orders_id = zo.orders_id 
+      " . (($ep_dltype == 'orders_2' || $ep_dltype == 'orders_4') ? " AND zos.orders_status_id != :orders_status_id: " : "") . 
+	  ($ep_dltype != 'orders_3' ? " AND zop.orders_products_id = opa.orders_products_id" : "") . "
+      AND zo.orders_status = zos.orders_status_id 
+		";
+    $filelayout_sql = $db->bindVars($filelayout_sql, ':orders_status_id:', $_POST['configuration[order_status]'], 'integer');
+
+//    echo $filelayout[] = $filelayout_sql;
+    break;
 	}
+  
 return $filelayout;;
 }
 
@@ -1246,7 +1358,22 @@ function ep_4_remove_product($product_model) {
  	global $db, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error;
 	$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
 	$ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
-	$sql = "SELECT products_id FROM ".TABLE_PRODUCTS." WHERE products_model = '".zen_db_input($product_model)."'";
+	$sql = "SELECT products_id FROM ".TABLE_PRODUCTS;
+  switch (EP4_DB_FILTER_KEY) {
+    case 'products_model':
+      $sql .= " WHERE products_model = :products_model:";
+      $sql = $db->bindVars($sql, ':products_model:', $product_model, 'string');
+      break;
+    case 'blank_new':
+    case 'products_id':
+      $sql .= " WHERE products_id = :products_id:";
+      $sql = $db->bindVars($sql, ':products_id:', $product_model, 'string');
+      break;
+    default:
+      $sql .= " WHERE products_model = :products_model:";
+      $sql = $db->bindVars($sql, ':products_model:', $product_model, 'string');
+      break;
+  }
 	$products = $db->Execute($sql);
 	if (($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno())) {
 		$ep_stack_sql_error = true;
@@ -1264,6 +1391,25 @@ function ep_4_remove_product($product_model) {
 	}
 	return;
 }
+
+function ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter = "^") {
+//  $datarow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
+  $dataRow = '';
+
+  $problem_chars = array("\r", "\n", "\t"); // carriage return, newline, tab
+  foreach ($filelayout as $key => $value) {
+//		$thetext = $active_row[$key];
+    // remove carriage returns, newlines, and tabs - needs review
+    $thetext = str_replace($problem_chars, ' ', $active_row[$key]);
+    // encapsulate data in quotes, and escape embedded quotes in data
+    $dataRow .= '"' . str_replace('"', '""', $thetext) . '"' . $csv_delimiter;
+  }
+  // Remove trailing tab, then append the end-of-line
+  $dataRow = rtrim($dataRow, $csv_delimiter) . "\n";
+
+  return $dataRow;
+}
+
 
 // DEPRECATED: no calls to this function!
 // reset products master categories ID - I do not believe this works correctly - chadd
@@ -1350,33 +1496,37 @@ function install_easypopulate_4() {
 		$group_id = mysql_insert_id();
 		$db->Execute("UPDATE ".TABLE_CONFIGURATION_GROUP." SET sort_order = ".$group_id." WHERE configuration_group_id = ".$group_id);
 		$db->Execute("INSERT INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
-			('Uploads Directory',                  'EASYPOPULATE_4_CONFIG_TEMP_DIR', '" . (ENABLE_SSL_ADMIN ? preg_replace("/" . DIR_WS_HTTPS_CATALOG . "/", "", DIR_WS_HTTPS_ADMIN, 1) : preg_replace("/" . DIR_WS_CATALOG . "/", "", DIR_WS_ADMIN, 1)) . "/temp/', 'Name of directory for your uploads  as compares to store\'s directory (default: " . (ENABLE_SSL_ADMIN ? preg_replace("/" . DIR_WS_HTTPS_CATALOG . "/", "", DIR_WS_HTTPS_ADMIN, 1) : preg_replace("/" . DIR_WS_CATALOG . "/", "", DIR_WS_ADMIN, 1)) . "/temp/).', ".$group_id.", '0', NULL, now(), NULL, NULL),
-			('Upload File Date Format',            'EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT', 'm-d-y', 'Choose order of date values that corresponds to your uploads file, usually generated by MS Excel. Raw dates in your uploads file (Eg 2005-09-26 09:00:00) are not affected, and will upload as they are.', ".$group_id.", '1', NULL, now(), NULL, 'zen_cfg_select_option(array(\"m-d-y\", \"d-m-y\", \"y-m-d\"),'),
-			('Default Raw Time',                   'EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME', '09:00:00', 'If no time value stipulated in upload file, use this value. Useful for ensuring specials begin after a specific time of the day (default: 09:00:00)', ".$group_id.", '2', NULL, now(), NULL, NULL),
-			('Upload/Download Prices Include Tax', 'EASYPOPULATE_4_CONFIG_PRICE_INC_TAX', 'false', 'Choose to include or exclude tax, depending on how you manage prices outside of Zen Cart.', ".$group_id.", '5', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
-			('Verbose Feedback',                   'EASYPOPULATE_4_CONFIG_VERBOSE', 'true', 'When importing, report all messages. Set to false for only warnings and errors. (default: true).', ".$group_id.", '6', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
-			('Make Zero Qty Products Inactive',    'EASYPOPULATE_4_CONFIG_ZERO_QTY_INACTIVE', 'false', 'When uploading, make the status Inactive for products with zero qty (default: false).', ".$group_id.", '7', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
-			('Smart Tags Replacement of Newlines', 'EASYPOPULATE_4_CONFIG_SMART_TAGS', 'true', 'Allows your description fields in your uploads file to have carriage returns and/or new-lines converted to HTML line-breaks on uploading, thus preserving some rudimentary formatting - Note: this legacy code is disabled until further review. (default: true).', ".$group_id.", '8', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
-			('Advanced Smart Tags',                'EASYPOPULATE_4_CONFIG_ADV_SMART_TAGS', 'false', 'Allow the use of complex regular expressions to format descriptions, making headings bold, add bullets, etc. Note: legacy code is disabled until further review. (default: false).', ".$group_id.", '9', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
-			('Debug Logging',                      'EASYPOPULATE_4_CONFIG_DEBUG_LOGGING', 'true', 'Allow Easy Populate to generate an error log on errors only (default: true)', ".$group_id.", '10', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
-			('Maximum Quantity Discounts',         'EASYPOPULATE_4_CONFIG_MAX_QTY_DISCOUNTS', '3', 'Maximum number of quantity discounts (price breaks). Is the number of discount columns in downloaded file (default: 3).', ".$group_id.", '11', NULL, now(), NULL, NULL),
-			('Split On Number of Records',         'EASYPOPULATE_4_CONFIG_SPLIT_RECORDS', '2000', 'Number of records to split csv files. Used to break large import files into smaller files. Useful on servers with limited resourses. (default: 2000).', ".$group_id.", '12', NULL, now(), NULL, NULL),
-			('Script Execution Time',              'EASYPOPULATE_4_CONFIG_EXECUTION_TIME', '60', 'Number of seconds for script to run before timeout. May not work on some servers. (default: 60).', ".$group_id.", '13', NULL, now(), NULL, NULL),
-			('Convert Curly Quotes, etc.',         'EASYPOPULATE_4_CONFIG_CURLY_QUOTES', '0', 'Convert Curly Quotes, Em-Dash, En-Dash and Ellipsis characters in Product Names &amp; Descriptions (default 0).<br><br>0=No Change<br>1=Replace with Basic Characters<br>3=Replace with HMTL equivalants', ".$group_id.", '14', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
-			('Convert Character 0x92',             'EASYPOPULATE_4_CONFIG_CHAR_92', '1', 'Convert Character 0x92 characters in Product Names &amp; Descriptions (default 1).<br><br>0=No Change<br>1=Replace with Standard Single Quote<br>2=Replace with HMTL equivalant', ".$group_id.", '15', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
-			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '16', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
-			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '17', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
-			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '18', NULL, now(), NULL, NULL),
-			('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '19', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
-			('AutoCreate URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_FROM_BLANK','1','Enable Autogeneration of URIs with CEON (When it is installed) if a URI does not currently exist for the product upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '20', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate URL For CEON - All Products','EP4_AUTORECREATE_EXISTING','0','Enable Autogeneration of URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter products based on this setting.<br /><br />Yes - Assign all products the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for products already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '21', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
-			('Export URL Information From CEON - All Products','EP4_EXPORT_ONLY','0','Export CEON URI autogenerated URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/>(Default - No)',".$group_id.", '25', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'),
-			('AutoCreate Category URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_CAT_FROM_BLANK','1','Enable Autogeneration of Category URIs with CEON (When it is installed) if a URI does not currently exist for the category upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '29', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate Category URL For CEON - All Categories','EP4_AUTORECREATE_CAT_EXISTING','0','Enable Autogeneration of Category URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter categories based on this setting.<br /><br />Yes - Assign all categories the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for categories already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '30', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
-			('Export URL Information From CEON - All Categories','EP4_EXPORT_CAT_ONLY','0','Export CEON URI autogenerated category URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the Category URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/>(Default - No)',".$group_id.", '35', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'),
-			('AutoCreate EZ-Page URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_EZ_FROM_BLANK','1','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) if a URI does not currently exist for the EZ-Page upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '39', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate EZ-Page URL For CEON - All EZ-Pages','EP4_AUTORECREATE_EZ_EXISTING','0','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) for all EZ-Pages on export?<br /><br />No - Do not alter EZ-Pages based on this setting.<br /><br />Yes - Assign all EZ-Pages the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for EZ-Pages already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '40', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
-			('Export URL Information From CEON - All EZ-Pages','EP4_EXPORT_EZ_ONLY','0','Export CEON URI autogenerated EZ-Page URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the EZ-Page URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/><br/>(Default - No)',".$group_id.", '45', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),')
+			('Uploads Directory',                  'EASYPOPULATE_4_CONFIG_TEMP_DIR', 'temp/', 'Name of directory for your uploads  as compared to the setting of Uploads Directory Admin/Catalog.<br /><br />Default is to use YOUR_ADMIN/temp/ by entering temp/ below.<br /><b>Caution:</b> the admin directory folder name should not be entered here as it will be stored in the database.  If the admin directory is to be used please set/verify Uploads Directory Admin/Catalog is set to true.<br /><br />(default is to use the YOUR_ADMIN directory and the below value of: temp/).', ".$group_id.", '10', NULL, now(), NULL, NULL),
+			('Uploads Directory Admin/Catalog',                  'EP4_ADMIN_TEMP_DIRECTORY', 'true', 'Should the admin directory be used to store the export and import files for EP4?<br /><br />This switch affects how Uploads Directory is used.<br /><br />true (default) or<br />false. ', ".$group_id.", '20', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Import/Export Primary Key', 'EP4_DB_FILTER_KEY', 'products_model', 'Select the primary key that is to be used for import of the data.<br /><br />The default for Easy Populate v4 is products_model.<br /><br /> The field products_model is independent of the store, while products_id will require/generate the product information associated with that products_id and could lead to duplication of product. Choosing blank_new will import by products_id and create new products when the products_id is not entered/blank.<br /><br />products_model (default)<br />products_id<br />blank_new', ".$group_id.", '30', NULL, now(), NULL, 'zen_cfg_select_option(array(\'products_model\', \'products_id\', \'blank_new\'),'),
+			('Upload File Date Format',            'EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT', 'm-d-y', 'Choose order of date values that corresponds to your uploads file, usually generated by MS Excel. Raw dates in your uploads file (Eg 2005-09-26 09:00:00) are not affected, and will upload as they are.', ".$group_id.", '40', NULL, now(), NULL, 'zen_cfg_select_option(array(\"m-d-y\", \"d-m-y\", \"y-m-d\"),'),
+			('Default Raw Time',                   'EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME', '09:00:00', 'If no time value stipulated in upload file, use this value. Useful for ensuring specials begin after a specific time of the day (default: 09:00:00)', ".$group_id.", '50', NULL, now(), NULL, NULL),
+			('Upload/Download Prices Include Tax', 'EASYPOPULATE_4_CONFIG_PRICE_INC_TAX', 'false', 'Choose to include or exclude tax, depending on how you manage prices outside of Zen Cart.', ".$group_id.", '60', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Verbose Feedback',                   'EASYPOPULATE_4_CONFIG_VERBOSE', 'true', 'When importing, report all messages. Set to false for only warnings and errors. (default: true).', ".$group_id.", '70', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Show all EP4 Filetypes with Files',       'EP4_SHOW_ALL_FILETYPES', 'true', 'When looking at the EP4 Tools screen, should the filename prefix for all specific file types be displayed for all possible file types (true [default]), should only the method(s) that will be used to process the files present be displayed (false), or should there be no assistance be provided on filenaming on the main page (Hidden) like it was until this feature was added? (true, false, or Hidden)', ".$group_id.", '80', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\", \"Hidden\"),'),
+      ('Replace Blank Image', 'EP4_REPLACE_BLANK_IMAGE', 'false', 'On import, if the image information is blank, then update the image path to the path of the blank image (true)? Otherwise the image path will remain blank (false <Default>).<br /><br />false (Default)<br />true.', ".$group_id.", '90', NULL, now(), NULL, 'zen_cfg_select_option(array(\'false\', \'true\'),'),
+			('Make Zero Qty Products Inactive',    'EASYPOPULATE_4_CONFIG_ZERO_QTY_INACTIVE', 'false', 'When uploading, make the status Inactive for products with zero qty (default: false).', ".$group_id.", '100', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Smart Tags Replacement of Newlines', 'EASYPOPULATE_4_CONFIG_SMART_TAGS', 'true', 'Allows your description fields in your uploads file to have carriage returns and/or new-lines converted to HTML line-breaks on uploading, thus preserving some rudimentary formatting - Note: this legacy code is disabled until further review. (default: true).', ".$group_id.", '110', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Advanced Smart Tags',                'EASYPOPULATE_4_CONFIG_ADV_SMART_TAGS', 'false', 'Allow the use of complex regular expressions to format descriptions, making headings bold, add bullets, etc. Note: legacy code is disabled until further review. (default: false).', ".$group_id.", '120', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Debug Logging',                      'EASYPOPULATE_4_CONFIG_DEBUG_LOGGING', 'true', 'Allow Easy Populate to generate an error log on errors only (default: true)', ".$group_id.", '130', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Maximum Quantity Discounts',         'EASYPOPULATE_4_CONFIG_MAX_QTY_DISCOUNTS', '3', 'Maximum number of quantity discounts (price breaks). Is the number of discount columns in downloaded file (default: 3).', ".$group_id.", '140', NULL, now(), NULL, NULL),
+			('Split On Number of Records',         'EASYPOPULATE_4_CONFIG_SPLIT_RECORDS', '2000', 'Number of records to split csv files. Used to break large import files into smaller files. Useful on servers with limited resourses. (default: 2000).', ".$group_id.", '150', NULL, now(), NULL, NULL),
+			('Script Execution Time',              'EASYPOPULATE_4_CONFIG_EXECUTION_TIME', '60', 'Number of seconds for script to run before timeout. May not work on some servers. (default: 60).', ".$group_id.", '160', NULL, now(), NULL, NULL),
+			('Convert Curly Quotes, etc.',         'EASYPOPULATE_4_CONFIG_CURLY_QUOTES', '0', 'Convert Curly Quotes, Em-Dash, En-Dash and Ellipsis characters in Products Description (default 0).<br><br>0=No Change<br>1=Replace with Basic Characters<br>3=Replace with HMTL equivalants', ".$group_id.", '170', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
+			('Convert Character 0x92',             'EASYPOPULATE_4_CONFIG_CHAR_92', '1', 'Convert Character 0x92 characters in Product Names &amp; Descriptions (default 1).<br><br>0=No Change<br>1=Replace with Standard Single Quote<br>2=Replace with HMTL equivalant', ".$group_id.", '180', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
+			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '190', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
+			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '200', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '210', NULL, now(), NULL, NULL),
+			('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '220', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+			('AutoCreate URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_FROM_BLANK','1','Enable Autogeneration of URIs with CEON (When it is installed) if a URI does not currently exist for the product upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '230', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate URL For CEON - All Products','EP4_AUTORECREATE_EXISTING','0','Enable Autogeneration of URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter products based on this setting.<br /><br />Yes - Assign all products the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for products already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '240', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
+			('Export URL Information From CEON - All Products','EP4_EXPORT_ONLY','0','Export CEON URI autogenerated URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/>(Default - No)',".$group_id.", '250', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate Category URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_CAT_FROM_BLANK','1','Enable Autogeneration of Category URIs with CEON (When it is installed) if a URI does not currently exist for the category upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '260', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate Category URL For CEON - All Categories','EP4_AUTORECREATE_CAT_EXISTING','0','Enable Autogeneration of Category URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter categories based on this setting.<br /><br />Yes - Assign all categories the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for categories already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '270', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
+			('Export URL Information From CEON - All Categories','EP4_EXPORT_CAT_ONLY','0','Export CEON URI autogenerated category URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the Category URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/>(Default - No)',".$group_id.", '280', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'),
+			('AutoCreate EZ-Page URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_EZ_FROM_BLANK','1','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) if a URI does not currently exist for the EZ-Page upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '290', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate EZ-Page URL For CEON - All EZ-Pages','EP4_AUTORECREATE_EZ_EXISTING','0','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) for all EZ-Pages on export?<br /><br />No - Do not alter EZ-Pages based on this setting.<br /><br />Yes - Assign all EZ-Pages the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for EZ-Pages already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '300', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
+			('Export URL Information From CEON - All EZ-Pages','EP4_EXPORT_EZ_ONLY','0','Export CEON URI autogenerated EZ-Page URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the EZ-Page URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/><br/>(Default - No)',".$group_id.", '310', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),')
 		");
 	} elseif (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.0') {
 		$db->Execute("INSERT INTO ".TABLE_CONFIGURATION_GROUP." (configuration_group_title, configuration_group_description, sort_order, visible) VALUES ('Easy Populate 4', 'Configuration Options for Easy Populate 4', '1', '1')");
@@ -1389,33 +1539,37 @@ function install_easypopulate_4() {
 		
         zen_register_admin_page('easypopulate_4_config', 'BOX_TOOLS_EASYPOPULATE_4','FILENAME_CONFIGURATION', 'gID='.$group_id, 'configuration', 'Y', 97);
 		$db->Execute("INSERT INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
-			('Uploads Directory',                  'EASYPOPULATE_4_CONFIG_TEMP_DIR', '" . (ENABLE_SSL_ADMIN ? str_replace(DIR_WS_HTTPS_CATALOG, "", DIR_WS_HTTPS_ADMIN) : str_replace(DIR_WS_CATALOG, "", DIR_WS_ADMIN)) . "temp/', 'Name of directory for your uploads  as compares to store\'s directory (default: " . (ENABLE_SSL_ADMIN ? str_replace(DIR_WS_HTTPS_CATALOG, "", DIR_WS_HTTPS_ADMIN) : str_replace(DIR_WS_CATALOG, "", DIR_WS_ADMIN)) . "temp/).', ".$group_id.", '0', NULL, now(), NULL, NULL),
-			('Upload File Date Format',            'EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT', 'm-d-y', 'Choose order of date values that corresponds to your uploads file, usually generated by MS Excel. Raw dates in your uploads file (Eg 2005-09-26 09:00:00) are not affected, and will upload as they are.', ".$group_id.", '1', NULL, now(), NULL, 'zen_cfg_select_option(array(\"m-d-y\", \"d-m-y\", \"y-m-d\"),'),
-			('Default Raw Time',                   'EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME', '09:00:00', 'If no time value stipulated in upload file, use this value. Useful for ensuring specials begin after a specific time of the day (default: 09:00:00)', ".$group_id.", '2', NULL, now(), NULL, NULL),
-			('Upload/Download Prices Include Tax', 'EASYPOPULATE_4_CONFIG_PRICE_INC_TAX', 'false', 'Choose to include or exclude tax, depending on how you manage prices outside of Zen Cart.', ".$group_id.", '5', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
-			('Verbose Feedback',                   'EASYPOPULATE_4_CONFIG_VERBOSE', 'true', 'When importing, report all messages. Set to false for only warnings and errors. (default: true).', ".$group_id.", '6', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
-			('Make Zero Qty Products Inactive',    'EASYPOPULATE_4_CONFIG_ZERO_QTY_INACTIVE', 'false', 'When uploading, make the status Inactive for products with zero qty (default: false).', ".$group_id.", '7', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
-			('Smart Tags Replacement of Newlines', 'EASYPOPULATE_4_CONFIG_SMART_TAGS', 'true', 'Allows your description fields in your uploads file to have carriage returns and/or new-lines converted to HTML line-breaks on uploading, thus preserving some rudimentary formatting - Note: this legacy code is disabled until further review. (default: true).', ".$group_id.", '8', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
-			('Advanced Smart Tags',                'EASYPOPULATE_4_CONFIG_ADV_SMART_TAGS', 'false', 'Allow the use of complex regular expressions to format descriptions, making headings bold, add bullets, etc. Note: legacy code is disabled until further review. (default: false).', ".$group_id.", '9', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
-			('Debug Logging',                      'EASYPOPULATE_4_CONFIG_DEBUG_LOGGING', 'true', 'Allow Easy Populate to generate an error log on errors only (default: true)', ".$group_id.", '10', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
-			('Maximum Quantity Discounts',         'EASYPOPULATE_4_CONFIG_MAX_QTY_DISCOUNTS', '3', 'Maximum number of quantity discounts (price breaks). Is the number of discount columns in downloaded file (default: 3).', ".$group_id.", '11', NULL, now(), NULL, NULL),
-			('Split On Number of Records',         'EASYPOPULATE_4_CONFIG_SPLIT_RECORDS', '2000', 'Number of records to split csv files. Used to break large import files into smaller files. Useful on servers with limited resourses. (default: 2000).', ".$group_id.", '12', NULL, now(), NULL, NULL),
-			('Script Execution Time',              'EASYPOPULATE_4_CONFIG_EXECUTION_TIME', '60', 'Number of seconds for script to run before timeout. May not work on some servers. (default: 60).', ".$group_id.", '13', NULL, now(), NULL, NULL),
-			('Convert Curly Quotes, etc.',         'EASYPOPULATE_4_CONFIG_CURLY_QUOTES', '0', 'Convert Curly Quotes, Em-Dash, En-Dash and Ellipsis characters in Products Description (default 0).<br><br>0=No Change<br>1=Replace with Basic Characters<br>3=Replace with HMTL equivalants', ".$group_id.", '14', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
-			('Convert Character 0x92',             'EASYPOPULATE_4_CONFIG_CHAR_92', '1', 'Convert Character 0x92 characters in Product Names &amp; Descriptions (default 1).<br><br>0=No Change<br>1=Replace with Standard Single Quote<br>2=Replace with HMTL equivalant', ".$group_id.", '15', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
-			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '16', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
-			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '17', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
-			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '18', NULL, now(), NULL, NULL),
-			('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '19', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
-			('AutoCreate URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_FROM_BLANK','1','Enable Autogeneration of URIs with CEON (When it is installed) if a URI does not currently exist for the product upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '20', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate URL For CEON - All Products','EP4_AUTORECREATE_EXISTING','0','Enable Autogeneration of URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter products based on this setting.<br /><br />Yes - Assign all products the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for products already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '21', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
-			('Export URL Information From CEON - All Products','EP4_EXPORT_ONLY','0','Export CEON URI autogenerated URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/>(Default - No)',".$group_id.", '25', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate Category URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_CAT_FROM_BLANK','1','Enable Autogeneration of Category URIs with CEON (When it is installed) if a URI does not currently exist for the category upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '29', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate Category URL For CEON - All Categories','EP4_AUTORECREATE_CAT_EXISTING','0','Enable Autogeneration of Category URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter categories based on this setting.<br /><br />Yes - Assign all categories the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for categories already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '30', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
-			('Export URL Information From CEON - All Categories','EP4_EXPORT_CAT_ONLY','0','Export CEON URI autogenerated category URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the Category URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/>(Default - No)',".$group_id.", '35', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'),
-			('AutoCreate EZ-Page URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_EZ_FROM_BLANK','1','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) if a URI does not currently exist for the EZ-Page upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '39', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
-			('AutoCreate EZ-Page URL For CEON - All EZ-Pages','EP4_AUTORECREATE_EZ_EXISTING','0','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) for all EZ-Pages on export?<br /><br />No - Do not alter EZ-Pages based on this setting.<br /><br />Yes - Assign all EZ-Pages the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for EZ-Pages already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '40', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
-			('Export URL Information From CEON - All EZ-Pages','EP4_EXPORT_EZ_ONLY','0','Export CEON URI autogenerated EZ-Page URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the EZ-Page URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/><br/>(Default - No)',".$group_id.", '45', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),') 
+			('Uploads Directory',                  'EASYPOPULATE_4_CONFIG_TEMP_DIR', 'temp/', 'Name of directory for your uploads  as compared to the setting of Uploads Directory Admin/Catalog.<br /><br />Default is to use YOUR_ADMIN/temp/ by entering temp/ below.<br /><b>Caution:</b> the admin directory folder name should not be entered here as it will be stored in the database.  If the admin directory is to be used please set/verify Uploads Directory Admin/Catalog is set to true.<br /><br />(default is to use the YOUR_ADMIN directory and the below value of: temp/).', ".$group_id.", '10', NULL, now(), NULL, NULL),
+			('Uploads Directory Admin/Catalog',                  'EP4_ADMIN_TEMP_DIRECTORY', 'true', 'Should the admin directory be used to store the export and import files for EP4?<br /><br />This switch affects how Uploads Directory is used.<br /><br />true (default) or<br />false. ', ".$group_id.", '20', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Import/Export Primary Key', 'EP4_DB_FILTER_KEY', 'products_model', 'Select the primary key that is to be used for import of the data.<br /><br />The default for Easy Populate v4 is products_model.<br /><br /> The field products_model is independent of the store, while products_id will require/generate the product information associated with that products_id and could lead to duplication of product. Choosing blank_new will import by products_id and create new products when the products_id is not entered/blank.<br /><br />products_model (default)<br />products_id<br />blank_new', ".$group_id.", '30', NULL, now(), NULL, 'zen_cfg_select_option(array(\'products_model\', \'products_id\', \'blank_new\'),'),
+			('Upload File Date Format',            'EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT', 'm-d-y', 'Choose order of date values that corresponds to your uploads file, usually generated by MS Excel. Raw dates in your uploads file (Eg 2005-09-26 09:00:00) are not affected, and will upload as they are.', ".$group_id.", '40', NULL, now(), NULL, 'zen_cfg_select_option(array(\"m-d-y\", \"d-m-y\", \"y-m-d\"),'),
+			('Default Raw Time',                   'EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME', '09:00:00', 'If no time value stipulated in upload file, use this value. Useful for ensuring specials begin after a specific time of the day (default: 09:00:00)', ".$group_id.", '50', NULL, now(), NULL, NULL),
+			('Upload/Download Prices Include Tax', 'EASYPOPULATE_4_CONFIG_PRICE_INC_TAX', 'false', 'Choose to include or exclude tax, depending on how you manage prices outside of Zen Cart.', ".$group_id.", '60', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Verbose Feedback',                   'EASYPOPULATE_4_CONFIG_VERBOSE', 'true', 'When importing, report all messages. Set to false for only warnings and errors. (default: true).', ".$group_id.", '70', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Show all EP4 Filetypes with Files',       'EP4_SHOW_ALL_FILETYPES', 'true', 'When looking at the EP4 Tools screen, should the filename prefix for all specific file types be displayed for all possible file types (true [default]), should only the method(s) that will be used to process the files present be displayed (false), or should there be no assistance be provided on filenaming on the main page (Hidden) like it was until this feature was added? (true, false, or Hidden)', ".$group_id.", '80', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\", \"Hidden\"),'),
+      ('Replace Blank Image', 'EP4_REPLACE_BLANK_IMAGE', 'false', 'On import, if the image information is blank, then update the image path to the path of the blank image (true)? Otherwise the image path will remain blank (false <Default>).<br /><br />false (Default)<br />true.', ".$group_id.", '90', NULL, now(), NULL, 'zen_cfg_select_option(array(\'false\', \'true\'),'),
+			('Make Zero Qty Products Inactive',    'EASYPOPULATE_4_CONFIG_ZERO_QTY_INACTIVE', 'false', 'When uploading, make the status Inactive for products with zero qty (default: false).', ".$group_id.", '100', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Smart Tags Replacement of Newlines', 'EASYPOPULATE_4_CONFIG_SMART_TAGS', 'true', 'Allows your description fields in your uploads file to have carriage returns and/or new-lines converted to HTML line-breaks on uploading, thus preserving some rudimentary formatting - Note: this legacy code is disabled until further review. (default: true).', ".$group_id.", '110', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Advanced Smart Tags',                'EASYPOPULATE_4_CONFIG_ADV_SMART_TAGS', 'false', 'Allow the use of complex regular expressions to format descriptions, making headings bold, add bullets, etc. Note: legacy code is disabled until further review. (default: false).', ".$group_id.", '120', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Debug Logging',                      'EASYPOPULATE_4_CONFIG_DEBUG_LOGGING', 'true', 'Allow Easy Populate to generate an error log on errors only (default: true)', ".$group_id.", '130', NULL, now(), NULL, 'zen_cfg_select_option(array(\"true\", \"false\"),'),
+			('Maximum Quantity Discounts',         'EASYPOPULATE_4_CONFIG_MAX_QTY_DISCOUNTS', '3', 'Maximum number of quantity discounts (price breaks). Is the number of discount columns in downloaded file (default: 3).', ".$group_id.", '140', NULL, now(), NULL, NULL),
+			('Split On Number of Records',         'EASYPOPULATE_4_CONFIG_SPLIT_RECORDS', '2000', 'Number of records to split csv files. Used to break large import files into smaller files. Useful on servers with limited resourses. (default: 2000).', ".$group_id.", '150', NULL, now(), NULL, NULL),
+			('Script Execution Time',              'EASYPOPULATE_4_CONFIG_EXECUTION_TIME', '60', 'Number of seconds for script to run before timeout. May not work on some servers. (default: 60).', ".$group_id.", '160', NULL, now(), NULL, NULL),
+			('Convert Curly Quotes, etc.',         'EASYPOPULATE_4_CONFIG_CURLY_QUOTES', '0', 'Convert Curly Quotes, Em-Dash, En-Dash and Ellipsis characters in Products Description (default 0).<br><br>0=No Change<br>1=Replace with Basic Characters<br>3=Replace with HMTL equivalants', ".$group_id.", '170', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
+			('Convert Character 0x92',             'EASYPOPULATE_4_CONFIG_CHAR_92', '1', 'Convert Character 0x92 characters in Product Names &amp; Descriptions (default 1).<br><br>0=No Change<br>1=Replace with Standard Single Quote<br>2=Replace with HMTL equivalant', ".$group_id.", '180', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
+			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '190', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
+			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '200', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '210', NULL, now(), NULL, NULL),
+			('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '220', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+			('AutoCreate URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_FROM_BLANK','1','Enable Autogeneration of URIs with CEON (When it is installed) if a URI does not currently exist for the product upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '230', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate URL For CEON - All Products','EP4_AUTORECREATE_EXISTING','0','Enable Autogeneration of URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter products based on this setting.<br /><br />Yes - Assign all products the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for products already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '240', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
+			('Export URL Information From CEON - All Products','EP4_EXPORT_ONLY','0','Export CEON URI autogenerated URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/>(Default - No)',".$group_id.", '250', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate Category URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_CAT_FROM_BLANK','1','Enable Autogeneration of Category URIs with CEON (When it is installed) if a URI does not currently exist for the category upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '260', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate Category URL For CEON - All Categories','EP4_AUTORECREATE_CAT_EXISTING','0','Enable Autogeneration of Category URIs with CEON (When it is installed) for all products on export?<br /><br />No - Do not alter categories based on this setting.<br /><br />Yes - Assign all categories the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for categories already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '270', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
+			('Export URL Information From CEON - All Categories','EP4_EXPORT_CAT_ONLY','0','Export CEON URI autogenerated category URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the Category URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/>(Default - No)',".$group_id.", '280', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'),
+			('AutoCreate EZ-Page URL For CEON When URL Doesn\'t Exist','EP4_AUTOCREATE_EZ_FROM_BLANK','1','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) if a URI does not currently exist for the EZ-Page upon export of the database?<br/><br/>(Default - Yes)',".$group_id.", '290', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),'), 
+			('AutoCreate EZ-Page URL For CEON - All EZ-Pages','EP4_AUTORECREATE_EZ_EXISTING','0','Enable Autogeneration of EZ-Page URIs with CEON (When it is installed) for all EZ-Pages on export?<br /><br />No - Do not alter EZ-Pages based on this setting.<br /><br />Yes - Assign all EZ-Pages the default CEON URI.<br /><br />Mixed - Assign the default CEON URIs for EZ-Pages already assigned a URI and by the setting of AutoCreate URL For CEON When URL Doesn\'t Exist.<br /><br/><br/>(Default - No)',".$group_id.", '300', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No''),array(''id''=>''2'',''text''=>''Mixed'')),'),
+			('Export URL Information From CEON - All EZ-Pages','EP4_EXPORT_EZ_ONLY','0','Export CEON URI autogenerated EZ-Page URIs Only? (Do not store them.)<br /><br />No - Allow autogeneration of the EZ-Page URIs to update the database (URIs will still be exported.)<br /><br />Yes - Export the URIs in accordance with the autogeneration rules.  Choosing this option will prevent updating the database with these options.<br /><br /><br/><br/>(Default - No)',".$group_id.", '310', NULL, now(), NULL, 'zen_cfg_select_drop_down(array(array(''id''=>''1'',''text''=>''Yes''),array(''id''=>''0'',''text''=>''No'')),')
 		");
 	} else { // unsupported version 
 		// i should do something here!
@@ -1450,12 +1604,12 @@ function remove_easypopulate_4() {
 
 function ep_4_chmod_check($tempdir) {
 	global $messageStack;
-	if (!@file_exists(DIR_FS_CATALOG . $tempdir . ".")) { // directory does not exist
-		$messageStack->add(sprintf(EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_MISSING, $tempdir, DIR_FS_CATALOG), 'warning');
+  if (!@file_exists((EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . $tempdir . ".")) { // directory does not exist
+		$messageStack->add(sprintf(EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_MISSING, $tempdir, (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN)), 'warning');
 		$chmod_check = false;
 	} else { // directory exists, test is writeable
-		if (!@is_writable(DIR_FS_CATALOG . $tempdir . ".")) { // directory does not exist
-			$messageStack->add(sprintf(EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_NOT_WRITABLE, $tempdir, DIR_FS_CATALOG), 'warning');
+		if (!@is_writable((EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . $tempdir . ".")) { // directory does not exist
+			$messageStack->add(sprintf(EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_NOT_WRITABLE, $tempdir, (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN)), 'warning');
 			$chmod_check = false;
 		} else { 
 			$chmod_check = true;
