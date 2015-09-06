@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4.php, v4.0.21 06-01-2012 chadderuski $
+// $Id: easypopulate_4.php, v4.0.31URI 08-29-2015 mc12345678 $
 
 // $display_output defines
 
@@ -93,5 +93,34 @@ define('EASYPOPULATE_4_DISPLAY_SPLIT_SHORT', 'Einträge aufteilen: ');
 define('EASYPOPULATE_4_DISPLAY_EXEC_TIME', 'Ausführungszeit: ');
 define('EASYPOPULATE_4_DISPLAY_ENABLE_META', 'Metatags der Artikel aktivieren:  ');
 define('EASYPOPULATE_4_DISPLAY_ENABLE_MUSIC', 'Artikeltyp Musik aktivieren: ');
+define('EASYPOPULATE_4_DISPLAY_CUSTOM_PRODUCT_FIELDS', 'Individuelle zusätzliche Artikelfelder von verschiedenen Erweiterungen');
+define('EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_SHORT_DESC', 'Artikel Kurzbeschreibung (Products Short Descriptions): ');
+define('EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_UNIT_MEAS', 'Product Unit of Measure: ');
+define('EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_UPC', 'Product UPC Code: ');
+define('EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_GOOGLE_CAT', 'Google Produkt Kategorie: ');
+define('EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_MSRP', 'Manufacturer\'s Suggested Retail Price: ');
+define('EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_MAP', 'Manufacturer\'s Advertised Price: ');
+define('EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_GP', 'Gruppenpreise pro Artikel: ');
+define('EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_EXCLUSIVE', '');
+define('EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_SBA', 'Stock By Attributes: ');
+define('EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_CEON', 'CEON URI: ');
+define('EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_DPM', 'Dual Pricing: ');
+define('EASYPOPULATE_4_DISPLAY_USER_DEF_FIELDS', 'Weitere individuelle Artikelfelder: ');
+define('EASYPOPULATE_4_DISPLAY_INSTALLED_LANG', 'Installierte Sprachen');
+define('EASYPOPULATE_4_DISPLAY_INSTALLED_LANG_DEF', 'Standard Sprache: ');
+define('EASYPOPULATE_4_DISPLAY_INT_CHAR_ENC', 'Internal Character Encoding: ');
+define('EASYPOPULATE_4_DISPLAY_DB_COLL', 'Datenbank Kollation: ');
+define('EASYPOPULATE_4_DISPLAY_DB_FLD_LGTH', 'Datenbank Feldlängen');
+define('EASYPOPULATE_4_DISPLAY_TITLE_UPLOAD', 'Datei für den Import hochladen');
+define('EASYPOPULATE_4_DISPLAY_MAX_UP_SIZE', 'Http Maximale Dateigröße für den Upload: %1$d bytes (%2$d Mbytes)');
+define('EASYPOPULATE_4_DISPLAY_UPLOAD_BUTTON_TEXT', 'Hochladen');
+define('EASYPOPULATE_4_DD_STATUS_DEFAULT', 'Status');
+define('EASYPOPULATE_4_DD_STATUS_ACTIVE', 'aktiv');
+define('EASYPOPULATE_4_DD_STATUS_INACTIVE', 'inaktiv');
+define('EASYPOPULATE_4_DD_STATUS_ALL', 'alle');
+define('EASYPOPULATE_4_DD_DOWNLOAD_DEFAULT', 'Download Typ');
+define('EASYPOPULATE_4_DD_DOWNLOAD_COMPLETE', 'Alle Artikel');
+define('EASYPOPULATE_4_DD_DOWNLOAD_QUANTITY', 'Artikelnummer/Preis/Anzahl');
+define('EASYPOPULATE_4_DD_DOWNLOAD_BREAKS', 'Artikelnummer/Preis/Staffelpreise');
 
 ?>

@@ -1,11 +1,13 @@
 <?php
 // $Id: easypopulate_4.php, v4.0.31URI 08-01-2015 mc12345678 $
+
 // CSV VARIABLES - need to make this configurable in the ADMIN
 // $csv_delimiter = "\t"; // "\t" = tab AND "," = COMMA
 $csv_delimiter = ","; // "\t" = tab AND "," = COMMA
-$csv_enclosure = '"'; // chadd - i think you should always us the '"' for best compatibility
+$csv_enclosure = '"'; // chadd - i think you should always use the '"' for best compatibility
 
 $excel_safe_output = true; // this forces enclosure in quotes
+
 // START INITIALIZATION
 require_once ('includes/application_top.php');
 if (!defined(EP4_DB_FILTER_KEY)) {
@@ -73,6 +75,7 @@ $ep_dltype = NULL;
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
 $specials_print = EASYPOPULATE_4_SPECIALS_HEADING;
 $has_specials = false;
+$zco_notifier->notify('EP4_START');
 
 // all mods go in this array as 'name' => 'true' if exist. eg $ep_supported_mods['psd'] => true means it exists.
 $ep_supported_mods = array();
@@ -117,6 +120,7 @@ if (!is_null($_GET['epinstaller']) && $_GET['epinstaller'] == 'remove') { // rem
   remove_easypopulate_4();
   zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
 } // end installation/removal
+
 // START: check for existance of various mods
 $ep_supported_mods['psd'] = ep_4_check_table_column(TABLE_PRODUCTS_DESCRIPTION, 'products_short_desc');
 $ep_supported_mods['uom'] = ep_4_check_table_column(TABLE_PRODUCTS, 'products_price_uom'); // uom = unit of measure, added by Chadd
@@ -129,6 +133,7 @@ $ep_supported_mods['gppi'] = ep_4_check_table_column(TABLE_PRODUCTS, 'products_g
 $ep_supported_mods['excl'] = ep_4_check_table_column(TABLE_PRODUCTS, 'products_exclusive'); // exclu = Custom Mod for Exclusive Products: 04-24-2012
 $ep_supported_mods['dual'] = ep_4_check_table_column(TABLE_PRODUCTS_ATTRIBUTES, 'options_values_price_w');
 // END: check for existance of various mods
+
 // custom products fields check
 $custom_field_names = array();
 $custom_field_check = array();
@@ -187,7 +192,9 @@ if (($collation == 'utf8') && ((substr($project, 0, 5) == "1.3.8") || (substr($p
 // test for Ajeh
 //$ajeh_sql = 'SELECT * FROM '. TABLE_PRODUCTS .' WHERE '.TABLE_PRODUCTS.'.products_id NOT IN (SELECT '. TABLE_PRODUCTS_TO_CATEGORIES.'.products_id FROM '. TABLE_PRODUCTS_TO_CATEGORIES.')';
 //$ajeh_result = ep_4_query($ajeh_sql);
+
 // Pre-flight checks finish here
+
 // check default language_id from configuration table DEFAULT_LANGUAGE
 // chadd - really shouldn't do this! $epdlanguage_id is better replaced with $langcode[]
 // $epdlanguage_id is the only value used here ( I assume for default language)
@@ -331,36 +338,36 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_REQUEST["delet
            echo EASYPOPULATE_4_DISPLAY_ENABLE_META . $ep_metatags . '<br />';
            echo EASYPOPULATE_4_DISPLAY_ENABLE_MUSIC . $ep_music . '<br />';
 
-           echo '<br /><b><u>Custom Products Fields</u></b><br />';
-           echo 'Product Short Descriptions: ' . (($ep_supported_mods['psd']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
-           echo 'Product Unit of Measure: ' . (($ep_supported_mods['uom']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
-           echo 'Product UPC Code: ' . (($ep_supported_mods['upc']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+           echo '<br /><b><u>' . EASYPOPULATE_4_DISPLAY_CUSTOM_PRODUCT_FIELDS . '</u></b><br />';
+           echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_SHORT_DESC . (($ep_supported_mods['psd']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+           echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_UNIT_MEAS . (($ep_supported_mods['uom']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+           echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_UPC . (($ep_supported_mods['upc']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
            // Google Product Category for Google Merchant Center
-           echo 'Google Product Category: ' . (($ep_supported_mods['gpc']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
-           echo "Manufacturer's Suggested Retail Price: " . (($ep_supported_mods['msrp']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
-           echo "Manufacturer's Advertised Price: " . (($ep_supported_mods['map']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
-           echo "Group Pricing Per Item: " . (($ep_supported_mods['gppi']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
-           echo "Exclusive Products Mod: " . (($ep_supported_mods['excl']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
-           echo "Stock By Attributes Mod: " . (($ep_4_SBAEnabled != false) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
-           echo "CEON URI Rewriter Mod: " . (($ep4CEONURIDoesExist == true) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
-           echo "Dual Pricing Mod: " . (($ep_supported_mods['dual']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+           echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_GOOGLE_CAT . (($ep_supported_mods['gpc']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+           echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_MSRP . (($ep_supported_mods['msrp']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+           echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_MAP . (($ep_supported_mods['map']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+           echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_GP . (($ep_supported_mods['gppi']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+           echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_EXCLUSIVE . (($ep_supported_mods['excl']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+           echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_SBA . (($ep_4_SBAEnabled != false) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+           echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_CEON . (($ep4CEONURIDoesExist == true) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+           echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_DPM . (($ep_supported_mods['dual']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
 
-           echo "<br /><b><u>User Defined Products Fields: </u></b><br />";
+           echo "<br /><b><u>" . EASYPOPULATE_4_DISPLAY_USER_DEF_FIELDS . "</u></b><br />";
            $i = 0;
            foreach ($custom_field_names as $field) {
              echo $field . ': ' . (($custom_field_check[$i]) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
              $i++;
            }
 
-           echo '<br /><b><u>Installed Languages</u></b> <br />';
+           echo '<br /><b><u>' . EASYPOPULATE_4_DISPLAY_INSTALLED_LANG . '</u></b><br />';
            foreach ($langcode as $key => $lang) {
              echo $lang['id'] . '-' . $lang['code'] . ': ' . $lang['name'] . '<br />';
            }
-           echo 'Default Language: ' . $epdlanguage_id . '-' . $epdlanguage_name . '<br />';
-           echo 'Internal Character Encoding: ' . (function_exists('mb_internal_encoding') ? mb_internal_encoding() : 'mb_internal_encoding not available') . '<br />';
-           echo 'DB Collation: ' . $collation . '<br />';
+           echo EASYPOPULATE_4_DISPLAY_INSTALLED_LANG_DEF . $epdlanguage_id . '-' . $epdlanguage_name . '<br />';
+           echo EASYPOPULATE_4_DISPLAY_INT_CHAR_ENC . (function_exists('mb_internal_encoding') ? mb_internal_encoding() : 'mb_internal_encoding not available') . '<br />';
+           echo EASYPOPULATE_4_DISPLAY_DB_COLL . $collation . '<br />';
 
-           echo '<br /><b><u>Database Field Lengths</u></b><br />';
+           echo '<br /><b><u>' . EASYPOPULATE_4_DISPLAY_DB_FLD_LGTH . '</u></b><br />';
            echo 'categories_name:' . $categories_name_max_len . '<br />';
            echo 'manufacturers_name:' . $manufacturers_name_max_len . '<br />';
            echo 'products_model:' . $products_model_max_len . '<br />';
@@ -383,11 +390,11 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_REQUEST["delet
 
         <form ENCTYPE="multipart/form-data" ACTION="easypopulate_4.php" METHOD="POST">
           <div align = "left"><br />
-            <b>Upload EP File</b><br />
-            <?php echo "Http Max Upload File Size: $upload_max_filesize bytes (" . round($upload_max_filesize / 1024 / 1024) . " Mbytes)<br />"; ?>
+            <b><?php echo EASYPOPULATE_4_DISPLAY_TITLE_UPLOAD; ?></b><br />
+            <?php echo sprintf(EASYPOPULATE_4_DISPLAY_MAX_UP_SIZE, $upload_max_filesize, round($upload_max_filesize / 1024 / 1024)) . '<br />'; ?>
             <input TYPE="hidden" name="MAX_FILE_SIZE" value="<?php echo $upload_max_filesize; ?>">
             <input name="uploadfile" type="file" size="50">
-            <input type="submit" name="buttoninsert" value="Upload File">
+            <input type="submit" name="buttoninsert" value=<?php echo EASYPOPULATE_4_DISPLAY_UPLOAD_BUTTON_TEXT; ?>>
             <br /><br /><br />
           </div>
         </form>
@@ -406,17 +413,18 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_REQUEST["delet
                while ($manufacturers = mysqli_fetch_array($manufacturers_query)) {
                  $manufacturers_array[] = array("id" => $manufacturers['manufacturers_id'], 'text' => $manufacturers['manufacturers_name']);
                }
+			
              } else {
                $manufacturers_query = mysql_query("SELECT manufacturers_id, manufacturers_name FROM " . TABLE_MANUFACTURERS . " ORDER BY manufacturers_name");
                while ($manufacturers = mysql_fetch_array($manufacturers_query)) {
                  $manufacturers_array[] = array("id" => $manufacturers['manufacturers_id'], 'text' => $manufacturers['manufacturers_name']);
                }
              }
-             $status_array = array(array("id" => '1', 'text' => "Status"), array("id" => '1', 'text' => "active"), array("id" => '0', 'text' => "inactive"), array("id" => '3', 'text' => "all"));
-             $export_type_array = array(array("id" => '0', 'text' => "Download Type"),
-               array("id" => '0', 'text' => "Complete Products"),
-               array("id" => '1', 'text' => "Model/Price/Qty"),
-               array("id" => '2', 'text' => "Model/Price/Breaks"));
+             $status_array = array(array("id" => '1', 'text' => EASYPOPULATE_4_DD_STATUS_DEFAULT ), array("id" => '1', 'text' => EASYPOPULATE_4_DD_STATUS_ACTIVE), array("id" => '0', 'text' => EASYPOPULATE_4_DD_STATUS_INACTIVE), array("id" => '3', 'text' => EASYPOPULATE_4_DD_STATUS_ALL));
+             $export_type_array = array(array("id" => '0', 'text' => EASYPOPULATE_4_DD_DOWNLOAD_DEFAULT),
+               array("id" => '0', 'text' => EASYPOPULATE_4_DD_DOWNLOAD_COMPLETE),
+               array("id" => '1', 'text' => EASYPOPULATE_4_DD_DOWNLOAD_QUANTITY),
+               array("id" => '2', 'text' => EASYPOPULATE_4_DD_DOWNLOAD_BREAKS));
 
              echo "<b>Filterable Exports:</b><br />";
 
@@ -474,7 +482,9 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_REQUEST["delet
 
           <a href="easypopulate_4.php?export=SBAStockProdFilter"><b>Stock of Items with Attributes Including SBA Sorted Ascending</b></a><br />
 
-        <?php } /* End SBA1 Addition */ ?>
+        <?php } /* End SBA1 Addition */ 
+		$zco_notifier->notify('EP4_LINK_SELECTION_END');
+		?>
         <?php /* Begin CEON URI addition */ if ($ep4CEONURIDoesExist == true) { ?>    <br /><b>CEON URI Export/Import Options</b><br />
           <a href="easypopulate_4.php?export=CEON_URI_active_all"><b>CEON URI Active Data Table</b> (basic single-line)</a><br />
           <a href="easypopulate_4.php?export=CEON_detailed"><b>Detailed CEON URI Data</b> (detailed multi-line)</a><br />
@@ -514,13 +524,14 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_REQUEST["delet
             "priceqty-ep" => PRICEQTY_EP_DESC,
             "sba-detailed-ep" => SBA_DETAILED_EP_DESC,
             "sba-stock-ep" => SBA_STOCK_EP_DESC,
-        "orders-full-ep"=>ORDERSEXPORT_LINK_SAVE1,
-        "orders-fullb-ep"=>ORDERSEXPORT_LINK_SAVE1B,
-        "orders-noattribs-ep"=>ORDERSEXPORT_LINK_SAVE2,
-        "orders-onlyAttribs-ep"=>ORDERSEXPORT_LINK_SAVE3,
+            "orders-full-ep"=>ORDERSEXPORT_LINK_SAVE1,
+            "orders-fullb-ep"=>ORDERSEXPORT_LINK_SAVE1B,
+            "orders-noattribs-ep"=>ORDERSEXPORT_LINK_SAVE2,
+            "orders-onlyAttribs-ep"=>ORDERSEXPORT_LINK_SAVE3,
             'ceon-uri-aa-ep' => CEON_URI_AA_EP_DESC,
             'ceon-uri-ez-ep' => CEON_URI_EZ_EP_DESC
           );
+		  $zco_notifier->notify('EP4_FILENAMES');
 
           $filetypes = array();
 

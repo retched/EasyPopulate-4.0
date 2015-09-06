@@ -237,7 +237,7 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
 					$a_products_options_values_id = $row5['products_options_values_id'];
 					
 
-// HERE ==========> // INSERT vs UPDATE!!!$a_products_options_values_id
+// HERE ==========> // INSERT vs UPDATE!!!
 					// need to query the v_products_id, v_products_options_id, and a_products_options_values_id
 					// if found update, else insert new values
 					$sql6 = "SELECT * FROM "

@@ -232,6 +232,8 @@ function ep_4_CEONURIExists () {
 }
 
 function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcode, $ep_supported_mods, $custom_fields) {
+  global $zco_notifier;
+  
 	$filelayout = array();
 	switch($ep_dltype) {
 	case 'SBAStock';
@@ -276,6 +278,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		break;
 		
 	case 'full': // FULL products download
+		$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START');
 		if (ep_4_CEONURIExists() == true) {
 			$ep4CEONURIDoesExist = true;
 			require(DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_datafiles/ceon_uri_mapping_product_pages.php');  // Brings in extra variables to support product page types.
@@ -293,6 +296,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			}
 			$filelayout[] = 'v_products_url_'.$l_id;
 		} 
+		$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
 		if ($ep4CEONURIDoesExist == true) {
 			$filelayout[] =	'v_products_type';
 			foreach ($langcode as $key => $lang) { // create variables for each language id
@@ -423,6 +427,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		if ($ep_supported_mods['excl'] == true) { // Custom Mode for Exclusive Products Status VARCHAR(32)
 			$filelayout_sql .=  'p.products_exclusive as v_products_exclusive,';
 		}
+		$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT');
 		if ($ep4CEONURIDoesExist == true) {
 /*			$filelayout_sql .=	'c.uri as v_uri,';
 			$filelayout_sql .=	'c.language_id as v_language_id,';
@@ -462,7 +467,8 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			FROM '
 			.TABLE_CATEGORIES.' as subc, '
 			.TABLE_PRODUCTS_TO_CATEGORIES.' as ptoc, '
-			.TABLE_PRODUCTS.' as p '; 
+			.TABLE_PRODUCTS.' as p ';
+			$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE');
 			if ($ep4CEONURIDoesExist == true) { 
 				$filenamelist = implode("','", $ceon_uri_mapping_product_pages);
 				$filelayout_sql .= 'LEFT JOIN '.TABLE_CEON_URI_MAPPINGS.' as c 
@@ -483,6 +489,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 
 	case 'featured': // added 5-2-2012
 		$filelayout[] = 'v_products_model';
+		$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FEATURED_FILELAYOUT');
     if (EP4_DB_FILTER_KEY === 'products_id' || EP4_DB_FILTER_KEY === 'blank_new') {
       $filelayout[] = 'v_products_id';
     }
@@ -612,6 +619,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 	break;	
 
 	case 'category': 
+       $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_FILELAYOUT');
 		if (ep_4_CEONURIExists() == true) {
 			$ep4CEONURIDoesExist = true;
 			require(DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_datafiles/ceon_uri_mapping_product_pages.php');  // Brings in extra variables to support product page types.
@@ -653,6 +661,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
     // Categories Meta Data - added 12-02-2010
 	// 12-10-2010 removed array_merge() for better performance
 	case 'categorymeta':
+	    $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORYMETA_FILELAYOUT');
 		if (ep_4_CEONURIExists() == true) {
 			$ep4CEONURIDoesExist = true;
 			require(DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_datafiles/ceon_uri_mapping_product_pages.php');  // Brings in extra variables to support product page types.
@@ -1002,7 +1011,7 @@ $filelayout_sql .= '
 		// d = table PRODUCTS_ATTRIBUTES_DOWNLOAD
 		// s = table PRODUCTS_WITH_ATTRIBUTES_STOCK
 		// pd = table PRODUCTS_DESCRIPTIONS
-		$filelayout_sql = 'SELECT
+		$filelayout_sql = 'SELECT DISTINCT
 			a.products_attributes_id            as v_products_attributes_id,
 			a.products_id                       as v_products_id,
 			p.products_model				    as v_products_model,
@@ -1226,6 +1235,9 @@ $filelayout_sql .= '
     $filelayout_sql = $db->bindVars($filelayout_sql, ':orders_status_id:', $_POST['configuration[order_status]'], 'integer');
 
 //    echo $filelayout[] = $filelayout_sql;
+    break;
+  default:
+    $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CASE_DEFAULT');
     break;
 	}
   
@@ -1574,6 +1586,7 @@ function install_easypopulate_4() {
 	} else { // unsupported version 
 		// i should do something here!
 	} 
+    $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_INSTALL_END');
 }
 
 function remove_easypopulate_4() {
