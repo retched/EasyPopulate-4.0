@@ -497,7 +497,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 //				$active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
 //				$active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
 //			} // end of special case 'attrib_basic'
-
+}  // This was missing in loop.
 
   // Products Image
   if (isset($filelayout['v_products_image'])) {
@@ -547,7 +547,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       // metaData end
       // for each language, get the description and set the vals
       //Start of CEON URI Addon - mc12345678
-      if ($ep4CEONURIDoesExist == true && EP4_AUTOCREATE_FROM_BLANK != '0' && EP4_AUTORECREATE_EXISTING != '0' && EP4_EXPORT_ONLY != '1') {
+      if ($ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_FROM_BLANK == '0' && EP4_AUTORECREATE_EXISTING == '0')) {
         $ceon_uri_mapping_admin = new EP4CeonURIMappingAdminProductPages();
 
         //$prev_uri_mappings should = $uri_mappings, because previous mappings appears to be used to undo the new $uri_mappings.  These two values would be gathered from above.  $uri_mapping_autogen is used to automatically create a new mapping and is likely to be associated with an admin Constant.  Ideally, if the fields are present then if there is a value in the field will not auto create, if there is null then would want to autocreate.  If the fields are not present, then probably want a flag that says to autocreate the path assuming that it does not already exist.  $pID is the product id which should be gathered from above. "All" mappings need to be posted, ie, if there is more than one language, and only one mapping is passed in then the other mapping should be set to NULL at least eventually if there is nothing already there/rules of import... 
@@ -656,7 +656,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     }
   } // END: Specials
   // EZ-Pages - mc12345678
-  if ($ep_dltype == 'CEON_EZPages' && EP4_AUTOCREATE_EZ_FROM_BLANK != '0' && EP4_AUTORECREATE_EZ_EXISTING != '0' && EP4_EXPORT_EZ_ONLY != '1') {
+  if ($ep_dltype == 'CEON_EZPages' && !(EP4_AUTOCREATE_EZ_FROM_BLANK == '0' && EP4_AUTORECREATE_EZ_EXISTING == '0')) {
     if ($ep4CEONURIDoesExist == true) {
       $EZ_prev_uri_mappings = array();
       $EZ_uri_mappings = array();
@@ -722,7 +722,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
   // Multi-Lingual Categories, Categories Meta, Categories Descriptions
   if ($ep_dltype == 'categorymeta') {
     // names and descriptions require that we loop thru all languages that are turned on in the store
-    if ($ep4CEONURIDoesExist == true && EP4_AUTOCREATE_CAT_FROM_BLANK != '0' && EP4_AUTORECREATE_CAT_EXISTING != '0' && EP4_EXPORT_CAT_ONLY != '1') {
+    if ($ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && EP4_AUTORECREATE_CAT_EXISTING == '0')) {
       $thecategory_id = $row['v_categories_id']; // starting category_id
       $ceon_uri_cat_mapping = new EP4CeonURIMappingAdminCategoryPages();
       foreach ($langcode as $key2 => $lang2) {
@@ -801,7 +801,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       //function zen_href_link($page = '', $parameters = '', $connection = 'NONSSL', $add_session_id = true, $search_engine_safe = true, $static = false, $use_dir_ws_catalog = true) 
     }
     // $fullcategory = array(); // this will have the entire category path separated by $category_delimiter
-    if ($ep4CEONURIDoesExist == true && $ep_dltype == 'category') {
+    if ($ep4CEONURIDoesExist == true && $ep_dltype == 'category' && !(EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && EP4_AUTORECREATE_CAT_EXISTING == '0')) {
       $ceon_uri_cat_mapping = new EP4CeonURIMappingAdminCategoryPages();
       foreach ($langcode as $key2 => $lang2) {
         $categories_name[$lang2['id']] = '';
@@ -1208,7 +1208,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 
   fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
   $ep_export_count++;
-  } // if $ep_dltype == 'attrib_basic'
+ // This was extra-> } // if $ep_dltype == 'attrib_basic'
 } // while ($row) 
 //Start SBA1 addresses writing to the file
 if ($ep_dltype == 'SBA_basic') {

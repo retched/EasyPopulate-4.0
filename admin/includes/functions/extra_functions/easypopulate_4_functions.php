@@ -232,7 +232,7 @@ function ep_4_CEONURIExists () {
 }
 
 function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcode, $ep_supported_mods, $custom_fields) {
-  global $zco_notifier;
+  global $db, $zco_notifier;
   
 	$filelayout = array();
 	switch($ep_dltype) {
@@ -279,7 +279,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		
 	case 'full': // FULL products download
 		$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START');
-		if (ep_4_CEONURIExists() == true) {
+		if (ep_4_CEONURIExists() == true && !(EP4_AUTOCREATE_FROM_BLANK == '0' && EP4_AUTORECREATE_EXISTING == '0')) {
 			$ep4CEONURIDoesExist = true;
 			require(DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_datafiles/ceon_uri_mapping_product_pages.php');  // Brings in extra variables to support product page types.
 		}
@@ -297,7 +297,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			$filelayout[] = 'v_products_url_'.$l_id;
 		} 
 		$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
-		if ($ep4CEONURIDoesExist == true) {
+		if ($ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_FROM_BLANK == '0' && EP4_AUTORECREATE_EXISTING == '0')) {
 			$filelayout[] =	'v_products_type';
 			foreach ($langcode as $key => $lang) { // create variables for each language id
 				$l_id = $lang['id'];
@@ -395,7 +395,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			}
 			$filelayout[] = 'v_music_genre_name';
 		}
-		$filelayout_sql = 'SELECT ' . ($ep4CEONURIDoesExist ? 'DISTINCT' : '' ) .
+		$filelayout_sql = 'SELECT ' . (($ep4CEONURIDoesExist && !(EP4_AUTOCREATE_FROM_BLANK == '0' && EP4_AUTORECREATE_EXISTING == '0')) ? 'DISTINCT' : '' ) .
 '			   
 			p.products_id					as v_products_id,
 			p.products_model				as v_products_model,
@@ -428,7 +428,13 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			$filelayout_sql .=  'p.products_exclusive as v_products_exclusive,';
 		}
 		$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT');
-		if ($ep4CEONURIDoesExist == true) {
+		if ($ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_FROM_BLANK == '0' && EP4_AUTORECREATE_EXISTING == '0')) {
+/*			foreach ($langcode as $key => $lang) { // create variables for each language id
+				$l_id = $lang['id'];
+				$filelayout_sql .= ' c'.$l_id.'.uri as v_uri_'.$l_id.', ';
+				$filelayout_sql .=	'c'.$l_id.'.main_page as v_main_page_'.$l_id. ', ';
+				$filelayout_sql .=	'c'.$l_id.'.associated_db_id as v_associated_db_id_'.$l_id.', ';
+			}*/
 /*			$filelayout_sql .=	'c.uri as v_uri,';
 			$filelayout_sql .=	'c.language_id as v_language_id,';
 			$filelayout_sql .=	'c.current_uri as v_current_uri,';*/
@@ -444,7 +450,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 				$filelayout_sql .= 'p.'.$field.' as v_'.$field.',';
 			}
 		}
-		$filelayout_sql .= 'p.products_weight as v_products_weight,
+		$filelayout_sql .= ' p.products_weight as v_products_weight,
 			p.product_is_call				as v_product_is_call,
 			p.products_sort_order			as v_products_sort_order, 
 			p.products_quantity_order_min	as v_products_quantity_order_min,
@@ -469,8 +475,18 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			.TABLE_PRODUCTS_TO_CATEGORIES.' as ptoc, '
 			.TABLE_PRODUCTS.' as p ';
 			$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE');
-			if ($ep4CEONURIDoesExist == true) { 
+			if ($ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_FROM_BLANK == '0' && EP4_AUTORECREATE_EXISTING == '0')) { 
 				$filenamelist = implode("','", $ceon_uri_mapping_product_pages);
+/*				foreach ($langcode as $key => $lang) { // create variables for each language id
+					$l_id = $lang['id'];
+					$filelayout_sql .= ' LEFT JOIN '.TABLE_CEON_URI_MAPPINGS.' as c'.$l_id.' 
+					ON 
+					p.products_id = c'.$l_id.'.associated_db_id AND 
+					c'.$l_id.'.main_page IN (\''.$filenamelist.'\') AND
+					c'.$l_id.'.language_id = '.$l_id.' AND 
+					c'.$l_id.'.current_uri = \'1\' ';
+				}*/
+
 				$filelayout_sql .= 'LEFT JOIN '.TABLE_CEON_URI_MAPPINGS.' as c 
 				ON 
 				p.products_id = c.associated_db_id AND
@@ -620,7 +636,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 
 	case 'category': 
        $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_FILELAYOUT');
-		if (ep_4_CEONURIExists() == true) {
+		if (ep_4_CEONURIExists() == true && !(EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && EP4_AUTORECREATE_CAT_EXISTING == '0')) {
 			$ep4CEONURIDoesExist = true;
 			require(DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_datafiles/ceon_uri_mapping_product_pages.php');  // Brings in extra variables to support product page types.
 		}
@@ -634,7 +650,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			$l_id = $lang['id'];
 			$filelayout[] = 'v_categories_name_'.$l_id;
 		} 
-		if ($ep4CEONURIDoesExist == true) {
+		if ($ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && EP4_AUTORECREATE_CAT_EXISTING == '0')) {
 			foreach ($langcode as $key => $lang) { // create variables for each language id
 				$l_id = $lang['id'];
 				$filelayout[] =	'v_uri_' . $l_id;
@@ -662,7 +678,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 	// 12-10-2010 removed array_merge() for better performance
 	case 'categorymeta':
 	    $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORYMETA_FILELAYOUT');
-		if (ep_4_CEONURIExists() == true) {
+		if (ep_4_CEONURIExists() == true && !(EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && EP4_AUTORECREATE_CAT_EXISTING == '0')) {
 			$ep4CEONURIDoesExist = true;
 			require(DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_datafiles/ceon_uri_mapping_product_pages.php');  // Brings in extra variables to support product page types.
 		}
@@ -676,7 +692,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			$filelayout[] = 'v_categories_description_'.$l_id;
 			$filelayout[] = 'v_uri_' . $l_id;
 		} 
-		if ($ep4CEONURIDoesExist == true) {
+		if ($ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && EP4_AUTORECREATE_CAT_EXISTING == '0')) {
 			$filelayout[] =	'v_categories_id';
 			$filelayout[] =	'v_main_page';
 //Don't need for product			$filelayout[] =	'v_query_string_parameters';
@@ -699,7 +715,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		break;
 	
 	case 'CEON_EZPages':
-		if (ep_4_CEONURIExists() == true) {
+		if (ep_4_CEONURIExists() == true && !(EP4_AUTOCREATE_EZ_FROM_BLANK == '0' && EP4_AUTORECREATE_EZ_EXISTING == '0')) {
 			$ep4CEONURIDoesExist = true;
 			require(DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_datafiles/ceon_uri_mapping_product_pages.php');  // Brings in extra variables to support product page types.
 		}
@@ -723,7 +739,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		$filelayout[] = 'v_page_is_ssl';
 		$filelayout[] = 'v_toc_chapter';
 
-		if ($ep4CEONURIDoesExist == true) {
+		if ($ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_EZ_FROM_BLANK == '0' && EP4_AUTORECREATE_EZ_EXISTING == '0')) {
 			foreach ($langcode as $key => $lang) { // create categories variables for each language id
 				$l_id = $lang['id'];
 	//			$filelayout[] = 'v_categories_name_'.$l_id;
@@ -744,8 +760,8 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			$filelayout[]   = 'v_metatags_keywords_'.$l_id;
 			$filelayout[]   = 'v_metatags_description_'.$l_id;
 		} 
-		$filelayout_sql = 'SELECT ' . ($ep4CEONURIDoesExist ? 'DISTINCT' : '');
-		if ($ep4CEONURIDoesExist == true) {
+		$filelayout_sql = 'SELECT ' . (($ep4CEONURIDoesExist && !(EP4_AUTOCREATE_EZ_FROM_BLANK == '0' && EP4_AUTORECREATE_EZ_EXISTING == '0')) ? 'DISTINCT' : '');
+		if ($ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_EZ_FROM_BLANK == '0' && EP4_AUTORECREATE_EZ_EXISTING == '0')) {
 /*			$filelayout_sql .=	'c.uri as v_uri,';
 			$filelayout_sql .=	'c.language_id as v_language_id,';
 			$filelayout_sql .=	'c.current_uri as v_current_uri,';*/
@@ -1501,7 +1517,7 @@ function ep_4_query($query) {
 }
 
 function install_easypopulate_4() {
-	global $db;
+	global $db, $zco_notifier;
 	$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
 	if ( (substr($project,0,5) == "1.3.8") || (substr($project,0,5) == "1.3.9") ) {
 		$db->Execute("INSERT INTO ".TABLE_CONFIGURATION_GROUP." (configuration_group_title, configuration_group_description, sort_order, visible) VALUES ('Easy Populate 4', 'Configuration Options for Easy Populate 4', '1', '1')");
