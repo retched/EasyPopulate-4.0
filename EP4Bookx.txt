@@ -1,0 +1,33 @@
+/**
+ * @EP4Bookx - EP4 CSV fork to import Bookx fields - tested with Zencart 1.5.4
+ *
+ * @version  0.9.0 - Still in development, make your changes in a local environment
+ * @see Bookx module for ZenCart
+ *
+ * @author mesnitu
+ */
+
+=== Note : Still under heavy tests ===
+
+EP4Bookx is a fork of  Easy Populate 4.0 to support Bookx fields.
+Based  on Music fields, was adapted to manage bookx
+
+Quick review how to use it:
+
+Install EasyPopulate as you would, and enable Bookx fields support in EP configuration
+
+You can assign a fallback genre, or leave it blank. Possibly other fallback fields, such as authors could be add it, or completely remove this functionality.
+
+If there's empty fields, such as authors, publishers, etc... a report is generated (still working on it ), with a link to edit the book.
+I found that there's no need to skip fields, but instead, insert them, and have the possibility to have a more visual way to know witch fields are missing and were
+ 
+EP4Bookx uses status 10 (same a 9 in EP), but  changed to remove bookx fields associated with the products.
+So you would do v_status 10, to remove books.
+
+For now, EP4Bookx only supports the default language, and only one Author and  Genre can be assign (it's on @todo list)
+
+/**
+ * @todo  export with support for languages
+ * @todo  export assinged multiple authors
+ * @todo  export assinged multiple genres
+ */
