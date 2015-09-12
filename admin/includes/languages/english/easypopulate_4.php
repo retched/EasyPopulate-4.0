@@ -85,4 +85,28 @@ define('EASYPOPULATE_4_DISPLAY_EXEC_TIME', 'Execution Time: ');
 define('EASYPOPULATE_4_DISPLAY_ENABLE_META', 'Enable Products Metatags: ');
 define('EASYPOPULATE_4_DISPLAY_ENABLE_MUSIC', 'Enable Products Music: ');
 
-?>
+/**
+ * @EP4 - Bookx
+ */
+
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_AUTHOR_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Author Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_AUTHOR_TYPES_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Author Type Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_PUBLISHER_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Publisher Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_GENRE_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Genre Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_BINDING_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Binding Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_SERIES_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Series Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_PRINTING_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Printing Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_CONDITION_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Condition Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_IMPRINT_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Imprint Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_SUBTITLE_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Bookx Subtitle:</b> %s - exceeds max. length: %s</font>');
+
+
+
+
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_DELETED','<br /><font color="fuchsia"><b>DELETED! - Model:</b> %s, - ISBN: %s</font>');
+define('EASY_POPULATE_4_BOOKX_EDIT_LINK', 'Edit');
+define('EASY_POPULATE_4_BOOKX_DISPLAY_DEFAULT_GENRE_NAME', 'Fallback Genre: ');
+//define('EASYPOPULATE_4_CONFIG_BOOKX_DEFAULT_GENRE_NAME', 'Fallback Genre');
+define('EASY_POPULATE_4_BOOKX_DEFAULT_PUBLISHER_NAME', 'General Publisher');
+
+define('EASYPOPULATE_4_DISPLAY_ENABLE_BOOKX', 'Enable Bookx Products: ');

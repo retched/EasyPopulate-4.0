@@ -27,9 +27,21 @@ $ep_char_92       = (int)EASYPOPULATE_4_CONFIG_CHAR_92;
 $ep_metatags      = (int)EASYPOPULATE_4_CONFIG_META_DATA; // 0-Disable, 1-Enable
 $ep_music         = (int)EASYPOPULATE_4_CONFIG_MUSIC_DATA; // 0-Disable, 1-Enable
 $ep_uses_mysqli   = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3' ? true : false);
-//:::::::@ALTERED for Bookx
+
+/**
+ *  @EP4Bookx 
+ *  Get the user config
+ */
 $ep_bookx         = (int)EASYPOPULATE_4_CONFIG_BOOKX_DATA; // 0-Disable, 1-Enable
 $ep_bookx_fallback_genre_name = EASYPOPULATE_4_CONFIG_BOOKX_DEFAULT_GENRE_NAME; 
+
+
+/**
+ * @EP4Bokox
+ */
+//$bookx_reports = array();
+//ends 
+
 @set_time_limit($ep_execution);  // executin limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
 
 if ((isset($error) && !$error) || !isset($error)) { 
@@ -137,6 +149,23 @@ $artists_name_max_len = zen_field_length(TABLE_RECORD_ARTISTS, 'artists_name');
 $record_company_name_max_len = zen_field_length(TABLE_RECORD_COMPANY, 'record_company_name');
 $music_genre_name_max_len = zen_field_length(TABLE_MUSIC_GENRE, 'music_genre_name');
 
+/**
+* @EP4Bookx
+*/
+$bookx_author_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHORS, 'author_name');
+$bookx_author_types_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION, 'type_description');
+$bookx_genre_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_GENRES_DESCRIPTION, 'genre_description');
+$bookx_series_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_SERIES_DESCRIPTION, 'series_name');
+$bookx_publisher_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_PUBLISHERS, 'publisher_name');
+$bookx_binding_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_BINDING_DESCRIPTION, 'binding_description');
+$bookx_printing_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_PRINTING_DESCRIPTION, 'printing_description');
+$bookx_condition_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_CONDITIONS_DESCRIPTION, 'condition_description');
+$bookx_imprint_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_IMPRINTS, 'imprint_name');
+$bookx_subtitle_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION, 'products_subtitle');
+//:::::::::::::::
+
+
+
 $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
 
 if ($ep_uses_mysqli) {
@@ -161,7 +190,26 @@ if ( ($collation == 'utf8') && ((substr($project,0,5) == "1.3.8") || (substr($pr
 	$artists_name_max_len = $artists_name_max_len/3;
 	$record_company_name_max_len = $record_company_name_max_len/3;
 	$music_genre_name_max_len = $music_genre_name_max_len/3;
+
+	/**
+     * @EP4Bookx
+     */
+    $bookx_author_name_max_len = $bookx_author_name_max_len/3;
+    $bookx_author_types_name_max_len = $bookx_author_types_name_max_len/3;
+    $bookx_genre_name_max_len  = $bookx_genre_name_max_len/3;
+    $bookx_series_name_max_len = $bookx_series_name_max_len/3;
+    $bookx_publisher_name_max_len = $bookx_publisher_name_max_len/3;
+    $bookx_binding_name_max_len = $bookx_binding_name_max_len/3;
+    $bookx_printing_name_max_len = $bookx_printing_name_max_len/3;
+    $bookx_condition_name_max_len = $bookx_condition_name_max_len/3;
+    $bookx_imprint_name_max_len = $bookx_imprint_name_max_len/3;
+    $bookx_subtitle_max_len = $bookx_subtitle_max_len/3;
+    //::::::::::::::::::::::::::
+
 }
+
+
+
 
 // test for Ajeh
 //$ajeh_sql = 'SELECT * FROM '. TABLE_PRODUCTS .' WHERE '.TABLE_PRODUCTS.'.products_id NOT IN (SELECT '. TABLE_PRODUCTS_TO_CATEGORIES.'.products_id FROM '. TABLE_PRODUCTS_TO_CATEGORIES.')';
@@ -309,8 +357,11 @@ if (((isset($error) && !$error) || !isset($error)) && isset($_REQUEST["delete"])
 		echo 'Convert Curly Quotes: '.$ep_curly_text.'<br/>';
 		echo 'Convert Char 0x92: '.$ep_char92_text.'<br/>';
 		echo EASYPOPULATE_4_DISPLAY_ENABLE_META.$ep_metatags.'<br/>';
-		echo EASYPOPULATE_4_DISPLAY_ENABLE_MUSIC.$ep_music.'<br/>';
-			
+		echo EASYPOPULATE_4_DISPLAY_ENABLE_MUSIC.$ep_music.'<br/>';        
+		//::::: @ALTERED for Bookx ::::::::::::::::
+        echo EASYPOPULATE_4_DISPLAY_ENABLE_BOOKX.$ep_bookx.'<br/>';
+        echo EASY_POPULATE_4_BOOKX_DISPLAY_DEFAULT_GENRE_NAME.$ep_bookx_default_genre_name.'<br />';
+        //:::::::::::::::::::::::::::::::::::://
 		echo '<br/><b><u>Custom Products Fields</u></b><br/>';
 		echo 'Product Short Descriptions: '.(($ep_supported_mods['psd']) ? '<font color="green">TRUE</font>':"FALSE").'<br/>';
 		echo 'Product Unit of Measure: '.(($ep_supported_mods['uom']) ? '<font color="green">TRUE</font>':"FALSE").'<br/>';
@@ -345,6 +396,17 @@ if (((isset($error) && !$error) || !isset($error)) && isset($_REQUEST["delete"])
 		echo 'manufacturers_name:'.$manufacturers_name_max_len.'<br/>';
 		echo 'products_model:'.$products_model_max_len.'<br/>';
 		echo 'products_name:'.$products_name_max_len.'<br/>';
+		/**
+		 * @EP4Bookx
+		 */
+		echo 'author_name:'.$bookx_author_name_max_len.'<br/>';
+		echo 'genre_description:'.$bookx_genre_name_max_len.'<br/>';		
+		echo 'series_name:'.$bookx_series_name_max_len.'<br/>';
+		echo 'publisher_name:'.$bookx_publisher_name_max_len.'<br/>';
+		echo 'binding_description:'.$bookx_binding_name_max_len.'<br/>';
+		echo 'printing_description:'.$bookx_printing_name_max_len.'<br/>';
+		echo 'condition_description:'.$bookx_condition_name_max_len.'<br/>';
+		echo 'imprint_name:'.$bookx_imprint_name_max_len.'<br/>';
 	
 	/*  // some error checking
 		echo '<br/><br/>Problem Data: '. mysql_num_rows($ajeh_result);
@@ -622,4 +684,5 @@ if (((isset($error) && !$error) || !isset($error)) && isset($_REQUEST["delete"])
 <?php require(DIR_WS_INCLUDES . 'footer.php'); ?>
 </body>
 </html>
-<?php require(DIR_WS_INCLUDES . 'application_bottom.php'); ?>
+<?php 
+require(DIR_WS_INCLUDES . 'application_bottom.php');

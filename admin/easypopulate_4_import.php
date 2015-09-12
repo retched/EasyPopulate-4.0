@@ -1,6 +1,20 @@
 <?php
 // $Id: easypopulate_4_import.php, v4.0.29 04-03-2015 mc12345678 $
 
+/**
+ * @EP4Bookx - EP4 CSV fork to import Bookx fields - tested with Zencart 1.54
+ * 
+ * @version  0.9.0 Beta Beta - Still in development, make your changes in a local environment
+ * @see Readme-EP4Bookx
+ *
+ * @author mesnitu
+ * @todo  export with support for languages
+ * @todo  export assinged multiple authors
+ * @todo  export assinged multiple genres
+ *
+ * 
+ */
+	
 // BEGIN: Data Import Module
 if ( isset($_GET['import']) ) {
 	$time_start = microtime(true); // benchmarking
@@ -8,6 +22,15 @@ if ( isset($_GET['import']) ) {
 
 	$file = array('name' => $_GET['import']);
 	$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_LOCAL_FILE_SPEC, $file['name']);
+	
+	/**
+	 * @EP4Bookx 1 of 4 
+	 * [It aggregates missing fields in a report linked to the imported book. Uses Bookx languages files as key so it can be tranlated ex: BOX_CATALOG_PRODUCT_BOOKX_PUBLISHERS]
+	 * @see   [adminFolder/includes/languades/YOUR_lang/extra_definitions/product_bookx.php]
+	 * @var array
+	 */
+	$bookx_reports = array();
+	//ends ep4bookx
 	
 	$ep_update_count = 0; // product records updated 
 	$ep_import_count = 0; // new products records imported
@@ -596,6 +619,23 @@ if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolo
 				continue 2; // short circuit - loop to next record
 			}
 			
+
+			/**
+			 * @EP4Bookx 2 of 5 
+			 * Remove Bookx Produtct
+			 * @todo  Display some books fields aside with the model (ex: title or ISBN)
+			 */
+			if ($items[$filelayout['v_status']] == 10) {
+				$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_DELETED, $items[$filelayout['v_products_model']],$items[$filelayout['v_bookx_isbn']]);
+				/**
+				 * Using Bookx function to remove books. 
+				 * @todo Remove from bookx_extra_description
+				 */
+				ep_4_remove_product_bookx($items[$filelayout['v_products_model']]);
+				continue 2; // short circuit - loop to next record
+			}
+			//ends ep4bookx
+
 			// Create variables and assign default values for each language products name, description, url and optional short description
 			foreach ($langcode as $key => $lang) {
 				$sql2 = 'SELECT * FROM '.TABLE_PRODUCTS_DESCRIPTION.' WHERE products_id = '.$row['v_products_id'].' AND language_id = '.$lang['id'];
@@ -1167,7 +1207,15 @@ if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolo
 				$v_products_id = $max_product_id;
 				if ($v_artists_name <> '') {
 					$v_products_type = 2; // 2 = music
-				} else {
+				} 
+				 /**
+                 * @EP4Bookx 3 of 4
+                 */
+				elseif (isset($v_bookx_genre_name) || isset($v_bookx_isbn) ) {
+					$v_products_type = 6; // 6 = Bookkx
+				}
+				//ends ep4bookx
+				else {
 					$v_products_type = 1; // 1 = standard product
 				}	
 				
@@ -1608,11 +1656,47 @@ if ( strtolower(substr($file['name'],0,14)) == "pricebreaks-ep") {
 				$display_output .= print_el_4($summary);
 			}
 		} // end of row insertion code
+
+		/**
+		 * @EP4Bookx 4 of 5
+		 * At last but not least , include the bookx import file. Try to stay clean 
+		 */
+		include 'easypopulate_4_import_bookx.php';
+		//end ep4bookx
+
 	} // end of Mail While Loop
 	} // conditional IF statement
 	
 	$display_output .= '<h3>Finished Processing Import File</h3>';
 	
+	/**
+		 * @EP4Bookx 5 of 5 
+		 * Reports missing fields with the book edit link
+		 * @todo  make this reports configurable
+		 * @todo  remove 
+		 * colors, leave classes
+		 */
+		if (!empty($bookx_reports)) {
+		$display_output .= '<div class="bookx-reports"><h3 style ="background-color: #ccc;"> BOOKX MISSING FIELDS </h3>'; 
+		$display_output .= '<p>Review some empty or defaults fields used in the import</p>';			
+		
+		//pr($bookx_reports);
+		$keys = array_keys($bookx_reports);
+
+		for($i = 0; $i < count($bookx_reports); $i++) {
+
+		    $display_output .= '<strong>' . strtoupper($keys[$i]) . "</strong><br/>";
+		    
+		    foreach($bookx_reports[$keys[$i]] as $key => $value) {
+		    	$class = ($key%2 == true) ? 'background-color:#eee;' : 'background-color:#ccc;';
+		        $display_output .= "<div style =".$class. "padding:5px;border:1px solid #666;>". $value . "</div>";
+		    }
+		}
+		$display_output .='</div>';
+		
+		}
+		//ends ep4Bookx
+
 		$display_output .= '<br/>Updated records: '.$ep_update_count;
 		$display_output .= '<br/>New Imported records: '.$ep_import_count;
 		$display_output .= '<br/>Errors Detected: '.$ep_error_count;
@@ -1638,4 +1722,3 @@ if ( strtolower(substr($file['name'],0,14)) == "pricebreaks-ep") {
 	$messageStack->add("File Import Completed.", 'success');
 	}
 } // END FILE UPLOADS
-?>

@@ -1,6 +1,16 @@
 <?php
 // $Id: easypopulate_4_functions.php, v4.0.30 06-27-2015 mc12345678 $
 
+/**
+ * @EP4Bookx - EP4 CSV fork to import Bookx fields - tested with Zencart 1.5.4
+ * @version  0.9.0 - Still in development, make your changes in a local environment
+ * @see Bookx module for ZenCart
+ * @see Readme-EP4Bookx
+ *
+ * @author mesnitu
+ */
+
+
 function ep_4_curly_quotes($curly_text) {
 	$ep_curly_quotes = (int)EASYPOPULATE_4_CONFIG_CURLY_QUOTES;
 	$ep_char_92 = (int)EASYPOPULATE_4_CONFIG_CHAR_92;
@@ -369,6 +379,37 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			}
 			$filelayout[] = 'v_music_genre_name';
 		}
+
+/**
+ * @EP4BookX
+ */
+              		
+	if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA == true) {
+		
+	        // BOOKX_EXTRA DESCRIPTION
+	        $filelayout[] = 'v_bookx_subtitle';
+			$filelayout[] = 'v_bookx_genre_name';
+			$filelayout[] = 'v_bookx_publisher_name';               
+			$filelayout[] = 'v_bookx_series_name'; // Series name, has Lang ID
+	      //         	foreach ($langcode as $key => $lang) { // create variables for each language id
+							// $l_id = $lang['id'];
+	      //       		$filelayout[] = 'v_bookx_series_name_'.$l_id; // Series name, as Lang ID
+	      //                 }
+	                       
+			$filelayout[] = 'v_bookx_imprint_name';
+			$filelayout[] = 'v_bookx_binding';
+			$filelayout[] = 'v_bookx_printing';
+			$filelayout[] = 'v_bookx_condition';
+			$filelayout[] = 'v_bookx_isbn';
+			$filelayout[] = 'v_bookx_size';
+			$filelayout[] = 'v_bookx_volume';
+			$filelayout[] = 'v_bookx_pages';
+			$filelayout[] = 'v_bookx_publishing_date';         
+			$filelayout[] = 'v_bookx_author_name';
+			$filelayout[] = 'v_bookx_author_type';			
+	}
+	//ends ep4bookx
+	//
 		$filelayout_sql = 'SELECT
 			p.products_id					as v_products_id,
 			p.products_model				as v_products_model,
@@ -1154,6 +1195,11 @@ function ep_4_query($query) {
 }
 
 function install_easypopulate_4() {
+    
+        /*   @ALTERED  ******************************** 
+         *    Enable Bookx data (group ID 100) , default Genre group ID 111 
+         * ********************************************/ 
+         
 	global $db;
 	$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
 	if ( (substr($project,0,5) == "1.3.8") || (substr($project,0,5) == "1.3.9") ) {
@@ -1176,7 +1222,12 @@ function install_easypopulate_4() {
 			('Convert Curly Quotes, etc.',         'EASYPOPULATE_4_CONFIG_CURLY_QUOTES', '0', 'Convert Curly Quotes, Em-Dash, En-Dash and Ellipsis characters in Product Names &amp; Descriptions (default 0).<br><br>0=No Change<br>1=Replace with Basic Characters<br>3=Replace with HMTL equivalants', ".$group_id.", '14', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
 			('Convert Character 0x92',             'EASYPOPULATE_4_CONFIG_CHAR_92', '1', 'Convert Character 0x92 characters in Product Names &amp; Descriptions (default 1).<br><br>0=No Change<br>1=Replace with Standard Single Quote<br>2=Replace with HMTL equivalant', ".$group_id.", '15', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
 			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '16', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
-			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '17', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '100', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+                       
+            ('Enable Products Bookx ',         'EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Bookx Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '17', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+
+            ('Bookx Fallback Genre Name',         'EASYPOPULATE_4_CONFIG_BOOKX_DEFAULT_GENRE_NAME', 'General', 'A fallback genre name for empty genre name fields (default: General).', ".$group_id.", '111', NULL, now(), NULL, NULL),
+
 			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '18', NULL, now(), NULL, NULL),
 			('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '19', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
 			('Show all EP4 Filetypes with Files',       'EP4_SHOW_ALL_FILETYPES', 'True', 'When looking at the EP4 Tools screen, should the filename prefix for all specific file types be displayed for all possible file types (True [default]), should only the method(s) that will be used to process the files present be displayed (False), or should there be no assistance be provided on filenaming on the main page (Hidden) like it was until this feature was added? (True, False, or Hidden)', ".$group_id.", '25', NULL, now(), NULL, 'zen_cfg_select_option(array(\"True\", \"False\", \"Hidden\"),')
@@ -1186,11 +1237,13 @@ function install_easypopulate_4() {
 		if (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') {
 			$group_id = mysqli_insert_id($db->link);
 		} else {
-    	$group_id = mysql_insert_id();
+		$group_id = mysql_insert_id();
 		}
 		$db->Execute("UPDATE ".TABLE_CONFIGURATION_GROUP." SET sort_order = ".$group_id." WHERE configuration_group_id = ".$group_id);
 		
         zen_register_admin_page('easypopulate_4_config', 'BOX_TOOLS_EASYPOPULATE_4','FILENAME_CONFIGURATION', 'gID='.$group_id, 'configuration', 'Y', 97);
+        // @ALTERED 
+        // Enable Bookx data and Insert group ID 100
 		$db->Execute("INSERT INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
 			('Uploads Directory',                  'EASYPOPULATE_4_CONFIG_TEMP_DIR', 'temp/', 'Name of directory for your uploads (default: temp/).', ".$group_id.", '0', NULL, now(), NULL, NULL),
 			('Upload File Date Format',            'EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT', 'm-d-y', 'Choose order of date values that corresponds to your uploads file, usually generated by MS Excel. Raw dates in your uploads file (Eg 2005-09-26 09:00:00) are not affected, and will upload as they are.', ".$group_id.", '1', NULL, now(), NULL, 'zen_cfg_select_option(array(\"m-d-y\", \"d-m-y\", \"y-m-d\"),'),
@@ -1208,6 +1261,9 @@ function install_easypopulate_4() {
 			('Convert Character 0x92',             'EASYPOPULATE_4_CONFIG_CHAR_92', '1', 'Convert Character 0x92 characters in Product Names &amp; Descriptions (default 1).<br><br>0=No Change<br>1=Replace with Standard Single Quote<br>2=Replace with HMTL equivalant', ".$group_id.", '15', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
 			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '16', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
 			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '17', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+            ('Enable Products Bookx',         'EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Books Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '100', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+            ('Bookx Fallback Genre Name',         'EASYPOPULATE_4_CONFIG_BOOKX_DEFAULT_GENRE_NAME', 'General', 'A fallback genre name for empty genre name fields (default: General).', ".$group_id.", '111', NULL, now(), NULL, NULL),
+
 			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '18', NULL, now(), NULL, NULL),
 			('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '19', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
 			('Show all EP4 Filetypes with Files',       'EP4_SHOW_ALL_FILETYPES', 'True', 'When looking at the EP4 Tools screen, should the filename prefix for all specific file types be displayed for all possible file types (True [default]), should only the method(s) that will be used to process the files present be displayed (False), or should there be no assistance be provided on filenaming on the main page (Hidden) like it was until this feature was added? (True, False, or Hidden)', ".$group_id.", '25', NULL, now(), NULL, 'zen_cfg_select_option(array(\"True\", \"False\", \"Hidden\"),')
@@ -1280,4 +1336,84 @@ function register_globals_vars_check_4 () {
 	print "_REQUEST: "; print_r($_REQUEST); echo '<br /><br />';
 	global $HTTP_POST_FILES;
 	print "HTTP_POST_FILES: "; print_r($HTTP_POST_FILES); echo '<br />';
+}
+
+/**
+ * @EP4BookX
+ * [Deletes all bookx produts with a status = 10, using the bookx function]
+ * @see   [product_bookx_functions.php]
+ * @param  [model] $product_model 
+ * @return [model]                [description]
+ *
+ * @todo  Remove bookx from bookx_extra_description
+ */
+function ep_4_remove_product_bookx($product_model) {
+ 	global $db, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error;
+	$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
+	$ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
+	$sql = "SELECT products_id FROM ".TABLE_PRODUCTS." WHERE products_model = '".zen_db_input($product_model)."'";
+	$products = $db->Execute($sql);
+	//$bookx_id = $products->fields['products_id'];
+	// Bye bye
+	bookx_delete_product($products->fields['products_id']);
+
+	if (($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno())) {
+		$ep_stack_sql_error = true;
+		if ($ep_debug_logging == true) {
+			$string = "MySQL error ".($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno()).": ".($ep_uses_mysqli ? mysqli_error($db->link) : mysql_error())."\nWhen executing:\n$sql\n";
+			write_debug_log($string);
+		}
+	} elseif ($ep_debug_logging_all == true) {
+		$string = "MySQL PASSED\nWhen executing:\n$sql\n";
+		write_debug_log($string);
+	}
+	while (!$products->EOF) {
+		zen_remove_product($products->fields['products_id']);
+		$products->MoveNext();
+	}
+	return;
+}
+/**
+ * [ep_4_bookx_delete_bookx_specific_product_entries description]
+ * @param  [type]  $product_id    [description]
+ * @param  boolean $delete_linked [description]
+ * @return [type]                 [description]
+ */
+function ep_4_bookx_delete_bookx_specific_product_entries($product_id = null, $delete_linked = true) {
+  	global $db;
+  	if (null != $product_id) {
+  		$db->Execute('DELETE FROM ' . TABLE_PRODUCT_BOOKX_EXTRA . '
+                      WHERE products_id = "' . (int)$product_id . '"');
+
+  		$db->Execute('DELETE FROM ' . TABLE_PRODUCT_BOOKX_GENRES_TO_PRODUCTS . '
+                      WHERE products_id = "' . (int)$product_id . '"');
+
+  		$db->Execute('DELETE FROM ' . TABLE_PRODUCT_BOOKX_AUTHORS_TO_PRODUCTS . '
+                      WHERE products_id = "' . (int)$product_id . '"');
+  	}
+  }
+
+/**
+ * @todo Returns only the filds used in bookx layout config
+ * @param  [config] $config [ex: SHOW_PRODUCT_BOOKX_LISTING_PUBLISHER]
+ * @return bolean         
+ */
+function ep_4_get_bookx_layout_config ($config) {
+global $db;
+$sql = $db->Execute("SELECT '".$config."' AS config  FROM ".TABLE_PRODUCT_TYPE_LAYOUT." WHERE product_type_id = 6");
+if(!$sql->EOF) {
+		return ($sql->fields['configuration_value']);
+	} else {
+		return null;
+	}
+
+}
+
+function pr ($var,$title = null) {
+    echo '<pre>';
+    if ($title):
+    echo '<h4>' . $title. '</h4>';
+    endif;
+    print_r($var);
+    echo '</pre>';
 }
