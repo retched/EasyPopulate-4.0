@@ -1,6 +1,5 @@
 <?php
 // $Id: easypopulate_4_functions.php, v4.0.30 06-27-2015 mc12345678 $
-
 /**
  * @EP4Bookx - EP4 CSV fork to import Bookx fields - tested with Zencart 1.5.4
  * @version  0.9.0 - Still in development, make your changes in a local environment
@@ -8,9 +7,12 @@
  * @see Readme-EP4Bookx
  *
  * @author mesnitu
+ * @todo  export with support for languages
+ * @todo  export assinged multiple authors
+ * @todo  export assinged multiple genres
  */
-
-
+	
+	
 function ep_4_curly_quotes($curly_text) {
 	$ep_curly_quotes = (int)EASYPOPULATE_4_CONFIG_CURLY_QUOTES;
 	$ep_char_92 = (int)EASYPOPULATE_4_CONFIG_CHAR_92;
@@ -236,6 +238,9 @@ function ep_4_CEONURIExists () {
 	}
 }
 
+
+
+//
 function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcode, $ep_supported_mods, $custom_fields) {
 	$filelayout = array();
 	switch($ep_dltype) {
@@ -379,37 +384,41 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			}
 			$filelayout[] = 'v_music_genre_name';
 		}
-
-/**
- * @EP4BookX
- */
+                
+//* @ALTERED
+// Bookx Info - 23-04-2015
+//:::TABLE_PRODUCT_BOOKX_EXTRA - (product_bookx_extra) => isbn, size,volume,pages,publishing_date, products_id, bookx_publisher_id ,bookx_series_id, bookx_imprint_id, bookx_binding_id, bookx_printing_id ,bookx_condition_id 
+//:::TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION' - (product_bookx_extra_description) => products_subtitle 
+//:::TABLE_PRODUCT_BOOKX_AUTHORS - (product_bookx_authors) => bookx_author_id, author_name, author_default_type
+//:::TABLE_PRODUCT_BOOKX_AUTHOR_TYPES - (product_bookx_author_types) => bookx_author_type_id
               		
-	if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA == true) {
-		
-	        // BOOKX_EXTRA DESCRIPTION
-	        $filelayout[] = 'v_bookx_subtitle';
-			$filelayout[] = 'v_bookx_genre_name';
-			$filelayout[] = 'v_bookx_publisher_name';               
-			$filelayout[] = 'v_bookx_series_name'; // Series name, has Lang ID
-	      //         	foreach ($langcode as $key => $lang) { // create variables for each language id
-							// $l_id = $lang['id'];
-	      //       		$filelayout[] = 'v_bookx_series_name_'.$l_id; // Series name, as Lang ID
-	      //                 }
-	                       
-			$filelayout[] = 'v_bookx_imprint_name';
-			$filelayout[] = 'v_bookx_binding';
-			$filelayout[] = 'v_bookx_printing';
-			$filelayout[] = 'v_bookx_condition';
-			$filelayout[] = 'v_bookx_isbn';
-			$filelayout[] = 'v_bookx_size';
-			$filelayout[] = 'v_bookx_volume';
-			$filelayout[] = 'v_bookx_pages';
-			$filelayout[] = 'v_bookx_publishing_date';         
-			$filelayout[] = 'v_bookx_author_name';
-			$filelayout[] = 'v_bookx_author_type';			
-	}
-	//ends ep4bookx
-	//
+if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA == true) {
+	
+        // BOOKX_EXTRA DESCRIPTION
+        $filelayout[] = 'v_bookx_subtitle';
+		$filelayout[] = 'v_bookx_genre_name';
+		$filelayout[] = 'v_bookx_publisher_name';               
+		$filelayout[] = 'v_bookx_series_name'; // Series name, has Lang ID
+      //         	foreach ($langcode as $key => $lang) { // create variables for each language id
+						// $l_id = $lang['id'];
+      //       		$filelayout[] = 'v_bookx_series_name_'.$l_id; // Series name, as Lang ID
+      //                 }
+                       
+		$filelayout[] = 'v_bookx_imprint_name';
+		$filelayout[] = 'v_bookx_binding';
+		$filelayout[] = 'v_bookx_printing';
+		$filelayout[] = 'v_bookx_condition';
+		$filelayout[] = 'v_bookx_isbn';
+		$filelayout[] = 'v_bookx_size';
+		$filelayout[] = 'v_bookx_volume';
+		$filelayout[] = 'v_bookx_pages';
+		$filelayout[] = 'v_bookx_publishing_date';         
+		$filelayout[] = 'v_bookx_author_name';
+		$filelayout[] = 'v_bookx_author_type';			
+}
+                
+                
+                
 		$filelayout_sql = 'SELECT
 			p.products_id					as v_products_id,
 			p.products_model				as v_products_model,
@@ -969,7 +978,7 @@ $filelayout_sql .= '
 			otv.products_options_values_id = v.products_options_values_id'; 
 		break;
 	}
-return $filelayout;;
+return $filelayout;
 }
 
 if (!function_exists(zen_get_sub_categories)) {
@@ -1116,6 +1125,60 @@ function ep_4_remove_product($product_model) {
 	}
 	return;
 }
+/**
+ * @EP4BookX
+ * [Deletes all bookx produts with a status = 10, using a bookx function]
+ * @see   [product_bookx_functions.php]
+ * @param  [model] $product_model 
+ * @return [model]                [description]
+ *
+ * @todo  Remove bookx from bookx_extra_description
+ */
+function ep_4_remove_product_bookx($product_model) {
+ 	global $db, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error;
+	$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
+	$ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
+	$sql = "SELECT products_id FROM ".TABLE_PRODUCTS." WHERE products_model = '".zen_db_input($product_model)."'";
+	$products = $db->Execute($sql);
+	//$bookx_id = $products->fields['products_id'];
+	// Bye bye
+	bookx_delete_product($products->fields['products_id']);
+
+	if (($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno())) {
+		$ep_stack_sql_error = true;
+		if ($ep_debug_logging == true) {
+			$string = "MySQL error ".($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno()).": ".($ep_uses_mysqli ? mysqli_error($db->link) : mysql_error())."\nWhen executing:\n$sql\n";
+			write_debug_log($string);
+		}
+	} elseif ($ep_debug_logging_all == true) {
+		$string = "MySQL PASSED\nWhen executing:\n$sql\n";
+		write_debug_log($string);
+	}
+	while (!$products->EOF) {
+		zen_remove_product($products->fields['products_id']);
+		$products->MoveNext();
+	}
+	return;
+}
+/**
+ * [ep_4_bookx_delete_bookx_specific_product_entries description]
+ * @param  [type]  $product_id    [description]
+ * @param  boolean $delete_linked [description]
+ * @return [type]                 [description]
+ */
+function ep_4_bookx_delete_bookx_specific_product_entries($product_id = null, $delete_linked = true) {
+  	global $db;
+  	if (null != $product_id) {
+  		$db->Execute('DELETE FROM ' . TABLE_PRODUCT_BOOKX_EXTRA . '
+                      WHERE products_id = "' . (int)$product_id . '"');
+
+  		$db->Execute('DELETE FROM ' . TABLE_PRODUCT_BOOKX_GENRES_TO_PRODUCTS . '
+                      WHERE products_id = "' . (int)$product_id . '"');
+
+  		$db->Execute('DELETE FROM ' . TABLE_PRODUCT_BOOKX_AUTHORS_TO_PRODUCTS . '
+                      WHERE products_id = "' . (int)$product_id . '"');
+  	}
+  }
 
 // DEPRECATED: no calls to this function!
 // reset products master categories ID - I do not believe this works correctly - chadd
@@ -1338,60 +1401,10 @@ function register_globals_vars_check_4 () {
 	print "HTTP_POST_FILES: "; print_r($HTTP_POST_FILES); echo '<br />';
 }
 
+
 /**
  * @EP4BookX
- * [Deletes all bookx produts with a status = 10, using the bookx function]
- * @see   [product_bookx_functions.php]
- * @param  [model] $product_model 
- * @return [model]                [description]
- *
- * @todo  Remove bookx from bookx_extra_description
  */
-function ep_4_remove_product_bookx($product_model) {
- 	global $db, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error;
-	$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-	$ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
-	$sql = "SELECT products_id FROM ".TABLE_PRODUCTS." WHERE products_model = '".zen_db_input($product_model)."'";
-	$products = $db->Execute($sql);
-	//$bookx_id = $products->fields['products_id'];
-	// Bye bye
-	bookx_delete_product($products->fields['products_id']);
-
-	if (($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno())) {
-		$ep_stack_sql_error = true;
-		if ($ep_debug_logging == true) {
-			$string = "MySQL error ".($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno()).": ".($ep_uses_mysqli ? mysqli_error($db->link) : mysql_error())."\nWhen executing:\n$sql\n";
-			write_debug_log($string);
-		}
-	} elseif ($ep_debug_logging_all == true) {
-		$string = "MySQL PASSED\nWhen executing:\n$sql\n";
-		write_debug_log($string);
-	}
-	while (!$products->EOF) {
-		zen_remove_product($products->fields['products_id']);
-		$products->MoveNext();
-	}
-	return;
-}
-/**
- * [ep_4_bookx_delete_bookx_specific_product_entries description]
- * @param  [type]  $product_id    [description]
- * @param  boolean $delete_linked [description]
- * @return [type]                 [description]
- */
-function ep_4_bookx_delete_bookx_specific_product_entries($product_id = null, $delete_linked = true) {
-  	global $db;
-  	if (null != $product_id) {
-  		$db->Execute('DELETE FROM ' . TABLE_PRODUCT_BOOKX_EXTRA . '
-                      WHERE products_id = "' . (int)$product_id . '"');
-
-  		$db->Execute('DELETE FROM ' . TABLE_PRODUCT_BOOKX_GENRES_TO_PRODUCTS . '
-                      WHERE products_id = "' . (int)$product_id . '"');
-
-  		$db->Execute('DELETE FROM ' . TABLE_PRODUCT_BOOKX_AUTHORS_TO_PRODUCTS . '
-                      WHERE products_id = "' . (int)$product_id . '"');
-  	}
-  }
 
 /**
  * @todo Returns only the filds used in bookx layout config

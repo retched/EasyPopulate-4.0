@@ -11,6 +11,7 @@
  * @todo  export with support for languages
  * @todo  export assinged multiple authors
  * @todo  export assinged multiple genres
+ * @todo  review the querys to have a standart 
  *
  *$filelayout[] = 'v_bookx_subtitle';      
  *$filelayout[] = 'v_bookx_genre_name';
@@ -29,6 +30,10 @@
  *
  */
 	
+/**
+ * Edit link to books with missing fields
+ * @var link
+ */
  $edit_link = "<a href=" . zen_href_link('product_bookx.php','cPath='. zen_get_product_path($v_products_id) . '&product_type=6&pID='. $v_products_id .'&action=new_product') . ">". EASY_POPULATE_4_BOOKX_EDIT_LINK . "</a>";
  //
  
@@ -47,8 +52,11 @@ if (isset($filelayout['v_bookx_genre_name']) ) {
 			$sql = "SELECT bookx_genre_id AS genreID FROM ".TABLE_PRODUCT_BOOKX_GENRES_DESCRIPTION." WHERE genre_description = '".addslashes(ep_4_curly_quotes($v_bookx_genre_name))."' LIMIT 1";
 			$result = ep_4_query($sql);
 			if ( $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) { //update
+				
 				$v_genre_id = $row['genreID']; // this id goes into the product_bookx_genres_to_products table				
+				
 				$sql = ep_4_query("UPDATE ".TABLE_PRODUCT_BOOKX_GENRES_DESCRIPTION." SET genre_description = '".addslashes($v_bookx_genre_name)."' WHERE bookx_genre_id = '".$v_genre_id."'");
+					
 					 if ($sql==true) {
 					 	// A default genre name
 					 	//echo 'result';
@@ -84,7 +92,7 @@ if (isset($filelayout['v_bookx_genre_name']) ) {
 		if ((mb_strlen($v_bookx_genre_name) > $bookx_genre_name_max_len)) {
 			$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_GENRE_NAME_LONG, $v_bookx_genre_name, $bookx_genre_name_max_len);
 			$ep_error_count++;	
-			continue;		
+				
 		}
 		$v_genre_id = 0; 
 	}
@@ -127,7 +135,7 @@ if (isset($filelayout['v_bookx_publisher_name']) ) {
 		if (mb_strlen($v_bookx_publisher_name) > $bookx_pubisher_name_max_len) {
 			$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_PUBLISHER_NAME_LONG, $v_bookx_publisher_name, $bookx_publisher_name_max_len);
 			$ep_error_count++;
-			continue;
+			
 		}
 		$v_publisher_id = 0; 
 	}
@@ -161,7 +169,7 @@ if (isset($filelayout['v_bookx_series_name']) ) {
 			
 			$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_SERIES_NAME_LONG, $v_bookx_series_name, $bookx_series_name_max_len);
 			$ep_error_count++;	
-			continue;		 
+					 
 		}
 		$v_series_id = 0;
 	}
@@ -189,7 +197,7 @@ if (isset($filelayout['v_bookx_binding']) ) {
 			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_BINDING][] = 'BINDING : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
 			$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_BINDING_NAME_LONG, $v_bookx_binding, $bookx_binding_name_max_len);
 			$ep_error_count++;	
-			continue;		 
+				 
 		}
 		$v_binding_id = 0;
 	}
@@ -207,7 +215,7 @@ if (isset($filelayout['v_bookx_printing']) ) {
 				$result = ep_4_query($sql);				
 			}
 			else  {
-				$sql_printing_id = ep_4_query("INSERT INTO ".TABLE_PRODUCT_BOOKX_PRINTING." (series_sort_order) VALUES (0)");
+				$sql_printing_id = ep_4_query("INSERT INTO ".TABLE_PRODUCT_BOOKX_PRINTING." (printing_sort_order) VALUES (0)");
 				$v_printing_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment
 				$sql_printing_name = ep_4_query("INSERT INTO ".TABLE_PRODUCT_BOOKX_PRINTING_DESCRIPTION." (bookx_printing_id, languages_id, printing_description) VALUES ('".$v_printing_id."', '".$epdlanguage_id."','".addslashes(ep_4_curly_quotes($v_bookx_printing))."')");				
 			}
@@ -217,7 +225,7 @@ if (isset($filelayout['v_bookx_printing']) ) {
 			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_PRINTING][] = 'printing : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
 			$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_PRINTING_NAME_LONG, $v_bookx_printing, $bookx_printing_name_max_len);
 			$ep_error_count++;	
-			continue;		 
+				 
 		}
 		$v_printing_id = 0;
 	}
@@ -292,7 +300,7 @@ if (isset($filelayout['v_bookx_imprint_name']) ) {
 		if (mb_strlen($v_bookx_imprint_name) > $bookx_imprint_name_max_len) {
 			$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_IMPRINTS_NAME_LONG, $v_bookx_imprint_name, $bookx_imprint_name_max_len);
 			$ep_error_count++;
-			continue;
+			
 		}
 		$v_imprint_id = 0; 
 	}
@@ -310,9 +318,12 @@ if (isset($filelayout['v_bookx_author_type']) ) {
 
 	if (($v_bookx_author_type != '') && (mb_strlen($v_bookx_author_type) <= $bookx_author_types_name_max_len) ) {
 		$sql = "SELECT bookx_author_type_id AS author_typeID FROM ".TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION." WHERE type_description ='".addslashes(ep_4_curly_quotes($v_bookx_author_type))."' LIMIT 1";
+
 		$result = ep_4_query($sql);
 			if ( $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) { //update			
+				
 				$v_author_type_id = $row['author_typeID']; // Goes to authors default_type
+				
 				$sql = "UPDATE ".TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION." SET languages_id = '".$epdlanguage_id."', type_description = '".addslashes(ep_4_curly_quotes($v_bookx_author_type))."' WHERE bookx_author_type_id = '".$v_author_type_id."'";
 				$result = ep_4_query($sql);				
 			}
@@ -327,7 +338,7 @@ if (isset($filelayout['v_bookx_author_type']) ) {
 			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_AUTHOR_TYPES][] = 'author_type : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
 			$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_AUTHOR_TYPES_NAME_LONG, $v_bookx_author_type, $bookx_author_type_name_max_len);
 			$ep_error_count++;	
-			continue;		 
+				 
 		}
 		$v_author_type_id = 0;
 	}
@@ -335,21 +346,23 @@ if (isset($filelayout['v_bookx_author_type']) ) {
 
 // Author Names
 if (isset($filelayout['v_bookx_author_name']) ) {
-	if ($v_bookx_author_name =='') { // check and warn of empty imprint name(still updates)
-			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_AUTHORS][] = 'Author Name : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
-			$ep_error_count++;
-		}
+	
 	if (isset($v_bookx_author_name) && ($v_bookx_author_name !=='') && (mb_strlen($v_bookx_author_name) <= $bookx_author_name_max_len) ) {
 
 		$sql_author_id = "SELECT bookx_author_id AS authorID FROM ".TABLE_PRODUCT_BOOKX_AUTHORS." WHERE author_name = '".addslashes(ep_4_curly_quotes($v_bookx_author_name))."' LIMIT 1";
 		$result = ep_4_query($sql_author_id);
-		
+	
+
 			if ( $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) {	
 			
 			$v_author_id = $row['authorID']; // this id goes into the product_bookx_authors_to_products table
 
+		
+
 				$sql = "UPDATE ".TABLE_PRODUCT_BOOKX_AUTHORS." SET author_name = '".addslashes(ep_4_curly_quotes($v_bookx_author_name))."',
 				last_modified = CURRENT_TIMESTAMP WHERE bookx_author_id = '".$v_author_id."'";
+
+
 				$result = ep_4_query($sql);
 				if ($result) {
 					zen_record_admin_activity('Updated Authors  ' . (int)$v_author_id . ' via EP4.', 'info');
@@ -357,22 +370,25 @@ if (isset($filelayout['v_bookx_author_name']) ) {
 						// @todo language
 						
 			}	else { // It is set to autoincrement, do not need to fetch max id
+					
+					
+				
 					$sql = "INSERT INTO ".TABLE_PRODUCT_BOOKX_AUTHORS." (author_name, author_image, author_image_copyright, author_default_type, author_sort_order, author_url, date_added, last_modified)
-			 		VALUES ('".addslashes(ep_4_curly_quotes($v_bookx_author_name))."', null,null,'".$v_author_type_id ."',null,null, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+			 		VALUES ('".addslashes(ep_4_curly_quotes(rtrim($v_bookx_author_name)))."', null,null,'".$v_author_type_id ."',null,null, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 					$result = ep_4_query($sql);
-			 			if ($result) {
-			  			zen_record_admin_activity('Inserted Authors ' . addslashes(ep_4_curly_quotes($v_bookx_author_name)) . ' via EP4.', 'info');
-			 			}
-			 
+			 		
+
 			 		$v_author_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment
-		
+					
+			 			if ($result) {
+			  			//zen_record_admin_activity('Inserted Authors ' . addslashes(ep_4_curly_quotes($v_bookx_author_name)) . ' via EP4.', 'info');
+			 			}
 			 		$sql2 = "INSERT INTO ".TABLE_PRODUCT_BOOKX_AUTHORS_DESCRIPTION." (bookx_author_id, languages_id, author_description) VALUES ('".$v_author_id."', '".$epdlanguage_id."', null)";
 			 		$result = ep_4_query($sql2);
+					 		
 			
 			// @todo language
 				}
-
-
 
 				// Author to Products 
 	$sql_author_to_product = ep_4_query("SELECT * FROM ".TABLE_PRODUCT_BOOKX_AUTHORS_TO_PRODUCTS." WHERE (products_id = '".$v_products_id."') and (bookx_author_id = '".$v_author_id."') LIMIT 1");
@@ -395,6 +411,10 @@ if (isset($filelayout['v_bookx_author_name']) ) {
 
 
 	}	else { // $v_bookx_author_name == '' or name length violation
+			if ($v_bookx_author_name =='') { // check and warn of empty imprint name(still updates)
+			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_AUTHORS][] = 'Author Name : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
+			$ep_error_count++;
+		}
 			if (mb_strlen($v_bookx_author_name) > $bookx_author_name_max_len) {
 		 	$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_AUTHOR_NAME_LONG, $v_bookx_author_name, $bookx_author_name_max_len);
 		 	$ep_error_count++;
@@ -435,23 +455,27 @@ if (isset($v_bookx_isbn)) {
 		
 }//ends Bookx Extra 
 
+
+/*
+*  Needs review
+ */
 // Bookx Extra Description 
-if (isset($filelayout['v_bookx_subtitle'])) {
-	if (isset($v_bookx_subtitle) && (mb_strlen($v_bookx_subtitle <= $bookx_subtitle_max_len))) {
+// if (isset($filelayout['v_bookx_subtitle'])) {
+// 	if (isset($v_bookx_subtitle) && (mb_strlen($v_bookx_subtitle <= $bookx_subtitle_max_len))) {
 
-	$sql = ep_4_query("SELECT * FROM ".TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION." WHERE (products_subtitle = '".$v_bookx_subtitle."') and (products_id = '".$v_publisher_id."') LIMIT 1");
+// 	$sql = ep_4_query("SELECT * FROM ".TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION." WHERE (products_subtitle = '".$v_bookx_subtitle."') and (products_id = '".$v_products_id."') LIMIT 1");
 
-	if ($sql->num_rows == 0) {
-		$sql = ep_4_query("INSERT INTO ".TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION." (products_id, languages_id, products_subtitle) VALUES ('".$v_products_id."', '".$epdlanguage_id."', '".addslashes(ep_4_curly_quotes($v_bookx_subtitle))."')");
+// 	if ($sql->num_rows == 0) {
+// 		$sql = ep_4_query("INSERT INTO ".TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION." (products_id, languages_id, products_subtitle) VALUES ('".$v_products_id."', '".$epdlanguage_id."', '".addslashes(ep_4_curly_quotes($v_bookx_subtitle))."')");
 	
-	}	else {
+// 	}	else {
 		
-			$sql = ep_4_query(" UPDATE ".TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION." SET products_id = '".$v_products_id."', languages_id = '".$epdlanguage_id."', products_subtitle = '".addslashes(ep_4_curly_quotes($v_bookx_subtitle))."'  WHERE products_id = '".$v_products_id."'");
-		}
-	}
-	else {
+// 			$sql = ep_4_query(" UPDATE ".TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION." SET products_id = '".$v_products_id."', languages_id = '".$epdlanguage_id."', products_subtitle = '".addslashes(ep_4_curly_quotes($v_bookx_subtitle))."'  WHERE products_id = '".$v_products_id."'");
+// 		}
+// 	}
+// 	else {
 
-		$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_SUBTITLE_NAME_LONG, $v_bookx_subtitle, $bookx_subtitle_name_max_len);
-		 	$ep_error_count++;
-	}
-}
+// 		$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_SUBTITLE_NAME_LONG, $v_bookx_subtitle, $bookx_subtitle_name_max_len);
+// 		 	$ep_error_count++;
+// 	}
+// }

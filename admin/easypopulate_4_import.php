@@ -1,20 +1,6 @@
 <?php
-// $Id: easypopulate_4_import.php, v4.0.29 04-03-2015 mc12345678 $
+// $Id: easypopulate_4_import.php, v4.0.28 01-03-2015 mc12345678 $
 
-/**
- * @EP4Bookx - EP4 CSV fork to import Bookx fields - tested with Zencart 1.54
- * 
- * @version  0.9.0 Beta Beta - Still in development, make your changes in a local environment
- * @see Readme-EP4Bookx
- *
- * @author mesnitu
- * @todo  export with support for languages
- * @todo  export assinged multiple authors
- * @todo  export assinged multiple genres
- *
- * 
- */
-	
 // BEGIN: Data Import Module
 if ( isset($_GET['import']) ) {
 	$time_start = microtime(true); // benchmarking
@@ -22,16 +8,15 @@ if ( isset($_GET['import']) ) {
 
 	$file = array('name' => $_GET['import']);
 	$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_LOCAL_FILE_SPEC, $file['name']);
-	
 	/**
-	 * @EP4Bookx 1 of 4 
+	 * @EP4Bookx - 1 of 4
 	 * [It aggregates missing fields in a report linked to the imported book. Uses Bookx languages files as key so it can be tranlated ex: BOX_CATALOG_PRODUCT_BOOKX_PUBLISHERS]
 	 * @see   [adminFolder/includes/languades/YOUR_lang/extra_definitions/product_bookx.php]
 	 * @var array
 	 */
 	$bookx_reports = array();
 	//ends ep4bookx
-	
+	//
 	$ep_update_count = 0; // product records updated 
 	$ep_import_count = 0; // new products records imported
 	$ep_error_count = 0; // errors detected during import
@@ -46,6 +31,7 @@ if ( isset($_GET['import']) ) {
 	$default_these[] = 'v_products_type';
 	$default_these[] = 'v_categories_id';
 	$default_these[] = 'v_products_price';
+	
 	if ($ep_supported_mods['uom'] == true) { // price UOM mod - chadd
 		$default_these[] = 'v_products_price_uom';
 	}
@@ -457,6 +443,8 @@ if ( isset($_GET['import']) ) {
 			// $items[$filelayout['v_categories_id']];
 			// $items[$filelayout['v_categories_image']];
 			$sql = 'SELECT categories_id FROM '.TABLE_CATEGORIES.' WHERE (categories_id = '.$items[$filelayout['v_categories_id']].') LIMIT 1';
+
+
 			$result = ep_4_query($sql);
 				if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
 				// UPDATE
@@ -524,6 +512,8 @@ if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolo
 	// Main IMPORT loop For Product Related Data. v_products_id is the main key
 	while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // read 1 line of data
 
+	
+	
 		// bug fix 5-10-2012: when adding/updating a mix of old and new products and missing certain columns, 
 		// an exising product's info is being put into a subsquently new product.
 		// So, first clear old values...
@@ -605,7 +595,7 @@ if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolo
 		// this gets default values for current v_products_model
 		// inputs: $items array (file data by column #); $filelayout array (headings by column #); 
 		// $row (current TABLE_PRODUCTS data by heading name)
-				while ( $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) { // chadd - this executes once?? why use while-loop??
+		while ( $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) { // chadd - this executes once?? why use while-loop??
 			$product_is_new = false; // we found products_model in database
 			// Get current products descriptions and categories for this model from database
 			// $row at present consists of current product data for above fields only (in $sql)
@@ -619,9 +609,9 @@ if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolo
 				continue 2; // short circuit - loop to next record
 			}
 			
-
 			/**
-			 * @EP4Bookx 2 of 5 
+			 * @EP4Bookx 2 of 5
+			 * 
 			 * Remove Bookx Produtct
 			 * @todo  Display some books fields aside with the model (ex: title or ISBN)
 			 */
@@ -660,6 +650,8 @@ if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolo
 				}
 				$row['v_products_url_'.$lang['id']] = $row2['products_url']; // url assigned
 			}
+
+		
 			
 			// Default values for manufacturers name if exist
 			// Note: need to test for '0' and NULL for best compatibility with older version of EP that set blank manufacturers to NULL
@@ -687,6 +679,7 @@ if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolo
 			foreach ($default_these as $thisvar) {
 				$$thisvar = $row[$thisvar];
 			}
+			
 		} // while ( $row = mysql_fetch_array($result) )
 //============================================================================
 	
@@ -882,7 +875,7 @@ if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolo
             if ($result) {
               zen_record_admin_activity('Inserted manufacturer ' . addslashes($v_manufactureres_name) . ' via EP4.', 'info');
             }
-						$v_manufacturers_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment, so can use this function
+				$v_manufacturers_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment, so can use this function
 				
 				// BUG FIX: TABLE_MANUFACTURERS_INFO need an entry for each installed language! chadd 11-14-2011
 				// This is not a complete fix, since we are not importing manufacturers_url
@@ -1188,9 +1181,7 @@ if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolo
 			}
 		}
 		// END: music_genre	
-		
-		
-		
+		// 
 		// insert new, or update existing, product
 		if ($v_products_model != "") { // products_model exists!
 			// First we check to see if this is a product in the current db.
@@ -1205,10 +1196,11 @@ if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolo
 					$max_product_id = 1;
 				}
 				$v_products_id = $max_product_id;
+				
 				if ($v_artists_name <> '') {
 					$v_products_type = 2; // 2 = music
 				} 
-				 /**
+                /**
                  * @EP4Bookx 3 of 4
                  */
 				elseif (isset($v_bookx_genre_name) || isset($v_bookx_isbn) ) {
@@ -1403,7 +1395,8 @@ if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolo
                     zen_record_admin_activity('Updated product music extra ' . (int)$v_artists_id . ' via EP4.', 'info');
                   }
 						}				
-					}					
+					}
+					
 					$ep_update_count++;				
 				} else {
 					$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT_FAIL, $v_products_model);
@@ -1656,6 +1649,7 @@ if ( strtolower(substr($file['name'],0,14)) == "pricebreaks-ep") {
 				$display_output .= print_el_4($summary);
 			}
 		} // end of row insertion code
+		
 
 		/**
 		 * @EP4Bookx 4 of 5
@@ -1663,18 +1657,17 @@ if ( strtolower(substr($file['name'],0,14)) == "pricebreaks-ep") {
 		 */
 		include 'easypopulate_4_import_bookx.php';
 		//end ep4bookx
-
+		
 	} // end of Mail While Loop
 	} // conditional IF statement
-	
+			
 	$display_output .= '<h3>Finished Processing Import File</h3>';
 	
-	/**
-		 * @EP4Bookx 5 of 5 
+		/**
+		 * @EP4Bookx
 		 * Reports missing fields with the book edit link
 		 * @todo  make this reports configurable
-		 * @todo  remove 
-		 * colors, leave classes
+		 * @todo  remove colors, leave classes
 		 */
 		if (!empty($bookx_reports)) {
 		$display_output .= '<div class="bookx-reports"><h3 style ="background-color: #ccc;"> BOOKX MISSING FIELDS </h3>'; 
@@ -1689,18 +1682,19 @@ if ( strtolower(substr($file['name'],0,14)) == "pricebreaks-ep") {
 		    
 		    foreach($bookx_reports[$keys[$i]] as $key => $value) {
 		    	$class = ($key%2 == true) ? 'background-color:#eee;' : 'background-color:#ccc;';
-		        $display_output .= "<div style =".$class. "padding:5px;border:1px solid #666;>". $value . "</div>";
+		        $display_output .= "<div style =".$class. "padding:10px;border:1px solid #666;>". $value . "</div>";
 		    }
 		}
 		$display_output .='</div>';
 		
 		}
 		//ends ep4Bookx
-
+		
 		$display_output .= '<br/>Updated records: '.$ep_update_count;
 		$display_output .= '<br/>New Imported records: '.$ep_import_count;
 		$display_output .= '<br/>Errors Detected: '.$ep_error_count;
 		$display_output .= '<br/>Warnings Detected: '.$ep_warning_count;
+
 	
 		$display_output .= '<br/>Memory Usage: '.memory_get_usage(); 
 		$display_output .= '<br/>Memory Peak: '.memory_get_peak_usage();
@@ -1721,4 +1715,5 @@ if ( strtolower(substr($file['name'],0,14)) == "pricebreaks-ep") {
 	} else {
 	$messageStack->add("File Import Completed.", 'success');
 	}
-} // END FILE UPLOADS
+} 
+// END FILE UPLOADS

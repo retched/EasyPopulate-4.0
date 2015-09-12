@@ -82,6 +82,7 @@ switch ($ep_dltype) { // chadd - changed to use $EXPORT_FILE
 	case 'full':
 	$EXPORT_FILE = 'Full-EP';
 	break;
+	//:::::::::::::::::::
 	case 'priceqty':
 	$EXPORT_FILE = 'PriceQty-EP';
 	break;
@@ -325,11 +326,11 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 				$row['v_categories_description_'.$lid] = $row2['categories_description'];
 			} // foreach
 
-      if (EASYPOPULATE_4_CONFIG_EXPORT_URI != '0') {
-        $row['v_html_uri'] = zen_catalog_href_link(FILENAME_DEFAULT, 'cPath=' . zen_get_path($row['v_categories_id']),'NONSSL');
-      }
+	  if (EASYPOPULATE_4_CONFIG_EXPORT_URI != '0') {
+		$row['v_html_uri'] = zen_catalog_href_link(FILENAME_DEFAULT, 'cPath=' . zen_get_path($row['v_categories_id']),'NONSSL');
+	  }
 
-    } // if ($ep_dltype ...
+	} // if ($ep_dltype ...
 		
 		// CATEGORIES EXPORT
 		// chadd - 12-13-2010 - logic change. $max_categories no longer required. better to loop back to root category and 
@@ -339,14 +340,14 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			$category_delimiter = "^";
 			$thecategory_id = $row['v_categories_id']; // starting category_id
 
-      if ($ep_dltype == 'full' && EASYPOPULATE_4_CONFIG_EXPORT_URI != '0'){
-        $sql_type = "SELECT type_handler FROM " . TABLE_PRODUCT_TYPES . " WHERE type_id = " . (int)zen_get_products_type($row['v_products_id']);
-        $sql_typename = $db->Execute($sql_type);
+	  if ($ep_dltype == 'full' && EASYPOPULATE_4_CONFIG_EXPORT_URI != '0'){
+		$sql_type = "SELECT type_handler FROM " . TABLE_PRODUCT_TYPES . " WHERE type_id = " . (int)zen_get_products_type($row['v_products_id']);
+		$sql_typename = $db->Execute($sql_type);
 //        $row['v_html_uri'] = zen_href_link(FILENAME_DEFAULT, 'main_page=' . $sql_typename->fields['type_handler'] . '_info&cPath=' . zen_get_generated_category_path_ids($row['v_master_categories_id']) . '&products_id=' . $row['v_products_id'],'NONSSL', false, true, false, true); //This generates an admin folder like link/reference not a catalog version.
-        $row['v_html_uri'] = zen_catalog_href_link($sql_typename->fields['type_handler'] . '_info', 'cPath=' . zen_get_generated_category_path_ids($row['v_master_categories_id']) . '&products_id=' . $row['v_products_id'],'NONSSL');
+		$row['v_html_uri'] = zen_catalog_href_link($sql_typename->fields['type_handler'] . '_info', 'cPath=' . zen_get_generated_category_path_ids($row['v_master_categories_id']) . '&products_id=' . $row['v_products_id'],'NONSSL');
 //zen_catalog_href_link($page = '', $parameters = '', $connection = 'NONSSL')        //FILENAME_DEFAULT . '?main_page=' . zen_get_products_type($row['products_id'])
-        //function zen_href_link($page = '', $parameters = '', $connection = 'NONSSL', $add_session_id = true, $search_engine_safe = true, $static = false, $use_dir_ws_catalog = true) 
-      }
+		//function zen_href_link($page = '', $parameters = '', $connection = 'NONSSL', $add_session_id = true, $search_engine_safe = true, $static = false, $use_dir_ws_catalog = true) 
+	  }
 			// $fullcategory = array(); // this will have the entire category path separated by $category_delimiter
 			// if parent_id is not null ('0'), then follow it up.
 			while (!empty($thecategory_id)) {
@@ -468,7 +469,7 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 				s.stock_id					 as v_stock_id,
 				s.stock_attributes				 as v_stock_attributes,
 				s.quantity					 as v_quantity' . ( $ep_4_SBAEnabled == '2' ? ',
-        s.customid            as v_customid ' : ' ') .
+		s.customid            as v_customid ' : ' ') .
 				'FROM '
 				.TABLE_PRODUCTS.                ' as p,'
 				.TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK. ' as s
@@ -548,9 +549,9 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 					$row['v_products_quantity'] = $rowSBA['v_quantity'];
 					$row['v_SBA_tracked'] = 'X';
 					$row['v_table_tracker'] = $rowSBA['v_stock_id'];
-          if ($ep_4_SBAEnabled == '2') {
-            $row['v_customid'] = $rowSBA['v_customid'];
-          }
+		  if ($ep_4_SBAEnabled == '2') {
+			$row['v_customid'] = $rowSBA['v_customid'];
+		  }
 					// loop through the SBA data until one before the end
 					// While not at the one before end
 					//  get the attribute and quantity data from the SBA table
@@ -652,6 +653,18 @@ while ($row = ($ep_uses_mysqli ?  mysqli_fetch_array($result) : mysql_fetch_arra
 			}
 		}
 		
+				
+				
+//:::::@ALTERED for Bookx
+//:::: Bookx Export for products with products_type == 6
+//::::: include temp file                
+//if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA) {    
+
+	include 'easypopulate_4_export_bookx.php';			
+	
+
+//}				   
+//:::::::::::::::::::::::::::::::::::::::::						
 
 		// MANUFACTURERS EXPORT - THIS NEEDS MULTI-LINGUAL SUPPORT LIKE EVERYTHING ELSE!
 		// if the filelayout says we need a manfacturers name, get it for download file
@@ -750,4 +763,3 @@ if (function_exists('memory_get_usage')) {
 $time_end = microtime(true);
 $time = $time_end - $time_start;	
 $display_output .= '<br>Execution Time: '.$time.' seconds.';
-?>

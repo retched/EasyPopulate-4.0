@@ -26,7 +26,6 @@ $ep_curly_quotes  = (int)EASYPOPULATE_4_CONFIG_CURLY_QUOTES;
 $ep_char_92       = (int)EASYPOPULATE_4_CONFIG_CHAR_92;
 $ep_metatags      = (int)EASYPOPULATE_4_CONFIG_META_DATA; // 0-Disable, 1-Enable
 $ep_music         = (int)EASYPOPULATE_4_CONFIG_MUSIC_DATA; // 0-Disable, 1-Enable
-$ep_uses_mysqli   = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3' ? true : false);
 
 /**
  *  @EP4Bookx 
@@ -37,10 +36,12 @@ $ep_bookx_fallback_genre_name = EASYPOPULATE_4_CONFIG_BOOKX_DEFAULT_GENRE_NAME;
 
 
 /**
- * @EP4Bokox
+ * [$bookx_reports description]
+ * @var array
  */
 //$bookx_reports = array();
-//ends 
+
+$ep_uses_mysqli   = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3' ? true : false);
 
 @set_time_limit($ep_execution);  // executin limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
 
@@ -53,8 +54,8 @@ if ((isset($error) && !$error) || !isset($error)) {
 
 /* Test area start */
 // error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);//test purposes only
-// register_globals_vars_check();
-// $maxrecs = 4; 
+//register_globals_vars_check();
+//$maxrecs = 4; 
 // usefull stuff: mysql_affected_rows(), mysql_num_rows().
 $ep_debug_logging_all = false; // do not comment out.. make false instead
 //$sql_fail_test == true; // used to cause an sql error on new product upload - tests error handling & logs
@@ -119,6 +120,7 @@ $ep_supported_mods['gppi'] = ep_4_check_table_column(TABLE_PRODUCTS,'products_gr
 $ep_supported_mods['excl'] = ep_4_check_table_column(TABLE_PRODUCTS,'products_exclusive'); // exclu = Custom Mod for Exclusive Products: 04-24-2012
 $ep_supported_mods['dual'] = ep_4_check_table_column(TABLE_PRODUCTS_ATTRIBUTES, 'options_values_price_w');
 // END: check for existance of various mods
+// 
 
 // custom products fields check
 $custom_field_names = array();
@@ -164,8 +166,6 @@ $bookx_imprint_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_IMPRINTS, 'im
 $bookx_subtitle_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION, 'products_subtitle');
 //:::::::::::::::
 
-
-
 $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
 
 if ($ep_uses_mysqli) {
@@ -190,8 +190,8 @@ if ( ($collation == 'utf8') && ((substr($project,0,5) == "1.3.8") || (substr($pr
 	$artists_name_max_len = $artists_name_max_len/3;
 	$record_company_name_max_len = $record_company_name_max_len/3;
 	$music_genre_name_max_len = $music_genre_name_max_len/3;
-
-	/**
+        
+    /**
      * @EP4Bookx
      */
     $bookx_author_name_max_len = $bookx_author_name_max_len/3;
@@ -205,11 +205,8 @@ if ( ($collation == 'utf8') && ((substr($project,0,5) == "1.3.8") || (substr($pr
     $bookx_imprint_name_max_len = $bookx_imprint_name_max_len/3;
     $bookx_subtitle_max_len = $bookx_subtitle_max_len/3;
     //::::::::::::::::::::::::::
-
+        
 }
-
-
-
 
 // test for Ajeh
 //$ajeh_sql = 'SELECT * FROM '. TABLE_PRODUCTS .' WHERE '.TABLE_PRODUCTS.'.products_id NOT IN (SELECT '. TABLE_PRODUCTS_TO_CATEGORIES.'.products_id FROM '. TABLE_PRODUCTS_TO_CATEGORIES.')';
@@ -684,5 +681,4 @@ if (((isset($error) && !$error) || !isset($error)) && isset($_REQUEST["delete"])
 <?php require(DIR_WS_INCLUDES . 'footer.php'); ?>
 </body>
 </html>
-<?php 
-require(DIR_WS_INCLUDES . 'application_bottom.php');
+<?php require(DIR_WS_INCLUDES . 'application_bottom.php'); ?>

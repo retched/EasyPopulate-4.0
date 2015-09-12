@@ -41,7 +41,7 @@ if (isset($filelayout['v_bookx_isbn'])) {
 // From TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION
 if (isset($filelayout['v_bookx_subtitle'])) {
 	/**
-	 * We could use the Bookx Functions, Less code, but dependent of any unwanted changes in BookX mod
+	 * We could use the Bookx Functions, Less code, but dependent of any unwanted changes
 	 */
 	$row['v_bookx_subtitle'] = bookx_get_products_subtitle($row['v_products_id'], $epdlanguage_id);
 
@@ -187,4 +187,4 @@ echo $author_default_type_id;
 }
 			
 
-} //ends product type 6
+} //ends product bookx export
