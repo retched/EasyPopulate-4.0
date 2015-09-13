@@ -1661,43 +1661,49 @@ if ( strtolower(substr($file['name'],0,14)) == "pricebreaks-ep") {
 	} // end of Mail While Loop
 	} // conditional IF statement
 			
-	$display_output .= '<h3>Finished Processing Import File</h3>';
 	
 		/**
 		 * @EP4Bookx
 		 * Reports missing fields with the book edit link
 		 * @todo  make this reports configurable
 		 * @todo  remove colors, leave classes
+		 * @idea  Download link to save for later the books with empty fields 
 		 */
 		if (!empty($bookx_reports)) {
-		$display_output .= '<div class="bookx-reports"><h3 style ="background-color: #ccc;"> BOOKX MISSING FIELDS </h3>'; 
+		$display_output .= '<div class="bookx-reports">'.EASYPOPULATE_4_DISPLAY_BOOKX_REPORTS_BOOKX_HEADER; 
 		$display_output .= '<p>Review some empty or defaults fields used in the import</p>';			
 		
 		//pr($bookx_reports);
 		$keys = array_keys($bookx_reports);
-
+		//pr($keys);
+		
+		$display_output .= '<ul>';
 		for($i = 0; $i < count($bookx_reports); $i++) {
 
-		    $display_output .= '<strong>' . strtoupper($keys[$i]) . "</strong><br/>";
+		    $display_output .= '<li class="bookx-report-type">' . strtoupper($keys[$i]) . '</li><ul class="ul">';
 		    
 		    foreach($bookx_reports[$keys[$i]] as $key => $value) {
-		    	$class = ($key%2 == true) ? 'background-color:#eee;' : 'background-color:#ccc;';
-		        $display_output .= "<div style =".$class. "padding:10px;border:1px solid #666;>". $value . "</div>";
+		    	$class = ($key%2 == true) ? 'odd' : 'even';
+		        $display_output .= "<li class=".$class.">". $value . "</li>";
 		    }
+		    $display_output .= '</ul>';
+
 		}
-		$display_output .='</div>';
+		
+		$display_output .='</ul></div>';
 		
 		}
 		//ends ep4Bookx
 		
-		$display_output .= '<br/>Updated records: '.$ep_update_count;
-		$display_output .= '<br/>New Imported records: '.$ep_import_count;
-		$display_output .= '<br/>Errors Detected: '.$ep_error_count;
-		$display_output .= '<br/>Warnings Detected: '.$ep_warning_count;
+	$display_output .= '<h3>Finished Processing Import File</h3>';
+	$display_output .= '<br/>Updated records: '.$ep_update_count;
+	$display_output .= '<br/>New Imported records: '.$ep_import_count;
+	$display_output .= '<br/>Errors Detected: '.$ep_error_count;
+	$display_output .= '<br/>Warnings Detected: '.$ep_warning_count;
 
-	
-		$display_output .= '<br/>Memory Usage: '.memory_get_usage(); 
-		$display_output .= '<br/>Memory Peak: '.memory_get_peak_usage();
+
+	$display_output .= '<br/>Memory Usage: '.memory_get_usage(); 
+	$display_output .= '<br/>Memory Peak: '.memory_get_peak_usage();
 	
 	// benchmarking
 	$time_end = microtime(true);

@@ -1,0 +1,35 @@
+.bookx-reports {
+	line-height: 1.5;
+	background: #F4F4F4;
+    display: table;
+    padding: 25px;
+    width: 80%;
+    /*margin: 0 auto;*/
+    border: 1px solid #DBDBDB;
+    border-radius: 5px;
+    padding-left: 20px;
+}
+.bookx-reports ul {
+	list-style-type: none;
+}
+.bookx-reports > ul {
+	margin: 0;
+	padding: 0;
+	
+}
+.odd,.even {
+	padding: 5px 10px;
+}
+.odd {
+	background: #F4F4F4;
+}
+.even {
+	background: #E9E9E9;
+}
+.bookx-report-type {
+ font-weight: bold;
+}
+.ul {
+margin: 10px;
+padding: 10px;	
+}

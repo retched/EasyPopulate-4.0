@@ -164,7 +164,6 @@ $bookx_printing_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_PRINTING_DES
 $bookx_condition_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_CONDITIONS_DESCRIPTION, 'condition_description');
 $bookx_imprint_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_IMPRINTS, 'imprint_name');
 $bookx_subtitle_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION, 'products_subtitle');
-
 //:::::::::::::::
 
 $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
@@ -294,6 +293,7 @@ if (((isset($error) && !$error) || !isset($error)) && isset($_REQUEST["delete"])
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo CHARSET; ?>">
 	<title><?php echo TITLE; ?></title>
 	<link rel="stylesheet" type="text/css" href="includes/stylesheet.css">
+	<link rel="stylesheet" type="text/css" href="includes/ep4bookx.css">
 	<link rel="stylesheet" type="text/css" href="includes/cssjsmenuhover.css" media="all" id="hoverJS">
 	<script language="javascript" type="text/javascript" src="includes/menu.js"></script>
 	<script language="javascript" type="text/javascript" src="includes/general.js"></script>
