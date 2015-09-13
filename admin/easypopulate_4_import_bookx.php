@@ -453,6 +453,10 @@ if (isset($v_bookx_isbn)) {
 				bookx_publisher_id, bookx_series_id,bookx_imprint_id, bookx_binding_id, bookx_printing_id, bookx_condition_id, publishing_date, pages, volume, size, isbn) VALUES ('".$v_products_id."','".$v_publisher_id."','".$v_series_id."',
 				'".$v_imprint_id."','". $v_binding_id ."','" . $v_printing_id ."','". $v_condition_id ."','".$v_bookx_publishing_date."','".$v_bookx_pages."','".$v_bookx_volume ."','".$v_bookx_size."','".$v_bookx_isbn."')";
 				$result = ep_4_query($query);
+
+				// Theres' always a insert record to bookx_extra_descritpion, even if no subtitle is given
+				$sql = ep_4_query("INSERT INTO ".TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION." (products_id, languages_id, products_subtitle) VALUES ('".$v_products_id."', '".$epdlanguage_id."', null)"); 
+
 			}
 				else {
 				
@@ -465,25 +469,23 @@ if (isset($v_bookx_isbn)) {
 }//ends Bookx Extra 
 
 /*
-*  Needs review
+ *  Needs review
+ *  A book ID was inserted in last query, just need to update the subtitle
  */
 // Bookx Extra Description 
-// if (isset($filelayout['v_bookx_subtitle'])) {
-// 	if (isset($v_bookx_subtitle) && (mb_strlen($v_bookx_subtitle <= $bookx_subtitle_max_len))) {
+if (isset($filelayout['v_bookx_subtitle'])) {
 
-// 	$sql = ep_4_query("SELECT * FROM ".TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION." WHERE (products_subtitle = '".$v_bookx_subtitle."') and (products_id = '".$v_products_id."') LIMIT 1");
+	$sql = ep_4_query("SELECT products_subtitle AS subtitle FROM ".TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION." WHERE (products_subtitle = '".$v_bookx_subtitle."') and (products_id = '".$v_products_id."') LIMIT 1");
 
-// 	if ($sql->num_rows == 0) {
-// 		$sql = ep_4_query("INSERT INTO ".TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION." (products_id, languages_id, products_subtitle) VALUES ('".$v_products_id."', '".$epdlanguage_id."', '".addslashes(ep_4_curly_quotes($v_bookx_subtitle))."')");
-	
-// 	}	else {
-		
-// 			$sql = ep_4_query(" UPDATE ".TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION." SET products_id = '".$v_products_id."', languages_id = '".$epdlanguage_id."', products_subtitle = '".addslashes(ep_4_curly_quotes($v_bookx_subtitle))."'  WHERE products_id = '".$v_products_id."'");
-// 		}
-// 	}
-// 	else {
+		if ( ($v_bookx_subtitle !='') || ($sql->num_rows == 0) && (mb_strlen($v_bookx_subtitle <= $bookx_subtitle_max_len))) {
 
-// 		$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_SUBTITLE_NAME_LONG, $v_bookx_subtitle, $bookx_subtitle_name_max_len);
-// 		 	$ep_error_count++;
-// 	}
-// }
+			$sql = ep_4_query("UPDATE ".TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION." SET languages_id = '".$epdlanguage_id."', products_subtitle = '".addslashes(ep_4_curly_quotes($v_bookx_subtitle))."'  WHERE products_id = '".$v_products_id."'");
+		}
+	else {
+
+		if (mb_strlen($v_bookx_subtitle > $bookx_subtitle_max_len)) {
+		$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_SUBTITLE_NAME_LONG, $v_bookx_subtitle, $bookx_subtitle_name_max_len);
+		 	$ep_error_count++;
+		 }
+	}
+}
