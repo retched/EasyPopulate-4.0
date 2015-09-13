@@ -8,7 +8,7 @@ to import Bookx fields by CSV - tested with Zencart 1.5.4
 
 ### Note : Still under heavy tests 
 >This are some initial files, that already import BookX fields, but isn't yet suitable in a production enviroment. A lot of testings and ideias going on.
-It stills **only supports the default language**, and the ability to assing multiple authors and genres are on todo list, but not yet implemented.
+It still **only supports the default language**, and the ability to assing multiple authors and genres are on todo list, but not yet implemented.
 
 
 ### Quick review : 
