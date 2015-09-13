@@ -5,6 +5,7 @@ to import Bookx fields by CSV - tested with Zencart 1.5.4
  * @version  0.9.0 - **Still in development, make your changes in a local environment**
  * @see Bookx module for ZenCart
  * Contribution by: @mesnitu
+ * Special thanks to @joaosantacruz for putting me in the right track
 
 ### Note : Still under heavy tests 
 >This are some initial files, that already import BookX fields, but isn't yet suitable in a production enviroment. A lot of testings and ideias going on.
