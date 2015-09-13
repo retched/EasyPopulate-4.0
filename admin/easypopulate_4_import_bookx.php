@@ -46,8 +46,7 @@ if (isset($filelayout['v_bookx_genre_name']) ) {
 			if (($v_bookx_genre_name == '' ) && (!empty($ep_bookx_fallback_genre_name))) {
 					$v_bookx_genre_name = $ep_bookx_fallback_genre_name;
 					//@reports
-					$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_GENRES][] = 'FallBack Genre in : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
-					$ep_error_count++;				
+					$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_GENRES][] = 'FallBack Genre in : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link;				
 			}			
 			$sql = "SELECT bookx_genre_id AS genreID FROM ".TABLE_PRODUCT_BOOKX_GENRES_DESCRIPTION." WHERE genre_description = '".addslashes(ep_4_curly_quotes($v_bookx_genre_name))."' LIMIT 1";
 			$result = ep_4_query($sql);
@@ -130,7 +129,7 @@ if (isset($filelayout['v_bookx_publisher_name']) ) {
 		} else { // $v_bookx_publisher_name length violation
 			if ($v_bookx_publisher_name =='') { // check and warn of empty publisher name(still updates)
 			//pr("EMPTY ISBN");
-			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_PUBLISHERS][] = 'PUBLISHER : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
+			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_PUBLISHERS][] = sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link;
 		}			
 		if (mb_strlen($v_bookx_publisher_name) > $bookx_pubisher_name_max_len) {
 			$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_PUBLISHER_NAME_LONG, $v_bookx_publisher_name, $bookx_publisher_name_max_len);
@@ -165,7 +164,7 @@ if (isset($filelayout['v_bookx_series_name']) ) {
 	else { // Empty series file fields 		
 		if ($v_bookx_series_name =='')  {
 			
-			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_SERIES][] = 'SERIES : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
+			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_SERIES][] = sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link;
 			}
 
 			if(mb_strlen($v_bookx_series_name) > $bookx_series_name_max_len) {
@@ -197,7 +196,7 @@ if (isset($filelayout['v_bookx_binding']) ) {
 	else { // Empty binding file fields 				
 		if ($v_bookx_binding =='') {
 
-			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_BINDING][] = 'BINDING : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
+			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_BINDING][] = sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link;
 		}
  
 		if (mb_strlen($v_bookx_binding) > $bookx_binding_name_max_len) {
@@ -229,7 +228,7 @@ if (isset($filelayout['v_bookx_printing']) ) {
 	}
 	else { // Empty printing file fields 		
 		if ($v_bookx_printing =='') {
-			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_PRINTING][] = 'printing : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
+			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_PRINTING][] = sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link;
 		}
 		if(mb_strlen($v_bookx_printing) > $bookx_printing_name_max_len)  {
 			$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_PRINTING_NAME_LONG, $v_bookx_printing, $bookx_printing_name_max_len);
@@ -242,6 +241,7 @@ if (isset($filelayout['v_bookx_printing']) ) {
 
 //:::: Book Condition 
 if (isset($filelayout['v_bookx_condition']) ) {
+
 	if (($v_bookx_condition != '') && (mb_strlen($v_bookx_condition) <= $bookx_condition_name_max_len) ) {
 		$sql = "SELECT bookx_condition_id AS conditionID FROM ".TABLE_PRODUCT_BOOKX_CONDITIONS_DESCRIPTION." WHERE condition_description ='".addslashes(ep_4_curly_quotes($v_bookx_condition))."' LIMIT 1";
 		$result = ep_4_query($sql);
@@ -264,7 +264,7 @@ if (isset($filelayout['v_bookx_condition']) ) {
 	else { // Empty condition file fields 		
 		if ($v_bookx_condition =='') {
 
-			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_CONDITIONS][] = 'condition : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
+			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_CONDITIONS][] = sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link;
 		}
 			if (mb_strlen($v_bookx_condition) > $bookx_condition_name_max_len) {
 			$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_CONDITION_NAME_LONG, $v_bookx_condition, $bookx_condition_name_max_len);
@@ -305,7 +305,7 @@ if (isset($filelayout['v_bookx_imprint_name']) ) {
 								}
 		} else { // $v_bookx_imprint_name length violation
 		if ($v_bookx_imprint_name =='') { // check and warn of empty imprint name(still updates)
-			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_IMPRINTS][] = 'imprint : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
+			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_IMPRINTS][] = sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link ;
 			}
 		if (mb_strlen($v_bookx_imprint_name) > $bookx_imprint_name_max_len) {
 			$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_IMPRINTS_NAME_LONG, $v_bookx_imprint_name, $bookx_imprint_name_max_len);
@@ -342,9 +342,9 @@ if (isset($filelayout['v_bookx_author_type']) ) {
 	else { // Empty author_type file fields
 		
 		if ($v_bookx_author_type =='') { // check and warn of empty imprint name(still updates)
-			$bookx_reports['Author Type'][] = 'Author Type : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
+			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_AUTHOR_TYPES][] = sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link;
 		} 		
-		if (($v_bookx_author_type =='') || (mb_strlen($v_bookx_author_type) > $bookx_author_types_name_max_len)) {
+		if ((mb_strlen($v_bookx_author_type) > $bookx_author_types_name_max_len)) {
 			
 			$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_AUTHOR_TYPES_NAME_LONG, $v_bookx_author_type, $bookx_author_type_name_max_len);
 			$ep_error_count++;	
@@ -422,7 +422,7 @@ if (isset($filelayout['v_bookx_author_name']) ) {
 
 	}	else { // $v_bookx_author_name == '' or name length violation
 			if ($v_bookx_author_name =='') { // check and warn of empty imprint name(still updates)
-			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_AUTHORS][] = 'Author Name : ' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link . '<br />';
+			$bookx_reports[BOX_CATALOG_PRODUCT_BOOKX_AUTHORS][] = sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 20)) . ' - ' .$edit_link;
 		}
 			if (mb_strlen($v_bookx_author_name) > $bookx_author_name_max_len) {
 		 	$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_AUTHOR_NAME_LONG, $v_bookx_author_name, $bookx_author_name_max_len);
@@ -443,7 +443,7 @@ if (isset($v_bookx_isbn)) {
 
 		if ($v_bookx_isbn =='') { // check and warn of empty ISBN (still updates)
 			//@fixme - This should act has other warnings. 
-			$bookx_reports['isbn'][] = 'ISBN :' .sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10)).'...'. $edit_link;
+			$bookx_reports[LABEL_BOOKX_ISBN][] = sprintf(substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10)).'...'. $edit_link;
 			$ep_error_count++;
 	
 		} else {
