@@ -95,7 +95,7 @@ if (($ep_dltype == 'full' || $ep_dltype == 'categorymeta') && EASYPOPULATE_4_CON
 $zco_notifier->notify('EP4_EXPORT_FILE_ARRAY_START');
 
 // Need to identify the extent of the array to make the SBA_basic table.
-if ($ep_dltype == 'SBA_basic') {
+/*if ($ep_dltype == 'SBA_basic') {
   // these variablels are for the Attrib_Basic Export
   $active_products_id = ""; // start empty
   $active_options_id = ""; // start empty
@@ -123,11 +123,11 @@ if ($ep_dltype == 'SBA_basic') {
         $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals'] ++;
 //				echo 'Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals' . ' 1<br />';
         //Set Value Name for current Value of Current Option of a Product (ProdXOpYValZ = Value)
-        $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals']] = $row['v_products_options_values_name'];
+        $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals']] = $row['v_products_options_values_name']; */
 //				echo 'Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals'] . ' 2<br />';
-        $active_row['v_products_options_name_' /* . $l_id */] = $row['v_products_options_name'];
-        $active_row['v_products_options_values_name_' /* . $l_id */] .= "," . $row['v_products_options_values_name'];
-        $active_row['v_products_options_type'] = $row['v_products_options_type'];
+//        $active_row['v_products_options_name_' /* . $l_id */] = $row['v_products_options_name'];
+//        $active_row['v_products_options_values_name_' /* . $l_id */] .= "," . $row['v_products_options_values_name'];
+/*        $active_row['v_products_options_type'] = $row['v_products_options_type'];
         continue;
       } else { // same product, new Option  - only executes once on new option
         // Clean the texts that could break CSV file formatting
@@ -145,12 +145,12 @@ if ($ep_dltype == 'SBA_basic') {
         //Set Option Type for current Option of a Product (ProdXOpYType = Option Type)
         $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Type'] = $row['v_products_options_type'];    //Set Value Name for current Value of Current Option of a Product (ProdXOpYValZ = Value)
         $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals']] = $row['v_products_options_values_name'];
-        $active_options_id = $row['v_options_id'];
+        $active_options_id = $row['v_options_id']; */
 //				$active_language_id = $row['v_language_id'];
 //				$l_id = $row['v_language_id'];
-        $active_row['v_products_options_name_' /* . $l_id */] = $row['v_products_options_name'];
-        $active_row['v_products_options_values_name_' /* . $l_id */] = $row['v_products_options_values_name'];
-        $active_row['v_products_options_type'] = $row['v_products_options_type'];
+//        $active_row['v_products_options_name_' /* . $l_id */] = $row['v_products_options_name'];
+//        $active_row['v_products_options_values_name_' /* . $l_id */] = $row['v_products_options_values_name'];
+/*        $active_row['v_products_options_type'] = $row['v_products_options_type'];
         continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
       }
     } else { // new combo or different product or first time through while-loop
@@ -190,11 +190,11 @@ if ($ep_dltype == 'SBA_basic') {
 
       $active_row['v_products_model'] = $row['v_products_model'];
       $active_row['v_products_options_type'] = $row['v_products_options_type'];
-
+*/
 //			$l_id = $row['v_language_id'];
-      $active_row['v_products_options_name_' /* . $l_id */] = $row['v_products_options_name'];
-      $active_row['v_products_options_values_name_' /* . $l_id */] = $row['v_products_options_values_name'];
-    } // end of special case 'attrib_basic'
+//      $active_row['v_products_options_name_' /* . $l_id */] = $row['v_products_options_name'];
+//      $active_row['v_products_options_values_name_' /* . $l_id */] = $row['v_products_options_values_name'];
+/*    } // end of special case 'attrib_basic'
   }
   //Add the applicable headers to the file layout
   for ($i = 1; $i <= $MaxOptions; $i++) {
@@ -202,7 +202,7 @@ if ($ep_dltype == 'SBA_basic') {
     $filelayout[] = 'v_products_options_name_' . $i; // (Actually want to add these in as the highest order of the options is identified and then also the values
     $filelayout[] = 'v_products_options_values_name_' . $i;
   }
-}
+}*/
 
 $filelayout = array_flip($filelayout);
 // END: File Download Layouts
@@ -232,7 +232,7 @@ switch ($ep_dltype) { // chadd - changed to use $EXPORT_FILE
     break;
   case 'SBA_detailed'; // mc12345678 - added 07-18-2013 to support Stock By Attributes
     $EXPORT_FILE = 'SBA-Detailed-EP';
-    break;
+/*    break;
   case 'SBA_basic'; // mc12345678 - added 07-20-2013 to support adding new Stock by Attributes
     $EXPORT_FILE = 'SBA-Basic-EP';
     break;
@@ -240,7 +240,7 @@ switch ($ep_dltype) { // chadd - changed to use $EXPORT_FILE
     $EXPORT_FILE = 'CEON-URI-aa-EP';
     break;
   case 'CEON_EZPages'; //mc12345678 - Added to export EZ Pages for CEON URIs.
-    $EXPORT_FILE = 'CEON-URI-ez-EP';
+    $EXPORT_FILE = 'CEON-URI-ez-EP';*/
     break;
   case 'SBAStock'; // mc12345678 - added 02-22-2014 to support providing a stock export when SBA is installed.
     $EXPORT_FILE = 'SBA-Stock-EP';
@@ -310,14 +310,14 @@ $result = ep_4_query($filelayout_sql);
 
 $zco_notifier->notify('EP4_EXPORT_WHILE_START');
 //Start CEON modification - mc12345678
-if (ep_4_CEONURIExists() == true) {
+/*if (ep_4_CEONURIExists() == true) {
   $ep4CEONURIDoesExist = true;
   //May need to limit these loadings so that applicable to action being taken instead of loading them all.. (Memory hog if all loaded all the time and may have some sort of conflict).  Could use if statements here to load them.
   require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.CeonURIMappingAdmin.php');
   require_once(DIR_FS_ADMIN . DIR_WS_CLASSES . 'class.EP4CeonURIMappingAdminProductPages.php');
   require_once(DIR_FS_ADMIN . DIR_WS_CLASSES . 'class.EP4CeonURIMappingAdminCategoryPages.php');
   require_once(DIR_FS_ADMIN . DIR_WS_CLASSES . 'class.EP4CeonURIMappingAdminEZPagePages.php');
-} //End CEON modification - mc12345678
+} */  //End CEON modification - mc12345678
 
 while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
 //  @set_time_limit($ep_execution);  // execution limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
@@ -508,10 +508,10 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 
     $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK');
     //Start of CEON URI Rewriter Not 100% sure that the following assignment is necessary; however, it works and does not break anything... - mc12345678
-    if ($ep4CEONURIDoesExist == true) {
+/*    if ($ep4CEONURIDoesExist == true) {
       $prev_uri_mappings = array();
       $uri_mappings = array();
-    }
+    }*/
 
     // For the CEON modification (mc12345678), names must be known before the first product is inspected and require that we loop thru all installed languages.
     //	Therefore, they are done in advance of the remaining action.
@@ -524,30 +524,32 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $result2 = ep_4_query($sql2);
       $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
       $row['v_products_name_' . $lid2] = $row2['products_name'];
-      $products_name[$lid2] = $row['v_products_name_' . $lid2]; // CEON Needed
+//      $products_name[$lid2] = $row['v_products_name_' . $lid2]; // CEON Needed
       $row['v_products_description_' . $lid2] = $row2['products_description'];
       if ($ep_supported_mods['psd'] == true) { // products short descriptions mod
         $row['v_products_short_desc_' . $lid2] = $row2['products_short_desc'];
       }
       $row['v_products_url_' . $lid2] = $row2['products_url'];
+      // metaData start
+      // for each language, get the description and set the vals
+      $sqlMeta = 'SELECT * FROM ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . ' WHERE products_id = :products_id: AND language_id = :language_id: LIMIT 1 ';
+      $sqlMeta = $db->bindVars($sqlMeta, ':products_id:', $row['v_products_id'], 'integer');
+      $sqlMeta = $db->bindVars($sqlMeta, ':language_id:', $lid2, 'integer');
+      $resultMeta = ep_4_query($sqlMeta);
+      $rowMeta = ($ep_uses_mysqli ? mysqli_fetch_array($resultMeta) : mysql_fetch_array($resultMeta));
+      $row['v_metatags_title_' . $lid2] = $rowMeta['metatags_title'];
+      $row['v_metatags_keywords_' . $lid2] = $rowMeta['metatags_keywords'];
+      $row['v_metatags_description_' . $lid2] = $rowMeta['metatags_description'];
+      // metaData end
 	  $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP');
     } // End modification for CEON URI Rewriter mc12345678
 
+    $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_END');
+
+/*      //Start of CEON URI Addon - mc12345678
+      if ($ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_FROM_BLANK == '0' && EP4_AUTORECREATE_EXISTING == '0')) {
     foreach ($langcode as $key => $lang) {
       $lid = $lang['id'];
-      // metaData start
-      $sqlMeta = 'SELECT * FROM ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . ' WHERE products_id = :products_id: AND language_id = :language_id: LIMIT 1 ';
-      $sqlMeta = $db->bindVars($sqlMeta, ':products_id:', $row['v_products_id'], 'integer');
-      $sqlMeta = $db->bindVars($sqlMeta, ':language_id:', $lid, 'integer');
-      $resultMeta = ep_4_query($sqlMeta);
-      $rowMeta = ($ep_uses_mysqli ? mysqli_fetch_array($resultMeta) : mysql_fetch_array($resultMeta));
-      $row['v_metatags_title_' . $lid] = $rowMeta['metatags_title'];
-      $row['v_metatags_keywords_' . $lid] = $rowMeta['metatags_keywords'];
-      $row['v_metatags_description_' . $lid] = $rowMeta['metatags_description'];
-      // metaData end
-      // for each language, get the description and set the vals
-      //Start of CEON URI Addon - mc12345678
-      if ($ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_FROM_BLANK == '0' && EP4_AUTORECREATE_EXISTING == '0')) {
         $ceon_uri_mapping_admin = new EP4CeonURIMappingAdminProductPages();
 
         //$prev_uri_mappings should = $uri_mappings, because previous mappings appears to be used to undo the new $uri_mappings.  These two values would be gathered from above.  $uri_mapping_autogen is used to automatically create a new mapping and is likely to be associated with an admin Constant.  Ideally, if the fields are present then if there is a value in the field will not auto create, if there is null then would want to autocreate.  If the fields are not present, then probably want a flag that says to autocreate the path assuming that it does not already exist.  $pID is the product id which should be gathered from above. "All" mappings need to be posted, ie, if there is more than one language, and only one mapping is passed in then the other mapping should be set to NULL at least eventually if there is nothing already there/rules of import... 
@@ -565,7 +567,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         //Determine if the URIs should be autogenerated from CEON's methodology.
         // When this is true, then future URIs will follow the rules associated with that plugin.
         $uri_mapping_autogen = ((!zen_not_null($ceon_uri_mapping_admin->_uri_mappings[$lid]) && EP4_AUTOCREATE_FROM_BLANK == '1') || EP4_AUTORECREATE_EXISTING == '1' || (EP4_AUTORECREATE_EXISTING == '2' && (EP4_AUTOCREATE_FROM_BLANK == '1' || (EP4_AUTOCREATE_FROM_BLANK == '0' && zen_not_null($ceon_uri_mapping_admin->_uri_mappings[$lid])))));
-        /*
+*/        /*
          * Rewriting: EP4_REWRITE
 0 off no rewrites                       			EP4_AUTOCREATE_FROM_BLANK = '0' & EP4_AUTORECREATE_EXISTING = '0'
 1 Rewrite unwritten (blank only)				EP4_AUTOCREATE_FROM_BLANK = '1' & EP4_AUTORECREATE_EXISTING = '0'
@@ -573,13 +575,13 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 3 Rewrite only existing (existing only)				EP4_AUTOCREATE_FROM_BLANK = '0' & EP4_AUTORECREATE_EXISTING = '2'
 
          */
-        $products_model = $row['v_products_model'];
+/*        $products_model = $row['v_products_model'];
         $current_category_id = $row['v_categories_id'];
         $master_category = $row['v_master_categories_id']; //mastercategory($pID);
         $ceon_uri_mapping_admin->_uri_mapping_autogen = $uri_mapping_autogen;
-        $returned = $ceon_uri_mapping_admin->productPreviewProcessSubmission($current_category_id, $products_name, $products_model, $master_category, $pID/* , $uri_mapping_autogen */);  // This returns a rewritten URI if it is to be rewritten which includes all languages being rewritten (autogen).
-        // The below values are what are sent on to be updated.  These values must be what is desired to go forward if an update is to occur.
-        $prev_uri_mappings = $ceon_uri_mapping_admin->_prev_uri_mappings;
+        $returned = $ceon_uri_mapping_admin->productPreviewProcessSubmission($current_category_id, $products_name, $products_model, $master_category, $pID*//* , $uri_mapping_autogen *//*);  // This returns a rewritten URI if it is to be rewritten which includes all languages being rewritten (autogen).
+        */// The below values are what are sent on to be updated.  These values must be what is desired to go forward if an update is to occur.
+/*        $prev_uri_mappings = $ceon_uri_mapping_admin->_prev_uri_mappings;
         $uri_mappings = $ceon_uri_mapping_admin->_uri_mappings;
 
         // Update all - No changes to the current data are necessary,
@@ -627,15 +629,15 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $row['v_date_added'] = $row['v_date_added'];
         $row['v_products_model'] = $row['v_products_model'];
 
-        /* EXPORT_ONLY Intention is to provide an option to export data only to the spreadsheet.  If any of the update options is selected, then export the resulting updated data but do not update the info. */
-        if (EP4_EXPORT_ONLY) {
+*/        /* EXPORT_ONLY Intention is to provide an option to export data only to the spreadsheet.  If any of the update options is selected, then export the resulting updated data but do not update the info. */
+/*        if (EP4_EXPORT_ONLY) {
           $row['v_uri_' . $lid] = $uri_mappings[$lid];
         } else {
           $row['v_uri_' . $lid] = $ceon_uri_mapping_admin->_uri_mappings[$lid];
         }
-      } // End of CEON Insert for Export mc12345678
     } // foreach
-    $messageStack->reset();
+      } // End of CEON Insert for Export mc12345678
+    $messageStack->reset();*/
   } // if($ep_dltype == 'full')
 
   // BEGIN: Specials
@@ -655,12 +657,14 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $row['v_specials_expires_date'] = '';
     }
   } // END: Specials
+  $zco_notifier->notify('EP4_EXPORT_SPECIALS_AFTER');
+
   // EZ-Pages - mc12345678
-  if ($ep_dltype == 'CEON_EZPages' && !(EP4_AUTOCREATE_EZ_FROM_BLANK == '0' && EP4_AUTORECREATE_EZ_EXISTING == '0')) {
-    if ($ep4CEONURIDoesExist == true) {
-      $EZ_prev_uri_mappings = array();
-      $EZ_uri_mappings = array();
-    }
+/*  if ($ep_dltype == 'CEON_EZPages' && !(EP4_AUTOCREATE_EZ_FROM_BLANK == '0' && EP4_AUTORECREATE_EZ_EXISTING == '0')) {
+		if ($ep4CEONURIDoesExist == true) { 
+			$EZ_prev_uri_mappings = array();
+			$EZ_uri_mappings = array();
+		}
 
 //		foreach ($langcode as $key2 => $lang2) {
 //			$lid2 = $lang2['id'];
@@ -692,21 +696,21 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $page_title = $row['v_pages_title'];
 
       /* $page_titles_array; // Need to populate this/identify how to... */
-      $page_titles_array = NULL;
+/*				$page_titles_array = NULL;
 
       $EZ_uri_mappings = $ceon_uri_EZmapping_admin->insertUpdateHandler($ezID, $page_title, $EZ_prev_uri_mappings, $EZ_uri_mappings, $page_titles_array);
 
 
-      if (true /* Write to file */) {
-        foreach ($langcode as $key2 => $lang2) {
-          $row['v_uri_' . $lang2['id']] = $EZ_uri_mappings[$lang2['id']];
-        }
-        $row['v_main_page'] = FILENAME_EZPAGES;
-        $row['v_associated_db'] = $ezID;
-        $row['v_alternate_url'] = (zen_not_null($row['v_alternate_url']) ? $row['v_alt_url'] : $row['v_alt_url_external']);
-        $row['v_redirection_type_code'] = $row['v_redirection_type_code'];
-        $row['v_date_added'] = $row['v_date_added'];
-      }
+				if (true *//* Write to file*//*){
+					foreach ($langcode as $key2 => $lang2) {
+						$row['v_uri_' . $lang2['id']] = $EZ_uri_mappings[$lang2['id']];
+					}
+					$row['v_main_page'] = FILENAME_EZPAGES;
+					$row['v_associated_db'] = $ezID;
+					$row['v_alternate_url'] = (zen_not_null($row['v_alternate_url']) ? $row['v_alt_url'] : $row['v_alt_url_external']);
+					$row['v_redirection_type_code'] = $row['v_redirection_type_code'];
+					$row['v_date_added'] = $row['v_date_added'];
+				}*/
 
 
       /* if (!(EP4_EXPORT_ONLY) && $uri_mapping_autogen && ($returned != $ceon_uri_EZmapping_admin->_prev_uri_mappings)) {
@@ -717,8 +721,8 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $row['v_associated_db_id'] = $ezID;
         $row['v_date_added'] = $row['v_date_added'];
         //				$row['v_products_model'] = $row['v_products_model']; */
-    } // End of CEON Insert for Export mc12345678
-  } //End EZ-Pages - mc12345678
+/*			} // End of CEON Insert for Export mc12345678
+	} //End EZ-Pages - mc12345678*/
   // Multi-Lingual Categories, Categories Meta, Categories Descriptions
   if ($ep_dltype == 'categorymeta') {
     // names and descriptions require that we loop thru all languages that are turned on in the store
@@ -801,7 +805,9 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       //function zen_href_link($page = '', $parameters = '', $connection = 'NONSSL', $add_session_id = true, $search_engine_safe = true, $static = false, $use_dir_ws_catalog = true) 
     }
     // $fullcategory = array(); // this will have the entire category path separated by $category_delimiter
-    if ($ep4CEONURIDoesExist == true && $ep_dltype == 'category' && !(EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && EP4_AUTORECREATE_CAT_EXISTING == '0')) {
+  $zco_notifier->notify('EP4_EXPORT_FULL_OR_CAT_FULL_AFTER');
+
+/*    if ($ep4CEONURIDoesExist == true && $ep_dltype == 'category' && !(EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && EP4_AUTORECREATE_CAT_EXISTING == '0')) {
       $ceon_uri_cat_mapping = new EP4CeonURIMappingAdminCategoryPages();
       foreach ($langcode as $key2 => $lang2) {
         $categories_name[$lang2['id']] = '';
@@ -825,7 +831,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 
       $cat_uri_mappings = $ceon_uri_cat_mapping->insertUpdateHandler($thecategory_id, $theparent_id, $cat_prev_uri_mappings, $cat_uri_mappings, $categories_name, true);
 
-      if (true /* Write to file */) {
+      if (true *//* Write to file *//*) {
         foreach ($langcode as $key2 => $lang2) {
           $row['v_uri_' . $lang2['id']] = $cat_uri_mappings[$lang2['id']];
         }
@@ -833,7 +839,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $row['v_associated_db'] = NULL;
         $row['v_master_categories_id'] = $theparent_id;
       }
-    }
+    }*/
     // if parent_id is not null ('0'), then follow it up.  Perhaps this could be replaced by Zen's zen_not_null() function?
     while (!empty($thecategory_id)) {
       // mult-lingual categories start - for each language, get category description and name
@@ -878,7 +884,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $lid = $lang['id'];
       $row['v_categories_name_' . $lid] = rtrim($row['v_categories_name_' . $lid], $category_delimiter);
     } // foreach
-  } // if() delimited categories path
+  } // if($ep_dltype == 'full' || $ep_dltype == 'category') delimited categories path
 
   //This will do all of the special work to provide the remaining row data:
   //  	'v_SBA_tracked';
@@ -1162,7 +1168,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     } else {
       $row['v_music_genre_name'] = '';
     }
-  }
+  } // if (v_artists_name && v_products_type)
 
 
   // MANUFACTURERS EXPORT - THIS NEEDS MULTI-LINGUAL SUPPORT LIKE EVERYTHING ELSE!
@@ -1208,7 +1214,6 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 
   fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
   $ep_export_count++;
- // This was extra-> } // if $ep_dltype == 'attrib_basic'
 } // while ($row) 
 //Start SBA1 addresses writing to the file
 if ($ep_dltype == 'SBA_basic') {
