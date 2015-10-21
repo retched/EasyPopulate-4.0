@@ -568,8 +568,8 @@ if (!is_null($_GET['import']) && isset($_GET['import'])) {
 							WHERE 
 							(categories_id = :categories_id: AND language_id = :language_id:)";
 
-            $sql = $db->bindVars($sql, ':categories_name:', $items[$filelayout['v_categories_name_' . $lid]], 'string');
-            $sql = $db->bindVars($sql, ':categories_description:', $items[$filelayout['v_categories_description_' . $lid]], 'string');
+            $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($items[$filelayout['v_categories_name_' . $lid]]), 'string');
+            $sql = $db->bindVars($sql, ':categories_description:', ep_4_curly_quotes($items[$filelayout['v_categories_description_' . $lid]]), 'string');
             $sql = $db->bindVars($sql, ':categories_id:', $items[$filelayout['v_categories_id']], 'integer');
             $sql = $db->bindVars($sql, ':language_id:', $lid, 'integer');
             $result = ep_4_query($sql);
@@ -603,9 +603,9 @@ if (!is_null($_GET['import']) && isset($_GET['import'])) {
 								categories_id		 = :categories_id:,
 								language_id 		 = :language_id:";
             }
-            $sql = $db->bindVars($sql, ':metatags_title:', $items[$filelayout['v_metatags_title_' . $lid]], 'string');
-            $sql = $db->bindVars($sql, ':metatags_keywords:', $items[$filelayout['v_metatags_keywords_' . $lid]], 'string');
-            $sql = $db->bindVars($sql, ':metatags_description:', $items[$filelayout['v_metatags_description_' . $lid]], 'string');
+            $sql = $db->bindVars($sql, ':metatags_title:', ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $lid]]), 'string');
+            $sql = $db->bindVars($sql, ':metatags_keywords:', ep_4_curly_quotes($items[$filelayout['v_metatags_keywords_' . $lid]]), 'string');
+            $sql = $db->bindVars($sql, ':metatags_description:', ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $lid]]), 'string');
             $sql = $db->bindVars($sql, ':categories_id:', $items[$filelayout['v_categories_id']], 'integer');
             $sql = $db->bindVars($sql, ':language_id:', $lid, 'integer');
             $result = ep_4_query($sql);
@@ -727,7 +727,7 @@ if (!is_null($_GET['import']) && isset($_GET['import'])) {
             $sql .= 'p.' . $field . ' as v_' . $field . ',';
           }
         }
-        $sql .= 'p.products_weight			as v_products_weight,
+        $sql .= 'p.products_weight      as v_products_weight,
 					p.products_discount_type		as v_products_discount_type,
 					p.products_discount_type_from   as v_products_discount_type_from,
 					p.product_is_call				as v_product_is_call,

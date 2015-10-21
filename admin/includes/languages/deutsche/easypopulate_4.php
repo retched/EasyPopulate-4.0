@@ -122,5 +122,17 @@ define('EASYPOPULATE_4_DD_DOWNLOAD_DEFAULT', 'Download Typ');
 define('EASYPOPULATE_4_DD_DOWNLOAD_COMPLETE', 'Alle Artikel');
 define('EASYPOPULATE_4_DD_DOWNLOAD_QUANTITY', 'Artikelnummer/Preis/Anzahl');
 define('EASYPOPULATE_4_DD_DOWNLOAD_BREAKS', 'Artikelnummer/Preis/Staffelpreise');
+define('EASYPOPULATE_4_DISPLAY_MANUFACTURERS', 'Hersteller');
+define('EASYPOPULATE_4_DISPLAY_FILTERABLE_EXPORTS', 'Filterbare Exporte:');
+define('EASYPOPULATE_4_DISPLAY_PRODUCTS_PRICE_EXPORT_OPTION', 'Artikel &amp; Preis Export/Import Optionen:');
+define('EASYPOPULATE_4_DISPLAY_COMPLETE_PRODUCTS', '<b>Alle Artikel</b> (mit Metatags falls in der Konfiguration aktiviert)');
+define('EASYPOPULATE_4_DISPLAY_PRICE_QTY', '<b>Artikelnummer/Preis/Anzahl</b> (mit Sonderangeboten)');
+define('EASYPOPULATE_4_DISPLAY_PRICE_BREAKS', '<b>Artikelnummer/Preis/Staffeklpreise</b>');
+define('EASYPOPULATE_4_DISPLAY_FEATURED', '<b>Empfohlene Artikel</b>');
+define('EASYPOPULATE_4_DISPLAY_TITLE_CATEGORY','Kategorie Export/Import Optionen');
+define('EASYPOPULATE_4_DISPLAY_EXPORT_CATEGORY','Artikelnummer/Kategorie');
+define('EASYPOPULATE_4_DISPLAY_EXPORT_CATEGORYMETA','<b>Nur Kategorien</b> (mit Metatags)');
+define('EASYPOPULATE_4_DISPLAY_TITLE_ATTRIBUTE','<b>Attribut Export/Import Optionen</b>');
+define('EASYPOPULATE_4_DISPLAY_EXPORT_ATTRIBUTE_BASIC','<b>Einfache Attribute</b> (einfach einzeilig)');
+define('EASYPOPULATE_4_DISPLAY_EXPORT_ATTRIBUTE_DETAILED','<b>Detaillierte Attribute</b> (detailliert mehrzeilig)');
 
-?>

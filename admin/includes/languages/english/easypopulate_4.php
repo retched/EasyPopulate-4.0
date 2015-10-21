@@ -80,8 +80,6 @@ define('SBA_DETAILED_EP_DESC','Prefix: %1$s. %2$s will be processed through the 
 define('SBA_STOCK_EP_DESC','Prefix: %1$s. %2$s will be processed through the Stock by Attributes Stock Modification filters.');
 define('ORDERS_EP_DESC', 'Prefix: %1$s. %2$s will not be processed for import.');
 define('CATCHALL_EP_DESC', 'This contains any other file. %2$s will be processed like the upload of a full data file.');
-define('CEON_URI_AA_EP_DESC', 'Prefix: %1$s. %2$s will be processed through through the aa directory.');
-define('CEON_URI_EZ_EP_DESC', 'Prefix: %1$s. %2$s will be processed through through the ez directory.');
 
 // error log defines - for ep_debug_log.txt
 define('EASYPOPULATE_4_ERRORLOG_SQL_ERROR', 'MySQL error %s: %s\nWhen executing:\n%sn');
@@ -122,5 +120,20 @@ define('EASYPOPULATE_4_DD_DOWNLOAD_DEFAULT', 'Download Type');
 define('EASYPOPULATE_4_DD_DOWNLOAD_COMPLETE', 'Complete Products');
 define('EASYPOPULATE_4_DD_DOWNLOAD_QUANTITY', 'Model/Price/Qty');
 define('EASYPOPULATE_4_DD_DOWNLOAD_BREAKS', 'Model/Price/Breaks');
+define('EASYPOPULATE_4_DISPLAY_MANUFACTURERS', 'Manufacturers');
+define('EASYPOPULATE_4_DISPLAY_FILTERABLE_EXPORTS', 'Filterable Exports:');
+define('EASYPOPULATE_4_DISPLAY_PRODUCTS_PRICE_EXPORT_OPTION', 'Product &amp; Pricing Export/Import Options:');
+define('EASYPOPULATE_4_DISPLAY_COMPLETE_PRODUCTS', '<b>Complete Products</b> (with Metatags)');
+define('EASYPOPULATE_4_DISPLAY_PRICE_QTY', '<b>Model/Price/Qty</b> (with Specials)');
+define('EASYPOPULATE_4_DISPLAY_PRICE_BREAKS', '<b>Model/Price/Breaks</b>');
+define('EASYPOPULATE_4_DISPLAY_FEATURED', '<b>Featured Products</b>');
+define('EASYPOPULATE_4_DISPLAY_TITLE_CATEGORY','Category Export/Import Options');
+define('EASYPOPULATE_4_DISPLAY_EXPORT_CATEGORY','Model/Category');
+define('EASYPOPULATE_4_DISPLAY_EXPORT_CATEGORYMETA','<b>Categories Only</b> (with Metatags)');
+define('EASYPOPULATE_4_DISPLAY_TITLE_ATTRIBUTE','<b>Attribute Export/Import Options</b>');
+define('EASYPOPULATE_4_DISPLAY_EXPORT_ATTRIBUTE_BASIC','<b>Basic Products Attributes</b> (basic single-line)');
+define('EASYPOPULATE_4_DISPLAY_EXPORT_ATTRIBUTE_DETAILED','<b>Detailed Products Attributes</b> (detailed multi-line)');
+/*define('','');
+define('','');
+define('','');*/
 
-?>

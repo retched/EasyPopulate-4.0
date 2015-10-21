@@ -85,7 +85,8 @@ if ($ep_dltype == 'SBAStockProdFilter') {
 
 $filelayout = array();
 $filelayout_sql = '';
-$filelayout = ep_4_set_filelayout($ep_dltype, $filelayout_sql, $sql_filter, $langcode, $ep_supported_mods, $custom_fields);
+require(DIR_FS_ADMIN . DIR_WS_MODULES . 'easypopulate_4_filelayout.php');
+//$filelayout = ep_4_set_filelayout($ep_dltype, $filelayout_sql, $sql_filter, $langcode, $ep_supported_mods, $custom_fields);
 
 if (($ep_dltype == 'full' || $ep_dltype == 'categorymeta') && EASYPOPULATE_4_CONFIG_EXPORT_URI != '0') {
   //require_once(DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'functions_categories.php');
@@ -820,7 +821,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
   if (isset($filelayout['v_manufacturers_name'])) {
     if (($row['v_manufacturers_id'] != '0') && ($row['v_manufacturers_id'] != '')) { // '0' is correct, but '' NULL is possible
       $sql2 = 'SELECT manufacturers_name FROM ' . TABLE_MANUFACTURERS . ' WHERE manufacturers_id = :manufacturers_id:';
-      $sql2 = $db->bindVars($sql2, ':manufacturers_id:', $row['v_manufactureres_id'], 'integer');
+      $sql2 = $db->bindVars($sql2, ':manufacturers_id:', $row['v_manufacturers_id'], 'integer');
       $result2 = ep_4_query($sql2);
       $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
       $row['v_manufacturers_name'] = $row2['manufacturers_name'];

@@ -69,7 +69,7 @@ $ep_debug_logging_all = false; // do not comment out.. make false instead
 /* Test area end */
 
 // Current EP Version - Modded by mc12345678 after Chadd had done so much
-$curver = '4.0.31URI - Beta 08-01-2015';
+$curver              = '4.0.31 - Beta 08-01-2015';
 $display_output = ''; // results of import displayed after script run
 $ep_dltype = NULL;
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
@@ -407,7 +407,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_REQUEST["delet
         <div align = "left">
              <?php
              $manufacturers_array = array();
-             $manufacturers_array[] = array("id" => '', 'text' => "Manufacturers");
+             $manufacturers_array[] = array("id" => '', 'text' => EASYPOPULATE_4_DISPLAY_MANUFACTURERS);
              if ($ep_uses_mysqli) {
                $manufacturers_query = mysqli_query($db->link, "SELECT manufacturers_id, manufacturers_name FROM " . TABLE_MANUFACTURERS . " ORDER BY manufacturers_name");
                while ($manufacturers = mysqli_fetch_array($manufacturers_query)) {
@@ -426,7 +426,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_REQUEST["delet
                array("id" => '1', 'text' => EASYPOPULATE_4_DD_DOWNLOAD_QUANTITY),
                array("id" => '2', 'text' => EASYPOPULATE_4_DD_DOWNLOAD_BREAKS));
 
-             echo "<b>Filterable Exports:</b><br />";
+             echo "<b>" . EASYPOPULATE_4_DISPLAY_FILTERABLE_EXPORTS . "</b><br />";
 
              echo zen_draw_pull_down_menu('ep_export_type', $export_type_array) . ' ';
              echo ' ' . zen_draw_pull_down_menu('ep_category_filter', array_merge(array(0 => array("id" => '', 'text' => "Categories")), zen_get_category_tree())) . ' ';
@@ -458,25 +458,25 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_REQUEST["delet
     </div></form>
     
     
-        <b>Product &amp; Pricing Export/Import Options:</b><br />
+        <b><?php echo EASYPOPULATE_4_DISPLAY_PRODUCTS_PRICE_EXPORT_OPTION; ?></b><br />
         <!-- Download file links -->
         <a href="easypopulate_4.php?export=full"><b>Complete Products</b> (with Metatags<?php if ($ep4CEONURIDoesExist == true) { ?> and CEON export<?php } ?>)</a><br />
-        <a href="easypopulate_4.php?export=priceqty"><b>Model/Price/Qty</b> (with Specials)</a><br />
-        <a href="easypopulate_4.php?export=pricebreaks"><b>Model/Price/Breaks</b></a><br />
-        <a href="easypopulate_4.php?export=featured"><b>Featured Products</b></a><br />
+        <a href="easypopulate_4.php?export=priceqty"><?php echo EASYPOPULATE_4_DISPLAY_PRICE_QTY; ?></a><br />
+        <a href="easypopulate_4.php?export=pricebreaks"><?php echo EASYPOPULATE_4_DISPLAY_PRICE_BREAKS; ?></a><br />
+        <a href="easypopulate_4.php?export=featured"><?php echo EASYPOPULATE_4_DISPLAY_FEATURED; ?></a><br />
 
-        <br /><b>Category Export/Import Options</b><br />
-        <a href="easypopulate_4.php?export=category"><b>Model/Category</b></a><br />
+        <br /><b><?php echo EASYPOPULATE_4_DISPLAY_TITLE_CATEGORY; ?></b><br />
+        <a href="easypopulate_4.php?export=category"><b><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_CATEGORY;?></b></a><br />
         <a href="easypopulate_4.php?export=categorymeta"><b>Categories Only</b> (with Metatags<?php if ($ep4CEONURIDoesExist == true) { ?> and CEON export<?php } ?>)</a><br />
 
-        <br /><b>Attribute Export/Import Options</b><br />
-        <a href="easypopulate_4.php?export=attrib_basic"><b>Basic Products Attributes</b> (basic single-line)</a><br /> 
-        <a href="easypopulate_4.php?export=attrib_detailed"><b>Detailed Products Attributes</b> (detailed multi-line)</a><br />
+        <br /><?php echo EASYPOPULATE_4_DISPLAY_TITLE_ATTRIBUTE; ?><br />
+        <a href="easypopulate_4.php?export=attrib_basic"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_ATTRIBUTE_BASIC; ?></a><br /> 
+        <a href="easypopulate_4.php?export=attrib_detailed"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_ATTRIBUTE_DETAILED; ?></a><br />
         <?php
         /* Begin SBA1 addition */
         if ($ep_4_SBAEnabled != false) {
-          ?>
-          <a href="easypopulate_4.php?export=SBA_basic"><b>Basic Stock By Attributes Data-Unfinished</b> (basic single-line)</a><br />
+          /* ?>
+          <a href="easypopulate_4.php?export=SBA_basic"><b>Basic Stock By Attributes Data-Unfinished</b> (basic single-line)</a><br /><?php */ ?>
           <a href="easypopulate_4.php?export=SBA_detailed"><b>Detailed Stock By Attributes Data</b> (detailed multi-line)</a><br />
           <a href="easypopulate_4.php?export=SBAStock"><b>Stock of Items with Attributes Including SBA</b></a><br />
 
@@ -485,17 +485,10 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_REQUEST["delet
         <?php } /* End SBA1 Addition */ 
 		$zco_notifier->notify('EP4_LINK_SELECTION_END');
 		?>
-        <?php /* Begin CEON URI addition */ if ($ep4CEONURIDoesExist == true) { ?>    <br /><b>CEON URI Export/Import Options</b><br />
-          <a href="easypopulate_4.php?export=CEON_URI_active_all"><b>CEON URI Active Data Table</b> (basic single-line)</a><br />
-          <a href="easypopulate_4.php?export=CEON_detailed"><b>Detailed CEON URI Data</b> (detailed multi-line)</a><br />
-          <a href="easypopulate_4.php?export=CEON_EZPages"><b>EZ Pages CEON Data</b> (Export)</a><br />
-        <?php } else { ?>CEON URI Mapping is not Installed. <br /><?php } /* End CEON URI Addition */ ?>
-
         <br>DIAGNOSTIC EXPORTS - Note: NOT FOR IMPORTING ATTRIBUTES!<br />
         <a href="easypopulate_4.php?export=options"><b>Attribute Options Names</b></a><br />
         <a href="easypopulate_4.php?export=values"><b>Attribute Options Values</b></a><br />
         <a href="easypopulate_4.php?export=optionvalues"><b>Attribute Options-Names-to-Values</b></a><br />
-
         <?php
 // List uploaded files in multifile mode
 // Table header
@@ -527,9 +520,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_REQUEST["delet
             "orders-full-ep"=>ORDERSEXPORT_LINK_SAVE1,
             "orders-fullb-ep"=>ORDERSEXPORT_LINK_SAVE1B,
             "orders-noattribs-ep"=>ORDERSEXPORT_LINK_SAVE2,
-            "orders-onlyAttribs-ep"=>ORDERSEXPORT_LINK_SAVE3,
-            'ceon-uri-aa-ep' => CEON_URI_AA_EP_DESC,
-            'ceon-uri-ez-ep' => CEON_URI_EZ_EP_DESC
+        "orders-onlyAttribs-ep"=>ORDERSEXPORT_LINK_SAVE3
           );
 		  $zco_notifier->notify('EP4_FILENAMES');
 
