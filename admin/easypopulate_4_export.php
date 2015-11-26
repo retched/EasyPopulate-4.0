@@ -862,11 +862,11 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
   } // if $ep_dltype == 'attrib_basic'
 } // while ($row) 
 //Start SBA1 addresses writing to the file
-if ($ep_dltype == 'SBA_basic') {
+/*if ($ep_dltype == 'SBA_basic') {
   $SBATree = array();
   $MaxArray = array();
   $CurValOp = array();
-  /* Here is the pseudo code to accomplish the SBA Basic writing to file:
+*/  /* Here is the pseudo code to accomplish the SBA Basic writing to file:
    * X For each product
    * X	Set the Number of options for that product
    * X	For each option of product
@@ -889,7 +889,7 @@ if ($ep_dltype == 'SBA_basic') {
    * X	next j
    * X while currentvalofop(1) <= maxarray(1)
    */
-  for ($i = 1; $i <= $SBABasicArray['NumProducts']; $i++) {
+/*  for ($i = 1; $i <= $SBABasicArray['NumProducts']; $i++) {
     $NumOptions = $SBABasicArray['Prod' . $i . 'NumOps'];
     //Obtain additional data for the row;
     $active_row['v_products_model'] = $SBABasicArray['Prod' . $i . 'Model'];
@@ -898,7 +898,7 @@ if ($ep_dltype == 'SBA_basic') {
       $MaxArray[$j] = $SBABasicArray['Prod' . $i . 'Op' . $j . 'NumVals'];
       $CurValOp[$j] = 1;
     } // end for $j/$NumOptions
-    /*
+*/    /*
      * 
      * 
      * NEED TO CLEAR THE REMAINING VARIABLES
@@ -906,12 +906,12 @@ if ($ep_dltype == 'SBA_basic') {
      * 
      */
 
-    do {
+/*    do {
       for ($k = 1; $k <= $NumOptions; $k++) {
-        /* 			OptionName get from prod number and option number combo
+*/        /* 			OptionName get from prod number and option number combo
          * 			Optionvalue get from value of option of product from currentvalofop(option)
          */
-        $active_row['v_products_options_name_' . $k] = $SBABasicArray['Prod' . $i . 'Op' . $k]; // (Actually want to add these in as the highest order of the options is identified and then also the values
+/*        $active_row['v_products_options_name_' . $k] = $SBABasicArray['Prod' . $i . 'Op' . $k]; // (Actually want to add these in as the highest order of the options is identified and then also the values
         $active_row['v_products_options_values_name_' . $k] = $SBABasicArray['Prod' . $i . 'Op' . $k . 'Val' . $CurValOp[$k]];
         $active_row['v_products_options_type_' . $k] = $SBABasicArray['Prod' . $i . 'Op' . $k . 'Type'];
       }  // EOF NumOptions for loop $k
@@ -937,7 +937,7 @@ if ($ep_dltype == 'SBA_basic') {
 //If Last Value + 1 is greater than number of values then {reset last value, Back down to previous Level
 //
 		//Increment Last value by 1
-
+*/
 /* 	$m = $SBABasicArray['Prod' . $i . 'NumOps'];
   while ($n < $SBATree[$SBABasicArray['Prod' . $i . 'NumOps']]) {
 

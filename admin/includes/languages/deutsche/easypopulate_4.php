@@ -80,8 +80,6 @@ define('SBA_DETAILED_EP_DESC','Prefix: %1$s. %2$s durch die Detailed Stock by At
 define('SBA_STOCK_EP_DESC','Prefix: %1$s. %2$s durch die Stock by Attributes Stock Modification Filter ausgefuehrt werden.');
 define('ORDERS_EP_DESC', 'Prefix: %1$s. %2$s will not be processed for import.');
 define('CATCHALL_EP_DESC', 'Alle anderen. %2$s durch die upload of a full data file Filter ausgefuehrt werden.');
-define('CEON_URI_AA_EP_DESC', 'Prefix: %1$s. %2$s will be processed through through the aa directory.');
-define('CEON_URI_EZ_EP_DESC', 'Prefix: %1$s. %2$s will be processed through through the ez directory.');
 
 // error log defines - for ep_debug_log.txt
 define('EASYPOPULATE_4_ERRORLOG_SQL_ERROR', 'MySQL error %s: %s\nWhen executing:\n%sn');

@@ -322,7 +322,8 @@ private $ep4CEONURIDoesExist;
 
   //  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_INSTALL_END');
   function updateEP4ExtraFunctionsInstallEnd(&$callingClass, $notifier, $paramsArray) {
-    global $db, $group_id, $project;
+    global $db, $project;
+    $group_id = $paramsArray['group_id'];
   
     if ( (substr($project,0,5) == "1.3.8") || (substr($project,0,5) == "1.3.9") ) {
       $db->Execute("INSERT INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
@@ -786,99 +787,99 @@ private $ep4CEONURIDoesExist;
   function update(&$callingClass, $notifier, $paramsArray) {
 
     if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START') {
-      updateEP4ExtraFunctionsSetFilelayoutFullStart($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExtraFunctionsSetFilelayoutFullStart($callingClass, $notifier, $paramsArray);
     }
 
     //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
     if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT') {
-      updateEP4ExtraFunctionsSetFilelayoutFullFilelayout($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExtraFunctionsSetFilelayoutFullFilelayout($callingClass, $notifier, $paramsArray);
     }
   
   // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT');
     if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT') {
-      updateEP4ExtraFunctionsSetFilelayoutFullSQLSelect($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExtraFunctionsSetFilelayoutFullSQLSelect($callingClass, $notifier, $paramsArray);
     }
 
   // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE');
     if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE') {
-      updateEP4ExtraFunctionsSetFilelayoutFullSQLTable($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExtraFunctionsSetFilelayoutFullSQLTable($callingClass, $notifier, $paramsArray);
     }
   
   // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_FILELAYOUT');
     if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_FILELAYOUT') {
-      updateEP4ExtraFunctionsSetFilelayoutCategoryFilelayout($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExtraFunctionsSetFilelayoutCategoryFilelayout($callingClass, $notifier, $paramsArray);
     }
 
   //  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_SQL_SELECT');
     if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_SQL_SELECT') {
-      updateEP4ExtraFunctionsSetFilelayoutCategorySQLSelect($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExtraFunctionsSetFilelayoutCategorySQLSelect($callingClass, $notifier, $paramsArray);
     }
 
   //  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORYMETA_FILELAYOUT');
     if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORYMETA_FILELAYOUT') {
-      updateEP4ExtraFunctionsSetFilelayoutCategorymetaFilelayout($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExtraFunctionsSetFilelayoutCategorymetaFilelayout($callingClass, $notifier, $paramsArray);
     }
 
     // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CASE_DEFAULT');
     if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CASE_DEFAULT') {
-      updateEP4ExtraFunctionsSetFilelayoutCaseDefault($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExtraFunctionsSetFilelayoutCaseDefault($callingClass, $notifier, $paramsArray);
     }
 
   //  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_INSTALL_END');
     if ($notifier == 'EP4_EXTRA_FUNCTIONS_INSTALL_END') {
-      updateEP4ExtraFunctionsInstallEnd($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExtraFunctionsInstallEnd($callingClass, $notifier, $paramsArray);
     }
 
     // $zco_notifier->notify('EP4_LINK_SELECTION_END');
     if ($notifier == 'EP4_LINK_SELECTION_END') {
-      updateEP4LinkSelectionEnd($callingClass, $notifier, $paramsArray);
+      $this->updateEP4LinkSelectionEnd($callingClass, $notifier, $paramsArray);
     }
   
   // $zco_notifier->notify('EP4_FILENAMES');
     if ($notifier == 'EP4_FILENAMES') {
-      updateEP4Filenames($callingClass, $notifier, $paramsArray);
+      $this->updateEP4Filenames($callingClass, $notifier, $paramsArray);
     }
 
   
   // 'EP4_EXPORT_FILE_ARRAY_START'
     if ($notifier == 'EP4_EXPORT_FILE_ARRAY_START') {
-      updateEP4ExportFileArrayStart($callingClass, $notifier, $paramsArray); // mc12345678 doesn't work on ZC 1.5.1 and below
+      $this->updateEP4ExportFileArrayStart($callingClass, $notifier, $paramsArray); // mc12345678 doesn't work on ZC 1.5.1 and below
     }
 
   // 'EP4_EXPORT_CASE_EXPORT_FILE_END'
     if ($notifier == 'EP4_EXPORT_CASE_EXPORT_FILE_END') {
-      updateEP4ExportCaseExportFileEnd($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExportCaseExportFileEnd($callingClass, $notifier, $paramsArray);
     }
 
 // EP4_EXPORT_WHILE_START
     if ($notifier == 'EP4_EXPORT_WHILE_START') {
-      updateEP4ExportWhileStart($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExportWhileStart($callingClass, $notifier, $paramsArray);
     }
 
   //$zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK');
     if ($notifier == 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK') {
-      updateEP4ExportLoopFullOrSBAStock($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExportLoopFullOrSBAStock($callingClass, $notifier, $paramsArray);
     }
 
   //  $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP');
     if ($notifier == 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP') {
-      updateEP4ExportLoopFullOrSBAStockLoop($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExportLoopFullOrSBAStockLoop($callingClass, $notifier, $paramsArray);
     }
 
 //    $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_END');
     if ($notifier == 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_END') {
-      updateEP4ExportLoopFullOrSBAStockEnd($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExportLoopFullOrSBAStockEnd($callingClass, $notifier, $paramsArray);
     }
 
 
 //  $zco_notifier->notify('EP4_EXPORT_SPECIALS_AFTER');
     if ($notifier == 'EP4_EXPORT_SPECIALS_AFTER') {
-      updateEP4ExportSpecialsAfter($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExportSpecialsAfter($callingClass, $notifier, $paramsArray);
     }
 
 //  $zco_notifier->notify('EP4_EXPORT_FULL_OR_CAT_FULL_AFTER');
     if ($notifier == 'EP4_EXPORT_FULL_OR_CAT_FULL_AFTER') {
-      updateEP4ExportFullOrCatFullAfter($callingClass, $notifier, $paramsArray);
+      $this->updateEP4ExportFullOrCatFullAfter($callingClass, $notifier, $paramsArray);
     }
   } // EOF Update()
 }

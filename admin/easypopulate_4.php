@@ -77,6 +77,9 @@ $specials_print = EASYPOPULATE_4_SPECIALS_HEADING;
 $has_specials = false;
 $zco_notifier->notify('EP4_START');
 
+// Load language file(s) for main screen menu(s).
+require(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_menus.php');
+
 // all mods go in this array as 'name' => 'true' if exist. eg $ep_supported_mods['psd'] => true means it exists.
 $ep_supported_mods = array();
 
@@ -460,14 +463,14 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_REQUEST["delet
     
         <b><?php echo EASYPOPULATE_4_DISPLAY_PRODUCTS_PRICE_EXPORT_OPTION; ?></b><br />
         <!-- Download file links -->
-        <a href="easypopulate_4.php?export=full"><b>Complete Products</b> (with Metatags<?php if ($ep4CEONURIDoesExist == true) { ?> and CEON export<?php } ?>)</a><br />
+    <a href="easypopulate_4.php?export=full"><?php echo EASYPOPULATE_4_DISPLAY_COMPLETE_PRODUCTS; ?></a><br/>
         <a href="easypopulate_4.php?export=priceqty"><?php echo EASYPOPULATE_4_DISPLAY_PRICE_QTY; ?></a><br />
         <a href="easypopulate_4.php?export=pricebreaks"><?php echo EASYPOPULATE_4_DISPLAY_PRICE_BREAKS; ?></a><br />
         <a href="easypopulate_4.php?export=featured"><?php echo EASYPOPULATE_4_DISPLAY_FEATURED; ?></a><br />
 
         <br /><b><?php echo EASYPOPULATE_4_DISPLAY_TITLE_CATEGORY; ?></b><br />
-        <a href="easypopulate_4.php?export=category"><b><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_CATEGORY;?></b></a><br />
-        <a href="easypopulate_4.php?export=categorymeta"><b>Categories Only</b> (with Metatags<?php if ($ep4CEONURIDoesExist == true) { ?> and CEON export<?php } ?>)</a><br />
+        <a href="easypopulate_4.php?export=category"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_CATEGORY; ?></a><br />
+    <a href="easypopulate_4.php?export=categorymeta"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_CATEGORYMETA; ?></a><br/>
 
         <br /><?php echo EASYPOPULATE_4_DISPLAY_TITLE_ATTRIBUTE; ?><br />
         <a href="easypopulate_4.php?export=attrib_basic"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_ATTRIBUTE_BASIC; ?></a><br /> 
@@ -520,7 +523,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_REQUEST["delet
             "orders-full-ep"=>ORDERSEXPORT_LINK_SAVE1,
             "orders-fullb-ep"=>ORDERSEXPORT_LINK_SAVE1B,
             "orders-noattribs-ep"=>ORDERSEXPORT_LINK_SAVE2,
-        "orders-onlyAttribs-ep"=>ORDERSEXPORT_LINK_SAVE3
+            "orders-onlyAttribs-ep"=>ORDERSEXPORT_LINK_SAVE3
           );
 		  $zco_notifier->notify('EP4_FILENAMES');
 

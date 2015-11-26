@@ -18,12 +18,13 @@ if (!is_null($_GET['import']) && isset($_GET['import'])) {
   $ep_error_count = 0; // errors detected during import
   $ep_warning_count = 0; // warning detected during import
 
-  $ep4CEONURIDoesExist = false;
+  $zco_notifier->notify('EP4_IMPORT_START');
+/*  $ep4CEONURIDoesExist = false;
   if (false && ep_4_CEONURIExists() == true) {
     $ep4CEONURIDoesExist = true;
     require_once(DIR_FS_CATALOG . DIR_WS_CLASSES . 'class.CeonURIMappingAdmin.php');
     require(DIR_FS_CATALOG . DIR_WS_INCLUDES . 'extra_datafiles/ceon_uri_mapping_product_pages.php');
-  }
+  }*/
 
 
   // When updating products info, these values are used for existing data
@@ -622,7 +623,8 @@ if (!is_null($_GET['import']) && isset($_GET['import'])) {
     } // if
 
     if (( strtolower(substr($file['name'], 0, 15)) <> "categorymeta-ep") && ( strtolower(substr($file['name'], 0, 7)) <> "attrib-") && ($ep_4_SBAEnabled != false ? ( strtolower(substr($file['name'], 0, 4)) <> "sba-") : true )) { //  temporary solution here... 12-06-2010
-      if ($ep4CEONURIDoesExist == true /* && false */) { // Not sure that this is fully developed yet and if correctly incorporated for use. 
+      $zco_notifier->notify('EP4_IMPORT_GENERAL_FILE_ALL');
+/*      if ($ep4CEONURIDoesExist == true */ /* && false *//*) { // Not sure that this is fully developed yet and if correctly incorporated for use. 
         //Order of calls:
         //collect_info
         require_once(DIR_WS_CLASSES . 'class.EP4CeonURIMappingAdminProductPages.php');
@@ -644,7 +646,7 @@ if (!is_null($_GET['import']) && isset($_GET['import'])) {
 //        $ceon_uri_mapping_admin->productPreviewProcessSubmission($current_category_id, $prev_uri_mappings, $uri_mappings, $uri_mapping_autogen, $products_name, $products_model, $master_category, $pID);
 
         // if information not posted, then collect data from get statement/ other data (This doesn't appear to be applicable as it doesn't seem that this condition will/could exist here.
-        /* $ceon_uri_mapping_admin->productPreviewInitialLoad((int) $_GET['pID'],
+*/        /* $ceon_uri_mapping_admin->productPreviewInitialLoad((int) $_GET['pID'],
           $zc_products->get_handler((int) $_GET['product_type'])); */
 
         // $i here is the language number and needs to be set/assigned.
@@ -671,7 +673,7 @@ if (!is_null($_GET['import']) && isset($_GET['import'])) {
 //			require_once(DIR_WS_CLASSES . 'class.CeonURIMappingAdminProductPages.php');
 //			$ceon_uri_mapping_admin = new CeonURIMappingAdminProductPages();
 //			$ceon_uri_mapping_admin->addURIMappingFieldsToProductCopyFieldsArray((int) $_GET['pID']);
-      }
+/*      }  */
       // Main IMPORT loop For Product Related Data. v_products_id is the main key
       while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // read 1 line of data
         // bug fix 5-10-2012: when adding/updating a mix of old and new products and missing certain columns, 
@@ -714,14 +716,15 @@ if (!is_null($_GET['import']) && isset($_GET['import'])) {
         if ($ep_supported_mods['excl'] == true) { // Exclusive Product Custom Mod
           $sql .= 'p.products_exclusive as v_products_exclusive,';
         }
-        if ($ep4CEONURIDoesExist == true) {
+        $zco_notifier->notify('EP4_IMPORT_PRODUCT_DEFAULT_SELECT_FIELDS');
+/*        if ($ep4CEONURIDoesExist == true) {
           $sql .= 'c.uri as v_uri,
 						c.language_id as v_language_id,
-						c.associated_db_id as v_associated_db_id, ' . /* c.master_categories_id as v_master_categories_id, */ '
+						c.associated_db_id as v_associated_db_id, ' . *//* c.master_categories_id as v_master_categories_id, */ /*'
 						c.main_page as v_main_page,
 						c.query_string_parameters as v_query_string_parameters,
 						c.associated_db_id as v_associated_db_id,';
-        }
+        }*/
         if (count($custom_fields) > 0) {
           foreach ($custom_fields as $field) {
             $sql .= 'p.' . $field . ' as v_' . $field . ',';
@@ -752,14 +755,15 @@ if (!is_null($_GET['import']) && isset($_GET['import'])) {
                 TABLE_PRODUCTS_TO_CATEGORIES . ' as ptoc,' .
                 TABLE_CATEGORIES . ' as subc,' .
                 TABLE_PRODUCTS . " as p ";
-        if ($ep4CEONURIDoesExist == true) {
+        $zco_notifier->notify('EP4_IMPORT_PRODUCT_DEFAULT_SELECT_TABLES');
+/*        if ($ep4CEONURIDoesExist == true) {
           $filenamelist = implode("','", $ceon_uri_mapping_product_pages);
           $sql .= " LEFT JOIN " . TABLE_CEON_URI_MAPPINGS . " as c 
 						ON 
 						p.products_id = c.associated_db_id AND
 						c.main_page IN ('" . $filenamelist . "') AND
 						c.current_uri = '1' ";
-        }
+        }*/
         $sql .= "WHERE
 					p.products_id      = ptoc.products_id AND
 					ptoc.categories_id = subc.categories_id AND ";
@@ -1073,18 +1077,22 @@ if (!is_null($_GET['import']) && isset($_GET['import'])) {
           } else { // It is set to autoincrement, do not need to fetch max id
             $sql = "INSERT INTO " . TABLE_MANUFACTURERS . " (manufacturers_name, date_added, last_modified)
 							VALUES (:manufacturers_name:, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
-            $sql = $db->bindVars($sql, ':manufacturers_name:', $v_manufacturers_name, 'string');
+            $sql = $db->bindVars($sql, ':manufacturers_name:', ep_4_curly_quotes($v_manufacturers_name), 'string');
             $result = ep_4_query($sql);
             if ($result) {
               zen_record_admin_activity('Inserted manufacturer ' . addslashes($v_manufactureres_name) . ' via EP4.', 'info');
             }
             $v_manufacturers_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment, so can use this function
+        
             // BUG FIX: TABLE_MANUFACTURERS_INFO need an entry for each installed language! chadd 11-14-2011
             // This is not a complete fix, since we are not importing manufacturers_url
             foreach ($langcode as $lang) {
               $l_id = $lang['id'];
               $sql = "INSERT INTO " . TABLE_MANUFACTURERS_INFO . " (manufacturers_id, languages_id, manufacturers_url)
-								VALUES ('" . addslashes($v_manufacturers_id) . "'," . (int) $l_id . ",'')"; // seems we are skipping manufacturers url
+								VALUES (:manufacturers_id:, :languages_id:, :manufacturers_url:)"; // seems we are skipping manufacturers url
+              $sql = $db->bindVars($sql, ':manufacturers_id:', $v_manufacturers_id, 'integer');
+              $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
+              $sql = $db->bindVars($sql, ':manufacturers_url:', '', 'string');
               $result = ep_4_query($sql);
               if ($result) {
                 zen_record_admin_activity('Inserted manufacturers info ' . (int) $v_manufacturers_id . ' via EP4.', 'info');
@@ -1257,7 +1265,8 @@ if (!is_null($_GET['import']) && isset($_GET['import'])) {
           } // ( $category_index=0; $category_index<$catego.....
         } // (isset($$v_categories_name_var))
 
-        if ($ep4CEONURIDoesExist == true /* && false */) { // Not sure that this is fully developed yet and if correctly incorporated for use. 
+        $zco_notifier->notify('EP4_IMPORT_AFTER_CATEGORY');
+/*        if ($ep4CEONURIDoesExist == true *//* && false *//*) { // Not sure that this is fully developed yet and if correctly incorporated for use. 
         
           $current_category_id = $v_categories_id;
           $master_category = zen_get_products_category_id($pID);
@@ -1265,13 +1274,13 @@ if (!is_null($_GET['import']) && isset($_GET['import'])) {
           $ceon_uri_mapping_admin->productPreviewProcessSubmission($current_category_id, $v_products_name, $v_products_model, $master_category, $pID); // This is a shortened version of the one below that uses data setup from an earlier run and not updated with anything else captured above...  Ideally, the data collected from teh file needs to be transferred into the database, which I am not sure has actually happened yet.
           $uri_mappings = $ceon_uri_mapping_admin->_uri_mappings;
           $prev_uri_mappings = $ceon_uri_mapping_admin->_prev_uri_mappings;
-          if (false && true /*|| $need_to_update_uris*/) {
+          if (false && true *//*|| $need_to_update_uris*//*) {
             $ceon_uri_mapping_admin->updateProductHandler($products_id, $zc_products->get_handler($product_type), $prev_uri_mappings, $uri_mappings);
           }
         }
         
 //        $ceon_uri_mapping_admin->productPreviewProcessSubmission($current_category_id, $prev_uri_mappings, $uri_mappings, $uri_mapping_autogen, $products_name, $products_model, $master_category, $pID);
-        $parent_category_id = $theparent_id;
+        $parent_category_id = $theparent_id;*/
         // END: CATEGORIES2 ===============================================================================================	
         // HERE ==========================>
         // BEGIN: record_artists
