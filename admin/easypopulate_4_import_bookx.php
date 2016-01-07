@@ -37,7 +37,6 @@
  $edit_link = "<a href=" . zen_href_link('product_bookx.php','cPath='. zen_get_product_path($v_products_id) . '&product_type='. $bookx_product_type .'&pID='. $v_products_id .'&action=new_product') . ">". EASYPOPULATE_4_BOOKX_EDIT_LINK . "</a>";
  //
  
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //::: BOOKX GENRE
 if (isset($filelayout['v_bookx_genre_name']) ) {	
 	if (isset($v_bookx_genre_name) /*&& ($v_bookx_genre_name !=='')*/ && (mb_strlen($v_bookx_genre_name) <= $bookx_genre_name_max_len) ) {
@@ -139,8 +138,6 @@ if (isset($filelayout['v_bookx_publisher_name']) ) {
 		$v_publisher_id = 0; 
 	}
 }// eof Publisher Name
-
-
 
 // Series Names 
 if (isset($filelayout['v_bookx_series_name']) ) {
@@ -288,6 +285,7 @@ if (isset($filelayout['v_bookx_imprint_name']) ) {
 						last_modified = CURRENT_TIMESTAMP
 						WHERE bookx_imprint_id = '".$v_imprint_id."'";
 						$result = ep_4_query($sql);
+
 						if ($result) {
 								//	zen_record_admin_activity('Updated imprints  ' . (int)$v_imprint_id . ' via EP4.', 'info');
 						}
@@ -314,7 +312,7 @@ if (isset($filelayout['v_bookx_imprint_name']) ) {
 		}
 		$v_imprint_id = 0; 
 	}
-}// eof Publisher Name
+}// eof 
 
 
 
@@ -323,15 +321,18 @@ if (isset($filelayout['v_bookx_author_type']) ) {
 
 
 	if (($v_bookx_author_type != '') && (mb_strlen($v_bookx_author_type) <= $bookx_author_types_name_max_len) ) {
-		$sql = "SELECT bookx_author_type_id AS author_typeID FROM ".TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION." WHERE type_description ='".addslashes(ep_4_curly_quotes($v_bookx_author_type))."' LIMIT 1";
 
+		$sql = "SELECT bookx_author_type_id AS author_typeID FROM ".TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION." WHERE type_description ='".addslashes(ep_4_curly_quotes($v_bookx_author_type))."' LIMIT 1";
 		$result = ep_4_query($sql);
+
 			if ( $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) { //update			
 				
 				$v_author_type_id = $row['author_typeID']; // Goes to authors default_type
 				
-				$sql = "UPDATE ".TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION." SET languages_id = '".$epdlanguage_id."', type_description = '".addslashes(ep_4_curly_quotes($v_bookx_author_type))."' WHERE bookx_author_type_id = '".$v_author_type_id."'";
-				$result = ep_4_query($sql);				
+				//$sql_update = "UPDATE ".TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION." SET languages_id = '".$epdlanguage_id."', type_description = '".addslashes(ep_4_curly_quotes($v_bookx_author_type))."' WHERE bookx_author_type_id = '".$v_author_type_id."'";
+				// @todo Check if this is correct to avoid the MySQLi error 1062: Duplicate entry '2-1' for key 'PRIMARY'
+				$sql_update = "UPDATE ".TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION." SET languages_id = '".$epdlanguage_id."', type_description = '".addslashes(ep_4_curly_quotes($v_bookx_author_type))."' WHERE type_description = '".addslashes(ep_4_curly_quotes($v_bookx_author_type))."'";
+				$result_update = ep_4_query($sql_update);			
 			}
 			else  {
 				$sql_author_type_id = ep_4_query("INSERT INTO ".TABLE_PRODUCT_BOOKX_AUTHOR_TYPES." (type_sort_order) VALUES (0)");
