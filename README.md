@@ -5,10 +5,11 @@ to import Bookx fields by CSV - tested with Zencart 1.5.4
  * @version  0.9.0 - **Still in development, make your changes in a local environment**
  * @see Bookx module for ZenCart
  * Contribution by: @mesnitu
+ * Special thanks to @joaosantacruz for putting me in the right track
 
 ### Note : Still under heavy tests 
 >This are some initial files, that already import BookX fields, but isn't yet suitable in a production enviroment. A lot of testings and ideias going on.
-It stills **only supports the default language**, and the ability to assing multiple authors and genres are on todo list, but not yet implemented.
+It still **only supports the default language**, and the ability to assing multiple authors and genres are on todo list, but not yet implemented.
 
 
 ### Quick review : 
@@ -38,12 +39,10 @@ For now, this are the supported fields (just the names, no description yet)
 
 ### Installation
 
-* Install EasyPopulate as you would. 
+* Install EasyPopulate as you would, with the included files for BookX
 * Enable Bookx fields in EP configuration page.
 * You can assign a fallback genre, or leave it blank (default: General) 
  
-
-
 ### Use it (still in idea stage)
 
 In EP4 configuration page, you may give a default genre. I've done so, cause in my personal use, there are a lot of books that actually goes into a general genre, so I don't have to wright then down, but mainly, because if genre or author is empty, it wont be on BookX filter. So just this is a just in case measure. 
@@ -55,15 +54,23 @@ If you already know EP4, the procedures are the same. You'll download the **Comp
 Make your changes, and reupload them. 
 
 At upload, if empty fields are found, such as authors, publishers, etc... a report is generated (still working on it ), with edit link to the the book.
-I found that there's no need to skip fields, but instead, insert them, and have the possibility to have a more visual way to know witch fields are missing and were.
-####Removing Books with EPBookx
-EP4Bookx uses status 10 (same as 9 in EP4), but changed to remove bookx fields associated with the products.
+I found that there's no need to skip this empty fields, but instead, insert them, and have the possibility to have a more visual way to know witch fields are missing and were.
+
+#### Removing Books with EPBookx
+EP4Bookx uses status 10 (same as 9 in EP4), but changed to remove BookX associated fields with the products.
 So you would do v_status 10, to remove books.
 
+### Know Issues 
+If you've never worked with this csv importers , be aware that "Author A" it's different than "Autor A ", or even more spaces of garbage, that sometimes are present in excel, calc, csv files.
+e.g : The image below shows such a case 
+
+![Garbage spaces](https://dl.dropboxusercontent.com/u/2355051/errors.png)
+
+For now, this author is skipped, because it exceeds the maximum characters length, permitted in the data base.
+A report is generated, so you can fix this entry, however, it’s always good practice to check, and re-check the csv file, before importing. 
 
  ## Todo  
  - [ ]  export /import with support for languages
  - [ ]  export /import assinged multiple authors
  - [ ]  export /import assigned multiple genres
- - [ ]  Se
  
