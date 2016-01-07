@@ -1204,7 +1204,7 @@ if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolo
                  * @EP4Bookx 3 of 4
                  */
 				elseif (isset($v_bookx_genre_name) || isset($v_bookx_isbn) ) {
-					$v_products_type = 6; // 6 = Bookkx
+					$v_products_type = $bookx_product_type; 
 				}
 				//ends ep4bookx
 				else {

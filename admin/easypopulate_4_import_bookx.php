@@ -34,7 +34,7 @@
  * Edit link to books with missing fields
  * @var link
  */
- $edit_link = "<a href=" . zen_href_link('product_bookx.php','cPath='. zen_get_product_path($v_products_id) . '&product_type=6&pID='. $v_products_id .'&action=new_product') . ">". EASYPOPULATE_4_BOOKX_EDIT_LINK . "</a>";
+ $edit_link = "<a href=" . zen_href_link('product_bookx.php','cPath='. zen_get_product_path($v_products_id) . '&product_type='. $bookx_product_type .'&pID='. $v_products_id .'&action=new_product') . ">". EASYPOPULATE_4_BOOKX_EDIT_LINK . "</a>";
  //
  
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -12,7 +12,7 @@
  */
 
 // From TABLE_PRODUCT_BOOKX_EXTRA
-if ($row['v_products_type'] == '6') {
+if ($row['v_products_type'] == $bookx_product_type) {
 
 
 if (isset($filelayout['v_bookx_isbn'])) {
@@ -162,29 +162,33 @@ if (isset($filelayout['v_bookx_author_name']))  {
 
 	$sql = ep_4_query("SELECT * FROM ".TABLE_PRODUCT_BOOKX_AUTHORS_TO_PRODUCTS." WHERE products_id = '".$row['v_products_id']."' LIMIT 5");
 	$row_bookx_authors_to_products = ($ep_uses_mysqli ? mysqli_fetch_array($sql) : mysql_fetch_array($sql));
-	 
+	//pr($row_bookx_authors_to_products);
+	// Get the Author Type Descritpion 
+	//$bookx_author_type = $row_bookx_authors_to_products['bookx_author_type_id'];
+
 	if (($row_bookx_authors_to_products['bookx_author_id'] != '0') && ($row_bookx_authors_to_products['bookx_author_id'] != '')) { // '0' is correct, but '' NULL is possible
 
 		$sql_authors_name = ep_4_query ("SELECT * FROM ".TABLE_PRODUCT_BOOKX_AUTHORS." WHERE bookx_author_id = '".$row_bookx_authors_to_products['bookx_author_id']."' LIMIT 5");
 			$row_bookx_authors_name  = ($ep_uses_mysqli ? mysqli_fetch_array($sql_authors_name ) : mysql_fetch_array($sql_authors_name ));
+			pr($row_bookx_authors_name);
+			//die();
 		$row['v_bookx_author_name'] = $row_bookx_authors_name['author_name'];
 
-	} else {
-		$row['v_bookx_author_name'] = '';
-		}
+    } else {         
+    	$row['v_bookx_author_name'] = '';     
+    }
 }
-
 
  /**
   * Bookx Author Type
   * use the Bookx function to get the type
   */
-if (isset($filelayout['v_bookx_author_type']) && ($row_bookx_authors_name['author_default_type'] != '0') && ($row_bookx_authors_name['author_default_type'] != '')) { // '0' is correct, but '' NULL is possible
-echo $author_default_type_id;
- $row['v_bookx_author_type'] = bookx_get_author_type_description($row_bookx_authors_to_products['bookx_author_type_id'], $epdlanguage_id);
-}	else {
-	$row['v_bookx_author_type'] = '';
-}
+	if (isset($filelayout['v_bookx_author_type']) && ($row_bookx_authors_name['author_default_type'] != '0') && ($row_bookx_authors_name['author_default_type'] != '')) { // '0' is correct, but '' NULL is possible
+		
+			$row['v_bookx_author_type'] = bookx_get_author_type_description($row_bookx_authors_to_products['bookx_author_type_id'], $epdlanguage_id);
+	}	else {
+			$row['v_bookx_author_type'] = '';
+		}
 			
 
 } //ends product bookx export
