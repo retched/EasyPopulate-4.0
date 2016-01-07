@@ -34,6 +34,11 @@ $ep_music         = (int)EASYPOPULATE_4_CONFIG_MUSIC_DATA; // 0-Disable, 1-Enabl
 $ep_bookx         = (int)EASYPOPULATE_4_CONFIG_BOOKX_DATA; // 0-Disable, 1-Enable
 $ep_bookx_fallback_genre_name = EASYPOPULATE_4_CONFIG_BOOKX_DEFAULT_GENRE_NAME; 
 
+if ($ep_bookx = 1) {
+	$sql = "SELECT type_id FROM ".TABLE_PRODUCT_TYPES." WHERE type_handler= 'product_bookx'";
+	$result = $db->Execute($sql);
+	$bookx_product_type = $result->fields['type_id'];
+}
 
 /**
  * [$bookx_reports description]
@@ -189,8 +194,7 @@ if ( ($collation == 'utf8') && ((substr($project,0,5) == "1.3.8") || (substr($pr
 	$products_url_max_len = $products_url_max_len/3;
 	$artists_name_max_len = $artists_name_max_len/3;
 	$record_company_name_max_len = $record_company_name_max_len/3;
-	$music_genre_name_max_len = $music_genre_name_max_len/3;
-        
+	$music_genre_name_max_len = $music_genre_name_max_len/3;   
     /**
      * @EP4Bookx
      */
@@ -204,7 +208,6 @@ if ( ($collation == 'utf8') && ((substr($project,0,5) == "1.3.8") || (substr($pr
     $bookx_condition_name_max_len = $bookx_condition_name_max_len/3;
     $bookx_imprint_name_max_len = $bookx_imprint_name_max_len/3;
     $bookx_subtitle_max_len = $bookx_subtitle_max_len/3;
-    //::::::::::::::::::::::::::
         
 }
 
