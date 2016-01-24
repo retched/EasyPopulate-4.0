@@ -35,7 +35,6 @@
  * @var link
  */
  $edit_link = "<a href=" . zen_href_link('product_bookx.php','cPath='. zen_get_product_path($v_products_id) . '&product_type='. $bookx_product_type .'&pID='. $v_products_id .'&action=new_product') . ">". EASYPOPULATE_4_BOOKX_EDIT_LINK . "</a>";
- //
  
 //::: BOOKX GENRE
 if (isset($filelayout['v_bookx_genre_name']) ) {	
