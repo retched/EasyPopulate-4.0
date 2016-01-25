@@ -474,7 +474,7 @@ if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA == true) {
 			p.metatags_products_name_status as v_metatags_products_name_status,
 			p.metatags_model_status         as v_metatags_model_status,
 			p.metatags_price_status         as v_metatags_price_status,
-			p.metatags_title_tagline_status as v_metatags_title_tagline_status 
+			p.metatags_title_tagline_status as v_metatags_title_tagline_status
 			FROM '
 			.TABLE_PRODUCTS.' as p,'
 			.TABLE_CATEGORIES.' as subc,'
@@ -1399,27 +1399,6 @@ function register_globals_vars_check_4 () {
 	print "_REQUEST: "; print_r($_REQUEST); echo '<br /><br />';
 	global $HTTP_POST_FILES;
 	print "HTTP_POST_FILES: "; print_r($HTTP_POST_FILES); echo '<br />';
-}
-
-
-/**
- * @EP4BookX
- */
-
-/**
- * @todo Returns only the filds used in bookx layout config
- * @param  [config] $config [ex: SHOW_PRODUCT_BOOKX_LISTING_PUBLISHER]
- * @return bolean         
- */
-function ep_4_get_bookx_layout_config ($config) {
-global $db;
-$sql = $db->Execute("SELECT '".$config."' AS config  FROM ".TABLE_PRODUCT_TYPE_LAYOUT." WHERE product_type_id = 6");
-if(!$sql->EOF) {
-		return ($sql->fields['configuration_value']);
-	} else {
-		return null;
-	}
-
 }
 
 function pr ($var,$title = null) {
