@@ -1,40 +1,40 @@
-<?php
+<?php 
 // $Id: easypopulate_4.php, v4.0.21 06-01-2012 chadderuski $
 
 // $display_output defines
 
 // file uploads display - output via $display_output
-define('EASYPOPULATE_4_DISPLAY_SPLIT_LOCATION','You can also download your split files from your %s directory<br />');
-define('EASYPOPULATE_4_DISPLAY_HEADING','<br /><h3><u>Import Results</u></h3><br />');
-define('EASYPOPULATE_4_DISPLAY_UPLOADED_FILE_SPEC','<p class=smallText>File uploaded.<br />Temporary filename: %s<br /><b>User filename: %s</b><br />Size: %s<br />'); // open paragraph
-define('EASYPOPULATE_4_DISPLAY_LOCAL_FILE_SPEC','<p class=smallText><b>Filename: %s</b><br />'); // open paragraph
+define('EASYPOPULATE_4_DISPLAY_SPLIT_LOCATION', 'You can also download your split files from your %s directory<br />');
+define('EASYPOPULATE_4_DISPLAY_HEADING', '<br /><h3><u>Import Results</u></h3><br />');
+define('EASYPOPULATE_4_DISPLAY_UPLOADED_FILE_SPEC', '<p class=smallText>File uploaded.<br />Temporary filename: %s<br /><b>User filename: %s</b><br />Size: %s<br />'); // open paragraph
+define('EASYPOPULATE_4_DISPLAY_LOCAL_FILE_SPEC', '<p class=smallText><b>Filename: %s</b><br />'); // open paragraph
 
 // upload results display - output via $display_output
-define('EASYPOPULATE_4_DISPLAY_RESULT_DELETED','<br /><font color="fuchsia"><b>DELETED! - Model:</b> %s</font> - GENRE: %s');
-define('EASYPOPULATE_4_DISPLAY_RESULT_DELETE_NOT_FOUND','<br /><font color="darkviolet"><b>NOT FOUND! - Model:</b> %s - cant delete...</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_DELETED', '<br /><font color="fuchsia"><b>DELETED! - Model:</b> %s</font> - GENRE: %s');
+define('EASYPOPULATE_4_DISPLAY_RESULT_DELETE_NOT_FOUND', '<br /><font color="darkviolet"><b>NOT FOUND! - Model:</b> %s - cant delete...</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NOT_FOUND', '<br /><font color="red"><b>SKIPPED! - Model:</b> %s - No category provided for this%s product</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Model:</b> %s - Category name: "%s" exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_URL_LONG','<br /><font color="red"><b>WARNING! - Model:</b> %s - URL: "%s" exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_MANUFACTURER_NAME_LONG','<br /><font color="red"><b>MANUFACTURER SKIPPED! - Manufacturer:</b> %s - Manufacturer name exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_MODEL_LONG','<br /><font color="red"><b>SKIPPED! - Model: </b>%s - Products model exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG','<br /><font color="red"><b>WARNING! - Model: </b>%s - Products name: "%s" exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Model:</b> %s - Category name: "%s" exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_URL_LONG', '<br /><font color="red"><b>WARNING! - Model:</b> %s - URL: "%s" exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_MANUFACTURER_NAME_LONG', '<br /><font color="red"><b>MANUFACTURER SKIPPED! - Manufacturer:</b> %s - Manufacturer name exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_MODEL_LONG', '<br /><font color="red"><b>SKIPPED! - Model: </b>%s - Products model exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG', '<br /><font color="red"><b>WARNING! - Model: </b>%s - Products name: "%s" exceeds max. length: %s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT', '<br /><font color="green"><b>NEW PRODUCT! - Model:</b> %s</font> | ');
 define('EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT_FAIL', '<br /><font color="red"><b>ADD NEW PRODUCT FAILED! - Model:</b> %s - SQL error. Check Easy Populate error log in uploads directory</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT', '<br /><font color="mediumblue"><b>UPDATED! - Model:</b> %s</font> | ');
 define('EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT_FAIL', '<br /><font color="red"><b>UPDATE PRODUCT FAILED! - Model:</b> %s - SQL error. Check Easy Populate error log in uploads directory</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_NO_MODEL', '<br /><font color="red"><b>No model field in record. This line was not imported</b></font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_COMPLETE','<br /><b>Upload Complete</b></p>'); // close paragraph above
-define('EASYPOPULATE_4_DISPLAY_RESULT_ARTISTS_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Artist Name:</b> %s - exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_RECORD_COMPANY_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Record Company Name:</b> %s - exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_MUSIC_GENRE_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Music Genre Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_COMPLETE', '<br /><b>Upload Complete</b></p>'); // close paragraph above
+define('EASYPOPULATE_4_DISPLAY_RESULT_ARTISTS_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Artist Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_RECORD_COMPANY_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Record Company Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_MUSIC_GENRE_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Music Genre Name:</b> %s - exceeds max. length: %s</font>');
 
 // $messageStack defines
 // checks - msg stack alerts - output via $messageStack
-define('EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_MISSING','<b>Easy Populate "Uploads Folder" missing!</b><br />Your uploads folder is missing. Your configuration indicates that your uploads folder is named <b>%s</b>, and is located in <b>%s</b>.<br>');
-define('EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_NOT_WRITABLE','<b>Easy Populate "Uploads Folder" is not writable!</b><br />Your uploads folder is not writable. Folder permissions for <b>%s</b> must be "777" or "755" depending on your server setup.<br>You must correct folder permissions before contining.<br>');
-define('EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_PERMISSIONS_SUCCESS','Easy Populate successfully adjusted the permissions on your uploads folder! You can now upload files using Easy Populate...');
-define('EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_PERMISSIONS_SUCCESS_777','Easy Populate successfully adjusted the permissions on your uploads folder, but the folder is now publically viewable. Please ensure that you added the index.html file to this directory to prevent public browsing/downloading of your Easy Populate files.');
-define('EASYPOPULATE_4_MSGSTACK_MODELSIZE_DETECT_FAIL','Easy Populate cannot determine the maximum size permissible for the products_model field in your products table. Please ensure that the length of your model data field does not exceed the Zen Cart default value of 32 characters for any given product. Failure to heed this warning may have unintended consequences for your data.');
+define('EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_MISSING', '<b>Easy Populate "Uploads Folder" missing!</b><br />Your uploads folder is missing. Your configuration indicates that your uploads folder is named <b>%s</b>, and is located in <b>%s</b>.<br>');
+define('EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_NOT_WRITABLE', '<b>Easy Populate "Uploads Folder" is not writable!</b><br />Your uploads folder is not writable. Folder permissions for <b>%s</b> must be "777" or "755" depending on your server setup.<br>You must correct folder permissions before contining.<br>');
+define('EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_PERMISSIONS_SUCCESS', 'Easy Populate successfully adjusted the permissions on your uploads folder! You can now upload files using Easy Populate...');
+define('EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_PERMISSIONS_SUCCESS_777', 'Easy Populate successfully adjusted the permissions on your uploads folder, but the folder is now publically viewable. Please ensure that you added the index.html file to this directory to prevent public browsing/downloading of your Easy Populate files.');
+define('EASYPOPULATE_4_MSGSTACK_MODELSIZE_DETECT_FAIL', 'Easy Populate cannot determine the maximum size permissible for the products_model field in your products table. Please ensure that the length of your model data field does not exceed the Zen Cart default value of 32 characters for any given product. Failure to heed this warning may have unintended consequences for your data.');
 define('EASYPOPULATE_4_MSGSTACK_ERROR_SQL', 'An SQL error has occured. Please check your input data for tabs within fields and delete these. If this error continues, please forward your error log to the Easy Populate maintainer');
 define('EASYPOPULATE_4_MSGSTACK_DROSS_DELETE_FAIL', '<b>Deleting of product data debris failed!</b> Please see the debug log in your uploads directory for further information.');
 define('EASYPOPULATE_4_MSGSTACK_DROSS_DELETE_SUCCESS', 'Deleting of product data debris succeeded!');
@@ -42,11 +42,11 @@ define('EASYPOPULATE_4_MSGSTACK_DROSS_DETECTED', '<b>%s partially deleted produc
 define('EASYPOPULATE_4_MSGSTACK_DATE_FORMAT_FAIL', '%s is not a valid date format. If you upload any date other than raw format (such as from Excel) you will mangle your dates. Please fix this by correcting your date format in the Easy Populate config.');
 
 // install - msg stack alerts - output via $messageStack
-define('EASYPOPULATE_4_MSGSTACK_INSTALL_DELETE_SUCCESS','Redundant file <b>%s</b> was deleted from <b>YOUR_ADMIN%s</b> directory.');
-define('EASYPOPULATE_4_MSGSTACK_INSTALL_DELETE_FAIL','Easy Populate was unable to delete redundant file <b>%s</b> from <b>YOUR_ADMIN%s</b> directory. Please delete this file manually.');
-define('EASYPOPULATE_4_MSGSTACK_INSTALL_CHMOD_FAIL','<b>Please run the Easy Populate install again after fixing your uploads directory problem.</b>');
-define('EASYPOPULATE_4_MSGSTACK_INSTALL_CHMOD_SUCCESS','<b>Configuration Variables Installation Successfull!</b>');
-define('EASYPOPULATE_4_MSGSTACK_INSTALL_KEYS_FAIL','<b>Easy Populate Configuration Missing.</b>  Please install your configuration by clicking %sInstall EP4%s');
+define('EASYPOPULATE_4_MSGSTACK_INSTALL_DELETE_SUCCESS', 'Redundant file <b>%s</b> was deleted from <b>YOUR_ADMIN%s</b> directory.');
+define('EASYPOPULATE_4_MSGSTACK_INSTALL_DELETE_FAIL', 'Easy Populate was unable to delete redundant file <b>%s</b> from <b>YOUR_ADMIN%s</b> directory. Please delete this file manually.');
+define('EASYPOPULATE_4_MSGSTACK_INSTALL_CHMOD_FAIL', '<b>Please run the Easy Populate install again after fixing your uploads directory problem.</b>');
+define('EASYPOPULATE_4_MSGSTACK_INSTALL_CHMOD_SUCCESS', '<b>Configuration Variables Installation Successfull!</b>');
+define('EASYPOPULATE_4_MSGSTACK_INSTALL_KEYS_FAIL', '<b>Easy Populate Configuration Missing.</b>  Please install your configuration by clicking %sInstall EP4%s');
 
 // file handling - msg stack alerts - output via $messageStack
 define('EASYPOPULATE_4_MSGSTACK_FILE_EXPORT_SUCCESS', 'File <b>%s.csv</b> successfully exported! The file is ready for download in your /%s directory.');
@@ -63,15 +63,15 @@ define('EASYPOPULATE_4_SPECIALS_FOOTER', '</p>'); // close paragraph
 
 define('EP_DESC_PLURAL', 'They');
 define('EP_DESC_SING', 'It');
-define('FEATURED_EP_DESC','Prefix: %1$s. %2$s will be processed through the featured filters.');
-define('PRICEQTY_EP_DESC','Prefix: %1$s. %2$s will be processed through the Price Quantity filters.');
-define('PRICEBREAKS_EP_DESC','Prefix: %1$s. %2$s will be processed through the Price Breaks filters.');
-define('CATEGORY_EP_DESC','Prefix: %1$s. %2$s will be processed through the Category filters.');
-define('CATEGORYMETA_EP_DESC','Prefix: %1$s. %2$s will be processed through the Category Meta filters.');
-define('ATTRIB_BASIC_EP','Prefix: %1$s. %2$s will be processed through the Basic Attribute filters.');
-define('ATTRIB_DETAILED_EP_DESC','Prefix: %1$s. %2$s will be processed through the Detailed Attributes filters.');
-define('SBA_DETAILED_EP_DESC','Prefix: %1$s. %2$s will be processed through the Detailed Stock by Attributes filters.');
-define('SBA_STOCK_EP_DESC','Prefix: %1$s. %2$s will be processed through the Stock by Attributes Stock Modification filters.');
+define('FEATURED_EP_DESC', 'Prefix: %1$s. %2$s will be processed through the featured filters.');
+define('PRICEQTY_EP_DESC', 'Prefix: %1$s. %2$s will be processed through the Price Quantity filters.');
+define('PRICEBREAKS_EP_DESC', 'Prefix: %1$s. %2$s will be processed through the Price Breaks filters.');
+define('CATEGORY_EP_DESC', 'Prefix: %1$s. %2$s will be processed through the Category filters.');
+define('CATEGORYMETA_EP_DESC', 'Prefix: %1$s. %2$s will be processed through the Category Meta filters.');
+define('ATTRIB_BASIC_EP', 'Prefix: %1$s. %2$s will be processed through the Basic Attribute filters.');
+define('ATTRIB_DETAILED_EP_DESC', 'Prefix: %1$s. %2$s will be processed through the Detailed Attributes filters.');
+define('SBA_DETAILED_EP_DESC', 'Prefix: %1$s. %2$s will be processed through the Detailed Stock by Attributes filters.');
+define('SBA_STOCK_EP_DESC', 'Prefix: %1$s. %2$s will be processed through the Stock by Attributes Stock Modification filters.');
 define('CATCHALL_EP_DESC', 'This contains any other file. %2$s will be processed like the upload of a full data file.');
 
 // error log defines - for ep_debug_log.txt
@@ -85,24 +85,28 @@ define('EASYPOPULATE_4_DISPLAY_EXEC_TIME', 'Execution Time: ');
 define('EASYPOPULATE_4_DISPLAY_ENABLE_META', 'Enable Products Metatags: ');
 define('EASYPOPULATE_4_DISPLAY_ENABLE_MUSIC', 'Enable Products Music: ');
 
-
-
 /**
- * @EP4 - Bookx
+ * Import file for EP4 
+ * @EP4Bookx - EP4 CSV fork to import Bookx fields - tested with Zencart 1.5.4
+ *
+ * @version  0.9.9 - Still in development, make your changes in a local environment
+ * @see Bookx module for ZenCart
+ * @see Readme-EP4Bookx
+ * @author mesnitu
  */
 
-define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_AUTHOR_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Author Name:</b> %s - exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_AUTHOR_TYPES_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Author Type Name:</b> %s - exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_PUBLISHER_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Publisher Name:</b> %s - exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_GENRE_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Genre Name:</b> %s - exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_BINDING_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Binding Name:</b> %s - exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_SERIES_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Series Name:</b> %s - exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_PRINTING_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Printing Name:</b> %s - exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_CONDITION_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Condition Name:</b> %s - exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_IMPRINT_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Book Imprint Name:</b> %s - exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_SUBTITLE_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Bookx Subtitle:</b> %s - exceeds max. length: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_DELETED','<br /><font color="fuchsia"><b>DELETED! - Model:</b> %s, - ISBN: %s</font>');
-define('EASYPOPULATE_4_DISPLAY_BOOKX_REPORTS_BOOKX_HEADER', '<h3>BOOKX MISSING FIELDS</h3>'); 
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_AUTHOR_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Book Author Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_AUTHOR_TYPES_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Author Type Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_PUBLISHER_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Book Publisher Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_GENRE_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Book Genre Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_BINDING_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Book Binding Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_SERIES_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Book Series Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_PRINTING_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Book Printing Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_CONDITION_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Book Condition Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_IMPRINT_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Book Imprint Name:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_SUBTITLE_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Bookx Subtitle:</b> %s - exceeds max. length: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_DELETED', '<br /><font color="fuchsia"><b>DELETED! - Model:</b> %s, - ISBN: %s</font>');
+define('EASYPOPULATE_4_DISPLAY_BOOKX_REPORTS_BOOKX_HEADER', '<h3>BOOKX MISSING FIELDS</h3>');
 
 define('EASYPOPULATE_4_BOOKX_EDIT_LINK', 'Edit');
 
@@ -110,3 +114,35 @@ define('EASY_POPULATE_4_BOOKX_DISPLAY_DEFAULT_GENRE_NAME', 'Fallback Genre: ');
 //define('EASYPOPULATE_4_CONFIG_BOOKX_DEFAULT_GENRE_NAME', 'Fallback Genre');
 define('EASY_POPULATE_4_BOOKX_DEFAULT_PUBLISHER_NAME', 'General Publisher');
 define('EASYPOPULATE_4_DISPLAY_ENABLE_BOOKX', 'Enable Bookx Products: ');
+
+/*
+ * @Reports - Temporary variables to define which bookx fields are to report
+ * Temporary variables to define which fields are generated in the report links. As in Zencart it is required to edit the files,  * possibly there's no need to create these fields in the database, and thus interfere less with the core EP4. 
+ */
+// true - reports ; false - Doesn't Report
+$report_bookx_subtitle = false;
+$report_bookx_genre_name = false;
+$report_bookx_publisher_name = false;
+$report_bookx_series_name = false;
+$report_bookx_imprint_name = false;
+$report_bookx_binding = false;
+$report_bookx_printing = false;
+$report_bookx_condition = true;
+$report_bookx_isbn = false;
+$report_bookx_size = false;
+$report_bookx_volume = false;
+$report_bookx_pages = false;
+$report_bookx_publishing_date = false;
+$report_bookx_author_name = true;
+$report_bookx_author_type = false;
+
+// Default values for empty fields
+$bookx_default_author_name = 'Various';
+$bookx_default_author_type = 'Writer';
+$bookx_default_printing = 'One Color';
+$bookx_default_binding = '';
+//$bookx_default_genre_name = ''; It's in Backoffice, probably to remove from there
+$bookx_default_publisher_name = '';
+$bookx_default_series_name = '';
+$bookx_default_imprint_name = '';
+$bookx_default_condition = '';
