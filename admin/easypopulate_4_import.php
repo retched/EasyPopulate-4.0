@@ -615,6 +615,7 @@ if ( ( strtolower(substr($file['name'],0,15)) <> "categorymeta-ep") && ( strtolo
 			 * Remove Bookx Produtct
 			 * @todo  Display some books fields aside with the model (ex: title or ISBN)
 			 */
+            //echo "FUNCTION BBB".bookx_count_fields(TABLE_PRODUCT_BOOKX_GENRES_TO_PRODUCTS, $v_products_id);
 			if ($items[$filelayout['v_status']] == 10) {
 				$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_DELETED, $items[$filelayout['v_products_model']],$items[$filelayout['v_bookx_isbn']]);
 				/**

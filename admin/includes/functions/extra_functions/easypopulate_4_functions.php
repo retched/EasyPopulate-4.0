@@ -1,5 +1,6 @@
 <?php
 // $Id: easypopulate_4_functions.php, v4.0.30 06-27-2015 mc12345678 $
+
 /**
  * @EP4Bookx - EP4 CSV fork to import Bookx fields - tested with Zencart 1.5.4
  * @version  0.9.0 - Still in development, make your changes in a local environment
@@ -8,11 +9,8 @@
  *
  * @author mesnitu
  * @todo  export with support for languages
- * @todo  export assinged multiple authors
- * @todo  export assinged multiple genres
  */
-	
-	
+ 	
 function ep_4_curly_quotes($curly_text) {
 	$ep_curly_quotes = (int)EASYPOPULATE_4_CONFIG_CURLY_QUOTES;
 	$ep_char_92 = (int)EASYPOPULATE_4_CONFIG_CHAR_92;
@@ -386,14 +384,9 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 		}
                 
 //* @ALTERED
-// Bookx Info - 23-04-2015
-//:::TABLE_PRODUCT_BOOKX_EXTRA - (product_bookx_extra) => isbn, size,volume,pages,publishing_date, products_id, bookx_publisher_id ,bookx_series_id, bookx_imprint_id, bookx_binding_id, bookx_printing_id ,bookx_condition_id 
-//:::TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION' - (product_bookx_extra_description) => products_subtitle 
-//:::TABLE_PRODUCT_BOOKX_AUTHORS - (product_bookx_authors) => bookx_author_id, author_name, author_default_type
-//:::TABLE_PRODUCT_BOOKX_AUTHOR_TYPES - (product_bookx_author_types) => bookx_author_type_id
-              		
+// Bookx Info - 23-04-2015             		
 if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA == true) {
-	
+	   
         // BOOKX_EXTRA DESCRIPTION
         $filelayout[] = 'v_bookx_subtitle';
 		$filelayout[] = 'v_bookx_genre_name';
@@ -455,6 +448,7 @@ if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA == true) {
 				$filelayout_sql .= 'p.'.$field.' as v_'.$field.',';
 			}
 		}
+        
 		$filelayout_sql .= 'p.products_weight as v_products_weight,
 			p.product_is_call				as v_product_is_call,
 			p.products_sort_order			as v_products_sort_order, 
@@ -1160,14 +1154,17 @@ function ep_4_remove_product_bookx($product_model) {
 	}
 	return;
 }
+
 /**
  * [ep_4_bookx_delete_bookx_specific_product_entries description]
  * @param  [type]  $product_id    [description]
  * @param  boolean $delete_linked [description]
  * @return [type]                 [description]
  */
+ // Probably to delete - not in use 
 function ep_4_bookx_delete_bookx_specific_product_entries($product_id = null, $delete_linked = true) {
   	global $db;
+   
   	if (null != $product_id) {
   		$db->Execute('DELETE FROM ' . TABLE_PRODUCT_BOOKX_EXTRA . '
                       WHERE products_id = "' . (int)$product_id . '"');
@@ -1402,9 +1399,9 @@ function register_globals_vars_check_4 () {
 }
 
 function pr ($var,$title = null) {
-    echo '<pre>';
+    echo '<pre style="background:#ccc;">';
     if ($title):
-    echo '<h4>' . $title. '</h4>';
+    echo '<b>' . $title. ':</b> ';
     endif;
     print_r($var);
     echo '</pre>';
