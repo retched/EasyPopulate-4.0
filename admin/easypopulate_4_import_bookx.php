@@ -218,20 +218,25 @@ if (isset($filelayout['v_bookx_binding'])) {
 //:::: Printing type
 if (isset($filelayout['v_bookx_printing'])) {
     if ($bookx_default_printing !='') {
-        $v_bookx_printing = $bookx_default_printing;
+        $items[$filelayout['v_bookx_printing']] = $bookx_default_printing;
     }
-   
+  
     if (($v_bookx_printing != '') && (mb_strlen($v_bookx_printing) <= $bookx_printing_name_max_len)) {
         $sql = "SELECT bookx_printing_id AS printingID FROM ".TABLE_PRODUCT_BOOKX_PRINTING_DESCRIPTION." WHERE printing_description ='".addslashes(ep_4_curly_quotes($v_bookx_printing))."' LIMIT 1";
         $result = ep_4_query($sql);
+        pr($sql);
+        pr($result);
         if ($row_printing = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) { //update			
             $v_printing_id = $row_printing['printingID']; // Goes to bookx_extra
             $sql = "UPDATE ".TABLE_PRODUCT_BOOKX_PRINTING_DESCRIPTION." SET languages_id = '".$epdlanguage_id."', printing_description = '".addslashes(ep_4_curly_quotes($v_bookx_printing))."' WHERE bookx_printing_id = '".$v_printing_id."'";
+            pr($sql);
             $result = ep_4_query($sql);
         } else {
             $sql_printing_id = ep_4_query("INSERT INTO ".TABLE_PRODUCT_BOOKX_PRINTING." (printing_sort_order) VALUES (0)");
             $v_printing_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment
+             pr($sql_printing_id);
             $sql_printing_name = ep_4_query("INSERT INTO ".TABLE_PRODUCT_BOOKX_PRINTING_DESCRIPTION." (bookx_printing_id, languages_id, printing_description) VALUES ('".$v_printing_id."', '".$epdlanguage_id."','".addslashes(ep_4_curly_quotes($v_bookx_printing))."')");
+              pr($sql_printing_name);
         }
     } else { // Empty printing file fields 		
         if ($v_bookx_printing == '' && $report_bookx_printing == true) {
