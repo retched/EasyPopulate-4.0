@@ -105,8 +105,11 @@ if (isset($filelayout['v_bookx_genre_name'])) {
 //::: Publisher Name
 if (isset($filelayout['v_bookx_publisher_name'])) {
 
-    if ($bookx_default_publisher_name != '' ? $v_bookx_publisher_name = $bookx_default_publisher_name : $v_bookx_publisher_name = '');
-
+    if ($bookx_default_publisher_name != '')  {
+        $v_bookx_publisher_name = $bookx_default_publisher_name;
+    }
+    
+    
     if (isset($v_bookx_publisher_name) && ($v_bookx_publisher_name != '') && (mb_strlen($v_bookx_publisher_name) <= $bookx_publisher_name_max_len)) {
 
         $sql = "SELECT bookx_publisher_id AS publisherID FROM ".TABLE_PRODUCT_BOOKX_PUBLISHERS." WHERE publisher_name = '".addslashes(ep_4_curly_quotes($v_bookx_publisher_name))."' LIMIT 1";
@@ -148,7 +151,9 @@ if (isset($filelayout['v_bookx_publisher_name'])) {
 // Series Names 
 if (isset($filelayout['v_bookx_series_name'])) {
 
-    ($bookx_default_series_name != '' ? $v_bookx_series_name = $bookx_default_series_name : $v_bookx_series_name = '');
+    if ($bookx_default_series_name != '') {
+        $v_bookx_series_name = $bookx_default_series_name;
+    }  
     if (($v_bookx_series_name != '') && (mb_strlen($v_bookx_series_name) <= $bookx_series_name_max_len)) {
 
         $sql_series_name = "SELECT bookx_series_id AS seriesID FROM ".TABLE_PRODUCT_BOOKX_SERIES_DESCRIPTION." WHERE series_name ='".addslashes(ep_4_curly_quotes($v_bookx_series_name))."' LIMIT 1";
@@ -180,7 +185,9 @@ if (isset($filelayout['v_bookx_series_name'])) {
 //:::: Binding Cover type
 if (isset($filelayout['v_bookx_binding'])) {
 
-    ($bookx_default_binding != '' ? $v_bookx_binding = $bookx_default_binding : $v_bookx_binding = '');
+    if($bookx_default_binding != '') {
+        $v_bookx_binding = $bookx_default_binding;
+    }  
 
     if (($v_bookx_binding != '') && (mb_strlen($v_bookx_binding) <= $bookx_binding_name_max_len)) {
 
@@ -210,6 +217,10 @@ if (isset($filelayout['v_bookx_binding'])) {
 
 //:::: Printing type
 if (isset($filelayout['v_bookx_printing'])) {
+    if ($bookx_default_printing !='') {
+        $v_bookx_printing = $bookx_default_printing;
+    }
+   
     if (($v_bookx_printing != '') && (mb_strlen($v_bookx_printing) <= $bookx_printing_name_max_len)) {
         $sql = "SELECT bookx_printing_id AS printingID FROM ".TABLE_PRODUCT_BOOKX_PRINTING_DESCRIPTION." WHERE printing_description ='".addslashes(ep_4_curly_quotes($v_bookx_printing))."' LIMIT 1";
         $result = ep_4_query($sql);
@@ -236,7 +247,10 @@ if (isset($filelayout['v_bookx_printing'])) {
 
 //:::: Book Condition 
 if (isset($filelayout['v_bookx_condition'])) {
-    ($bookx_default_condition != '' ? $v_bookx_condition = $bookx_default_condition : $v_bookx_condition = '');
+    
+    if ($bookx_default_condition !='') {
+        $v_bookx_condition = $bookx_default_condition;
+    }
     if (($v_bookx_condition != '') && (mb_strlen($v_bookx_condition) <= $bookx_condition_name_max_len)) {
         $sql = "SELECT bookx_condition_id AS conditionID FROM ".TABLE_PRODUCT_BOOKX_CONDITIONS_DESCRIPTION." WHERE condition_description ='".addslashes(ep_4_curly_quotes($v_bookx_condition))."' LIMIT 1";
         $result = ep_4_query($sql);
@@ -270,8 +284,10 @@ if (isset($filelayout['v_bookx_condition'])) {
 
 //:::: Book Imprint 
 if (isset($filelayout['v_bookx_imprint_name'])) {
-
-    ($bookx_default_imprint_name != '' ? $v_bookx_imprint_name = $bookx_default_imprint_name : $v_bookx_imprint_name = '');
+     
+     if ($bookx_default_imprint_name !='') {
+        $v_bookx_imprint_name = $bookx_default_imprint_name;
+    }
     if (isset($v_bookx_imprint_name) && ($v_bookx_imprint_name != '') && (mb_strlen($v_bookx_imprint_name) <= $bookx_imprint_name_max_len)) {
         $sql = "SELECT bookx_imprint_id AS imprintID FROM ".TABLE_PRODUCT_BOOKX_IMPRINTS." WHERE imprint_name = '".addslashes(ep_4_curly_quotes($v_bookx_imprint_name))."' LIMIT 1";
         $result = ep_4_query($sql);
