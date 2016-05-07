@@ -592,6 +592,17 @@ function install_easypopulate_4() {
     $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_INSTALL_END', array('group_id' => $group_id));
 }
 
+function update_easypopulate_4() {
+  global $zco_notifier;
+  
+  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_UPDATE_START');
+  
+  // Need to go ahead and install ignore each of the items in the install script (ideally to have this list in one place so no duplication is necessary)
+  // Then need to update the sort order and go ahead and let an outside program follow up.
+  
+  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_UPDATE_END');
+}
+
 function remove_easypopulate_4() {
 	global $db;
 	$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
