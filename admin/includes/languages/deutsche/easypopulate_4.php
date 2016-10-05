@@ -89,6 +89,7 @@ define('EASYPOPULATE_4_ERRORLOG_SQL_ERROR', 'MySQL error %s: %s\nWhen executing:
 define('EASYPOPULATE_4_REMOVE_SETTINGS', 'Easy Populate 4 deinstallieren' );
 define('EASYPOPULATE_4_CONFIG_SETTINGS', 'Konfigurationseinstellungen');
 define('EASYPOPULATE_4_CONFIG_UPLOAD', 'Upload Verzeichnis: ');
+define('EASYPOPULATE_4_UPDATE_SETTINGS', 'Update EP4 Database');
 define('EASYPOPULATE_4_DISPLAY_SPLIT_SHORT', 'Einträge aufteilen: ');
 define('EASYPOPULATE_4_DISPLAY_EXEC_TIME', 'Ausführungszeit: ');
 define('EASYPOPULATE_4_DISPLAY_ENABLE_META', 'Metatags der Artikel aktivieren:  ');

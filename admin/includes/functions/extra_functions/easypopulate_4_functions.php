@@ -641,7 +641,7 @@ function ep_4_query($query) {
 }
 
 function install_easypopulate_4() {
-  global $db, $zco_notifier;
+  global $db, $zco_notifier, $curver_detail;
 	$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
 	if ( (substr($project,0,5) == "1.3.8") || (substr($project,0,5) == "1.3.9") ) {
     // @todo: Should inspect for an existing record and reuse it if available.
@@ -701,10 +701,12 @@ function install_easypopulate_4() {
         ('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '210', NULL, now(), NULL, NULL)");
         $db->Execute("INSERT IGNORE INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
         ('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '220', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
-		");
+    ");
         $db->Execute("INSERT IGNORE INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
-        ('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', 6, '220', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
-		");
+        ('EP4-version', 'TOOLS_EASYPOPULATE_4_VERSION', '" . $curver_detail . "', 'This is the version of EP4 installed.', 6, '70', NULL, now(), NULL, 'zen_cfg_select_option(array(\'" . $curver_detail . "\'),')
+        ON DUPLICATE KEY UPDATE configuration_value = '" . $curver_detail . "', set_function = 'zen_cfg_select_option(array(\'" . $curver_detail . "\'),'
+    ");
+
 	} elseif (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.0') {
 
         $group_check = $db->Execute("SELECT configuration_group_id FROM " . TABLE_CONFIGURATION_GROUP . " WHERE configuration_group_title = 'Easy Populate 4'");
@@ -819,6 +821,13 @@ function install_easypopulate_4() {
 			('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '220', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
 		");
 
+      
+    $db->Execute("INSERT IGNORE INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
+      ('EP4-version', 'TOOLS_EASYPOPULATE_4_VERSION', '" . $curver_detail . "', 'This is the version of EP4 installed.', 6, '70', NULL, now(), NULL, 'zen_cfg_select_option(array(\'" . $curver_detail . "\'),')
+      ON DUPLICATE KEY
+       UPDATE configuration_value = '" . $curver_detail . "', set_function = 'zen_cfg_select_option(array(\'" . $curver_detail . "\'),'
+    ");
+    
 
 	} else { // unsupported version
 		// i should do something here!

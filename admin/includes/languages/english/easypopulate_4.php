@@ -89,6 +89,7 @@ define('EASYPOPULATE_4_ERRORLOG_SQL_ERROR', 'MySQL error %s: %s\nWhen executing:
 define('EASYPOPULATE_4_REMOVE_SETTINGS', 'Un-Install EP4');
 define('EASYPOPULATE_4_CONFIG_SETTINGS', 'Configuration Settings');
 define('EASYPOPULATE_4_CONFIG_UPLOAD', 'Upload Directory: ');
+define('EASYPOPULATE_4_UPDATE_SETTINGS', 'Update EP4 Database');
 define('EASYPOPULATE_4_DISPLAY_SPLIT_SHORT', 'Split Records: ');
 define('EASYPOPULATE_4_DISPLAY_EXEC_TIME', 'Execution Time: ');
 define('EASYPOPULATE_4_DISPLAY_ENABLE_META', 'Enable Products Metatags: ');

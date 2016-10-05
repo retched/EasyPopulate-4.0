@@ -78,17 +78,17 @@ $ep_debug_logging_all = false; // do not comment out.. make false instead
 //$sql_fail_test == true; // used to cause an sql error on new product upload - tests error handling & logs
 /* Test area end */
 
-$curver = '4.0.36.ZC';
+$curver_detail = '4.0.36.ZC';
 $message = '';
 if (IS_ADMIN_FLAG) {
-  $new_version_details = plugin_version_check_for_updates(2069, $curver);
+  $new_version_details = plugin_version_check_for_updates(2069, $curver_detail);
   if ($new_version_details !== FALSE) {
     $message = '<span class="alert">' . ' - NOTE: A NEW VERSION OF THIS PLUGIN IS AVAILABLE. <a href="' . $new_version_details['link'] . '" target="_blank">[Details]</a>' . '</span>';
   }
 }
 
 // Current EP Version - Modded by mc12345678 after Chadd had done so much
-$curver              = $curver . ' - 07-05-2016' . $message;
+$curver              = $curver_detail . ' - 07-05-2016' . $message;
 $display_output = ''; // results of import displayed after script run
 $ep_dltype = NULL;
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
@@ -158,7 +158,7 @@ if (EASYPOPULATE_4_CONFIG_TEMP_DIR === 'EASYPOPULATE_4_CONFIG_TEMP_DIR' && (is_n
 }
 
 // installation start
-if (!is_null($_GET['epinstaller']) && isset($_GET['epinstaller']) && $_GET['epinstaller'] == 'install') {
+if (!is_null($_GET['epinstaller']) && isset($_GET['epinstaller']) && ($_GET['epinstaller'] == 'install' || $_GET['epinstaller'] == 'update')) {
   install_easypopulate_4(); // install new configuration keys
   //$messageStack->add(EASYPOPULATE_4_MSGSTACK_INSTALL_CHMOD_SUCCESS, 'success');
   zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
@@ -358,7 +358,31 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
          <?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?>
       <div class="pageHeading"><?php echo "Easy Populate $curver"; ?></div>
 
-      <div style="text-align:right; float:right; width:25%"><a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'epinstaller=remove') ?>"><?php echo EASYPOPULATE_4_REMOVE_SETTINGS; ?></a>
+
+      <div style="text-align:right; float:right; width:25%"><?php 
+      $update = false;
+      if (!defined('TOOLS_EASYPOPULATE_4_VERSION')) { // database does not have key
+        $group_check = $db->Execute("SELECT configuration_group_id FROM " . TABLE_CONFIGURATION_GROUP . " WHERE configuration_group_title = 'Easy Populate 4'");
+
+        // But EP4 is already installed
+        if (!$group_check->EOF && $group_check->RecordCount() > 0 && $group_check->fields['configuration_group_id'] > 0) {
+          $update = true;
+        }
+        unset($group_check);
+      } else {
+        // If EP4 is installed, is not to the version available on ZC, current version is not the same as the software version (allows an upgrade or a downgrade, but downgrade won't remove admin settings).
+        if (plugin_version_check_for_updates(2069, $curver_detail) !== FALSE && plugin_version_check_for_updates(2069, TOOLS_EASYPOPULATE_4_VERSION) !== FALSE && $curver_detail !== TOOLS_EASYPOPULATE_4_VERSION) {
+          $update = true;
+        }
+        if (plugin_version_check_for_updates(2069, $curver_detail) === FALSE && plugin_version_check_for_updates(2069, TOOLS_EASYPOPULATE_4_VERSION) !== FALSE) {
+          $update = true;
+        }
+      }
+      if ($update) { ?>
+      <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'epinstaller=update') ?>"><?php echo EASYPOPULATE_4_UPDATE_SETTINGS; ?></a><br /><br />
+<?php } 
+      unset($update); 
+      ?><a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'epinstaller=remove') ?>"><?php echo EASYPOPULATE_4_REMOVE_SETTINGS; ?></a>
            <?php
            echo '<br /><b><u>' . EASYPOPULATE_4_CONFIG_SETTINGS . '</u></b><br />';
            echo EASYPOPULATE_4_CONFIG_UPLOAD . '<b>' . (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ 'catalog/' : /* Admin side */ 'admin/') . $tempdir . '</b><br />';

@@ -348,4 +348,7 @@
                                         Added German installation instructions.
 4.0.36.ZC                       Updated the curver to reflect the latest version that might be identified by other
                                         users that perhaps previously downloaded 4.0.36.a from github.
-                                        
+                                Improved the upgrade process by allowing database upgrade without having to 
+                                        remove all of the settings.  Now under certain conditions an upgrade link
+                                        appears in the upper right hand corner when applicable.  Otherwise, can also
+                                        activate manually like "always".
