@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4_export.php, v4.0.37 11-27-2016 mc12345678 $
+// $Id: easypopulate_4_export.php, v4.0.37 02-08-2017 mc12345678 $
 
 if (!defined('IS_ADMIN_FLAG')) {
   die('Illegal Access');
@@ -48,7 +48,7 @@ if ($ep_dltype == 'fullsingle') {
     $sql_filter .= ' AND p.master_categories_id = ptoc.categories_id'; // Complete Products by master_categories_id only (no linked product)
     $ep_dltype = 'full';
 }
-  
+
 // override for $ep_dltype
 if ( isset($_POST['ep_order_export_type']) ) {
   if ($_POST['ep_order_export_type']=='1') { 
