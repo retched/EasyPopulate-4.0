@@ -207,7 +207,7 @@ function ep_4_CEONURIExists () {
 		//Columns in table: stock_id, products_id, stock_attributes, quantity, and sort.
 		$colsarray = ep_4_query('SHOW COLUMNS FROM ' . TABLE_CEON_URI_MAPPINGS);
 //		echo 'After execute<br />';
-		$numCols = ($ep_uses_mysqli ? mysqli_num_rows($colsarray) : mysql_num_rows($colsarray));
+		$numCols = ($ep_uses_mysqli ? ($colsarray === false ? 0 : mysqli_num_rows($colsarray)) : mysql_num_rows($colsarray));
 		if ($numCols == 9) {
 			while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($colsarray) : mysql_fetch_array($colsarray))){
 				switch ($row['Field']) {
