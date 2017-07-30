@@ -40,7 +40,7 @@ if (isset($_POST['ep_export_type'])) {
     $ep_dltype = 'pricebreaks'; // Model/Price/Breaks
   } elseif ($_POST['ep_export_type'] == '3') {
     $sql_filter .= ' AND p.master_categories_id = ptoc.categories_id'; // Complete Products by master_categories_id only (no linked product)
-    $ep_dltype = 'full';  
+    $ep_dltype = 'full';
   }
 }
 
@@ -51,7 +51,7 @@ if ($ep_dltype == 'fullsingle') {
 
 // override for $ep_dltype
 if ( isset($_POST['ep_order_export_type']) ) {
-  if ($_POST['ep_order_export_type']=='1') { 
+  if ($_POST['ep_order_export_type']=='1') {
     $ep_dltype = 'orders_1'; // Full Orders Export
   } elseif ($_POST['ep_order_export_type']=='2') {
     $ep_dltype = 'orders_2'; // New Full Orders Export
@@ -195,7 +195,7 @@ unset($filelayout_header);
 
 // Trim trailing tab then append end-of-line
 $column_headers = rtrim($column_headers, $csv_delimiter) . "\n";
-//Need to make sure that headers are ready if SBA_basic 
+//Need to make sure that headers are ready if SBA_basic
 if ($ep_dltype <> 'SBA_basic') { // mc12345678 - SBA Basic add on.
   fwrite($fp, $column_headers); // write column headers
 } else {
@@ -258,7 +258,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 
         fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
         unset($dataRow);
-        
+
         $ep_export_count++;
         $last_products_id = $active_row['v_products_model'];
       } // end if new model
@@ -296,7 +296,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     $row['v_customers_country'] = NULL;
     $row['v_customers_telephone'] = NULL;
     $row['v_customers_email_address'] = NULL;
-      } 
+      }
       if (isset($row['v_orders_id']) || !isset($tracker['v_products_id']) || (isset($tracker['v_products_id']) && $tracker['v_products_id'] != $row['v_products_id'])) {
         $tracker['v_products_id'] = $row['v_products_id'];
       } else {
@@ -444,9 +444,9 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $row['v_html_uri'] = zen_catalog_href_link(FILENAME_DEFAULT, zen_get_path($row['v_categories_id']), 'NONSSL');
     }
   } // if ($ep_dltype categorymeta...
-    
+
   // CATEGORIES EXPORT
-  // chadd - 12-13-2010 - logic change. $max_categories no longer required. better to loop back to root category and 
+  // chadd - 12-13-2010 - logic change. $max_categories no longer required. better to loop back to root category and
   // concatenate the entire categories path into one string with $category_delimiter for separater.
   if (($ep_dltype == 'full') || ($ep_dltype == 'category')) { // chadd - 12-02-2010 fixed error: missing parenthesis
     // NEW While-loop for unlimited category depth
@@ -461,7 +461,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 //        $row['v_html_uri'] = zen_href_link(FILENAME_DEFAULT, 'main_page=' . $sql_typename->fields['type_handler'] . '_info&cPath=' . zen_get_generated_category_path_ids($row['v_master_categories_id']) . '&products_id=' . $row['v_products_id'],'NONSSL', false, true, false, true); //This generates an admin folder like link/reference not a catalog version.
       $row['v_html_uri'] = zen_catalog_href_link($sql_typename->fields['type_handler'] . '_info', 'cPath=' . zen_get_generated_category_path_ids($row['v_master_categories_id']) . '&products_id=' . $row['v_products_id'], 'NONSSL');
 //zen_catalog_href_link($page = '', $parameters = '', $connection = 'NONSSL')        //FILENAME_DEFAULT . '?main_page=' . zen_get_products_type($row['products_id'])
-      //function zen_href_link($page = '', $parameters = '', $connection = 'NONSSL', $add_session_id = true, $search_engine_safe = true, $static = false, $use_dir_ws_catalog = true) 
+      //function zen_href_link($page = '', $parameters = '', $connection = 'NONSSL', $add_session_id = true, $search_engine_safe = true, $static = false, $use_dir_ws_catalog = true)
     }
     // $fullcategory = array(); // this will have the entire category path separated by $category_delimiter
 
@@ -501,7 +501,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     unset($key);
     unset($lang);
     unset($lid);
-    
+
   } // if($ep_dltype == 'full' || $ep_dltype == 'category') delimited categories path
 
   //This will do all of the special work to provide the remaining row data:
@@ -510,7 +510,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
   //  Products_attributes (either combined attributes of a non-SBA tracked item
   //  or the SBA stock data (both legible/understandable to a reviewer of the
   //  spreadsheet)
-  //  
+  //
   // Clean the texts that could break CSV file formatting
   $dataRow = '';
   $problem_chars = array("\r", "\n", "\t"); // carriage return, newline, tab
@@ -523,7 +523,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     // o = table PRODUCTS_OPTIONS
     // v = table PRODUCTS_OPTIONS_VALUES
     // d = table PRODUCTS_ATTRIBUTES_DOWNLOAD
-    $sqlAttrib = 'SELECT DISTINCT 
+    $sqlAttrib = 'SELECT DISTINCT
         ' . /* a.products_attributes_id            as v_products_attributes_id, */'
               p.products_id                       as v_products_id,
         ' . /* p.products_model            as v_products_model,
@@ -556,7 +556,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
               a.attributes_price_words_free       as v_attributes_price_words_free,
               a.attributes_price_letters          as v_attributes_price_letters,
               a.attributes_price_letters_free     as v_attributes_price_letters_free,
-              a.attributes_required               as v_attributes_required */' 
+              a.attributes_required               as v_attributes_required */'
         FROM '
             . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . ' as ovpo,'
             . TABLE_PRODUCTS_OPTIONS_VALUES . ' as v,'
@@ -566,12 +566,12 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
             . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK . ' pwas ON pwas.stock_attributes = a.products_attributes_id
         WHERE
         a.products_id       = p.products_id AND
-        a.options_id        = o.products_options_id AND 
+        a.options_id        = o.products_options_id AND
         a.options_values_id = v.products_options_values_id AND
         o.language_id       = v.language_id AND
         p.products_id    = :products_id: AND
         o.products_options_id  = ovpo.products_options_id AND
-        v.products_options_values_id  = ovpo.products_options_values_id AND 
+        v.products_options_values_id  = ovpo.products_options_values_id AND
         o.language_id       = 1 ORDER BY p.products_id ASC'; /* , a.options_id, v.products_options_values_id'; */
     $sqlAttrib = $db->bindVars($sqlAttrib, ':products_id:', $row['v_products_id'], 'integer');
     $resultAttrib = ep_4_query($sqlAttrib);
@@ -591,9 +591,9 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     $row['v_SBA_tracked'] = '';
     $row['v_table_tracker'] = $row['v_products_id'];
 
-    //Check if product is tracked via SBA  
+    //Check if product is tracked via SBA
     $sqlSBA = 'SELECT
-        s.products_id        as v_products_id, 
+        s.products_id        as v_products_id,
         s.stock_id           as v_stock_id,
         s.stock_attributes         as v_stock_attributes,
         s.quantity           as v_quantity' . ( $ep_4_SBAEnabled == '2' ? ',
@@ -601,7 +601,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
             'FROM '
             . TABLE_PRODUCTS . ' as p,'
             . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK . ' as s
-        WHERE 
+        WHERE
         s.products_id    = p.products_id AND
         p.products_id = :products_id:';
     $sqlSBA = $db->bindVars($sqlSBA, ':products_id:', $row['v_products_id'], 'integer');
@@ -639,13 +639,13 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       } // End Data Cleanup
       unset($key);
       unset($value);
-      
+
       // Remove trailing tab, then append the end-of-line
       $dataRow = rtrim($dataRow, $csv_delimiter) . "\n";
 
       fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
       unset($dataRow);
-      
+
       // loop through the SBA data until one before the end
       // Must get the attribute and quantity data from the SBA table
       // While not at the one before end
@@ -665,12 +665,12 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         foreach ($trackAttribute as $currentAttrib) {
           $sqlSBAAttributes = 'SELECT
               o.products_options_name    as v_SBA_option_name,
-              v.products_options_values_name  as v_SBA_value_name 
+              v.products_options_values_name  as v_SBA_value_name
               FROM '
                   . TABLE_PRODUCTS_OPTIONS . ' as o, '
                   . TABLE_PRODUCTS_OPTIONS_VALUES . ' as v, '
                   . TABLE_PRODUCTS_ATTRIBUTES . ' as a
-              WHERE 
+              WHERE
               o.products_options_id = a.options_id AND
               v.products_options_values_id = a.options_values_id AND
               a.products_attributes_id = :currentAttrib:';
@@ -769,7 +769,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       unset($key);
       unset($lang);
       unset($lid);
-      
+
     } else {
       $row['v_artists_name'] = ''; // no artists name
       $row['v_artists_image'] = '';
@@ -780,7 +780,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       unset($key);
       unset($lang);
       unset($lid);
-      
+
     }
     // record company
     if (($row_music_extra['record_company_id'] != '0') && ($row_music_extra['record_company_id'] != '')) { // '0' is correct, but '' NULL is possible
@@ -808,7 +808,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       unset($key);
       unset($lang);
       unset($lid);
-      
+
     } else {
       $row['v_record_company_name'] = '';
       $row['v_record_company_image'] = '';
@@ -852,7 +852,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
   while (isset($filelayout['v_discount_qty_' . $discount_index])) {
     if ($row['v_products_discount_type'] != '0') { // if v_products_discount_type == 0 then there are no quantity breaks
       $sql2 = 'SELECT discount_id, discount_qty, discount_price FROM ' .
-              TABLE_PRODUCTS_DISCOUNT_QUANTITY . ' WHERE products_id = 
+              TABLE_PRODUCTS_DISCOUNT_QUANTITY . ' WHERE products_id =
               :products_id: AND discount_id = :discount_id:';
       $sql2 = $db->bindVars($sql2, ':products_id:', $row['v_products_id'], 'integer');
       $sql2 = $db->bindVars($sql2, ':discount_id:', $discount_index, 'integer');
@@ -880,13 +880,13 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
   unset($row);
   $ep_export_count++;
   } // if $ep_dltype == 'attrib_basic'
-} // while ($row) 
+} // while ($row)
 //Start SBA1 addresses writing to the file
 
 if ($ep_dltype == 'attrib_basic') { // must write last record
   // Clean the texts that could break CSV file formatting
   $dataRow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
-  
+
   fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
   $ep_export_count++;
 } // EOF ep_dltype attrib_basic

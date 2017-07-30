@@ -7,7 +7,7 @@
 
       // check products table to see if product_model exists
       while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // read 1 line of data
-        $sql = "SELECT * FROM " . TABLE_PRODUCTS; 
+        $sql = "SELECT * FROM " . TABLE_PRODUCTS;
 
         switch (EP4_DB_FILTER_KEY) {
           case 'products_model':
@@ -25,7 +25,7 @@
             break;
         }
         ${$chosen_key} = NULL;
-  
+
         $sql .= " LIMIT 1";
 
         $sql = $db->bindVars($sql, ':products_model:', $items[$filelayout['v_products_model']], 'string');
@@ -57,14 +57,14 @@
               $v_status = 0;
               $v_date_status_change = date("Y-m-d");
             }
-            $sql = "UPDATE " . TABLE_FEATURED . " SET 
-							featured_last_modified  = CURRENT_TIMESTAMP,
-							expires_date            = :expires_date:,
-							date_status_change      = :date_status_change:,
-							status                  = :status:,
-							featured_date_available = :featured_date_available:
-							WHERE (
-							featured_id = :featured_id:)";
+            $sql = "UPDATE " . TABLE_FEATURED . " SET
+              featured_last_modified  = CURRENT_TIMESTAMP,
+              expires_date            = :expires_date:,
+              date_status_change      = :date_status_change:,
+              status                  = :status:,
+              featured_date_available = :featured_date_available:
+              WHERE (
+              featured_id = :featured_id:)";
             $sql = $db->bindVars($sql, ':expires_date:', $v_expires_date, 'string');
             $sql = $db->bindVars($sql, ':date_status_change:', $v_date_status_change, 'string');
             $sql = $db->bindVars($sql, ':status:', $v_status , 'integer');
@@ -103,15 +103,15 @@
               $v_status = 0;
               $v_date_status_change = date("Y-m-d");
             }
-            $sql = "INSERT INTO " . TABLE_FEATURED . " SET 
-							featured_id             = :max_featured_id:,
-							products_id             = :products_id:,
-							featured_date_added     = CURRENT_TIMESTAMP,
-							featured_last_modified  = '',
-							expires_date            = :expires_date:,
-							date_status_change      = :date_status_change:,
-							status                  = :status:,
-							featured_date_available = :featured_date_available:";
+            $sql = "INSERT INTO " . TABLE_FEATURED . " SET
+              featured_id             = :max_featured_id:,
+              products_id             = :products_id:,
+              featured_date_added     = CURRENT_TIMESTAMP,
+              featured_last_modified  = '',
+              expires_date            = :expires_date:,
+              date_status_change      = :date_status_change:,
+              status                  = :status:,
+              featured_date_available = :featured_date_available:";
             $sql = $db->bindVars($sql, ':max_featured_id:', $max_featured_id, 'string');
             $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
             $sql = $db->bindVars($sql, ':expires_date:', $v_expires_date, 'date');
