@@ -460,6 +460,7 @@ if (!defined('IS_ADMIN_FLAG')) {
     foreach ($langcode as $key => $lang) { // create categories variables for each language id
       $l_id = $lang['id'];
       $filelayout[] = 'v_categories_name_'.$l_id;
+      $filelayout[] = 'v_category_path_'.$l_id;
       $filelayout[] = 'v_categories_description_'.$l_id;
 //      $filelayout[] = 'v_uri_' . $l_id;
     }

@@ -410,6 +410,32 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 
   // Multi-Lingual Categories, Categories Meta, Categories Descriptions
   if ($ep_dltype == 'categorymeta') {
+    $thecategory_id = $row['v_categories_id']; // starting category_id
+    
+    while (!empty($thecategory_id)) {
+      // mult-lingual categories start - for each language, get category description and name
+      $sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = :categories_id: ORDER BY language_id';
+      $sql2 = $db->bindVars($sql2, ':categories_id:', $thecategory_id, 'integer');
+      $result2 = ep_4_query($sql2);
+      unset($sql2);
+      while ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2))) {
+        $lid = $row2['language_id'];
+        $row['v_category_path_' . $lid] = $row2['categories_name'] . $category_delimiter . $row['v_category_path_' . $lid];
+      } //while
+      unset($row2);
+      unset($lid);
+      // look for parent categories ID
+      $sql3 = 'SELECT parent_id FROM ' . TABLE_CATEGORIES . ' WHERE categories_id = :categories_id:';
+      $sql3 = $db->bindVars($sql3, ':categories_id:', $thecategory_id, 'integer');
+      $result3 = ep_4_query($sql3);
+      $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
+      $theparent_id = $row3['parent_id'];
+      if ($theparent_id != '') { // Found parent ID, set thecategoryid to get the next level
+        $thecategory_id = $theparent_id;
+      } else { // Category Root Found
+        $thecategory_id = false;
+      }
+    } // while
     // names and descriptions require that we loop thru all languages that are turned on in the store
     foreach ($langcode as $key => $lang) {
       $lid = $lang['id'];
@@ -433,6 +459,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       unset($sql2);
       $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
       $row['v_categories_name_' . $lid] = $row2['categories_name'];
+      $row['v_category_path_' . $lid] = rtrim($row['v_category_path_' . $lid], $category_delimiter);
       $row['v_categories_description_' . $lid] = $row2['categories_description'];
       unset($row2);
     } // foreach
