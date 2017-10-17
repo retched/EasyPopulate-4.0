@@ -1595,7 +1595,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           WHERE
           '.TABLE_PRODUCTS.'.products_id='.$v_products_id);
 $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) : mysql_fetch_array($result_incategory));
-          if (!zen_not_null($result_incategory['products_id']) || sizeof($result_incategory) <= 0 /* ($ep_uses_mysqli ? mysqli_num_rows($result_incategory) : mysql_num_rows($result_incategory)) == 0 */) { // nope, this is a new category for this product
+          if (!zen_not_null($result_incategory['products_id']) || count($result_incategory) <= 0 /* ($ep_uses_mysqli ? mysqli_num_rows($result_incategory) : mysql_num_rows($result_incategory)) == 0 */) { // nope, this is a new category for this product
               if ($items[$filelayout['v_status']] == 7) {
 
                 /* $result_incategory = ep_4_query('SELECT

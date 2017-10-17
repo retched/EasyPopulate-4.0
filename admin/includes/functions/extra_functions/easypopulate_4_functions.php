@@ -275,7 +275,7 @@ if (!function_exists('zen_get_sub_categories')) {
       " WHERE parent_id = '".(int)$categories_id."'"));
     while ($sub_categories = ($ep_uses_mysqli ? mysqli_fetch_array($sub_categories_query) : mysql_fetch_array($sub_categories_query))) {
       if ($sub_categories['categories_id'] == 0) return true;
-      $categories[sizeof($categories)] = $sub_categories['categories_id'];
+      $categories[count($categories)] = $sub_categories['categories_id'];
       if ($sub_categories['categories_id'] != $categories_id) {
         zen_get_sub_categories($categories, $sub_categories['categories_id']);
       }

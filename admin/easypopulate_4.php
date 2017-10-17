@@ -360,7 +360,7 @@ $ep_4_SBAEnabled = ep_4_SBA1Exists();
 $ep4CEONURIDoesExist = false;
 if (ep_4_CEONURIExists() == true) {
   $ep4CEONURIDoesExist = true;
-  if (!sizeof($languages)) {
+  if (!count($languages)) {
     $languages = zen_get_languages();
   }
 }
@@ -708,7 +708,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
 
           $filetypes = array();
 
-          for ($i = 0; $i < sizeof($files); $i++) {
+          for ($i = 0; $i < count($files); $i++) {
             if (($files[$i] != ".") && ($files[$i] != "..") && preg_match("/\.(sql|gz|csv|txt|log)$/i", $files[$i])) {
               $found = false;
 
@@ -744,20 +744,20 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
             (EP4_SHOW_ALL_FILETYPES != 'false' ? $val = $filetypes[$key] : '');
             if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
               $val = array();
-              for ($i = 0; $i < sizeof($files); $i++) {
+              for ($i = 0; $i < count($files); $i++) {
                 $val[$i] = $i;
               }
             }
 
             $file_count = 0;
             //Display the information needed to start use of a filetype.
-            $plural_state = "<strong>" . (sizeof($val) > 1 ? EP_DESC_PLURAL : EP_DESC_SING) . "</strong>";
+            $plural_state = "<strong>" . (count($val) > 1 ? EP_DESC_PLURAL : EP_DESC_SING) . "</strong>";
             if (EP4_SHOW_ALL_FILETYPES != 'Hidden') {
               echo "<tr><td colspan=\"8\">" . sprintf($filenames_merged[$key], "<strong>" . $key . "</strong>", $plural_state) . "</td></tr>";
               echo "<tr><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_FILENAME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SIZE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DATE_TIME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_TYPE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SPLIT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_IMPORT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DELETE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DOWNLOAD . "</th>\n";
             }
 
-            for ($i = 0; $i < sizeof($val); $i++) {
+            for ($i = 0; $i < count($val); $i++) {
               if (EP4_SHOW_ALL_FILETYPES != 'Hidden' || (EP4_SHOW_ALL_FILETYPES == 'Hidden' && ($files[$i] != ".") && ($files[$i] != "..") && preg_match("/\.(sql|gz|csv|txt|log)$/i", $files[$i]) )) {
                 $file_count++;
                 echo '<tr><td>' . $files[$val[$i]] . '</td>
@@ -811,7 +811,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
             } // End loop within a filetype
             if ($file_count == 0 && EP4_SHOW_ALL_FILETYPES != 'Hidden') {
               echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED . "</font></td></tr>\n";
-            } // if (sizeof($files)>0)
+            } // if (count($files)>0)
             if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
               break;
             }
@@ -820,7 +820,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
           unset($val);
           if (EP4_SHOW_ALL_FILETYPES != 'Hidden') {
             echo "</table>\n";
-            if (sizeof($filetypes) == 0 && EP4_SHOW_ALL_FILETYPES == 'false') {
+            if (count($filetypes) == 0 && EP4_SHOW_ALL_FILETYPES == 'false') {
               echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
               echo "<tr><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_FILENAME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SIZE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DATE_TIME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_TYPE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SPLIT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_IMPORT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DELETE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DOWNLOAD . "</th>\n";
               echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED . "</font></td></tr>\n";
@@ -833,7 +833,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
         } // opendir()
         if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
           echo "</table>\n";
-          if (sizeof($filetypes) == 0) {
+          if (count($filetypes) == 0) {
             echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
             echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED . "</font></td></tr>\n";
             echo "</table>\n";
