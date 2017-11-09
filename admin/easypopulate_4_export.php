@@ -418,7 +418,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
   // Multi-Lingual Categories, Categories Meta, Categories Descriptions
   if ($ep_dltype == 'categorymeta') {
     $thecategory_id = $row['v_categories_id']; // starting category_id
-    
+
     while (!empty($thecategory_id)) {
       // mult-lingual categories start - for each language, get category description and name
       $sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = :categories_id: ORDER BY language_id';
