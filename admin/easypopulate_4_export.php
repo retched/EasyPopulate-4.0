@@ -437,7 +437,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $result3 = ep_4_query($sql3);
       $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
       $theparent_id = $row3['parent_id'];
-      if ($theparent_id != '') { // Found parent ID, set thecategoryid to get the next level
+      if (!empty($theparent_id)) { // Found parent ID, set thecategoryid to get the next level
         $thecategory_id = $theparent_id;
       } else { // Category Root Found
         $thecategory_id = false;
@@ -520,7 +520,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $result3 = ep_4_query($sql3);
       $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
       $theparent_id = $row3['parent_id'];
-      if ($theparent_id != '') { // Found parent ID, set thecategoryid to get the next level
+      if (!empty($theparent_id)) { // Found parent ID, set thecategoryid to get the next level
         $thecategory_id = $theparent_id;
       } else { // Category Root Found
         $thecategory_id = false;
@@ -784,7 +784,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     $result_music_extra = ep_4_query($sql_music_extra);
     $row_music_extra = ($ep_uses_mysqli ? mysqli_fetch_array($result_music_extra) : mysql_fetch_array($result_music_extra));
     // artist
-    if (($row_music_extra['artists_id'] != '0') && ($row_music_extra['artists_id'] != '')) { // '0' is correct, but '' NULL is possible
+    if (!empty($row_music_extra['artists_id'])) { // '0' is correct, but '' NULL is possible
       $sql_record_artists = 'SELECT * FROM ' . TABLE_RECORD_ARTISTS . ' WHERE artists_id = :artists_id: LIMIT 1';
       $sql_record_artists = $db->bindVars($sql_record_artists, ':artists_id:', $row_music_extra['artists_id'], 'integer');
       $result_record_artists = ep_4_query($sql_record_artists);
@@ -817,7 +817,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 
     }
     // record company
-    if (($row_music_extra['record_company_id'] != '0') && ($row_music_extra['record_company_id'] != '')) { // '0' is correct, but '' NULL is possible
+    if (!empty($row_music_extra['record_company_id'])) { // '0' is correct, but '' NULL is possible
       $sql_record_company = 'SELECT * FROM ' . TABLE_RECORD_COMPANY . ' WHERE record_company_id = :record_company_id: LIMIT 1';
       $sql_record_company = $db->bindVars($sql_record_company, ':record_company_id:', $row_music_extra['record_company_id'], 'integer');
       $result_record_company = ep_4_query($sql_record_company);
@@ -848,7 +848,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $row['v_record_company_image'] = '';
     }
     // genre
-    if (($row_music_extra['music_genre_id'] != '0') && ($row_music_extra['music_genre_id'] != '')) { // '0' is correct, but '' NULL is possible
+    if (!empty($row_music_extra['music_genre_id'])) { // '0' is correct, but '' NULL is possible
       $sql_music_genre = 'SELECT * FROM ' . TABLE_MUSIC_GENRE . ' WHERE music_genre_id = :music_genre_id: LIMIT 1';
       $sql_music_genre = $db->bindVars($sql_music_genre, ':music_genre_id:', $row_music_extra['music_genre_id'], 'integer');
       $result_music_genre = ep_4_query($sql_music_genre);
@@ -866,7 +866,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
   // MANUFACTURERS EXPORT - THIS NEEDS MULTI-LINGUAL SUPPORT LIKE EVERYTHING ELSE!
   // if the filelayout says we need a manfacturers name, get it for download file
   if (isset($filelayout['v_manufacturers_name'])) {
-    if (($row['v_manufacturers_id'] != '0') && ($row['v_manufacturers_id'] != '')) { // '0' is correct, but '' NULL is possible
+    if (!empty($row['v_manufacturers_id'])) { // '0' is correct, but '' NULL is possible
       $sql2 = 'SELECT manufacturers_name FROM ' . TABLE_MANUFACTURERS . ' WHERE manufacturers_id = :manufacturers_id:';
       $sql2 = $db->bindVars($sql2, ':manufacturers_id:', $row['v_manufacturers_id'], 'integer');
       $result2 = ep_4_query($sql2);
@@ -884,7 +884,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
   // Price/Qty/Discounts
   $discount_index = 1;
   while (isset($filelayout['v_discount_qty_' . $discount_index])) {
-    if ($row['v_products_discount_type'] != '0') { // if v_products_discount_type == 0 then there are no quantity breaks
+    if (!empty($row['v_products_discount_type'])) { // if v_products_discount_type == 0 then there are no quantity breaks
       $sql2 = 'SELECT discount_id, discount_qty, discount_price FROM ' .
               TABLE_PRODUCTS_DISCOUNT_QUANTITY . ' WHERE products_id =
               :products_id: AND discount_id = :discount_id:';
