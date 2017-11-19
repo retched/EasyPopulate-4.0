@@ -770,7 +770,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         // HERE ==========================>
         // BEGIN: record_artists
         if (isset($filelayout['v_artists_name'])) {
-          if (isset($v_artists_name) && ($v_artists_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_artists_name) <= $max_len['artists_name']) || (!function_exists('mb_strlen') && strlen($v_artists_name) <= $max_len['artists_name']))) {
+          require(DIR_WS_MODULES . 'easypopulate_4_import_artists_name.php');
+          /*if (isset($v_artists_name) && ($v_artists_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_artists_name) <= $max_len['artists_name']) || (!function_exists('mb_strlen') && strlen($v_artists_name) <= $max_len['artists_name']))) {
             $sql = "SELECT artists_id AS artistsID FROM " . TABLE_RECORD_ARTISTS . " WHERE artists_name = :artists_name: LIMIT 1";
             $sql = $db->bindVars($sql, ':artists_name:', ep_4_curly_quotes($v_artists_name), 'string');
             $result = ep_4_query($sql);
@@ -866,14 +867,15 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               continue;
             }
             $v_artists_id = 0; // chadd - zencart uses artists_id = '0' for no assisgned artists
-          }
+          }*/
         }
         // END: record_artists
 
         // HERE ==========================>
         // BEGIN: record_company
         if (isset($filelayout['v_record_company_name'])) {
-          if (isset($v_record_company_name) && ($v_record_company_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_record_company_name) <= $max_len['record_company_name']) || (!function_exists('mb_strlen') && strlen($v_record_company_name) <= $max_len['record_company_name']))) {
+          require(DIR_WS_MODULES . 'easypopulate_4_import_record_company_name.php');
+          /*if (isset($v_record_company_name) && ($v_record_company_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_record_company_name) <= $max_len['record_company_name']) || (!function_exists('mb_strlen') && strlen($v_record_company_name) <= $max_len['record_company_name']))) {
             $sql = "SELECT record_company_id AS record_companyID FROM " . TABLE_RECORD_COMPANY . " WHERE record_company_name = :record_company_name: LIMIT 1";
             $sql = $db->bindVars($sql, ':record_company_name:', ep_4_curly_quotes($v_record_company_name), 'string');
             $result = ep_4_query($sql);
@@ -940,14 +942,15 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               continue;
             }
             $v_record_company_id = 0; // record_company_id = '0' for no assisgned artists
-          }
+          }*/
         }
         // END: record_company
 
         // HERE ==========================>
         // BEGIN: music_genre
         if (isset($filelayout['v_music_genre_name'])) {
-          if (isset($v_music_genre_name) && ($v_music_genre_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_music_genre_name) <= $max_len['music_genre_name']) || (!function_exists('mb_strlen') && strlen($v_music_genre_name) <= $max_len['music_genre_name']))) {
+          require(DIR_WS_MODULES . 'easypopulate_4_import_music_genre_name.php');
+          /*if (isset($v_music_genre_name) && ($v_music_genre_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_music_genre_name) <= $max_len['music_genre_name']) || (!function_exists('mb_strlen') && strlen($v_music_genre_name) <= $max_len['music_genre_name']))) {
             $sql = "SELECT music_genre_id AS music_genreID FROM " . TABLE_MUSIC_GENRE . " WHERE music_genre_name = :music_genre_name: LIMIT 1";
             $sql = $db->bindVars($sql, ':music_genre_name:', $v_music_genre_name, 'string');
             $result = ep_4_query($sql);
@@ -972,7 +975,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               continue;
             }
             $v_music_genre_id = 0; // chadd - zencart uses genre_id = '0' for no assisgned artists
-          }
+          }*/
         }
         // END: music_genre
 
