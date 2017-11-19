@@ -74,6 +74,28 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
      */
     $filelayout = array_flip($raw_headers);
 
+    switch (EP4_DB_FILTER_KEY) {
+      case 'products_model':
+        $chosen_key = 'v_products_model';
+        $chosen_key_sql = "
+            p.products_model   = :products_model:";
+        $chosen_key_sql_limit = " WHERE (products_model = :products_model:) LIMIT 1";
+        break;
+      case 'blank_new':
+      case 'products_id':
+        $chosen_key = 'v_products_id';
+        $chosen_key_sql = "
+            p.products_id   = :products_id:";
+        $chosen_key_sql_limit = " WHERE (products_id = :products_id:) LIMIT 1";
+        break;
+      default:
+        $chosen_key = 'v_products_model';
+        $chosen_key_sql = "
+            p.products_model   = :products_model:";
+        $chosen_key_sql_limit = " WHERE (products_model = :products_model:) LIMIT 1";
+        break;
+    }
+
     // Featured Products 5-2-2012
     if (strtolower(substr($file['name'], 0, 11)) == "featured-ep") {
       require(DIR_FS_ADMIN . DIR_WS_MODULES . 'easypopulate_4_featured_ep.php');
@@ -201,7 +223,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         $sql .= "WHERE
           p.products_id      = ptoc.products_id AND
           ptoc.categories_id = subc.categories_id AND ";
-        switch (EP4_DB_FILTER_KEY){
+
+        $sql .= $chosen_key_sql;
+
+        /*switch (EP4_DB_FILTER_KEY){
           case 'products_model':
             $sql .= "
             p.products_model   = :products_model:";
@@ -215,7 +240,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             $sql .= "
             p.products_model   = :products_model:";
             break;
-        }
+        }*/
         $sql = $db->bindVars($sql, ':products_model:', $items[$filelayout['v_products_model']], 'string');
         $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_products_id']], 'integer');
         $result = ep_4_query($sql);
@@ -237,7 +262,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           $continueNextRow = false;
           if ($items[$filelayout['v_status']] == 9) {
 //            $chosen_key = ''; //mc12345678 unnecessary because assigned regardless
-            switch (EP4_DB_FILTER_KEY) {
+            /*switch (EP4_DB_FILTER_KEY) {
               case 'products_model':
                 $chosen_key = 'v_products_model';
                 break;
@@ -248,7 +273,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               default:
                 $chosen_key = 'v_products_model';
                 break;
-            }
+            }*/
 
             $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DELETED, $items[$filelayout[$chosen_key]]);
             ep_4_remove_product($items[$filelayout[$chosen_key]]);
@@ -333,7 +358,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         // inputs: $items; $filelayout; $product_is_new
         // chadd - this first condition cannot exist since we short-circuited on delete above
 //        $chosen_key = ''; //mc12345678 unnecessary because assigned regardless
-        switch (EP4_DB_FILTER_KEY) {
+        /*switch (EP4_DB_FILTER_KEY) {
           case 'products_model':
             $chosen_key = 'v_products_model';
             break;
@@ -344,7 +369,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           default:
             $chosen_key = 'v_products_model';
             break;
-        }
+        }*/
 
         if ($items[$filelayout['v_status']] == 9 && zen_not_null($items[$filelayout[$chosen_key]])) {
           // cannot delete product that is not found
@@ -980,7 +1005,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         // END: music_genre
 
 //        $chosen_key = ''; //mc12345678 - Deemed unnecessary because variable is always set to something.
-        switch (EP4_DB_FILTER_KEY) {
+        /*switch (EP4_DB_FILTER_KEY) {
           case 'products_model':
             $chosen_key = 'v_products_model';
             break;
@@ -991,13 +1016,16 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           default:
             $chosen_key = 'v_products_model';
             break;
-        }
+        }*/
 
         // insert new, or update existing, product
         if (${$chosen_key} != "" || ($chosen_key == 'v_products_id' && defined('EP4_DB_FILTER_KEY') && EP4_DB_FILTER_KEY === 'blank_new' && !zen_not_null(${$chosen_key}))) { // products_model exists!
           // First we check to see if this is a product in the current db.
           $sql = "SELECT products_id FROM " . TABLE_PRODUCTS;
-          switch ($chosen_key) {
+          
+          $sql .= $chosen_key_sql_limit;
+          
+          /*switch ($chosen_key) {
             case 'v_products_model':
               $sql .= " WHERE (products_model = :products_model:) LIMIT 1";
               break;
@@ -1007,7 +1035,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             default:
               $sql .= " WHERE (products_model = :products_model:) LIMIT 1";
               break;
-          }
+          }*/
           $sql = $db->bindVars($sql, ':products_model:', $v_products_model, 'string');
           $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
           $result = ep_4_query($sql);
@@ -1408,7 +1436,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             if ($v_products_discount_type != '0') { // if v_products_discount_type == 0 then there are no quantity breaks
               if (${$chosen_key} != "") { // we check to see if this is a product in the current db, must have product model number
                 $sql = "SELECT products_id FROM " . TABLE_PRODUCTS;
-                switch ($chosen_key) {
+
+                $sql .= $chosen_key_sql_limit;
+
+                /*switch ($chosen_key) {
                   case 'v_products_model':
                     $sql .= " WHERE (products_model = :products_model:) LIMIT 1";
                     break;
@@ -1418,7 +1449,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   default:
                     $sql .= " WHERE (products_model = :products_model:) LIMIT 1";
                     break;
-                }
+                }*/
                 $sql = $db->bindVars($sql, ':products_model:', $v_products_model, 'string');
                 $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
                 $result = ep_4_query($sql);
@@ -1461,7 +1492,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             } else { // products_discount_type == 0, so remove any old quantity_discounts
               if (${$chosen_key} != "") { // we check to see if this is a product in the current db, must have product model number
                 $sql = "SELECT products_id FROM " . TABLE_PRODUCTS;
-                switch ($chosen_key) {
+
+                $sql .= $chosen_key_sql_limit;
+
+                /*switch ($chosen_key) {
                   case 'v_products_model':
                     $sql .= " WHERE (products_model = :products_model:) LIMIT 1";
                     break;
@@ -1471,7 +1505,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   default:
                     $sql .= " WHERE (products_model = :products_model:) LIMIT 1";
                     break;
-                }
+                }*/
                 $sql = $db->bindVars($sql, ':products_model:', $v_products_model, 'string');
                 $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
                 $result = ep_4_query($sql);

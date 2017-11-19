@@ -9,7 +9,9 @@
       while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // read 1 line of data
         $sql = "SELECT * FROM " . TABLE_PRODUCTS;
 
-        switch (EP4_DB_FILTER_KEY) {
+        $sql .= $chosen_key_sql_limit;
+
+        /*switch (EP4_DB_FILTER_KEY) {
           case 'products_model':
             $sql .= " WHERE (products_model = :products_model:)";
             $chosen_key = 'v_products_model';
@@ -23,10 +25,10 @@
             $sql .= " WHERE (products_model = :products_model:)";
             $chosen_key = 'v_products_model';
             break;
-        }
+        }*/
         ${$chosen_key} = NULL;
 
-        $sql .= " LIMIT 1";
+        //$sql .= " LIMIT 1";
 
         $sql = $db->bindVars($sql, ':products_model:', $items[$filelayout['v_products_model']], 'string');
         $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_products_id']], 'string');
@@ -41,12 +43,12 @@
             $v_featured_id = $row2['featured_id'];
             $v_today = strtotime(date("Y-m-d"));
             if (isset($filelayout['v_expires_date']) && $items[$filelayout['v_expires_date']] > '0001-01-01') {
-            $v_expires_date = $items[$filelayout['v_expires_date']];
+              $v_expires_date = $items[$filelayout['v_expires_date']];
             } else {
               $v_expires_date = '0001-01-01';
             }
             if (isset($filelayout['v_featured_date_available']) && $items[$filelayout['v_featured_date_available']] > '0001-01-01') {
-            $v_featured_date_available = $items[$filelayout['v_featured_date_available']];
+              $v_featured_date_available = $items[$filelayout['v_featured_date_available']];
             } else {
               $v_featured_date_available = '0001-01-01';
             }
