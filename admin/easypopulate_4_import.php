@@ -1161,7 +1161,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             $query = $db->bindVars($query, ':products_discount_type:', $v_products_discount_type, 'integer');
             $query = $db->bindVars($query, ':products_discount_type_from:', $v_products_discount_type_from, 'integer');
             $query = $db->bindVars($query, ':product_is_call:', $v_product_is_call, 'integer');
-            $query = $db->bindVars($query, ':products_sort_order:', $v_products_sort_order, 'string');
+            $query = $db->bindVars($query, ':products_sort_order:', $v_products_sort_order, 'integer');
             $query = $db->bindVars($query, ':products_quantity_order_min:', $v_products_quantity_order_min, 'float');
             $query = $db->bindVars($query, ':products_quantity_order_units:', $v_products_quantity_order_units, 'float');
             $query = $db->bindVars($query, ':products_priced_by_attribute:', $v_products_priced_by_attribute, 'integer');
@@ -1320,7 +1320,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             $query = $db->bindVars($query, ':products_discount_type:', $v_products_discount_type, 'integer');
             $query = $db->bindVars($query, ':products_discount_type_from:', $v_products_discount_type_from, 'integer');
             $query = $db->bindVars($query, ':product_is_call:', $v_product_is_call, 'integer');
-            $query = $db->bindVars($query, ':products_sort_order:', $v_products_sort_order, 'string');
+            $query = $db->bindVars($query, ':products_sort_order:', $v_products_sort_order, 'integer');
             $query = $db->bindVars($query, ':products_quantity_order_min:', $v_products_quantity_order_min, 'float');
             $query = $db->bindVars($query, ':products_quantity_order_units:', $v_products_quantity_order_units, 'float');
             $query = $db->bindVars($query, ':products_priced_by_attribute:', $v_products_priced_by_attribute, 'integer');
