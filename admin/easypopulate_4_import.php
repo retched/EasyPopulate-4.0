@@ -21,6 +21,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
   $ep_import_count = 0; // new products records imported
   $ep_error_count = 0; // errors detected during import
   $ep_warning_count = 0; // warning detected during import
+  $no_bypass = false; // does a condition exist to bypass import?
 
   $zco_notifier->notify('EP4_IMPORT_START');
 
@@ -39,10 +40,24 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
   } else if (!($handle = fopen($file_location, "r"))) {
     $display_output .= '<font color="red"><b>ERROR: Cannot open import file:' . $file_location . '</b></font><br/>';
   }
+
+  if (function_exists('getFileDelimiter')) {
+    $csv_delimiter = getFileDelimiter($file_location);
+    if (!empty($csv_delimiter) && is_array($csv_delimiter)) {
+      if (count($csv_delimiter) == 1) {
+        $csv_delimiter = $csv_delimiter[0];
+      } else {
+        $messageStack->add(EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES, 'warning');
+        $ep_error_count++;
+        $no_bypass = true;
+      }
+    }
+  }
+
   unset($file_location);
 
   // Read Column Headers
-  if ($raw_headers = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) {
+  if (!$no_bypass && ($raw_headers = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure))) {
     /*    $header_search = array("ARTIST","TITLE","FORMAT","LABEL",
       "CATALOG_NUMBER","UPC","PRICE","RETAIL",
       "WHOLESALE",  "GENRE","RELEASE_DATE","EXCLUSIVE",

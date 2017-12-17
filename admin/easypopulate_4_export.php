@@ -184,7 +184,7 @@ if (defined('EASYPOPULATE_4_CONFIG_DATE_SORT') && EASYPOPULATE_4_CONFIG_DATE_SOR
 }
 
 // create file name and path and prepare for writing
-$tmpfpath = (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . '' . $tempdir . "$EXPORT_FILE" . (($csv_delimiter == ",") ? ".csv" : ".txt");
+$tmpfpath = (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . '' . $tempdir . "$EXPORT_FILE" . (($csv_delimiter == "," || $csv_delimiter == ";" || $csv_delimiter == "\t" || $csv_delimiter == " ") ? ".csv" : ".txt");
 $fp = fopen($tmpfpath, "w+");
 unset($tmpfpath);
 

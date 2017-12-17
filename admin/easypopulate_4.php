@@ -1,9 +1,16 @@
 <?php
 // $Id: easypopulate_4.php, v4.0.37 02-08-2017 mc12345678 $
 
+// START INITIALIZATION
+require_once ('includes/application_top.php');
 // CSV VARIABLES - need to make this configurable in the ADMIN
 // $csv_delimiter = "\t"; // "\t" = tab AND "," = COMMA
 $csv_delimiter = ","; // "\t" = tab AND "," = COMMA
+if (defined('EASYPOPULATE_4_CONFIG_CSV_DELIMITER')) {
+  $csv_delimiter = EASYPOPULATE_4_CONFIG_CSV_DELIMITER;
+  $csv_list = getDBDelimiterList();
+  $csv_delimiter = $csv_list[(int)$csv_delimiter];
+}
 $csv_enclosure = '"'; // chadd - i think you should always use the '"' for best compatibility
 //$category_delimiter = "^"; //Need to move this to the admin panel
 $category_delimiter = "\x5e"; //Need to move this to the admin panel
@@ -12,8 +19,6 @@ $category_delimiter = "\x5e"; //Need to move this to the admin panel
 
 $excel_safe_output = true; // this forces enclosure in quotes
 
-// START INITIALIZATION
-require_once ('includes/application_top.php');
 if (!defined('EP4_DB_FILTER_KEY')) {
   // Need to define this to support use of primary key for import/export
   //   Instead of adding an additional switch, have incorporated the conversion
@@ -364,6 +369,173 @@ if (ep_4_CEONURIExists() == true) {
     $languages = zen_get_languages();
   }
 }
+
+function getDBDelimiterList() {
+  global $db;
+  
+  $sql = "SELECT set_function FROM " . TABLE_CONFIGURATION . " where configuration_key = 'EASYPOPULATE_4_CONFIG_CSV_DELIMITER'";
+  $set_function = $db->Execute($sql);
+
+  if ($set_function->EOF) {
+    return NULL;
+  }
+
+  $output_array = array();
+  $output_array2 = array();
+
+  $set_function_val = $set_function->fields['set_function'];
+
+  $delimiters = array(','); // Default to using a comma.  Specifically necessary to support those that have this function but not the defining key.
+
+  preg_match_all("/\(([^\)(]+)\)/", $set_function_val, $output_array); // Pull the inner part of the set_function to determine what delimiter(s) are available
+
+  if (!empty($output_array) && !empty($output_array[0])) {
+    $delimiters = array();
+    foreach ($output_array[1] as $out_array) {
+      $output_delimiters = preg_replace('/&quot;/','"', $out_array);
+      preg_match_all('/\'([^\']+)\'/', $output_delimiters, $output_array2); // Pull just the array of values within the function
+
+      if (!empty($output_array2) && !empty($output_array2[1])) {
+        $delimiters[] = $output_array2[1][3];
+      }
+    }
+    
+  }
+
+  return $delimiters;
+}
+
+function getFileDelimiter($file, $checkLines = 2) {
+  global $db;
+
+  $tempdir = EASYPOPULATE_4_CONFIG_TEMP_DIR;
+  if (substr($tempdir, -1) != '/') {
+    $tempdir .= '/';
+  }
+  while (substr($tempdir, 0, 1) == '/') {
+    $tempdir = substr($tempdir, 1);
+  }
+
+  $basepath = "";
+  $realBase = realpath($basepath);
+  $userpath = $basepath . $file;
+  $realUserPath = realpath($userpath);
+  if ($realUserPath === false || strpos($realUserPath, $realBase) !== 0) {
+      return NULL; // return back to the function with a non-result?
+  }
+
+  $file = new SplFileObject($file);
+
+  $delimiters = getDBDelimiterList();
+
+  if (is_null($delimiters)) {
+    return NULL;
+  }
+  // Test the file for $checkLines quantity  each of the delimiters
+
+  $results = array();
+  foreach ($delimiters as $key => $delimiter) {
+    $i = 0;
+    $file->rewind();
+
+    while($file->valid() && $i < $checkLines) {
+      $line[$delimiter][$i] = $file->fgetcsv($delimiter); // obtain fields based on attempted delimiter.
+      if (count($line[$delimiter][$i]) > 1) { // There are at least two fields which would be needed to perform any work.
+        if (!empty($results[$delimiter])) {
+          if (!empty($results[$delimiter][$i])) {
+            $results[$delimiter][$i]++;
+          } else {
+            $results[$delimiter][$i] = 1;
+          }
+        } else {
+          $results[$delimiter] = array();
+          $results[$delimiter][$i] = 1;
+        }
+      }
+      $i++;
+    }
+  }
+
+  $size_results = count($results); // Identifies the number of delimiters that were potentially obtained.
+  
+  if ($size_results == 1) {
+    // found the one delimiter that works
+    $results = array_keys($results, max($results));
+    return $results[0]; // The one and only delimiter.
+  } else if ($size_results > 1) {
+    // Options available, need to let know.
+    // Have opportunity to evaluate the results of the row(s).
+    // Ideally can evaluate each line for number of fields.
+    // The number of fields should align between each line, otherwise there could be a problem with the file.
+
+    foreach ($delimiters as $delimiter) {
+      if (empty($line[$delimiter])) {
+        continue;
+      }
+
+      $i = 0;
+      $base = count($line[$delimiter][$i]); // Establish the number of fields in the first line.
+      $i++;
+      // Check each line to see how the number of fields compares to the first.
+      while ($i <= $checkLines) {
+        if (!empty($line[$delimiter][$i]) && count($line[$delimiter][$i]) <> $base) { // If any line has a different number of fields from the first, then columns do not match and/or delimiter is not properly used.
+          unset($results[$delimiter]); // Remove the data associated with a delimiter that doesn't match.
+          break; // stop processing any remaining rows.
+        }
+        $i++;
+      }
+    }
+    $returndelimiters = array();
+    if (!empty($results)) {
+      foreach ($delimiters as $delimiter) {
+        if ((isset($results[$delimiter]) || array_key_exists($delimiter, $results)) && is_array($results[$delimiter]) && count($results[$delimiter]) == $checkLines) {
+          // Delimiter is used in every line and resulted in a satisfactory split of the data.
+          $returndelimiters[] = $delimiter;
+        }
+      }
+    }
+
+    return $returndelimiters; // Will return an array, but question is if it is empty or has 1 or more values.   
+  } else {
+    // None found and need user to do something else.
+    return NULL;
+  }
+}
+
+function ep_4_display_CSV_Delimiter($filename) {
+  $file_delimiter = getFileDelimiter($filename);
+
+  if (!isset($file_delimiter)) {
+    // File does not have a matching delimiter to what is in the database, bad filename, or delimiter is not set in database, need user to take some sort of action.
+    return NULL;
+  } else if (is_array($file_delimiter)) {
+    // Could have none (empty array), 1 delimiter, or multiple come back.
+    // if empty array then the delimiter was inconsistently used in each row.
+    // if 1 delimiter, then its the one to use. Return user friendly choice.
+    // if 2 or more delimiters, need to offer choices/advise of potential issue.
+    if (empty($file_delimiter)) {
+      return NULL;
+    } else if (count($file_delimiter) == 1) {
+      if ($file_delimiter[0] == "\t") {
+        $file_delimiter[0] = 'tab';
+      } elseif ($file_delimiter[0] == " " || $file_delimiter[0] == "&nbsp;") {
+        $file_delimiter[0] = 'space';
+      }
+      return $file_delimiter[0];
+    } else {
+      return array('delims'=>$file_delimiter);
+    }
+  } else {
+    // Single delimiter used and was "immediately" found return user friendly choice.
+    if ($file_delimiter == "\t") {
+      $file_delimiter = 'tab';
+    } elseif ($file_delimiter == " " || $file_delimiter == "&nbsp;") {
+      $file_delimiter = 'space';
+    }
+    return $file_delimiter;
+  }
+}
+
 if ( (!is_null($_POST['export']) && isset($_POST['export'])) || (!is_null($_GET['export']) && isset($_GET['export'])) || (!is_null($_POST['exportorder']) && isset($_POST['exportorder'])) ) {
   include_once('easypopulate_4_export.php'); // this file contains all data export code
 }
@@ -758,8 +930,36 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
             }
 
             for ($i = 0; $i < count($val); $i++) {
+              $file_delimiter_error = false;
               if (EP4_SHOW_ALL_FILETYPES != 'Hidden' || (EP4_SHOW_ALL_FILETYPES == 'Hidden' && ($files[$i] != ".") && ($files[$i] != "..") && preg_match("/\.(sql|gz|csv|txt|log)$/i", $files[$i]) )) {
                 $file_count++;
+                $file_delimiter = ep_4_display_CSV_Delimiter($upload_dir . $files[$val[$i]]);
+
+                $file_text = '';
+                if (is_array($file_delimiter)) {
+                  $file_text = '"';
+                  foreach($file_delimiter as $file_delim) {
+                    switch ($file_delim) {
+                      case "\t":
+                        $file_text .= 'tab';
+                        break;
+                      case " ":
+                        $file_text .= 'space';
+                        break;
+                      default:
+                        $file_text .= $file_delim;
+                        break;
+                    }
+                    $file_text .= '", "';
+                  }
+                  $file_text = substr($file_text, 0, -3);
+                }
+
+                if (isset($file_delimiter) && is_array($file_delimiter) || !isset($file_delimiter)) {
+                  $file_delimiter = $file_text . EASYPOPULATE_4_DELIMITER_UNKNOWN;
+                  $file_delimiter_error = true;
+                }
+
                 echo '<tr><td>' . $files[$val[$i]] . '</td>
           <td align="right">' . filesize($upload_dir . $files[$val[$i]]) . '</td>
           <td align="center">' . date("Y-m-d H:i:s", filemtime($upload_dir . $files[$val[$i]])) . '</td>';
@@ -773,7 +973,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
                     echo '<td align=center>GZip</td>';
                     break;
                   case 'csv':
-                    echo '<td align=center>CSV</td>';
+                    echo '<td align=center>CSV ' . $file_delimiter . ' </td>';
                     break;
                   case 'txt':
                     echo '<td align=center>TXT</td>';
@@ -791,9 +991,11 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
                   if (strtolower(substr($files[$val[$i]], 0, 12)) == "sba-stock-ep") {
 //                    echo "<td align=center><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT . "</a><br /><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "&amp;sync=1\"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT_SYNC; </a></td>\n";
                     echo "<td align=center>" . zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('import', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form><br />" . zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('import', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_hidden_field('sync', '1', /*$parameters = */'') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT_SYNC, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form></td>\n"; //"<a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT . "</a><br /><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "&amp;sync=1\"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT_SYNC; //</a></td>\n";
-                  } else {
+                  } else if(!$file_delimiter_error) {
 //                    echo "<td align=center><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT . "</a></td>\n";
                     echo "<td align=center>" . zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('import', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form></td>\n"; // <a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT . "</a></td>\n";
+                  } else {
+                    echo "<td align=center>Import error</td>\n";
                   }
 //        echo zen_draw_form('custom', 'easypopulate_4.php', '', 'post', 'id="custom"');
 
