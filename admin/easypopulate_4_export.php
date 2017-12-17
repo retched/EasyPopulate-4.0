@@ -225,17 +225,18 @@ $zco_notifier->notify('EP4_EXPORT_WHILE_START');
 while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
 
   if ($ep_dltype == 'attrib_basic') { // special case 'attrib_basic'
+    $l_id = (int)$row['v_language_id'];
+
     if ($row['v_products_id'] == $active_products_id) {
       if ($row['v_options_id'] == $active_options_id) {
         // collect the products_options_values_name
         if ($active_language_id <> $row['v_language_id']) {
-          $l_id = $row['v_language_id'];
+
           $active_row['v_products_options_type'] = $row['v_products_options_type'];
           $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
           $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
           $active_language_id = $row['v_language_id'];
         } else {
-          $l_id = $row['v_language_id'];
           $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
           $active_row['v_products_options_values_name_' . $l_id] .= "," . $row['v_products_options_values_name'];
           $active_row['v_products_options_type'] = $row['v_products_options_type'];
@@ -251,7 +252,6 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 
         $active_options_id = $row['v_options_id'];
         $active_language_id = $row['v_language_id'];
-        $l_id = $row['v_language_id'];
         $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
         $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
         $active_row['v_products_options_type'] = $row['v_products_options_type'];
@@ -281,7 +281,6 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       }
       $active_row['v_products_options_type'] = $row['v_products_options_type'];
 
-      $l_id = $row['v_language_id'];
       $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
       $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
     } // end of special case 'attrib_basic'
