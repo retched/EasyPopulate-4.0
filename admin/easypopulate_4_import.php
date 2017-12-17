@@ -1816,9 +1816,9 @@ $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) :
               }
               $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_NEW, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price, $v_specials_price);
             } else { // existing product
-              if ($v_specials_price == '0') { // delete of existing requested
+              if ($v_specials_price < 0 || (defined('EASYPOPULATE_4_CONFIG_SPECIALS_REMOVE_AT') && EASYPOPULATE_4_CONFIG_SPECIALS_REMOVE_AT == 'zero' && $v_specials_price == '0')) { // delete of existing requested with negative number or option to do so when 0.
                 $db->Execute("DELETE FROM " . TABLE_SPECIALS . " WHERE products_id = '" . (int) $v_products_id . "'");
-                $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_DELETE, ${$chosen_key});
+                $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_DELETE, ${$chosen_key}, ${$chosen_key});
                 continue;
               }
               // just make an update
