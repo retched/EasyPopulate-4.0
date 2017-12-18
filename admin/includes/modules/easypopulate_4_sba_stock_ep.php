@@ -15,6 +15,9 @@
       }
 
       while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // read 1 line of data
+
+        @set_time_limit($ep_execution);
+
         //IF STANDARD STOCK, then Update the standard stock
         if ($items[$filelayout['v_SBA_tracked']] == '') {
           $sql = "UPDATE " . TABLE_PRODUCTS . " SET
@@ -59,6 +62,8 @@
             $ep_error_count++;
           } // if
         } //end if Standard / SBA stock
+        print(str_repeat(" ", 300));
+        flush();
       } // end while
 
       if ($sync) {

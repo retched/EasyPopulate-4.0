@@ -155,6 +155,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
       // Main IMPORT loop For Product Related Data. v_products_id is the main key
       while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // read 1 line of data
 
+        @set_time_limit($ep_execution);
+
         // bug fix 5-10-2012: when adding/updating a mix of old and new products and missing certain columns,
         // an exising product's info is being put into a subsquently new product.
         // So, first clear old values...
@@ -905,8 +907,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               foreach ($langcode as $lang2) {
                 $v_categories_name_check = 'v_categories_name_' . $lang2['id'];
 
-                  $cat_lang_id = $lang2['id'];
-                  $sql = "INSERT INTO " . TABLE_CATEGORIES_DESCRIPTION . " SET
+                $cat_lang_id = $lang2['id'];
+                $sql = "INSERT INTO " . TABLE_CATEGORIES_DESCRIPTION . " SET
                     categories_id   = :categories_id:,
                     language_id     = :language_id:,
                     categories_name = :categories_name:";
@@ -953,14 +955,14 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 unset($result);
               }
               unset($lang2);
-          $thiscategoryid = $max_category_id;
-        }
-        // the current catid is the next level's parent
-        $theparent_id = $thiscategoryid;
-        // keep setting this, we need the lowest level category ID later
-        $v_categories_id = $thiscategoryid;
-      } // ( $category_index=0; $category_index<$catego.....
-    } // (isset($$v_categories_name_var))
+              $thiscategoryid = $max_category_id;
+            }
+            // the current catid is the next level's parent
+            $theparent_id = $thiscategoryid;
+            // keep setting this, we need the lowest level category ID later
+            $v_categories_id = $thiscategoryid;
+          } // ( $category_index = 0; $category_index < $catego.....
+        } // (isset($$v_categories_name_var))
         $zco_notifier->notify('EP4_IMPORT_AFTER_CATEGORY');
         // END: CATEGORIES2 ===============================================================================================
         // HERE ==========================>
@@ -1705,268 +1707,268 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 
           // BEGIN: Products Descriptions
           // the following is common in both the updating an existing product and creating a new product // mc12345678 updated to allow omission of v_products_description in the import file.
-    $add_products_description_data = false;
-    $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_ADD_OR_CHANGE_DATA');
-    if ((isset($v_products_name) && is_array($v_products_name))
-       || (isset($v_products_description) && is_array($v_products_description))
-       || ($ep_supported_mods['psd'] == true && isset($v_products_short_desc))
-       || (isset($v_products_url) && is_array($v_products_url))
-       || $add_products_description_data) { //
-      // Effectively need a way to step through all language options, this section to be "accepted" if there is something to be updated.  Prefer the ability to verify update need without having to loop on anything, but just by "presence" of information.
-      foreach ($langcode as $lang) {
-        // foreach ($v_products_name as $key => $name) {  // Decouple the dependency on the products_name being imported to update the products_name, description, short description and/or URL. //mc12345678 2015-Dec-12
-        $lang_id = $lang['id'];
-        $lang_id_code = $lang['code'];
-        $sql = "SELECT * FROM " . TABLE_PRODUCTS_DESCRIPTION . " WHERE
-                  products_id = :products_id: AND
-                  language_id = :language_id:";
-        $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
-        $sql = $db->bindVars($sql, ':language_id:', $lang_id, 'integer');
+          $add_products_description_data = false;
+          $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_ADD_OR_CHANGE_DATA');
+          if ((isset($v_products_name) && is_array($v_products_name))
+             || (isset($v_products_description) && is_array($v_products_description))
+             || ($ep_supported_mods['psd'] == true && isset($v_products_short_desc))
+             || (isset($v_products_url) && is_array($v_products_url))
+             || $add_products_description_data) { //
+            // Effectively need a way to step through all language options, this section to be "accepted" if there is something to be updated.  Prefer the ability to verify update need without having to loop on anything, but just by "presence" of information.
+            foreach ($langcode as $lang) {
+              // foreach ($v_products_name as $key => $name) {  // Decouple the dependency on the products_name being imported to update the products_name, description, short description and/or URL. //mc12345678 2015-Dec-12
+              $lang_id = $lang['id'];
+              $lang_id_code = $lang['code'];
+              $sql = "SELECT * FROM " . TABLE_PRODUCTS_DESCRIPTION . " WHERE
+                        products_id = :products_id: AND
+                        language_id = :language_id:";
+              $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
+              $sql = $db->bindVars($sql, ':language_id:', $lang_id, 'integer');
 
-        $result = ep_4_query($sql);
-        unset($sql);
+              $result = ep_4_query($sql);
+              unset($sql);
 
-        if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) {
-          $sql = "INSERT INTO " . TABLE_PRODUCTS_DESCRIPTION . " (
-                      products_id,
-            " . (isset($filelayout['v_products_name_' . $lang_id]) || isset($filelayout['v_products_name_' . $lang_id_code]) || $product_is_new
-                  ? "products_name, "
-                  : "") .
-            ((isset($filelayout['v_products_description_' . $lang_id]) || isset($filelayout['v_products_description_' . $lang_id_code]) || $product_is_new)
-              ? " products_description, "
-              : "");
-          if ($ep_supported_mods['psd'] == true && isset($v_products_short_desc)) {
-            $sql .= " products_short_desc,";
-          }
-          $sql .= (isset($filelayout['v_products_url_' . $lang_id]) || isset($filelayout['v_products_url_' . $lang_id_code]) ? " products_url, " : "");
-          $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_INSERT_FIELDS');
-          $sql .= "
-                   language_id )
-                            VALUES (
-                   :v_products_id:,
-                   " . (isset($filelayout['v_products_name_' . $lang_id]) || isset($filelayout['v_products_name_' . $lang_id_code]) || $product_is_new ? ":v_products_name:, " : "") .
-                   ((isset($filelayout['v_products_description_' . $lang_id]) || isset($filelayout['v_products_description_' . $lang_id_code]) || $product_is_new)
-                     ? ":v_products_description:, "
-                     : "");
-          if ($ep_supported_mods['psd'] == true && isset($v_products_short_desc)) {
-            $sql .= ":v_products_short_desc:, ";
-          }
-          $sql .= (isset($filelayout['v_products_url_' . $lang_id]) || isset($filelayout['v_products_url_' . $lang_id_code]) ? ":v_products_url:, " : "");
-          $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_INSERT_FIELDS_VALUES');
-          $sql .= "
-                   :language_id:)";
-
-          $oldPost = $_POST;
-          unset($_POST);
-
-          if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
-            $_POST['products_name'][$lang_id] = $v_products_name[$lang_id];
-          }
-          if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
-            $_POST['products_name'][$lang_id_code] = $v_products_name[$lang_id_code];
-          }
-          if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
-            $_POST['products_description'][$lang_id] = $v_products_description[$lang_id];
-          }
-          if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
-            $_POST['products_description'][$lang_id_code] = $v_products_description[$lang_id_code];
-          }
-          if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
-            $_POST['products_short_description'][$lang_id] = $v_products_short_desc[$lang_id];
-          }
-          if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
-            $_POST['products_short_description'][$lang_id_code] = $v_products_short_desc[$lang_id_code];
-          }
-          if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
-            $_POST['products_url'][$lang_id] = $v_products_url[$lang_id];
-          }
-          if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
-            $_POST['products_url'][$lang_id_code] = $v_products_url[$lang_id_code];
-          }
-
-          if (class_exists('AdminRequestSanitizer')) {
-            $sanitizer = AdminRequestSanitizer::getInstance();
-            $sanitizer->runSanitizers();
-          }
-
-          if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
-            $v_products_name_store = $v_products_name[$lang_id] = $_POST['products_name'][$lang_id];
-          }
-          if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
-            $v_products_name_store = $v_products_name[$lang_id_code] = $_POST['products_name'][$lang_id_code];
-          }
-
-          if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
-            $v_products_desc_store = $v_products_description[$lang_id] = $_POST['products_description'][$lang_id];
-          }
-          if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
-            $v_products_desc_store = $v_products_description[$lang_id_code] = $_POST['products_description'][$lang_id_code];
-          }
-
-          if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
-            $v_products_short_desc_store = $v_products_short_desc[$lang_id] = $_POST['products_short_description'][$lang_id];
-          }
-          if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
-            $v_products_short_desc_store = $v_products_short_desc[$lang_id_code] = $_POST['products_short_description'][$lang_id_code];
-          }
-
-          if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
-            $v_products_url_store = $v_products_url[$lang_id] = $_POST['products_url'][$lang_id];
-          }
-          if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
-            $v_products_url_store = $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
-          }
-            
-          $_POST = $oldPost;
-          unset($oldPost);
-
-          $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_START');
-          $sql = $db->bindVars($sql, ':v_products_id:', $v_products_id, 'integer');
-          $sql = $db->bindVars($sql, ':language_id:', $lang_id, 'integer');
-          $sql = $db->bindVars($sql, ':v_products_name:', (isset($v_products_name_store) ? $v_products_name_store : ''), $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':v_products_description:', (isset($v_products_desc_store) ? $v_products_desc_store : ''), $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':v_products_short_desc:', (isset($v_products_short_desc_store) ? $v_products_short_desc_store : ''), $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':v_products_url:', (isset($v_products_url_store) ? $v_products_url_store : ''), $zc_support_ignore_null);
-          $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_END');
-
-          $result = ep_4_query($sql);
-          if ($result) {
-            zen_record_admin_activity('New product ' . (int)$v_products_id . ' description added via EP4.', 'info');
-          }
-        } else { // already in the description, update it
-          $sql = "UPDATE " . TABLE_PRODUCTS_DESCRIPTION . " SET ";
-          $update_count = false;
-          if (isset($filelayout['v_products_name_' . $lang_id]) || isset($filelayout['v_products_name_' . $lang_id_code])) {
-            $sql .= " products_name      = :v_products_name:";
-            $update_count = true;
-          }
-          if (isset($filelayout['v_products_description_' . $lang_id]) || isset($filelayout['v_products_description_' . $lang_id_code]) || $product_is_new) {
-            $sql .= ($update_count ? ", " : "") . "products_description = :v_products_description:";
-            $update_count = true;
-          }
-          if ($ep_supported_mods['psd'] == true && (isset($v_products_short_desc[$lang_id]) || isset($v_products_short_desc[$lang_id_code]))) {
-            $sql .= ($update_count ? ", " : "") . "products_short_desc = :v_products_short_desc:";
+              if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) {
+                $sql = "INSERT INTO " . TABLE_PRODUCTS_DESCRIPTION . " (
+                            products_id,
+                  " . (isset($filelayout['v_products_name_' . $lang_id]) || isset($filelayout['v_products_name_' . $lang_id_code]) || $product_is_new
+                        ? "products_name, "
+                        : "") .
+                  ((isset($filelayout['v_products_description_' . $lang_id]) || isset($filelayout['v_products_description_' . $lang_id_code]) || $product_is_new)
+                    ? " products_description, "
+                    : "");
+                if ($ep_supported_mods['psd'] == true && isset($v_products_short_desc)) {
+                  $sql .= " products_short_desc,";
                 }
-          if (isset($filelayout['v_products_url_' . $lang_id]) || isset($filelayout['v_products_url_' . $lang_id_code])) {
-            $sql .= ($update_count ? ", " : "") . " products_url = :v_products_url: ";
-            $update_count = true;
-          }
-          // If using this notifier to add to the $sql, the when something is added be sure to
-          //  set $update_count = true;
-          $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_UPDATE_FIELDS_VALUES');
+                $sql .= (isset($filelayout['v_products_url_' . $lang_id]) || isset($filelayout['v_products_url_' . $lang_id_code]) ? " products_url, " : "");
+                $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_INSERT_FIELDS');
+                $sql .= "
+                         language_id )
+                                  VALUES (
+                         :v_products_id:,
+                         " . (isset($filelayout['v_products_name_' . $lang_id]) || isset($filelayout['v_products_name_' . $lang_id_code]) || $product_is_new ? ":v_products_name:, " : "") .
+                         ((isset($filelayout['v_products_description_' . $lang_id]) || isset($filelayout['v_products_description_' . $lang_id_code]) || $product_is_new)
+                           ? ":v_products_description:, "
+                           : "");
+                if ($ep_supported_mods['psd'] == true && isset($v_products_short_desc)) {
+                  $sql .= ":v_products_short_desc:, ";
+                }
+                $sql .= (isset($filelayout['v_products_url_' . $lang_id]) || isset($filelayout['v_products_url_' . $lang_id_code]) ? ":v_products_url:, " : "");
+                $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_INSERT_FIELDS_VALUES');
+                $sql .= "
+                         :language_id:)";
 
-          $sql .= "        WHERE products_id = :v_products_id: AND language_id = :language_id:";
+                $oldPost = $_POST;
+                unset($_POST);
 
-          $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_UPDATE_WHERE');
+                if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
+                  $_POST['products_name'][$lang_id] = $v_products_name[$lang_id];
+                }
+                if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
+                  $_POST['products_name'][$lang_id_code] = $v_products_name[$lang_id_code];
+                }
+                if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
+                  $_POST['products_description'][$lang_id] = $v_products_description[$lang_id];
+                }
+                if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
+                  $_POST['products_description'][$lang_id_code] = $v_products_description[$lang_id_code];
+                }
+                if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
+                  $_POST['products_short_description'][$lang_id] = $v_products_short_desc[$lang_id];
+                }
+                if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
+                  $_POST['products_short_description'][$lang_id_code] = $v_products_short_desc[$lang_id_code];
+                }
+                if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
+                  $_POST['products_url'][$lang_id] = $v_products_url[$lang_id];
+                }
+                if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
+                  $_POST['products_url'][$lang_id_code] = $v_products_url[$lang_id_code];
+                }
 
-          $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_START');
+                if (class_exists('AdminRequestSanitizer')) {
+                  $sanitizer = AdminRequestSanitizer::getInstance();
+                  $sanitizer->runSanitizers();
+                }
 
-          $oldPost = $_POST;
-          unset($_POST);
+                if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
+                  $v_products_name_store = $v_products_name[$lang_id] = $_POST['products_name'][$lang_id];
+                }
+                if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
+                  $v_products_name_store = $v_products_name[$lang_id_code] = $_POST['products_name'][$lang_id_code];
+                }
 
-          if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
-            $_POST['products_name'][$lang_id] = $v_products_name[$lang_id];
-          }
-          if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
-            $_POST['products_name'][$lang_id_code] = $v_products_name[$lang_id_code];
-          }
-          if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
-            $_POST['products_description'][$lang_id] = $v_products_description[$lang_id];
-          }
-          if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
-            $_POST['products_description'][$lang_id_code] = $v_products_description[$lang_id_code];
-          }
-          if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
-            $_POST['products_short_description'][$lang_id] = $v_products_short_desc[$lang_id];
-          }
-          if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
-            $_POST['products_short_description'][$lang_id_code] = $v_products_short_desc[$lang_id_code];
-          }
-          if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
-            $_POST['products_url'][$lang_id] = $v_products_url[$lang_id];
-          }
-          if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
-            $_POST['products_url'][$lang_id_code] = $v_products_url[$lang_id_code];
-          }
+                if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
+                  $v_products_desc_store = $v_products_description[$lang_id] = $_POST['products_description'][$lang_id];
+                }
+                if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
+                  $v_products_desc_store = $v_products_description[$lang_id_code] = $_POST['products_description'][$lang_id_code];
+                }
 
-          if (class_exists('AdminRequestSanitizer')) {
-            $sanitizer = AdminRequestSanitizer::getInstance();
-            $sanitizer->runSanitizers();
-          }
+                if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
+                  $v_products_short_desc_store = $v_products_short_desc[$lang_id] = $_POST['products_short_description'][$lang_id];
+                }
+                if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
+                  $v_products_short_desc_store = $v_products_short_desc[$lang_id_code] = $_POST['products_short_description'][$lang_id_code];
+                }
 
-          if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
-            $v_products_name_store = $v_products_name[$lang_id] = $_POST['products_name'][$lang_id];
-          }
-          if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
-            $v_products_name_store = $v_products_name[$lang_id_code] = $_POST['products_name'][$lang_id_code];
-          }
+                if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
+                  $v_products_url_store = $v_products_url[$lang_id] = $_POST['products_url'][$lang_id];
+                }
+                if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
+                  $v_products_url_store = $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
+                }
 
-          if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
-            $v_products_desc_store = $v_products_description[$lang_id] = $_POST['products_description'][$lang_id];
-          }
-          if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
-            $v_products_desc_store = $v_products_description[$lang_id_code] = $_POST['products_description'][$lang_id_code];
-          }
+                $_POST = $oldPost;
+                unset($oldPost);
 
-          if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
-            $v_products_short_desc_store = $v_products_short_desc[$lang_id] = $_POST['products_short_description'][$lang_id];
-          }
-          if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
-            $v_products_short_desc_store = $v_products_short_desc[$lang_id_code] = $_POST['products_short_description'][$lang_id_code];
-          }
+                $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_START');
+                $sql = $db->bindVars($sql, ':v_products_id:', $v_products_id, 'integer');
+                $sql = $db->bindVars($sql, ':language_id:', $lang_id, 'integer');
+                $sql = $db->bindVars($sql, ':v_products_name:', (isset($v_products_name_store) ? $v_products_name_store : ''), $zc_support_ignore_null);
+                $sql = $db->bindVars($sql, ':v_products_description:', (isset($v_products_desc_store) ? $v_products_desc_store : ''), $zc_support_ignore_null);
+                $sql = $db->bindVars($sql, ':v_products_short_desc:', (isset($v_products_short_desc_store) ? $v_products_short_desc_store : ''), $zc_support_ignore_null);
+                $sql = $db->bindVars($sql, ':v_products_url:', (isset($v_products_url_store) ? $v_products_url_store : ''), $zc_support_ignore_null);
+                $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_END');
 
-          if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
-            $v_products_url_store = $v_products_url[$lang_id] = $_POST['products_url'][$lang_id];
-          }
-          if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
-            $v_products_url_store = $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
-          }
+                $result = ep_4_query($sql);
+                if ($result) {
+                  zen_record_admin_activity('New product ' . (int)$v_products_id . ' description added via EP4.', 'info');
+                }
+              } else { // already in the description, update it
+                $sql = "UPDATE " . TABLE_PRODUCTS_DESCRIPTION . " SET ";
+                $update_count = false;
+                if (isset($filelayout['v_products_name_' . $lang_id]) || isset($filelayout['v_products_name_' . $lang_id_code])) {
+                  $sql .= " products_name      = :v_products_name:";
+                  $update_count = true;
+                }
+                if (isset($filelayout['v_products_description_' . $lang_id]) || isset($filelayout['v_products_description_' . $lang_id_code]) || $product_is_new) {
+                  $sql .= ($update_count ? ", " : "") . "products_description = :v_products_description:";
+                  $update_count = true;
+                }
+                if ($ep_supported_mods['psd'] == true && (isset($v_products_short_desc[$lang_id]) || isset($v_products_short_desc[$lang_id_code]))) {
+                  $sql .= ($update_count ? ", " : "") . "products_short_desc = :v_products_short_desc:";
+                }
+                if (isset($filelayout['v_products_url_' . $lang_id]) || isset($filelayout['v_products_url_' . $lang_id_code])) {
+                  $sql .= ($update_count ? ", " : "") . " products_url = :v_products_url: ";
+                  $update_count = true;
+                }
+                // If using this notifier to add to the $sql, the when something is added be sure to
+                //  set $update_count = true;
+                $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_UPDATE_FIELDS_VALUES');
 
-          $_POST = $oldPost;
-          unset($oldPost);
+                $sql .= "        WHERE products_id = :v_products_id: AND language_id = :language_id:";
 
-          $sql = $db->bindVars($sql, ':v_products_name:', (isset($v_products_name_store) ? $v_products_name_store : ''), $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':v_products_description:', (isset($v_products_desc_store) ? $v_products_desc_store : ''), $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':v_products_short_desc:', (isset($v_products_short_desc_store) ? $v_products_short_desc_store : ''), $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':v_products_url:', (isset($v_products_url_store) ? $v_products_url_store : ''), $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':v_products_id:', $v_products_id, 'integer');
-          $sql = $db->bindVars($sql, ':language_id:', $lang_id, 'integer');
-          $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_END');
+                $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_UPDATE_WHERE');
+
+                $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_START');
+
+                $oldPost = $_POST;
+                unset($_POST);
+
+                if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
+                  $_POST['products_name'][$lang_id] = $v_products_name[$lang_id];
+                }
+                if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
+                  $_POST['products_name'][$lang_id_code] = $v_products_name[$lang_id_code];
+                }
+                if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
+                  $_POST['products_description'][$lang_id] = $v_products_description[$lang_id];
+                }
+                if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
+                  $_POST['products_description'][$lang_id_code] = $v_products_description[$lang_id_code];
+                }
+                if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
+                  $_POST['products_short_description'][$lang_id] = $v_products_short_desc[$lang_id];
+                }
+                if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
+                  $_POST['products_short_description'][$lang_id_code] = $v_products_short_desc[$lang_id_code];
+                }
+                if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
+                  $_POST['products_url'][$lang_id] = $v_products_url[$lang_id];
+                }
+                if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
+                  $_POST['products_url'][$lang_id_code] = $v_products_url[$lang_id_code];
+                }
+
+                if (class_exists('AdminRequestSanitizer')) {
+                  $sanitizer = AdminRequestSanitizer::getInstance();
+                  $sanitizer->runSanitizers();
+                }
+
+                if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
+                  $v_products_name_store = $v_products_name[$lang_id] = $_POST['products_name'][$lang_id];
+                }
+                if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
+                  $v_products_name_store = $v_products_name[$lang_id_code] = $_POST['products_name'][$lang_id_code];
+                }
+
+                if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
+                  $v_products_desc_store = $v_products_description[$lang_id] = $_POST['products_description'][$lang_id];
+                }
+                if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
+                  $v_products_desc_store = $v_products_description[$lang_id_code] = $_POST['products_description'][$lang_id_code];
+                }
+
+                if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
+                  $v_products_short_desc_store = $v_products_short_desc[$lang_id] = $_POST['products_short_description'][$lang_id];
+                }
+                if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
+                  $v_products_short_desc_store = $v_products_short_desc[$lang_id_code] = $_POST['products_short_description'][$lang_id_code];
+                }
+
+                if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
+                  $v_products_url_store = $v_products_url[$lang_id] = $_POST['products_url'][$lang_id];
+                }
+                if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
+                  $v_products_url_store = $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
+                }
+
+                $_POST = $oldPost;
+                unset($oldPost);
+
+                $sql = $db->bindVars($sql, ':v_products_name:', (isset($v_products_name_store) ? $v_products_name_store : ''), $zc_support_ignore_null);
+                $sql = $db->bindVars($sql, ':v_products_description:', (isset($v_products_desc_store) ? $v_products_desc_store : ''), $zc_support_ignore_null);
+                $sql = $db->bindVars($sql, ':v_products_short_desc:', (isset($v_products_short_desc_store) ? $v_products_short_desc_store : ''), $zc_support_ignore_null);
+                $sql = $db->bindVars($sql, ':v_products_url:', (isset($v_products_url_store) ? $v_products_url_store : ''), $zc_support_ignore_null);
+                $sql = $db->bindVars($sql, ':v_products_id:', $v_products_id, 'integer');
+                $sql = $db->bindVars($sql, ':language_id:', $lang_id, 'integer');
+                $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_END');
 
                 // Be sure to run the update query only if there has been something provded to
                 //  update.
-          if ($update_count == true) {
-            $result = ep_4_query($sql);
-            if ($result) {
-              zen_record_admin_activity('Updated product ' . (int)$v_products_id . ' description via EP4.', 'info');
-            }
-          }  // Perform query if there is something to update.
-        } // END: already in description, update it
-        unset($sql);
-        unset($result);
-        unset($v_products_name_store);
-        unset($v_products_desc_store);
-        unset($v_products_short_desc_store);
-        unset($v_products_url_store);
-      } // END: foreach on languages
-      unset($lang);
-    } // END: Products Descriptions End
+                if ($update_count == true) {
+                  $result = ep_4_query($sql);
+                  if ($result) {
+                    zen_record_admin_activity('Updated product ' . (int)$v_products_id . ' description via EP4.', 'info');
+                  }
+                }  // Perform query if there is something to update.
+              } // END: already in description, update it
+              unset($sql);
+              unset($result);
+              unset($v_products_name_store);
+              unset($v_products_desc_store);
+              unset($v_products_short_desc_store);
+              unset($v_products_url_store);
+            } // END: foreach on languages
+            unset($lang);
+          } // END: Products Descriptions End
           //==================================================================================================================================
           // Assign product to category if linked
           // chadd - need to dig into further
           if (isset($v_categories_id)) { // find out if this product is listed in the category given
-        $result_incategory = ep_4_query('SELECT
-          '.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id,
-          '.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id,
-          '.TABLE_PRODUCTS.'.master_categories_id
-          FROM
-          '.TABLE_PRODUCTS.'
-          LEFT JOIN
-          '.TABLE_PRODUCTS_TO_CATEGORIES.' ON ('.TABLE_PRODUCTS.'.products_id = '.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id AND '.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id='.$v_categories_id.')
-          WHERE
-          '.TABLE_PRODUCTS.'.products_id='.$v_products_id);
-$result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) : mysql_fetch_array($result_incategory));
-          if (!zen_not_null($result_incategory['products_id']) || count($result_incategory) <= 0 /* ($ep_uses_mysqli ? mysqli_num_rows($result_incategory) : mysql_num_rows($result_incategory)) == 0 */) { // nope, this is a new category for this product
+            $result_incategory = ep_4_query('SELECT
+              '.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id,
+              '.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id,
+              '.TABLE_PRODUCTS.'.master_categories_id
+              FROM
+              '.TABLE_PRODUCTS.'
+              LEFT JOIN
+              '.TABLE_PRODUCTS_TO_CATEGORIES.' ON ('.TABLE_PRODUCTS.'.products_id = '.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id AND '.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id='.$v_categories_id.')
+              WHERE
+              '.TABLE_PRODUCTS.'.products_id='.$v_products_id);
+            $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) : mysql_fetch_array($result_incategory));
+            if (!zen_not_null($result_incategory['products_id']) || count($result_incategory) <= 0 /* ($ep_uses_mysqli ? mysqli_num_rows($result_incategory) : mysql_num_rows($result_incategory)) == 0 */) { // nope, this is a new category for this product
               if ($items[$filelayout['v_status']] == 7) {
 
                 /* $result_incategory = ep_4_query('SELECT
@@ -2168,8 +2170,11 @@ $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) :
           unset($summary);
         } // end of row insertion code
         unset($items);
-      } // end of Mail While Loop
+        print(str_repeat(" ", 300));
+        flush();
+      } // end of Main While Loop
       unset($handle);
+      print("\n");
     } // conditional IF statement
 
     $zco_notifier->notify('EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT');

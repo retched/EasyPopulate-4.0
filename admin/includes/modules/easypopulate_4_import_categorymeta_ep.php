@@ -6,6 +6,9 @@
  */
 
       while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // read 1 line of data
+
+        @set_time_limit($ep_execution);
+
         // $items[$filelayout['v_categories_id']];
         // $items[$filelayout['v_categories_image']];
         $sql = 'SELECT categories_id FROM ' . TABLE_CATEGORIES . ' WHERE (categories_id = :categories_id:) LIMIT 1';
@@ -108,4 +111,6 @@
           $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Category ID: </b>%s - Not Found!</font>', $items[$filelayout['v_categories_id']]);
           $ep_error_count++;
         } // if category found
+        print(str_repeat(" ", 300));
+        flush();
       } // while

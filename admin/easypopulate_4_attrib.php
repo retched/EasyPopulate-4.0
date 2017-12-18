@@ -324,5 +324,7 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
       // END: PRODUCTS OPTIONS VALUES
     } // END: if
   }  // END: while #2
+  print(str_repeat(" ", 300));
+  flush();
 } // END: while #1
 

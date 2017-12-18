@@ -6,6 +6,9 @@
  */
 
       while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // read 1 line of data
+
+        @set_time_limit($ep_execution);
+
         $sql = 'SELECT * FROM ' . TABLE_PRODUCTS_ATTRIBUTES . '
           WHERE (
           products_attributes_id = :products_attributes_id:' . /* AND
@@ -93,4 +96,6 @@
           $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Attribute Entry on ' . substr($chosen_key, 2) . 'Model: </b>%s - Not Found!</font>', $items[$filelayout[$chosen_key]]);
           $ep_error_count++;
         } // if
+        print(str_repeat(" ", 300));
+        flush();
       } // while

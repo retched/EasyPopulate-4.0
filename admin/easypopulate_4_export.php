@@ -224,6 +224,8 @@ $zco_notifier->notify('EP4_EXPORT_WHILE_START');
 
 while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
 
+  @set_time_limit($ep_execution);
+
   if ($ep_dltype == 'attrib_basic') { // special case 'attrib_basic'
     $l_id = (int)$row['v_language_id'];
 
@@ -951,8 +953,11 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
   unset($row);
   $ep_export_count++;
   } // if $ep_dltype == 'attrib_basic'
+  print(str_repeat(" ", 300));
+  flush();
 } // while ($row)
 //Start SBA1 addresses writing to the file
+print("\n");
 
 if ($ep_dltype == 'attrib_basic') { // must write last record
   // Clean the texts that could break CSV file formatting

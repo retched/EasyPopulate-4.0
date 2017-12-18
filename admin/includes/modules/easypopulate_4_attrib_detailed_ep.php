@@ -9,6 +9,9 @@
 
 
       while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // read 1 line of data
+
+        @set_time_limit($ep_execution);
+
 //Need to validate that the four file records are present or else can do nothing.
         if (isset($filelayout['v_products_attributes_id']) && isset($filelayout['v_products_id']) && isset($filelayout['v_options_id']) && isset($filelayout['v_options_values_id'])) {
           $attrib_key_set = true;
@@ -157,4 +160,6 @@
           $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Attribute Entry on ' . substr($chosen_key, 2) . ': </b>%s - Not Found!</font>', $items[$filelayout[$chosen_key]]);
           $ep_error_count++;
         } // if
+        print(str_repeat(" ", 300));
+        flush();
       } // while

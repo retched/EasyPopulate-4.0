@@ -7,6 +7,9 @@
 
       // check products table to see if product_model exists
       while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // read 1 line of data
+
+        @set_time_limit($ep_execution);
+
         $sql = "SELECT * FROM " . TABLE_PRODUCTS;
 
         $sql .= $chosen_key_sql_limit;
@@ -130,4 +133,6 @@
           $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - ' . $chosen_key . ': </b>%s - Not Found!</font>', $items[$filelayout[$chosen_key]]);
           $ep_error_count++;
         }
+        print(str_repeat(" ", 300));
+        flush();
       }
