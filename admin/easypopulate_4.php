@@ -163,16 +163,26 @@ if (EASYPOPULATE_4_CONFIG_TEMP_DIR === 'EASYPOPULATE_4_CONFIG_TEMP_DIR' && (is_n
 }
 
 // installation start
-if (!is_null($_GET['epinstaller']) && isset($_GET['epinstaller']) && ($_GET['epinstaller'] == 'install' || $_GET['epinstaller'] == 'update')) {
+if (isset($_GET['epinstaller']) && ($_GET['epinstaller'] == 'install' || $_GET['epinstaller'] == 'update')) {
   install_easypopulate_4(); // install new configuration keys
   //$messageStack->add(EASYPOPULATE_4_MSGSTACK_INSTALL_CHMOD_SUCCESS, 'success');
   zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
 }
 
-if (!is_null($_GET['epinstaller']) && $_GET['epinstaller'] == 'remove') { // remove easy populate configuration variables
+if (isset($_GET['epinstaller']) && $_GET['epinstaller'] == 'remove') { // remove easy populate configuration variables
   remove_easypopulate_4();
   zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
 } // end installation/removal
+
+$ep_4_SBAEnabled = ep_4_SBA1Exists();
+
+$ep4CEONURIDoesExist = false;
+if (ep_4_CEONURIExists() == true) {
+  $ep4CEONURIDoesExist = true;
+  if (empty($languages) || !is_array($languages)) {
+    $languages = zen_get_languages();
+  }
+}
 
 // START: check for existance of various mods
 $ep_supported_mods['psd'] = ep_4_check_table_column(TABLE_PRODUCTS_DESCRIPTION, 'products_short_desc');
@@ -341,7 +351,7 @@ if (($collation == 'utf8') && ((substr($project, 0, 5) == "1.3.8") || (substr($p
 // $epdlanguage_id is used only in categories generation code since the products import code doesn't support multi-language categories
 /* @var $epdlanguage_query array */
 //$epdlanguage_query = $db->Execute("SELECT languages_id, name FROM ".TABLE_LANGUAGES." WHERE code = '".DEFAULT_LANGUAGE."'");
-if (!defined(DEFAULT_LANGUAGE)) {
+if (!defined('DEFAULT_LANGUAGE')) {
   $epdlanguage_query = ep_4_query("SELECT languages_id, code FROM " . TABLE_LANGUAGES . " ORDER BY languages_id LIMIT 1");
   $epdlanguage = ($ep_uses_mysqli ? mysqli_fetch_array($epdlanguage_query) : mysql_fetch_array($epdlanguage_query));
   define('DEFAULT_LANGUAGE', $epdlanguage['code']);
@@ -357,19 +367,11 @@ if (($ep_uses_mysqli ? mysqli_num_rows($epdlanguage_query) : mysql_num_rows($epd
 }
 
 $langcode = ep_4_get_languages(); // array of currently used language codes ( 1, 2, 3, ...)
-$ep_4_SBAEnabled = ep_4_SBA1Exists();
 
 /*
   if ( isset($_GET['export2']) ) { // working on attributes export
   include_once('easypopulate_4_export2.php'); // this file contains all data import code
   } */
-$ep4CEONURIDoesExist = false;
-if (ep_4_CEONURIExists() == true) {
-  $ep4CEONURIDoesExist = true;
-  if (!count($languages)) {
-    $languages = zen_get_languages();
-  }
-}
 
 function getDBDelimiterList() {
   global $db;
@@ -537,13 +539,13 @@ function ep_4_display_CSV_Delimiter($filename) {
   }
 }
 
-if ( (!is_null($_POST['export']) && isset($_POST['export'])) || (!is_null($_GET['export']) && isset($_GET['export'])) || (!is_null($_POST['exportorder']) && isset($_POST['exportorder'])) ) {
+if (isset($_POST['export']) || isset($_GET['export']) || isset($_POST['exportorder'])) {
   include_once('easypopulate_4_export.php'); // this file contains all data export code
 }
-if (!is_null($_POST['import']) && isset($_POST['import'])) {
+if (isset($_POST['import'])) {
   include_once('easypopulate_4_import.php'); // this file contains all data import code
 }
-if (!is_null($_POST['split']) && isset($_POST['split'])) {
+if (isset($_POST['split'])) {
   include_once('easypopulate_4_split.php'); // this file has split code
 }
 
@@ -568,7 +570,7 @@ if (isset($_FILES['uploadfile'])) {
 }
 
 // Handle file deletion (delete only in the current directory for security reasons)
-if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]) && isset($_POST["delete"])) && !is_null($_SERVER["SCRIPT_FILENAME"]) && $_POST["delete"] != basename($_SERVER["SCRIPT_FILENAME"])) {
+if (((isset($error) && !$error) || !isset($error)) && (isset($_POST["delete"])) && !is_null($_SERVER["SCRIPT_FILENAME"]) && $_POST["delete"] != basename($_SERVER["SCRIPT_FILENAME"])) {
   if (preg_match("/(\.(sql|gz|csv|txt|log))$/i", $_POST["delete"]) && @unlink($upload_dir . basename($_POST["delete"]))) {
     // $messageStack->add(sprintf($_POST["delete"]." was deleted successfully"), 'success');
     zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
@@ -915,7 +917,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
           }
 
           foreach ((EP4_SHOW_ALL_FILETYPES != 'false' ? $filenames_merged : $filetypes) as $key => $val) {
-            (EP4_SHOW_ALL_FILETYPES != 'false' ? $val = $filetypes[$key] : '');
+            (EP4_SHOW_ALL_FILETYPES != 'false' ? $val = ((isset($filetypes[$key]) || array_key_exists($key, $filetypes)) ? $filetypes[$key] : NULL) : '');
             if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
               $val = array();
               for ($i = 0; $i < count($files); $i++) {
@@ -965,7 +967,9 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
                 echo '<tr><td>' . $files[$val[$i]] . '</td>
           <td align="right">' . filesize($upload_dir . $files[$val[$i]]) . '</td>
           <td align="center">' . date("Y-m-d H:i:s", filemtime($upload_dir . $files[$val[$i]])) . '</td>';
-                $ext = strtolower(end(explode('.', $files[$val[$i]])));
+                $elem_list = explode('.', $files[$val[$i]]);
+                $end_elem = end($elem_list);
+                $ext = strtolower($end_elem);
                 // file type
                 switch ($ext) {
                   case 'sql':

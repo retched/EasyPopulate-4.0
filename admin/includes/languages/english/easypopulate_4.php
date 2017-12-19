@@ -83,6 +83,10 @@ define('SBA_DETAILED_EP_DESC','Prefix: %1$s. %2$s will be processed through the 
 define('SBA_STOCK_EP_DESC','Prefix: %1$s. %2$s will be processed through the Stock by Attributes Stock Modification filters.');
 define('ORDERS_EP_DESC', 'Prefix: %1$s. %2$s will not be processed for import.');
 define('CATCHALL_EP_DESC', 'This contains any other file. %2$s will be processed like a full data file.');
+define('ORDERSEXPORT_LINK_SAVE1', 'ORDERSEXPORT_LINK_SAVE1');
+define('ORDERSEXPORT_LINK_SAVE1B', 'ORDERSEXPORT_LINK_SAVE1B');
+define('ORDERSEXPORT_LINK_SAVE2', 'ORDERSEXPORT_LINK_SAVE2');
+define('ORDERSEXPORT_LINK_SAVE3', 'ORDERSEXPORT_LINK_SAVE3');
 
 // error log defines - for ep_debug_log.txt
 define('EASYPOPULATE_4_ERRORLOG_SQL_ERROR', 'MySQL error %s: %s\nWhen executing:\n%sn');

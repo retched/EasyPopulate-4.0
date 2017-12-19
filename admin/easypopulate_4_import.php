@@ -354,7 +354,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           // ${$thisvar} creates a variable named $thisvar and sets the value to $row value ($v_products_price = $row['v_products_price'];),
           // which is the existing value for these fields in the database before importing the updated information
           foreach ($default_these as $thisvar) {
-            ${$thisvar} = $row[$thisvar];
+            ${$thisvar} = (isset($row[$thisvar]) || array_key_exists($thisvar, $row)) ? $row[$thisvar] : '';
           }
           unset($thisvar);
           unset($row);
@@ -1477,17 +1477,17 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                      WHERE (products_id = :products_id:)";
             $query = $db->bindVars($query, ':products_model:', $v_products_model , $zc_support_ignore_null);
             $query = $db->bindVars($query, ':products_price:', $v_products_price , 'currency');
-            $query = $db->bindVars($query, ':products_price_uom:', $v_products_price_uom , 'currency');
-            $query = $db->bindVars($query, ':products_upc:', $v_products_upc, $zc_support_ignore_null);
-            $query = $db->bindVars($query, ':products_gpc:', $v_products_gpc, $zc_support_ignore_null);
-            $query = $db->bindVars($query, ':products_msrp:', $v_products_msrp, 'currency');
-            $query = $db->bindVars($query, ':map_enabled:', $v_map_enabled, $zc_support_ignore_null);
-            $query = $db->bindVars($query, ':map_price:', $v_map_price, 'currency');
-            $query = $db->bindVars($query, ':products_group_a_price:', $v_products_group_a_price, 'currency');
-            $query = $db->bindVars($query, ':products_group_b_price:', $v_products_group_b_price, 'currency');
-            $query = $db->bindVars($query, ':products_group_c_price:', $v_products_group_c_price, 'currency');
-            $query = $db->bindVars($query, ':products_group_d_price:', $v_products_group_d_price, 'currency');
-            $query = $db->bindVars($query, ':products_exclusive:', $v_products_exclusive, $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':products_price_uom:', (isset($v_products_price_uom) ? $v_products_price_uom : '0.00') , 'currency');
+            $query = $db->bindVars($query, ':products_upc:', (isset($v_products_upc) ? $v_products_upc : ''), $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':products_gpc:', (isset($v_products_gpc) ? $v_products_gpc : ''), $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':products_msrp:', (isset($v_products_msrp) ? $v_products_msrp : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':map_enabled:', (isset($v_map_enabled) ? $v_map_enabled : ''), $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':map_price:', (isset($v_map_price) ? $v_map_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_group_a_price:', (isset($v_products_group_a_price) ? $v_products_group_a_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_group_b_price:', (isset($v_products_group_b_price) ? $v_products_group_b_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_group_c_price:', (isset($v_products_group_c_price) ? $v_products_group_c_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_group_d_price:', (isset($v_products_group_d_price) ? $v_products_group_d_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_exclusive:', (isset($v_products_exclusive) ? $v_products_exclusive : ''), $zc_support_ignore_null);
             $query = $db->bindVars($query, ':products_image:', $v_products_image, $zc_support_ignore_null);
             $query = $db->bindVars($query, ':products_weight:', $v_products_weight, 'float');
             $query = $db->bindVars($query, ':products_discount_type:', $v_products_discount_type, 'integer');

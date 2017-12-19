@@ -212,9 +212,9 @@ if ($ep_dltype <> 'SBA_basic') { // mc12345678 - SBA Basic add on.
 unset($column_headers);
 
 // these variables are for the Attrib_Basic Export
-$active_products_id = ""; // start empty
-$active_options_id = ""; // start empty
-$active_language_id = ""; // start empty
+$active_products_id = 0; // start empty
+$active_options_id = 0; // start empty
+$active_language_id = 0; // start empty
 $active_row = array(); // empty array
 $last_products_id = "";
 $print1 = 0;
@@ -234,19 +234,19 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       }
     }
 
-    if ($row['v_products_id'] == $active_products_id) {
-      if ($row['v_options_id'] == $active_options_id) {
+    if ($row['v_products_id'] == (int)$active_products_id) {
+      if ($row['v_options_id'] == (int)$active_options_id) {
         // collect the products_options_values_name
-        if ($active_language_id <> $row['v_language_id']) {
+        if ($active_language_id <> (int)$row['v_language_id']) {
 
-          $active_row['v_products_options_type'] = $row['v_products_options_type'];
+          $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
           $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
           $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
-          $active_language_id = $row['v_language_id'];
+          $active_language_id = (int)$row['v_language_id'];
         } else {
           $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
           $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] .= "," . $row['v_products_options_values_name'];
-          $active_row['v_products_options_type'] = $row['v_products_options_type'];
+          $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
         }
         continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
       } else { // same product, new attribute - only executes once on new option
@@ -257,15 +257,15 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         unset($dataRow);
         $ep_export_count++;
 
-        $active_options_id = $row['v_options_id'];
-        $active_language_id = $row['v_language_id'];
+        $active_options_id = (int)$row['v_options_id'];
+        $active_language_id = (int)$row['v_language_id'];
         $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
         $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
-        $active_row['v_products_options_type'] = $row['v_products_options_type'];
+        $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
         continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
       } // end of options_id check
     } else { // new combo or different product or first time through while-loop
-      if ($active_row['v_products_id'] <> $last_products_id) {
+      if (isset($active_row['v_products_id']) && ($active_row['v_products_id'] <> $last_products_id)) {
         // Clean the texts that could break CSV file formatting
 
         $dataRow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
@@ -274,19 +274,19 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         unset($dataRow);
 
         $ep_export_count++;
-        $last_products_id = $active_row['v_products_id'];
+        $last_products_id = ((isset($active_row['v_products_id']) || array_key_exists('v_products_id', $active_row)) ? (int)$active_row['v_products_id'] : 0);
       } // end if new model
 
       // get current row of data
-      $active_products_id = $row['v_products_id'];
-      $active_options_id = $row['v_options_id'];
-      $active_language_id = $row['v_language_id'];
+      $active_products_id = (int)$row['v_products_id'];
+      $active_options_id = (int)$row['v_options_id'];
+      $active_language_id = (int)$row['v_language_id'];
 
       $active_row['v_products_model'] = $row['v_products_model'];
       if ($chosen_key != 'v_products_model' && zen_not_null($chosen_key)) {
           $active_row[$chosen_key] = $row[$chosen_key];
       }
-      $active_row['v_products_options_type'] = $row['v_products_options_type'];
+      $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
 
       $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
       $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
@@ -441,8 +441,8 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
             break;
           }
         }
-        $row['v_category_path_' . $lid] = $row2['categories_name'] . $category_delimiter . $row['v_category_path_' . $lid];
-        $row['v_category_path_' . $lid_code] = $row2['categories_name'] . $category_delimiter . $row['v_category_path_' . $lid_code];
+        $row['v_category_path_' . $lid] = $row2['categories_name'] . $category_delimiter . ((isset($row['v_category_path_' . $lid]) || array_key_exists('v_category_path_' . $lid, $row)) ? $row['v_category_path_' . $lid] : '');
+        $row['v_category_path_' . $lid_code] = $row2['categories_name'] . $category_delimiter . ((isset($row['v_category_path_' . $lid_code]) || array_key_exists('v_category_path_' . $lid_code, $row)) ? $row['v_category_path_' . $lid_code] : '');
       } //while
       unset($row2);
       unset($lid);
@@ -535,8 +535,8 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
             break;
           }
         }
-        $row['v_categories_name_' . $lid] = $row2['categories_name'] . $category_delimiter . $row['v_categories_name_' . $lid];
-        $row['v_categories_name_' . $lid_code] = $row2['categories_name'] . $category_delimiter . $row['v_categories_name_' . $lid_code];
+        $row['v_categories_name_' . $lid] = $row2['categories_name'] . $category_delimiter . ((isset($row['v_categories_name_' . $lid]) || array_key_exists('v_categories_name_' . $lid, $row)) ? $row['v_categories_name_' . $lid] : '');
+        $row['v_categories_name_' . $lid_code] = $row2['categories_name'] . $category_delimiter . ((isset($row['v_categories_name_' . $lid_code]) || array_key_exists('v_categories_name_' . $lid_code, $row)) ? $row['v_categories_name_' . $lid_code] : '');
       } //while
       unset($row2);
       unset($lid);
@@ -937,9 +937,11 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 
   // We check the value of tax class and title instead of the id
   // Then we add the tax to price if $price_with_tax is set to 1
-  $row_tax_multiplier = ep_4_get_tax_class_rate($row['v_tax_class_id']);
-  $row['v_tax_class_title'] = zen_get_tax_class_title($row['v_tax_class_id']);
-  $row['v_products_price'] = round($row['v_products_price'] + ($price_with_tax * $row['v_products_price'] * $row_tax_multiplier / 100), 2);
+  $row_tax_multiplier = ep_4_get_tax_class_rate(((isset($row['v_tax_class_id']) || array_key_exists('v_tax_class_id', $row)) ? $row['v_tax_class_id'] : 0));
+  $row['v_tax_class_title'] = zen_get_tax_class_title(((isset($row['v_tax_class_id']) || array_key_exists('v_tax_class_id', $row)) ? $row['v_tax_class_id'] : 0));
+  if (isset($row['v_products_price']) || array_key_exists('v_products_price', $row)) {
+    $row['v_products_price'] = round($row['v_products_price'] + ($price_with_tax * $row['v_products_price'] * $row_tax_multiplier / 100), 2);
+  }
 
   // Clean the texts that could break CSV file formatting
   $dataRow = ep_4_rmv_chars($filelayout, $row, $csv_delimiter);
