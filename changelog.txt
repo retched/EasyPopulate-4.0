@@ -378,3 +378,43 @@
                                   Improved the reporting of the product update to include identifying the
                                         $chosen_key that was used to update or try to update a product during import.
                                   Modified alignment of some code for readability and consistency.
+                                  Added a csv delimiter selector.  This will generate the export file with the 
+                                        selected delimiter (comma, semi-colon, tab, or space character).  As part of
+                                        this also created a function to roughly identify the delimiter of a file being
+                                        used to import.  This same function is used to display the delimiter of each
+                                        import file that is present in the EP4 directory.  If it doesn't resolve 
+                                        correctly there, it will not on import either.
+                                  Moved the code to initiate the ZC load of information higher up in the sequence of
+                                        loading so that EP4 could have more control over the processing of information.
+                                  Modified the value of $price_with_tax to that of a number (1 for true and 0 for false).
+                                        This way the value can be used in numerical calculations as a known value rather
+                                        than an assumed/expected value.
+                                  Ran EP4 through strict mode identifying areas of programming that may have been 
+                                        incorrectly considered. (I.e testing if a value is first set to null then to 
+                                        see if it is set which is first of all backwards and second unnecessarily 
+                                        duplicates the test.)  This further reduces NOTICES generated to be ignored.
+                                  Corrected a long standing test/check for the condition of a default language being defined.
+                                  Reviewed/modified the code for PHP 7.2 known changes or potentially expected changes.
+                                  Added a feature to set the exported filename such that a list of filenames will sort by
+                                        calendar date by numeric year-mo-day .
+                                  Added a timer reset as well as data to be pushed to the browser to try to prevent
+                                        import and export failures.  Code should work provided that the site is not
+                                        operating in safe mode.
+                                  Added an import and export option to use the language code (ie. en for english, de
+                                        for german, etc...).  Such a field will take priority over the historical
+                                        number reference.
+                                  Moved portions of the import code to a separate file to remove the code from the core.
+                                  Relocated some code to reduce duplication.
+                                  Incorporated the use of the AdminRequest Sanitizer class for data import.
+                                  Modified/updated the add date for product so that will not store a value less than
+                                        0001-01-01.
+                                  Incorporated a test for the datatype sanitizer that would replace an entire string
+                                        with the value of null if it contained NULL without affecting historical
+                                        compatibility.
+                                  Added the ability to delete specials from the database based on admin panel settings
+                                        instead of keeping them disabled.
+                                  Renamed the language folder deutsche to german to directly support the standard
+                                        installation of ZC and expectation that the language directory be that of the
+                                        English equivalent.
+                                  Reworked the detailed attributes import to support omitting columns when importing data.
+                                  
