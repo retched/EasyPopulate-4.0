@@ -2176,6 +2176,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
       unset($handle);
       print("\n");
     } // conditional IF statement
+  }
 
     $zco_notifier->notify('EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT');
 
@@ -2201,7 +2202,6 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
     $time = $time_end - $time_start;
 //    $display_output .= '<br/>Execution Time: ' . $time . ' seconds.';
     $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_EXEC_TIME, $time);
-  }
 
   // specials status = 0 if date_expires is past.
   // HEY!!! THIS ALSO CALLS zen_update_products_price_sorter($v_products_id); !!!!!!
