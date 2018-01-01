@@ -227,9 +227,9 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           p.metatags_title_tagline_status as v_metatags_title_tagline_status,
           subc.categories_id        as v_categories_id
           FROM ' .
+                TABLE_PRODUCTS . ' as p, ' .
                 TABLE_PRODUCTS_TO_CATEGORIES . ' as ptoc,' .
-                TABLE_CATEGORIES . ' as subc,' .
-                TABLE_PRODUCTS . " as p ";
+                TABLE_CATEGORIES . ' as subc ';
         $zco_notifier->notify('EP4_IMPORT_PRODUCT_DEFAULT_SELECT_TABLES');
         $sql .= "WHERE
           p.products_id      = ptoc.products_id AND
@@ -295,8 +295,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           $zco_notifier->notify('EP4_IMPORT_FILE_EARLY_ROW_PROCESSING');
 
           if ($continueNextRow == true) {
+            unset($continueNextRow);
             continue 2; // short circuit - loop to next record
           }
+          unset($continueNextRow);
 
           // Create variables and assign default values for each language products name, description, url and optional short description
           foreach ($langcode as $lang) {
@@ -563,13 +565,13 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         if (isset($v_tax_class_title)) {
           $v_tax_class_id = ep_4_get_tax_title_class_id($v_tax_class_title);
         }
-        // we check the tax rate of this tax_class_id
-        $row_tax_multiplier = ep_4_get_tax_class_rate($v_tax_class_id);
-
-        // And we recalculate price without the included tax...
-        // Since it seems display is made before, the displayed price will still include tax
-        // This is same problem for the tax_clas_id that display tax_class_title
         if ($price_with_tax == true) {
+          // we check the tax rate of this tax_class_id
+          $row_tax_multiplier = ep_4_get_tax_class_rate($v_tax_class_id);
+
+          // And we recalculate price without the included tax...
+          // Since it seems display is made before, the displayed price will still include tax
+          // This is same problem for the tax_clas_id that display tax_class_title
           $v_products_price = round($v_products_price / (1 + ( $row_tax_multiplier * $price_with_tax / 100) ), 4);
         }
 
@@ -626,6 +628,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           $sql = $db->bindVars($sql, ':manufacturers_name:', $v_manufacturers_name, $zc_support_ignore_null);
 
           $result = ep_4_query($sql);
+          unset ($sql);
           if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) {
             $v_manufacturers_id = $row['manID']; // this id goes into the products table
           } else { // It is set to autoincrement, do not need to fetch max id
@@ -633,12 +636,14 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               VALUES (:manufacturers_name:, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
             $sql = $db->bindVars($sql, ':manufacturers_name:', ep_4_curly_quotes($v_manufacturers_name), $zc_support_ignore_null);
             $result = ep_4_query($sql);
+            unset($sql);
 
             $v_manufacturers_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment, so can use this function
 
             if ($result) {
               zen_record_admin_activity('Inserted manufacturer ' . zen_db_input($v_manufacturers_name) . ' via EP4.', 'info');
             }
+            unset($result);
 
             // BUG FIX: TABLE_MANUFACTURERS_INFO need an entry for each installed language! chadd 11-14-2011
             // This is not a complete fix, since we are not importing manufacturers_url
@@ -693,6 +698,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 
           $categories_names_array = array();
           $categories_count = array();
+          $categories_count['id'] = array();
+          $categories_count['code'] = array();
+          $categories_count_value = array();
+          $v_categories_name_check = array();
 
           foreach ($langcode as $lang) {
             if (!function_exists('mb_split')) {
@@ -734,11 +743,11 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 
           // need check on $categories_count to ensure all counts are equal
           if (count($categories_count['id']) > 1) { // check elements
-            $categories_count_value = $categories_count['id'][$lid_first];
+            $categories_count_value['id'] = $categories_count['id'][$lid_first];
             foreach ($langcode as $lang) {
-              $v_categories_name_check = 'v_categories_name_' . $lang['id'];
-              if (isset(${$v_categories_name_check})) {
-                if (($categories_count_value != $categories_count['id'][$lang['id']]) && ($categories_count['id'][$lang['id']] != 0)) {
+              $v_categories_name_check['id'] = 'v_categories_name_' . $lang['id'];
+              if (isset(${$v_categories_name_check['id']})) {
+                if (($categories_count_value['id'] != $categories_count['id'][$lang['id']]) && ($categories_count['id'][$lang['id']] != 0)) {
                   //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG,
                   //$v_products_model, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name']);
                   $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['id']]];
@@ -751,11 +760,11 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             unset($lang);
           }
           if (count($categories_count['code']) > 1) { // check elements
-            $categories_count_value = $categories_count['code'][$lid_first_code];
+            $categories_count_value['code'] = $categories_count['code'][$lid_first_code];
             foreach ($langcode as $lang) {
-              $v_categories_name_check = 'v_categories_name_' . $lang['code'];
-              if (isset(${$v_categories_name_check})) {
-                if (($categories_count_value != $categories_count['code'][$lang['code']]) && ($categories_count['code'][$lang['code']] != 0)) {
+              $v_categories_name_check['code'] = 'v_categories_name_' . $lang['code'];
+              if (isset(${$v_categories_name_check['code']})) {
+                if (($categories_count_value['code'] != $categories_count['code'][$lang['code']]) && ($categories_count['code'][$lang['code']] != 0)) {
                   //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG,
                   //$v_products_model, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name']);
                   $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['code']]];
@@ -807,9 +816,9 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               FROM " . TABLE_CATEGORIES . " AS cat,
                  " . TABLE_CATEGORIES_DESCRIPTION . " AS des
               WHERE
+                cat.parent_id = :parent_id: AND
                 cat.categories_id = des.categories_id AND
                 des.language_id = :language_id: AND
-                cat.parent_id = :parent_id: AND
                 des.categories_name = :categories_name: LIMIT 1";
             $oldPost = $_POST;
             unset($_POST);
@@ -818,6 +827,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             if (class_exists('AdminRequestSanitizer')) {
               $sanitizer = AdminRequestSanitizer::getInstance();
               $sanitizer->runSanitizers();
+              unset($sanitizer);
             }
 
             $thiscategoryname = $_POST['categories_name'][$lid];
@@ -839,8 +849,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 $current_category_id = $thiscategoryid;
               }
               foreach ($langcode as $lang2) {
-                $v_categories_name_check = 'v_categories_name_' . $lang2['id'];
-                if (isset(${$v_categories_name_check})) { // update
+                $v_categories_name_check['id'] = 'v_categories_name_' . $lang2['id'];
+                if (isset(${$v_categories_name_check['id']})) { // update
                   $cat_lang_id = $lang2['id'];
                   $sql = "UPDATE " . TABLE_CATEGORIES_DESCRIPTION . " SET
                       categories_name = :categories_name:
@@ -854,6 +864,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   if (class_exists('AdminRequestSanitizer')) {
                     $sanitizer = AdminRequestSanitizer::getInstance();
                     $sanitizer->runSanitizers();
+                    unset($sanitizer);
                   }
 
                   $categories_names_array['id'][$cat_lang_id][$category_index] = $_POST['categories_name'][$cat_lang_id];
@@ -874,12 +885,12 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               unset($lang2);
             } else { // otherwise add new category
               // get next available categoies_id
-              $sql = "SELECT MAX(categories_id) max FROM " . TABLE_CATEGORIES;
+              $sql = "SELECT MAX(categories_id) + 1 max FROM " . TABLE_CATEGORIES;
               $result = ep_4_query($sql);
               unset($sql);
               $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
               unset($result);
-              $max_category_id = $row['max'] + 1;
+              $max_category_id = $row['max'];
               // if database is empty, start at 1
               if (!is_numeric($max_category_id)) {
                 $max_category_id = 1;
@@ -905,7 +916,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               // else, set to that langauges category entry:
               // categories_name = '".zen_db_input($categories_names_array['id'][$lid][$category_index])."'";
               foreach ($langcode as $lang2) {
-                $v_categories_name_check = 'v_categories_name_' . $lang2['id'];
+                $v_categories_name_check['id'] = 'v_categories_name_' . $lang2['id'];
 
                 $cat_lang_id = $lang2['id'];
                 $sql = "INSERT INTO " . TABLE_CATEGORIES_DESCRIPTION . " SET
@@ -915,7 +926,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 $sql = $db->bindVars($sql, ':categories_id:', $max_category_id, 'integer');
                 $sql = $db->bindVars($sql, ':language_id:', $cat_lang_id, 'integer');
 
-                if (isset(${$v_categories_name_check})) { // update
+                if (isset(${$v_categories_name_check['id']})) { // update
                   $oldPost = $_POST;
                   unset($_POST);
                   $_POST['categories_name'] = $categories_names_array['id'][$cat_lang_id][$category_index];
@@ -923,6 +934,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   if (class_exists('AdminRequestSanitizer')) {
                     $sanitizer = AdminRequestSanitizer::getInstance();
                     $sanitizer->runSanitizers();
+                    unset($sanitizer);
                   }
 
                   $categories_names_array['id'][$cat_lang_id][$category_index] = $_POST['categories_name'];
@@ -937,6 +949,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   if (class_exists('AdminRequestSanitizer')) {
                     $sanitizer = AdminRequestSanitizer::getInstance();
                     $sanitizer->runSanitizers();
+                    unset($sanitizer);
                   }
 
                   $thiscategoryname = $_POST['categories_name'];
@@ -1216,6 +1229,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           if (class_exists('AdminRequestSanitizer')) {
             $sanitizer = AdminRequestSanitizer::getInstance();
             $sanitizer->runSanitizers();
+            unset($sanitizer);
           }
 
           $v_products_model = $_POST['products_model'];
@@ -1224,7 +1238,9 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           $sql = $db->bindVars($sql, ':products_model:', $v_products_model, $zc_support_ignore_null);
           $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
           $result = ep_4_query($sql);
+          unset($sql);
           if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) { // new item, insert into products
+            unset($result);
             $v_date_added = ($v_date_added >= '0001-01-01') ? $v_date_added : 'CURRENT_TIMESTAMP';
             $sql = "SHOW TABLE STATUS LIKE '" . TABLE_PRODUCTS . "'";
             $result = ep_4_query($sql);
@@ -1366,8 +1382,9 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               $ep_import_count++;
               // PRODUCT_MUSIC_EXTRA
               if ($v_products_type == '2') {
-                $sql_music_extra = ep_4_query("SELECT * FROM " . TABLE_PRODUCT_MUSIC_EXTRA . " WHERE (products_id = :products_id:) LIMIT 1");
+                $sql_music_extra = "SELECT * FROM " . TABLE_PRODUCT_MUSIC_EXTRA . " WHERE (products_id = :products_id:) LIMIT 1";
                 $sql_music_extra = $db->bindVars($sql_music_extra, ':products_id:', $v_products_id, 'integer');
+                $sql_music_extra = ep_4_query($sql_music_extra);
                 if (($ep_uses_mysqli ? mysqli_num_rows($sql_music_extra) : mysql_num_rows($sql_music_extra)) == 0) { // new item, insert into products
                   $query = "INSERT INTO " . TABLE_PRODUCT_MUSIC_EXTRA . " SET
                     products_id     = :products_id:,
@@ -1385,6 +1402,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   }
                   unset($result);
                 }
+                unset($sql_music_extra);
               }
             } else {
               $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT_FAIL, ${$chosen_key});
@@ -1533,7 +1551,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               }
               // PRODUCT_MUSIC_EXTRA
               if ($v_products_type == '2') {
-                $sql_music_extra = ep_4_query("SELECT * FROM " . TABLE_PRODUCT_MUSIC_EXTRA . " WHERE (products_id = '" . $v_products_id . "') LIMIT 1");
+                $sql_music_extra = ep_4_query("SELECT * FROM " . TABLE_PRODUCT_MUSIC_EXTRA . " WHERE (products_id = " . (int)$v_products_id . ") LIMIT 1");
                 if (($ep_uses_mysqli ? mysqli_num_rows($sql_music_extra) : mysql_num_rows($sql_music_extra)) == 1) { // update
                   $query = "UPDATE " . TABLE_PRODUCT_MUSIC_EXTRA . " SET
                   artists_id        = :artists_id:,
@@ -1550,6 +1568,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                     zen_record_admin_activity('Updated product music extra ' . (int) $v_artists_id . ' via EP4.', 'info');
                   }
                 }
+                unset($sql_music_extra);
               }
               $ep_update_count++;
             } else {
@@ -1594,6 +1613,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
                 $sql = $db->bindVars($sql, ':key:', $key, 'integer');
               }
+              unset($row);
               $result = ep_4_query($sql);
               unset($sql);
               if ($result) {
@@ -1638,13 +1658,14 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 $sql = $db->bindVars($sql, ':products_model:', $v_products_model, $zc_support_ignore_null);
                 $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
                 $result = ep_4_query($sql);
+                unset($sql);
                 if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) != 0) { // found entry
                   $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
                   $v_products_id = $row3['products_id'];
 
                   // remove all old associated quantity discounts
                   // this simplifies the below code to JUST insert all the new values
-                  $db->Execute("DELETE FROM " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . " WHERE products_id = '" . (int) $v_products_id . "'");
+                  $db->Execute("DELETE FROM " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . " WHERE products_id = " . (int) $v_products_id);
 
                   // initialize quantity discount variables
                   $xxx = 1;
@@ -1698,7 +1719,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
                   $v_products_id = $row3['products_id'];
                   // remove all associated quantity discounts
-                  $db->Execute("DELETE FROM " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . " WHERE products_id = '" . (int) $v_products_id . "'");
+                  $db->Execute("DELETE FROM " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . " WHERE products_id = " . (int) $v_products_id);
                 }
               }
             } // if ($v_products_discount_type != '0')
@@ -1729,6 +1750,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               unset($sql);
 
               if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) {
+                  unset($result);
                 $sql = "INSERT INTO " . TABLE_PRODUCTS_DESCRIPTION . " (
                             products_id,
                   " . (isset($filelayout['v_products_name_' . $lang_id]) || isset($filelayout['v_products_name_' . $lang_id_code]) || $product_is_new
@@ -1789,6 +1811,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 if (class_exists('AdminRequestSanitizer')) {
                   $sanitizer = AdminRequestSanitizer::getInstance();
                   $sanitizer->runSanitizers();
+                  unset($sanitizer);
                 }
 
                 if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
@@ -1832,9 +1855,11 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_END');
 
                 $result = ep_4_query($sql);
+                unset($sql);
                 if ($result) {
                   zen_record_admin_activity('New product ' . (int)$v_products_id . ' description added via EP4.', 'info');
                 }
+                unset($result);
               } else { // already in the description, update it
                 $sql = "UPDATE " . TABLE_PRODUCTS_DESCRIPTION . " SET ";
                 $update_count = false;
@@ -1894,6 +1919,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 if (class_exists('AdminRequestSanitizer')) {
                   $sanitizer = AdminRequestSanitizer::getInstance();
                   $sanitizer->runSanitizers();
+                  unset($sanitizer);
                 }
 
                 if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
@@ -1958,15 +1984,15 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           // chadd - need to dig into further
           if (isset($v_categories_id)) { // find out if this product is listed in the category given
             $result_incategory = ep_4_query('SELECT
-              '.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id,
-              '.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id,
-              '.TABLE_PRODUCTS.'.master_categories_id
+              ptc.products_id,
+              ptc.categories_id,
+              p.master_categories_id
               FROM
-              '.TABLE_PRODUCTS.'
+              '.TABLE_PRODUCTS.' p
               LEFT JOIN
-              '.TABLE_PRODUCTS_TO_CATEGORIES.' ON ('.TABLE_PRODUCTS.'.products_id = '.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id AND '.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id='.$v_categories_id.')
+              '.TABLE_PRODUCTS_TO_CATEGORIES.' ptc ON (p.products_id = ptc.products_id AND ptc.categories_id='.(int)$v_categories_id.')
               WHERE
-              '.TABLE_PRODUCTS.'.products_id='.$v_products_id);
+              p.products_id='.(int)$v_products_id);
             $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) : mysql_fetch_array($result_incategory));
             if (!zen_not_null($result_incategory['products_id']) || count($result_incategory) <= 0 /* ($ep_uses_mysqli ? mysqli_num_rows($result_incategory) : mysql_num_rows($result_incategory)) == 0 */) { // nope, this is a new category for this product
               if ($items[$filelayout['v_status']] == 7) {
@@ -1983,18 +2009,18 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 // if the master_categories_id != categories_id, then for "safety" sake, should successfully insert the product to the category before deleting it from the previous category. Should also verify that the master_categories_id is set, because if it is not then there is a bigger issue.  As part of the verification, if it is not set, then don't try to delete the previous, just add it and provide equivalent information.
                 if ((int) $result_incategory['master_categories_id'] != (int) $v_categories_id) {
                   //move is eminent
-                  if ($result_incategory['master_categories_id'] > 0) {
+                  if ((int)$result_incategory['master_categories_id'] > 0) {
                     //master_category is assigned to the product do the move.
                     // Ensure the product still is on the way to the move and available.
                     $res1 = ep_4_query('INSERT INTO ' . TABLE_PRODUCTS_TO_CATEGORIES . ' (products_id, categories_id)
-            VALUES (' . $v_products_id . ', ' . $v_categories_id . ')');
+            VALUES (' . (int)$v_products_id . ', ' . (int)$v_categories_id . ')');
                     if ($res1) {
                       //Successfully inserted the product to the category, now need to remove the link from the previous category.
-                      $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . $v_categories_id . '
-                                 WHERE products_id = ' . $v_products_id);
+                      $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . (int)$v_categories_id . '
+                                 WHERE products_id = ' . (int)$v_products_id);
 
-                      $res2 = ep_4_query('DELETE FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' WHERE products_id = ' . $v_products_id . ' AND categories_id =
-                             ' . $result_incategory['master_categories_id']);
+                      $res2 = ep_4_query('DELETE FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' WHERE products_id = ' . (int)$v_products_id . ' AND categories_id =
+                             ' . (int)$result_incategory['master_categories_id']);
                       if ($res1 && $res2) {
                         zen_record_admin_activity('Product ' . (int) $v_products_id . ' moved to category ' . (int) $v_categories_id . ' via EP4.', 'info');
                       } else if ($res1 && !$res2) {
@@ -2008,11 +2034,11 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   } /* EOF Master Category is set */ else {
                     //master_category is not assigned, assign the category to the master category and do the move.
                     $res1 = ep_4_query('INSERT INTO ' . TABLE_PRODUCTS_TO_CATEGORIES . ' (products_id, categories_id)
-            VALUES (' . $v_products_id . ', ' . $v_categories_id . ')');
+            VALUES (' . (int)$v_products_id . ', ' . (int)$v_categories_id . ')');
                     if ($res1) {
                       //Successfully inserted the product to the category, now need to remove the link from the previous category.
-                      $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . $v_categories_id . '
-                                 WHERE products_id = ' . $v_products_id);
+                      $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . (int)$v_categories_id . '
+                                 WHERE products_id = ' . (int)$v_products_id);
                       if ($res1) {
                         zen_record_admin_activity('Product ' . (int) $v_products_id . ' moved to category ' . (int) $v_categories_id . ' via EP4.', 'info');
                       } else {
@@ -2023,7 +2049,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 } // End if master and category different, nothing else to do as no where to go because both are the same...
               } /* EOF status == Move */ else {
                 $res1 = ep_4_query('INSERT INTO ' . TABLE_PRODUCTS_TO_CATEGORIES . ' (products_id, categories_id)
-            VALUES (' . $v_products_id . ', ' . $v_categories_id . ')');
+            VALUES (' . (int)$v_products_id . ', ' . (int)$v_categories_id . ')');
                 if ($res1) {
                   zen_record_admin_activity('Product ' . (int) $v_products_id . ' copied as link to category ' . (int) $v_categories_id . ' via EP4.', 'info');
                 }
@@ -2034,21 +2060,21 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 
 //do category move action.
                 // if the master_categories_id != categories_id, then for "safety" sake, should successfully insert the product to the category before deleting it from the previous category. Should also verify that the master_categories_id is set, because if it is not then there is a bigger issue.  As part of the verification, if it is not set, then don't try to delete the previous, just add it and provide equivalent information.
-                if ($result_incategory['master_categories_id'] != $result_incategory['categories_id']) {
+                if ((int)$result_incategory['master_categories_id'] != (int)$result_incategory['categories_id']) {
                   //move is eminent
-                  if ($result_incategory['master_categories_id'] > 0) {
+                  if ((int)$result_incategory['master_categories_id'] > 0) {
                     //master_category is assigned to the product complete the move.
                     // Ensure the product still is on the way to the move and available.
                     //      $res1 = ep_4_query('INSERT INTO '.TABLE_PRODUCTS_TO_CATEGORIES.' (products_id, categories_id)
                     //      VALUES ("'.$v_products_id.'", "'.$v_categories_id.'")');
-                    $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . $v_categories_id . '
-                                 WHERE products_id = ' . $v_products_id);
+                    $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . (int)$v_categories_id . '
+                                 WHERE products_id = ' . (int)$v_products_id);
 
                     /* if ($res1) */
                       //Successfully updated the product to the category, now need to remove the link from the previous category.
 
-                    $res2 = ep_4_query('DELETE FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' WHERE products_id = ' . $v_products_id . ' AND categories_id =
-                             ' . $result_incategory['master_categories_id']);
+                    $res2 = ep_4_query('DELETE FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' WHERE products_id = ' . (int)$v_products_id . ' AND categories_id =
+                             ' . (int)$result_incategory['master_categories_id']);
 
                     if ($res1 && $res2) {
                       zen_record_admin_activity('Product ' . (int) $v_products_id . ' moved from category ' . (int)$result_incategory['master_categories_id'] . ' to category ' . (int) $v_categories_id . ' via EP4.', 'info');
@@ -2062,8 +2088,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                     //   $res1 = ep_4_query('INSERT INTO '.TABLE_PRODUCTS_TO_CATEGORIES.' (products_id, categories_id)
                     //      VALUES ("'.$v_products_id.'", "'.$v_categories_id.'")');
                     //Successfully inserted the product to the category, now need to remove the link from the previous category.
-                    $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . $v_categories_id . '
-                                 WHERE products_id = ' . $v_products_id);
+                    $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . (int)$v_categories_id . '
+                                 WHERE products_id = ' . (int)$v_products_id);
                     if ($res1) {
                       zen_record_admin_activity('Product ' . (int) $v_products_id . ' master_categories_id established as category ' . (int) $v_categories_id . ' via EP4.', 'info');
                     }
@@ -2092,7 +2118,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             $v_specials_expires_date = ($v_specials_expires_date == true  && $v_specials_expires_date > "0001-01-01") ? date("Y-m-d H:i:s", strtotime($v_specials_expires_date)) : "0001-01-01";
 
             // Check if this product already has a special
-            $special = ep_4_query("SELECT products_id FROM " . TABLE_SPECIALS . " WHERE products_id = " . $v_products_id);
+            $special = ep_4_query("SELECT products_id FROM " . TABLE_SPECIALS . " WHERE products_id = " . (int)$v_products_id);
 
             if (($ep_uses_mysqli ? mysqli_num_rows($special) : mysql_num_rows($special)) == 0) { // not in db
               if ($v_specials_price == '0') { // delete requested, but is not a special
@@ -2126,7 +2152,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_NEW, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price, $v_specials_price);
             } else { // existing product
               if ($v_specials_price < 0 || (defined('EASYPOPULATE_4_CONFIG_SPECIALS_REMOVE_AT') && EASYPOPULATE_4_CONFIG_SPECIALS_REMOVE_AT == 'zero' && $v_specials_price == '0')) { // delete of existing requested with negative number or option to do so when 0.
-                $db->Execute("DELETE FROM " . TABLE_SPECIALS . " WHERE products_id = '" . (int) $v_products_id . "'");
+                $db->Execute("DELETE FROM " . TABLE_SPECIALS . " WHERE products_id = " . (int) $v_products_id);
                 $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_DELETE, ${$chosen_key}, ${$chosen_key});
                 continue;
               }

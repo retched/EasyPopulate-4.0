@@ -139,7 +139,7 @@ if (EP4_ADMIN_TEMP_DIRECTORY !== 'true') {
 
     $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'' . $temp_rem . '\' WHERE configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', false, false, 0, true);
 
-    // need a message to  be displayed...
+    // @TODO need a message to  be displayed...
 
     // Reload the page with the path now reset. No parameters are passed.
     zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
@@ -153,9 +153,9 @@ if ($ep_debug_logging_all == true) {
 
 // Pre-flight checks start here
 $chmod_check = ep_4_chmod_check($tempdir);
-if ($chmod_check == false) { // test for temporary folder and that it is writable
+//if ($chmod_check == false) { // test for temporary folder and that it is writable
   // $messageStack->add(EASYPOPULATE_4_MSGSTACK_INSTALL_CHMOD_FAIL, 'caution');
-}
+//}
 
 // /temp is the default folder - check if it exists & has writeable permissions
 if (EASYPOPULATE_4_CONFIG_TEMP_DIR === 'EASYPOPULATE_4_CONFIG_TEMP_DIR' && (is_null($_GET['epinstaller']) && !isset($_GET['epinstaller']) && $_GET['epinstaller'] != 'install')) { // admin area config not installed
@@ -409,7 +409,7 @@ function getDBDelimiterList() {
 }
 
 function getFileDelimiter($file, $checkLines = 2) {
-  global $db;
+  //global $db;
 
   $tempdir = EASYPOPULATE_4_CONFIG_TEMP_DIR;
   if (substr($tempdir, -1) != '/') {

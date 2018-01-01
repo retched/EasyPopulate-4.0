@@ -636,8 +636,8 @@ function ep_4_query($query) {
     $string = ($ep_uses_mysqli ? "MySQLi" : "MySQL") . " PASSED\nWhen executing:\n$query\n";
     write_debug_log_4($string);
   }
-  unset($project);
-  unset($ep_uses_mysqli);
+//  unset($project);
+//  unset($ep_uses_mysqli);
   unset($string);
 
   return $result;
@@ -935,9 +935,9 @@ function ep4_directory_check($ep_debug_log_path) {
 }
 
 function ep4_delimiter_display($config_value) {
-  global $db;
+  // global $db;
 
-  $ep_delim_value_return = '';
+  // $ep_delim_value_return = '';
 
   switch ($config_value) {
     case '0':
