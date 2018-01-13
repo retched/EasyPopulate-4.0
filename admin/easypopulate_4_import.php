@@ -346,6 +346,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               // test column headers for each language
               if (zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['id']]]))) { // import column found
                 $categories_name_exists = true;
+                break;
               }
             }
             unset($lang);
@@ -569,6 +570,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           // test column headers for each language
           if (zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['id']]]))) { // import column found
             $categories_name_exists = true; // at least one language column defined
+            break;
           }
         }
         unset($lang);
@@ -992,7 +994,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
           $result = ep_4_query($sql);
           if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) { // new item, insert into products
-            $v_date_added = ($v_date_added == 'NULL') ? CURRENT_TIMESTAMP : $v_date_added;
+            $v_date_added = ($v_date_added >= '0001-01-01') ? $v_date_added : 'CURRENT_TIMESTAMP';
             $sql = "SHOW TABLE STATUS LIKE '" . TABLE_PRODUCTS . "'";
             $result = ep_4_query($sql);
             unset($sql);
@@ -1171,8 +1173,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             }
           } else { // existing product, get the id from the query and update the product data
             // if date added is null, let's keep the existing date in db..
-            $v_date_added = (!zen_not_null($v_date_added) ? $row['v_date_added'] : $v_date_added); // if NULL, use date in db
-            $v_date_added = zen_not_null($v_date_added) ? $v_date_added : CURRENT_TIMESTAMP; // if updating, but date added is null, we use today's date
+            $v_date_added = (!zen_not_null($v_date_added) || $v_date_added < '0001-01-01' ? $row['v_date_added'] : $v_date_added); // if NULL, use date in db
+            $v_date_added = (zen_not_null($v_date_added) && $v_date_added >= '0001-01-01') ? $v_date_added : 'CURRENT_TIMESTAMP'; // if updating, but date added is null, we use today's date
             $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
             $v_products_id = $row['products_id'];
             unset($row);
