@@ -351,6 +351,7 @@ if (($ep_uses_mysqli ? mysqli_num_rows($epdlanguage_query) : mysql_num_rows($epd
   $epdlanguage = ($ep_uses_mysqli ? mysqli_fetch_array($epdlanguage_query) : mysql_fetch_array($epdlanguage_query));
   $epdlanguage_id = $epdlanguage['languages_id'];
   $epdlanguage_name = $epdlanguage['name'];
+  $epdlanguage_code = $epdlanguage['code'];
 } else {
   exit("EP4 FATAL ERROR: No default language set."); // this should never happen
 }

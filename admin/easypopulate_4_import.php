@@ -23,6 +23,9 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
   $ep_warning_count = 0; // warning detected during import
   $no_bypass = false; // does a condition exist to bypass import?
 
+  $lid_first = $epdlanguage_id;
+  $lid_first_code = $epdlanguage_code;
+
   $zco_notifier->notify('EP4_IMPORT_START');
 
   require(DIR_FS_ADMIN . DIR_WS_MODULES . 'easypopulate_4_default_these.php');
@@ -650,7 +653,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 
           // need check on $categories_count to ensure all counts are equal
           if (count($categories_count) > 1) { // check elements
-            $categories_count_value = $categories_count[$langcode[1]['id']];
+            $categories_count_value = $categories_count[$lid_first];
             foreach ($langcode as $lang) {
               $v_categories_name_check = 'v_categories_name_' . $lang['id'];
               if (isset(${$v_categories_name_check})) {
@@ -668,7 +671,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           }
         }
         // start with first defined language... (does not have to be 1)
-        $lid = $langcode[1]['id'];
+        $lid = $lid_first;
+        //$lid = $langcode[1]['id'];
         $v_categories_name_var = 'v_categories_name_' . $lid; // ${$v_categories_name_var} >> $v_categories_name_1, $v_categories_name_2, etc.
         if (isset(${$v_categories_name_var})) { // does column header exist?
           // start from the highest possible category and work our way down from the parent
