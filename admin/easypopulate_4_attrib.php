@@ -17,16 +17,16 @@ $products_sort_order_increment = 10;
 
 // attribute import loop - read 1 line of data from input file
 while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // while #1 - Main Loop
-  $v_products_model = $contents[$filelayout['v_products_model']];
+  ${$chosen_key} = $contents[$filelayout[$chosen_key]];
 
   // READ products_id and products_model from TABLE_PRODUCTS
   // Since products_model must be unique (for EP4 at least), this query can be LIMIT 1
-  $query ="SELECT * FROM ".TABLE_PRODUCTS." WHERE (products_model = :v_products_model:) LIMIT 1";
-  $query = $db->bindVars($query, ':v_products_model:', $v_products_model, 'string');
+  $query ="SELECT * FROM ".TABLE_PRODUCTS." WHERE (" . $chosen_key_sql . ")";
+  $query = $db->bindVars($query, ':' . $chosen_key. ':', ${$chosen_key}, 'string');
   $result = ep_4_query($query);
 
   if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0)  { // products_model is not in TABLE_PRODUCTS
-    $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Model: </b>%s - Not Found! Unable to apply attributes.</font>', $v_products_model);
+    $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Primary key: %s:</b>%s - Not Found! Unable to apply attributes.</font>', $chosen_key, ${$chosen_key});
     $ep_error_count++;
     continue; // skip current record (returns to while #1)
   }
@@ -36,7 +36,7 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
     $v_products_id = $row['products_id'];
 
     // why am I again testing products_model? I used that to query the database in the first place!
-    if ($contents[$filelayout['v_products_model']] == $row['products_model']) {
+    if ($contents[$filelayout[$chosen_key]] == $row[$chosen_key]) {
       // echo "model: ".$contents[$filelayout['v_products_model']]."<br>";
       // echo "options_name: ".$contents[$filelayout['v_products_options_name']]."<br>";
       // echo "options_type: ".$contents[$filelayout['v_products_options_type']]."<br>";
@@ -313,12 +313,12 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
       if (!$table_products_attributes_update) {
         // FEEDBACK ========> implode(",", $values_names_array[1])
         $display_output .= sprintf('<br /><font color="green"><b>NEW ATTRIBUTE! - Model:</b> %s, <b>Option:</b> %s, <b>Values:</b> %s</font>',
-                     $v_products_model, $v_products_options_name[$language_id], implode(",", $values_names_array[$language_id]));
+                     ${$chosen_key}, $v_products_options_name[$language_id], implode(",", $values_names_array[$language_id]));
         $ep_import_count++; // record inserted
       } else {
         // FEEDBACK =======>
         $display_output .= sprintf('<br /><font color="blue"><b>UPDATED ATTRIBUTE! - Model:</b> %s <b>Option:</b> %s, <b>Values:</b> %s</font>',
-                    $v_products_model, $v_products_options_name[$language_id], implode(",", $values_names_array[$language_id]));
+                    ${$chosen_key}, $v_products_options_name[$language_id], implode(",", $values_names_array[$language_id]));
         $ep_update_count++; // records updated
       }
       // END: PRODUCTS OPTIONS VALUES
