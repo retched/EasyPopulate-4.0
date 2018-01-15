@@ -66,7 +66,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
   unset($file_location);
 
   // Read Column Headers
-  if (!$no_bypass && ($raw_headers = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure))) {
+  if (!$no_bypass && ($raw_headers = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== false) {
     /*    $header_search = array("ARTIST","TITLE","FORMAT","LABEL",
       "CATALOG_NUMBER","UPC","PRICE","RETAIL",
       "WHOLESALE",  "GENRE","RELEASE_DATE","EXCLUSIVE",
@@ -153,7 +153,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
       $zco_notifier->notify('EP4_IMPORT_GENERAL_FILE_ALL');
 
       // Main IMPORT loop For Product Related Data. v_products_id is the main key
-      while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // read 1 line of data
+      while (($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== false) { // read 1 line of data
 
         @set_time_limit($ep_execution);
 
