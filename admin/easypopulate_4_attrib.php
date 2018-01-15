@@ -8,7 +8,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 
 // Database default values
 $products_options_id  = 1; // this needs to auto increment for NEW products options
-$language_id          = 1; // default 1=english
+$language_id          = $epdlanguage_id; // default 1=english
 $product_options_type = 0; // default 0=Dropdown, 1=Text, 2=Radio, 3=Checkbox, 4=File, 5=Read Only
 $products_options_values_id = 1;
 $new_options_name = 0;
@@ -66,7 +66,7 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
       // Probably better to set to the default language id... will look into this for future update
 
 // HERE ==> language 1 is main key, and assumbed
-      $l_id = 1; // temporary check - should this be the default language id?
+      $l_id = $language_id; // temporary check - should this be the default language id?
       $query  = "SELECT products_options_id, products_options_name FROM ".TABLE_PRODUCTS_OPTIONS."
         WHERE products_options_name = :v_products_options_name: AND language_id = :language_id:";
       $query = $db->bindVars($query, ':v_products_options_name:', $v_products_options_name[$l_id], 'string');
@@ -104,7 +104,7 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
       // BEGIN: PRODUCTS OPTIONS VALUES
 
 // HERE ==> multi language products_options_values_name
-      $number_of_elements = count($values_names_array[1]); // all elements count must be the same
+      $number_of_elements = count($values_names_array[$language_id]); // all elements count must be the same
       $values_names_index = 0; // values_names index - array indexes start at zero
       $products_options_values_sort_order = 1;
 
@@ -138,7 +138,7 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
           // look for existing products_options_name associated with products_options_id
 
           // for multi-language values names
-          $l_id = 1; // first defined language is main key - mandatory
+          $l_id = $language_id; // first defined language is main key - mandatory
           $sql = "SELECT
             a.products_options_id,
             a.products_options_values_id,
@@ -205,7 +205,7 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
           } else { // duplicate entry, skip
           }
         } else { // add $products_options_values_id
-          $l_id = 1; // default first language is main key
+          $l_id = $language_id; // default first language is main key
           $sql5 = "SELECT
             a.products_options_id,
             a.products_options_values_id,
@@ -238,7 +238,7 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
           (products_id, options_id, options_values_id)
           VALUES (".(int)$v_products_id.", ".(int)$v_products_options_id.",0)");
         } else {
-          $l_id = 1; // default first language is main key
+          $l_id = $language_id; // default first language is main key
           $sql5 = "SELECT
             a.products_options_id,
             a.products_options_values_id,
@@ -313,12 +313,12 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
       if (!$table_products_attributes_update) {
         // FEEDBACK ========> implode(",", $values_names_array[1])
         $display_output .= sprintf('<br /><font color="green"><b>NEW ATTRIBUTE! - Model:</b> %s, <b>Option:</b> %s, <b>Values:</b> %s</font>',
-                     $v_products_model, $v_products_options_name[1], implode(",", $values_names_array[1]));
+                     $v_products_model, $v_products_options_name[$language_id], implode(",", $values_names_array[$language_id]));
         $ep_import_count++; // record inserted
       } else {
         // FEEDBACK =======>
         $display_output .= sprintf('<br /><font color="blue"><b>UPDATED ATTRIBUTE! - Model:</b> %s <b>Option:</b> %s, <b>Values:</b> %s</font>',
-                    $v_products_model, $v_products_options_name[1], implode(",", $values_names_array[1]));
+                    $v_products_model, $v_products_options_name[$language_id], implode(",", $values_names_array[$language_id]));
         $ep_update_count++; // records updated
       }
       // END: PRODUCTS OPTIONS VALUES
