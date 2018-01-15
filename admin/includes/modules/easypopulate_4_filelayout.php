@@ -8,6 +8,8 @@ if (!defined('IS_ADMIN_FLAG')) {
   die('Illegal Access');
 }
 
+if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT', 'id');
+
   if (!isset($chosen_key)){
     switch (EP4_DB_FILTER_KEY) {
       case 'products_model':
@@ -33,15 +35,32 @@ if (!defined('IS_ADMIN_FLAG')) {
     $filelayout[] = 'v_status';
     foreach ($langcode as $key => $lang) { // create variables for each language id
       $l_id = $lang['id'];
-      $filelayout[] = 'v_products_name_'.$l_id;
-      $filelayout[] = 'v_products_description_'.$l_id;
+      $l_id_code = $lang['code'];
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[] = 'v_products_name_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[] = 'v_products_name_'.$l_id_code;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[] = 'v_products_description_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[] = 'v_products_description_'.$l_id_code;
+      }
       if ($ep_supported_mods['psd'] == true) { // products short description mod
-        $filelayout[] = 'v_products_short_desc_'.$l_id;
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+          $filelayout[] = 'v_products_short_desc_'.$l_id;
+        }
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+          $filelayout[] = 'v_products_short_desc_'.$l_id_code;
+        }
       }
     }
     unset($key);
     unset($lang);
     unset($l_id);
+    unset($l_id_code);
     $ep_4_SBAEnabled = ep_4_SBA1Exists();
     if ($ep_4_SBAEnabled == '2') {
       $filelayout[] = 'v_customid';
@@ -90,16 +109,38 @@ if (!defined('IS_ADMIN_FLAG')) {
     $filelayout[] = 'v_products_image';
     foreach ($langcode as $key => $lang) { // create variables for each language id
       $l_id = $lang['id'];
-      $filelayout[] = 'v_products_name_'.$l_id;
-      $filelayout[] = 'v_products_description_'.$l_id;
-      if ($ep_supported_mods['psd'] == true) { // products short description mod
-        $filelayout[] = 'v_products_short_desc_'.$l_id;
+      $l_id_code = $lang['code'];
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[] = 'v_products_name_'.$l_id;
       }
-      $filelayout[] = 'v_products_url_'.$l_id;
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[] = 'v_products_name_'.$l_id_code;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[] = 'v_products_description_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[] = 'v_products_description_'.$l_id_code;
+      }
+      if ($ep_supported_mods['psd'] == true) { // products short description mod
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+          $filelayout[] = 'v_products_short_desc_'.$l_id;
+        }
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+          $filelayout[] = 'v_products_short_desc_'.$l_id_code;
+        }
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[] = 'v_products_url_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[] = 'v_products_url_'.$l_id_code;
+      }
     }
     unset($key);
     unset($lang);
     unset($l_id);
+    unset($l_id_code);
     $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
 
     $filelayout[] = 'v_specials_price';
@@ -138,23 +179,29 @@ if (!defined('IS_ADMIN_FLAG')) {
         }
       }
     unset($field);
-		}
-		$filelayout[] = 'v_products_weight';
-		$filelayout[] = 'v_product_is_call';
-		$filelayout[] = 'v_products_sort_order';
-		$filelayout[] = 'v_products_quantity_order_min';
-		$filelayout[] = 'v_products_quantity_order_units';
-		$filelayout[] = 'v_products_priced_by_attribute'; // 4-30-2012
-		$filelayout[] = 'v_product_is_always_free_shipping'; // 4-30-2012
-		$filelayout[] = 'v_date_avail'; // should be changed to v_products_date_available for clarity
-		$filelayout[] = 'v_date_added'; // should be changed to v_products_date_added for clarity
-		$filelayout[] = 'v_products_quantity';
-		$filelayout[] = 'v_manufacturers_name';
-		// NEW code for 'unlimited' category depth - 1 Category Column for each installed Language
-		foreach ($langcode as $key => $lang) { // create categories variables for each language id
-			$l_id = $lang['id'];
-			$filelayout[] = 'v_categories_name_'.$l_id;
-		} 
+    }
+    $filelayout[] = 'v_products_weight';
+    $filelayout[] = 'v_product_is_call';
+    $filelayout[] = 'v_products_sort_order';
+    $filelayout[] = 'v_products_quantity_order_min';
+    $filelayout[] = 'v_products_quantity_order_units';
+    $filelayout[] = 'v_products_priced_by_attribute'; // 4-30-2012
+    $filelayout[] = 'v_product_is_always_free_shipping'; // 4-30-2012
+    $filelayout[] = 'v_date_avail'; // should be changed to v_products_date_available for clarity
+    $filelayout[] = 'v_date_added'; // should be changed to v_products_date_added for clarity
+    $filelayout[] = 'v_products_quantity';
+    $filelayout[] = 'v_manufacturers_name';
+    // NEW code for 'unlimited' category depth - 1 Category Column for each installed Language
+    foreach ($langcode as $key => $lang) { // create categories variables for each language id
+      $l_id = $lang['id'];
+      $l_id_code = $lang['code'];
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[] = 'v_categories_name_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[] = 'v_categories_name_'.$l_id_code;
+      }
+    }
     unset($key);
     unset($lang);
     unset($l_id);
@@ -169,9 +216,24 @@ if (!defined('IS_ADMIN_FLAG')) {
       $filelayout[] = 'v_metatags_title_tagline_status';
       foreach ($langcode as $key => $lang) { // create variables for each language id
         $l_id = $lang['id'];
-        $filelayout[] = 'v_metatags_title_'.$l_id;
-        $filelayout[] = 'v_metatags_keywords_'.$l_id;
-        $filelayout[] = 'v_metatags_description_'.$l_id;
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+          $filelayout[] = 'v_metatags_title_'.$l_id;
+        }
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+          $filelayout[] = 'v_metatags_title_'.$l_id_code;
+        }
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+          $filelayout[] = 'v_metatags_keywords_'.$l_id;
+        }
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+          $filelayout[] = 'v_metatags_keywords_'.$l_id_code;
+        }
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+          $filelayout[] = 'v_metatags_description_'.$l_id;
+        }
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+          $filelayout[] = 'v_metatags_description_'.$l_id_code;
+        }
       }
     }
     // music info - 4-23-2012
@@ -183,20 +245,34 @@ if (!defined('IS_ADMIN_FLAG')) {
       $filelayout[] = 'v_artists_image';
       foreach ($langcode as $key => $lang) { // create variables for each language id
         $l_id = $lang['id'];
-        $filelayout[] = 'v_artists_url_'.$l_id;
+        $l_id_code = $lang['code'];
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+          $filelayout[] = 'v_artists_url_'.$l_id;
+        }
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+          $filelayout[] = 'v_artists_url_'.$l_id_code;
+        }
       }
       unset($key);
       unset($lang);
       unset($l_id);
+      unset($l_id_code);
       $filelayout[] = 'v_record_company_name';
       $filelayout[] = 'v_record_company_image';
       foreach ($langcode as $key => $lang) { // create variables for each language id
         $l_id = $lang['id'];
-        $filelayout[] = 'v_record_company_url_'.$l_id;
+        $l_id_code = $lang['code'];
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+          $filelayout[] = 'v_record_company_url_'.$l_id;
+        }
+        if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+          $filelayout[] = 'v_record_company_url_'.$l_id_code;
+        }
       }
       unset($key);
       unset($lang);
       unset($l_id);
+      unset($l_id_code);
       $filelayout[] = 'v_music_genre_name';
     }
     $filelayout_sql = 'SELECT DISTINCT
@@ -427,11 +503,18 @@ if (!defined('IS_ADMIN_FLAG')) {
     // NEW code for unlimited category depth - 1 Category Column for each installed Language
     foreach ($langcode as $key => $lang) { // create categories variables for each language id
       $l_id = $lang['id'];
-      $filelayout[] = 'v_categories_name_'.$l_id;
+      $l_id_code = $lang['code'];
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[] = 'v_categories_name_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[] = 'v_categories_name_'.$l_id_code;
+      }
     }
     unset($key);
     unset($lang);
     unset($l_id);
+    unset($l_id_code);
 
     $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_SQL_SELECT');
 
@@ -459,26 +542,60 @@ if (!defined('IS_ADMIN_FLAG')) {
     $filelayout[] = 'v_categories_image';
     foreach ($langcode as $key => $lang) { // create categories variables for each language id
       $l_id = $lang['id'];
-      $filelayout[] = 'v_categories_name_'.$l_id;
-      $filelayout[] = 'v_category_path_'.$l_id;
-      $filelayout[] = 'v_categories_description_'.$l_id;
+      $l_id_code = $lang['code'];
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[] = 'v_categories_name_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[] = 'v_categories_name_'.$l_id_code;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[] = 'v_category_path_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[] = 'v_category_path_'.$l_id_code;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[] = 'v_categories_description_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[] = 'v_categories_description_'.$l_id_code;
+      }
 //      $filelayout[] = 'v_uri_' . $l_id;
     }
     unset($key);
     unset($lang);
     unset($l_id);
+    unset($l_id_code);
 
     $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_SQL_SELECT');
 
     foreach ($langcode as $key => $lang) { // create metatags variables for each language id
       $l_id = $lang['id'];
-      $filelayout[]   = 'v_metatags_title_'.$l_id;
-      $filelayout[]   = 'v_metatags_keywords_'.$l_id;
-      $filelayout[]   = 'v_metatags_description_'.$l_id;
+      $l_id_code = $lang['code'];
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[]   = 'v_metatags_title_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[]   = 'v_metatags_title_'.$l_id_code;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[]   = 'v_metatags_keywords_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[]   = 'v_metatags_keywords_'.$l_id_code;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[]   = 'v_metatags_description_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[]   = 'v_metatags_description_'.$l_id_code;
+      }
     }
     unset($key);
     unset($lang);
     unset($l_id);
+    unset($l_id_code);
 
     $filelayout[] = 'v_sort_order';
     $filelayout_sql = 'SELECT
@@ -599,19 +716,33 @@ $filelayout_sql .= '
     $filelayout[] = 'v_products_options_type'; // 0-drop down, 1=text , 2=radio , 3=checkbox, 4=file, 5=read only
     foreach ($langcode as $key => $lang) { // create categories variables for each language id
       $l_id = $lang['id'];
-      $filelayout[] = 'v_products_options_name_'.$l_id;
+      $l_id_code = $lang['code'];
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[] = 'v_products_options_name_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[] = 'v_products_options_name_'.$l_id_code;
+      }
     }
     unset($key);
     unset($lang);
     unset($l_id);
+    unset($l_id_code);
 
     foreach ($langcode as $key => $lang) { // create categories variables for each language id
       $l_id = $lang['id'];
-      $filelayout[] = 'v_products_options_values_name_'.$l_id;
+      $l_id_code = $lang['code'];
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[] = 'v_products_options_values_name_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[] = 'v_products_options_values_name_'.$l_id_code;
+      }
     }
     unset($key);
     unset($lang);
     unset($l_id);
+    unset($l_id_code);
 
     // a = table PRODUCTS_ATTRIBUTES
     // p = table PRODUCTS

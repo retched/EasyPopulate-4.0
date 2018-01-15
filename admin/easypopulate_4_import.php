@@ -306,7 +306,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
             unset($result2);
             // create variables (v_products_name_1, v_products_name_2, etc. which corresponds to our column headers) and assign data
-            $row['v_products_name_' . $lang['id']] = ep_4_curly_quotes($row2['products_name']);
+            $row['v_products_name_' . $lang['code']] = $row['v_products_name_' . $lang['id']] = ep_4_curly_quotes($row2['products_name']);
 
             // utf-8 conversion of smart-quotes, em-dash, and ellipsis
             /*        $text = $row2['products_description'];
@@ -315,14 +315,14 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               array("'", "'", '"', '"', '-', '--', '...'),  $text);
               $row['v_products_description_'.$lang['id']] = $text; // description assigned
              */
-            $row['v_products_description_' . $lang['id']] = ep_4_curly_quotes($row2['products_description']); // description assigned
+            $row['v_products_description_' . $lang['code']] = $row['v_products_description_' . $lang['id']] = ep_4_curly_quotes($row2['products_description']); // description assigned
 
             //$row['v_products_description_'.$lang['id']] = $row2['products_description']; // description assigned
             // if short descriptions exist
             if ($ep_supported_mods['psd'] == true) {
-              $row['v_products_short_desc_' . $lang['id']] = ep_4_curly_quotes($row2['products_short_desc']);
+              $row['v_products_short_desc_' . $lang['code']] = $row['v_products_short_desc_' . $lang['id']] = ep_4_curly_quotes($row2['products_short_desc']);
             }
-            $row['v_products_url_' . $lang['id']] = $row2['products_url']; // url assigned
+            $row['v_products_url_' . $lang['code']] = $row['v_products_url_' . $lang['id']] = $row2['products_url']; // url assigned
             unset($row2);
           }
           unset($lang);
@@ -440,6 +440,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         // Note 11-08-2011: I may remove the "smart_tags_4" function for better performance.
         foreach ($langcode as $lang) {
           $l_id = $lang['id'];
+          $l_id_code = $lang['code'];
           // products meta tags
           if (isset($filelayout['v_metatags_title_' . $l_id])) {
             $v_metatags_title[$l_id] = ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $l_id]]);
@@ -449,6 +450,15 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           }
           if (isset($filelayout['v_metatags_description_' . $l_id])) {
             $v_metatags_description[$l_id] = ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $l_id]]);
+          }
+          if (isset($filelayout['v_metatags_title_' . $l_id_code])) {
+            $v_metatags_title[$l_id_code] = ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $l_id_code]]);
+          }
+          if (isset($filelayout['v_metatags_keywords_' . $l_id_code])) {
+            $v_metatags_keywords[$l_id_code] = ep_4_curly_quotes($items[$filelayout['v_metatags_keywords_' . $l_id_code]]);
+          }
+          if (isset($filelayout['v_metatags_description_' . $l_id_code])) {
+            $v_metatags_description[$l_id_code] = ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $l_id_code]]);
           }
 
           // products name, description, url, and optional short description
@@ -468,6 +478,19 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               $v_products_name[$l_id] = "";
             }
           }
+          if (isset($filelayout['v_products_name_' . $l_id_code])) { // do for each language in our upload file if exist
+            // check products name length and display warning on error, but still process record
+            $v_products_name[$l_id_code] = ep_4_curly_quotes($items[$filelayout['v_products_name_' . $l_id_code]]);
+            if ((function_exists('mb_strlen') && mb_strlen($v_products_name[$l_id_code]) > $max_len['products_name']) || (!function_exists('mb_strlen') && strlen($v_products_name[$l_id_code]) > $max_len['products_name'])) {
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG, $v_products_model, $v_products_name[$l_id_code], $max_len['products_name']);
+              $ep_warning_count++;
+            }
+          } else { // column doesn't exist in the IMPORT file
+            // and product is new
+            if ($product_is_new) {
+              $v_products_name[$l_id_code] = "";
+            }
+          }
           if (isset($filelayout['v_products_description_' . $l_id])) { // do for each language in our upload file if exist
             // utf-8 conversion of smart-quotes, em-dash, en-dash, and ellipsis
             $v_products_description[$l_id] = ep_4_curly_quotes($items[$filelayout['v_products_description_' . $l_id]]);
@@ -484,6 +507,22 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               }
             }
           }
+          if (isset($filelayout['v_products_description_' . $l_id_code])) { // do for each language in our upload file if exist
+            // utf-8 conversion of smart-quotes, em-dash, en-dash, and ellipsis
+            $v_products_description[$l_id_code] = ep_4_curly_quotes($items[$filelayout['v_products_description_' . $l_id_code]]);
+            if ($ep_supported_mods['psd'] == true) { // if short descriptions exist
+              $v_products_short_desc[$l_id_code] = ep_4_curly_quotes($items[$filelayout['v_products_short_desc_' . $l_id_code]]);
+            }
+          } else { // column doesn't exist in the IMPORT file
+            // and product is new
+            if ($product_is_new) {
+              $v_products_description[$l_id_code] = "";
+              // if short descriptions exist
+              if ($ep_supported_mods['psd'] == true) {
+                $v_products_short_desc[$l_id_code] = "";
+              }
+            }
+          }
           if (isset($filelayout['v_products_url_' . $l_id])) { // do for each language in our upload file if exist
             $v_products_url[$l_id] = $items[$filelayout['v_products_url_' . $l_id]];
             // check products url length and display warning on error, but still process record
@@ -497,7 +536,21 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               $v_products_url[$l_id] = "";
             }
           }
+          if (isset($filelayout['v_products_url_' . $l_id_code])) { // do for each language in our upload file if exist
+            $v_products_url[$l_id_code] = $items[$filelayout['v_products_url_' . $l_id_code]];
+            // check products url length and display warning on error, but still process record
+            if ((function_exists('mb_strlen') && mb_strlen($v_products_url[$l_id_code]) > $max_len['products_url']) || (!function_exists('mb_strlen') && strlen($v_products_url[$l_id_code]) > $max_len['products_url'])) {
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_URL_LONG, $v_products_model, $v_products_url[$l_id_code], $max_len['products_url']);
+              $ep_warning_count++;
+            }
+          } else { // column doesn't exist in the IMPORT file
+            // and product is new
+            if ($product_is_new) {
+              $v_products_url[$l_id_code] = "";
+            }
+          }
           unset($l_id);
+          unset($l_id_code);
         }
         unset($lang);
 
@@ -618,12 +671,19 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         foreach ($langcode as $lang) {
           // test column headers for each language
           if (zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['id']]]))) { // import column found
-            $categories_name_exists = true; // at least one language column defined
+            $categories_name_exists['id'] = true; // at least one language column defined
+            break;
+          }
+        }
+        foreach ($langcode as $lang) {
+          // test column headers for each language
+          if (zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['code']]]))) { // import column found
+            $categories_name_exists['code'] = true; // at least one language column defined
             break;
           }
         }
         unset($lang);
-        if ($categories_name_exists) { // we have at least 1 language column
+        if ($categories_name_exists['id'] || $categories_name_exists['code']) { // we have at least 1 language column
           // chadd - 12-14-2010 - $categories_names_array[] has our category names
           // $categories_delimiter = "\x5e"; // add this to configuration variables
           $categories_delimiter = $category_delimiter; // add this to configuration variables
@@ -635,22 +695,35 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           foreach ($langcode as $lang) {
             if (!function_exists('mb_split')) {
             // iso-8859-1
-              $categories_names_array[$lang['id']] = explode($categories_delimiter,$items[$filelayout['v_categories_name_'.$lang['id']]]);
+              $categories_names_array['id'][$lang['id']] = explode($categories_delimiter,$items[$filelayout['v_categories_name_'.$lang['id']]]);
+              $categories_names_array['code'][$lang['code']] = explode($categories_delimiter,$items[$filelayout['v_categories_name_'.$lang['code']]]);
             } else {
             // utf-8
-              $categories_names_array[$lang['id']] = mb_split(preg_quote($categories_delimiter), $items[$filelayout['v_categories_name_' . $lang['id']]]);
+              $categories_names_array['id'][$lang['id']] = mb_split(preg_quote($categories_delimiter), $items[$filelayout['v_categories_name_' . $lang['id']]]);
+              $categories_names_array['code'][$lang['code']] = mb_split(preg_quote($categories_delimiter), $items[$filelayout['v_categories_name_' . $lang['code']]]);
             }
 
             // get the number of tokens in $categories_names_array[]
-            $categories_count[$lang['id']] = count($categories_names_array[$lang['id']]);
+            $categories_count['id'][$lang['id']] = count($categories_names_array['id'][$lang['id']]);
+            $categories_count['code'][$lang['code']] = count($categories_names_array['code'][$lang['code']]);
             // check category names for length violation. abort on error
-            if ($categories_count[$lang['id']] > 0) { // only check $max_len['categories_name'] if $categories_count[$lang['id']] > 0
-              for ($category_index = 0; $category_index < $categories_count[$lang['id']]; $category_index++) {
-                if ((function_exists('mb_strlen') && mb_strlen($categories_names_array[$lang['id']][$category_index]) > $max_len['categories_name']) || (!function_exists('mb_strlen') && strlen($categories_names_array[$lang['id']][$category_index]) > $max_len['categories_name'])) {
-                  $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array[$lang['id']][$category_index], $max_len['categories_name']);
+            if ($categories_count['id'][$lang['id']] > 0) { // only check $max_len['categories_name'] if $categories_count['id'][$lang['id']] > 0
+              for ($category_index = 0; $category_index < $categories_count['id'][$lang['id']]; $category_index++) {
+                if ((function_exists('mb_strlen') && mb_strlen($categories_names_array['id'][$lang['id']][$category_index]) > $max_len['categories_name']) || (!function_exists('mb_strlen') && strlen($categories_names_array['id'][$lang['id']][$category_index]) > $max_len['categories_name'])) {
+                  $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name']);
                   $ep_error_count++;
                   unset($lang);
-                  continue 3; // skip to next record
+                  continue 3; // skip to next record don't attempt further processing of current record.
+                }
+              }
+            }
+            if ($categories_count['code'][$lang['code']] > 0) { // only check $max_len['categories_name'] if $categories_count['code'][$lang['id']] > 0
+              for ($category_index = 0; $category_index < $categories_count['code'][$lang['code']]; $category_index++) {
+                if ((function_exists('mb_strlen') && mb_strlen($categories_names_array['code'][$lang['code']][$category_index]) > $max_len['categories_name']) || (!function_exists('mb_strlen') && strlen($categories_names_array['code'][$lang['code']][$category_index]) > $max_len['categories_name'])) {
+                  $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array['code'][$lang['code']][$category_index], $max_len['categories_name']);
+                  $ep_error_count++;
+                  unset($lang);
+                  continue 3; // skip to next record don't attempt further processing of current record.
                 }
               }
             }
@@ -658,14 +731,14 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           unset($lang);
 
           // need check on $categories_count to ensure all counts are equal
-          if (count($categories_count) > 1) { // check elements
-            $categories_count_value = $categories_count[$lid_first];
+          if (count($categories_count['id']) > 1) { // check elements
+            $categories_count_value = $categories_count['id'][$lid_first];
             foreach ($langcode as $lang) {
               $v_categories_name_check = 'v_categories_name_' . $lang['id'];
               if (isset(${$v_categories_name_check})) {
-                if (($categories_count_value != $categories_count[$lang['id']]) && ($categories_count[$lang['id']] != 0)) {
+                if (($categories_count_value != $categories_count['id'][$lang['id']]) && ($categories_count['id'][$lang['id']] != 0)) {
                   //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG,
-                  //$v_products_model, $categories_names_array[$lang['id']][$category_index], $max_len['categories_name']);
+                  //$v_products_model, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name']);
                   $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['id']]];
                   $ep_error_count++;
                   unset($lang);
@@ -675,19 +748,59 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             } // foreach
             unset($lang);
           }
+          if (count($categories_count['code']) > 1) { // check elements
+            $categories_count_value = $categories_count['code'][$lid_first_code];
+            foreach ($langcode as $lang) {
+              $v_categories_name_check = 'v_categories_name_' . $lang['code'];
+              if (isset(${$v_categories_name_check})) {
+                if (($categories_count_value != $categories_count['code'][$lang['code']]) && ($categories_count['code'][$lang['code']] != 0)) {
+                  //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG,
+                  //$v_products_model, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name']);
+                  $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['code']]];
+                  $ep_error_count++;
+                  unset($lang);
+                  continue 2; // skip to next record
+                }
+              }
+            } // foreach
+            unset($lang);
+          }
+          if (count($categories_count['code']) > 1 && count($categories_count['id']) > 1) { // check elements
+            $categories_count_value['code'] = $categories_count['code'][$lid_first_code];
+            $categories_count_value['id'] = $categories_count['id'][$lid_first_code];
+
+            foreach ($langcode as $lang) {
+              $v_categories_name_check['code'] = 'v_categories_name_' . $lang['code'];
+              $v_categories_name_check['id'] = 'v_categories_name_' . $lang['id'];
+              if (isset(${$v_categories_name_check['code']}) && isset(${$v_categories_name_check['id']})) {
+                if (($categories_count_value['code'] != $categories_count['id'][$lang['id']]) && ($categories_count['id'][$lang['id']] != 0) || ($categories_count_value['id'] != $categories_count['code'][$lang['code']]) && ($categories_count['code'][$lang['code']] != 0)) {
+                  //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG,
+                  //$v_products_model, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name']);
+                  $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['code']]];
+                  $ep_error_count++;
+                  unset($lang);
+                  continue 2; // skip to next record
+                }
+              }
+            } // foreach
+            unset($lang);
+          }
+
         }
         // start with first defined language... (does not have to be 1)
         $lid = $lid_first;
+        $lid_code = $lid_first_code;
         //$lid = $langcode[1]['id'];
         $v_categories_name_var = 'v_categories_name_' . $lid; // ${$v_categories_name_var} >> $v_categories_name_1, $v_categories_name_2, etc.
-        if (isset(${$v_categories_name_var})) { // does column header exist?
+        $v_categories_name_var_code = 'v_categories_name_' . $lid_code; // ${$v_categories_name_var} >> $v_categories_name_1, $v_categories_name_2, etc.
+        if (isset(${$v_categories_name_var}) || isset(${$v_categories_name_var_code})) { // does column header exist?
           // start from the highest possible category and work our way down from the parent
           $v_categories_id = 0;
           $theparent_id = 0; // 0 is top level parent
           $thiscategoryid = 0;
 //category_index,           // $categories_delimiter = "^"; // add this to configuration variables
-          for ($category_index = 0; $category_index < $categories_count[$lid]; $category_index++) {
-            $thiscategoryname = ep_4_curly_quotes($categories_names_array[$lid][$category_index]); // category name - 5-3-2012 added curly quote fix
+          for ($category_index = 0; $category_index < $categories_count['id'][$lid]; $category_index++) {
+            $thiscategoryname = ep_4_curly_quotes($categories_names_array['id'][$lid][$category_index]); // category name - 5-3-2012 added curly quote fix
             $sql = "SELECT cat.categories_id
               FROM " . TABLE_CATEGORIES . " AS cat,
                  " . TABLE_CATEGORIES_DESCRIPTION . " AS des
@@ -696,6 +809,18 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 des.language_id = :language_id: AND
                 cat.parent_id = :parent_id: AND
                 des.categories_name = :categories_name: LIMIT 1";
+            $oldPost = $_POST;
+            unset($_POST);
+            $_POST['categories_name'] = array($lid => $thiscategoryname);
+
+            if (class_exists('AdminRequestSanitizer')) {
+              $sanitizer = AdminRequestSanitizer::getInstance();
+              $sanitizer->runSanitizers();
+            }
+
+            $thiscategoryname = $_POST['categories_name'][$lid];
+            $_POST = $oldPost;
+            unset($oldPost);
             $sql = $db->bindVars($sql, ':language_id:', $lid, 'integer');
             $sql = $db->bindVars($sql, ':parent_id:', $theparent_id, 'integer');
             $sql = $db->bindVars($sql, ':categories_name:', $thiscategoryname, $zc_support_ignore_null);
@@ -720,7 +845,19 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                     WHERE
                       categories_id   = :categories_id: AND
                       language_id     = :language_id:";
-                  $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($categories_names_array[$cat_lang_id][$category_index]), $zc_support_ignore_null);
+                  $oldPost = $_POST;
+                  unset($_POST);
+                  $_POST['categories_name'][$cat_lang_id] = $categories_names_array['id'][$cat_lang_id][$category_index];
+
+                  if (class_exists('AdminRequestSanitizer')) {
+                    $sanitizer = AdminRequestSanitizer::getInstance();
+                    $sanitizer->runSanitizers();
+                  }
+
+                  $categories_names_array['id'][$cat_lang_id][$category_index] = $_POST['categories_name'][$cat_lang_id];
+                  $_POST = $oldPost;
+                  unset($oldPost);
+                  $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($categories_names_array['id'][$cat_lang_id][$category_index]), $zc_support_ignore_null);
                   $sql = $db->bindVars($sql, ':categories_id:', $thiscategoryid, 'integer');
                   $sql = $db->bindVars($sql, ':language_id:', $cat_lang_id, 'integer');
                   $result = ep_4_query($sql);
@@ -764,7 +901,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               // Check for multiple categories language. If a column is not defined, default to the main language:
               // categories_name = '".zen_db_input($thiscategoryname)."'";
               // else, set to that langauges category entry:
-              // categories_name = '".zen_db_input($categories_names_array[$lid][$category_index])."'";
+              // categories_name = '".zen_db_input($categories_names_array['id'][$lid][$category_index])."'";
               foreach ($langcode as $lang2) {
                 $v_categories_name_check = 'v_categories_name_' . $lang2['id'];
 
@@ -1543,6 +1680,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
       foreach ($langcode as $lang) {
         // foreach ($v_products_name as $key => $name) {  // Decouple the dependency on the products_name being imported to update the products_name, description, short description and/or URL. //mc12345678 2015-Dec-12
         $lang_id = $lang['id'];
+        $lang_id_code = $lang['code'];
         $sql = "SELECT * FROM " . TABLE_PRODUCTS_DESCRIPTION . " WHERE
                   products_id = :products_id: AND
                   language_id = :language_id:";
@@ -1555,40 +1693,104 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) {
           $sql = "INSERT INTO " . TABLE_PRODUCTS_DESCRIPTION . " (
                       products_id,
-            " . (isset($filelayout['v_products_name_' . $lang_id]) || $product_is_new
+            " . (isset($filelayout['v_products_name_' . $lang_id]) || isset($filelayout['v_products_name_' . $lang_id_code]) || $product_is_new
                   ? "products_name, "
                   : "") .
-            ((isset($filelayout['v_products_description_' . $lang_id]) || ( isset($filelayout['v_products_description_' . $lang_id]) && $product_is_new) )
+            ((isset($filelayout['v_products_description_' . $lang_id]) || isset($filelayout['v_products_description_' . $lang_id_code]) || $product_is_new)
               ? " products_description, "
               : "");
           if ($ep_supported_mods['psd'] == true && isset($v_products_short_desc)) {
             $sql .= " products_short_desc,";
           }
-          $sql .= (isset($filelayout['v_products_url_' . $lang_id]) ? " products_url, " : "");
+          $sql .= (isset($filelayout['v_products_url_' . $lang_id]) || isset($filelayout['v_products_url_' . $lang_id_code]) ? " products_url, " : "");
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_INSERT_FIELDS');
           $sql .= "
                    language_id )
                             VALUES (
                    :v_products_id:,
-                   " . (isset($filelayout['v_products_name_' . $lang_id]) || $product_is_new ? ":v_products_name:, " : "") .
-                   ((isset($filelayout['v_products_description_' . $lang_id]) || ( isset($filelayout['v_products_description_' . $lang_id]) && $product_is_new) )
+                   " . (isset($filelayout['v_products_name_' . $lang_id]) || isset($filelayout['v_products_name_' . $lang_id_code]) || $product_is_new ? ":v_products_name:, " : "") .
+                   ((isset($filelayout['v_products_description_' . $lang_id]) || isset($filelayout['v_products_description_' . $lang_id_code]) || $product_is_new)
                      ? ":v_products_description:, "
                      : "");
           if ($ep_supported_mods['psd'] == true && isset($v_products_short_desc)) {
             $sql .= ":v_products_short_desc:, ";
           }
-          $sql .= (isset($filelayout['v_products_url_' . $lang_id]) ? ":v_products_url:, " : "");
+          $sql .= (isset($filelayout['v_products_url_' . $lang_id]) || isset($filelayout['v_products_url_' . $lang_id_code]) ? ":v_products_url:, " : "");
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_INSERT_FIELDS_VALUES');
           $sql .= "
                    :language_id:)";
 
+          $oldPost = $_POST;
+          unset($_POST);
+
+          if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
+            $_POST['products_name'][$lang_id] = $v_products_name[$lang_id];
+          }
+          if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
+            $_POST['products_name'][$lang_id_code] = $v_products_name[$lang_id_code];
+          }
+          if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
+            $_POST['products_description'][$lang_id] = $v_products_description[$lang_id];
+          }
+          if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
+            $_POST['products_description'][$lang_id_code] = $v_products_description[$lang_id_code];
+          }
+          if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
+            $_POST['products_short_description'][$lang_id] = $v_products_short_desc[$lang_id];
+          }
+          if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
+            $_POST['products_short_description'][$lang_id_code] = $v_products_short_desc[$lang_id_code];
+          }
+          if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
+            $_POST['products_url'][$lang_id] = $v_products_url[$lang_id];
+          }
+          if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
+            $_POST['products_url'][$lang_id_code] = $v_products_url[$lang_id_code];
+          }
+
+          if (class_exists('AdminRequestSanitizer')) {
+            $sanitizer = AdminRequestSanitizer::getInstance();
+            $sanitizer->runSanitizers();
+          }
+
+          if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
+            $v_products_name_store = $v_products_name[$lang_id] = $_POST['products_name'][$lang_id];
+          }
+          if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
+            $v_products_name_store = $v_products_name[$lang_id_code] = $_POST['products_name'][$lang_id_code];
+          }
+
+          if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
+            $v_products_desc_store = $v_products_description[$lang_id] = $_POST['products_description'][$lang_id];
+          }
+          if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
+            $v_products_desc_store = $v_products_description[$lang_id_code] = $_POST['products_description'][$lang_id_code];
+          }
+
+          if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
+            $v_products_short_desc_store = $v_products_short_desc[$lang_id] = $_POST['products_short_description'][$lang_id];
+          }
+          if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
+            $v_products_short_desc_store = $v_products_short_desc[$lang_id_code] = $_POST['products_short_description'][$lang_id_code];
+          }
+
+          if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
+            $v_products_url_store = $v_products_url[$lang_id] = $_POST['products_url'][$lang_id];
+          }
+          if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
+            $v_products_url_store = $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
+          }
+            
+          $_POST = $oldPost;
+          unset($oldPost);
+
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_START');
           $sql = $db->bindVars($sql, ':v_products_id:', $v_products_id, 'integer');
           $sql = $db->bindVars($sql, ':language_id:', $lang_id, 'integer');
-          $sql = $db->bindVars($sql, ':v_products_name:', $v_products_name[$lang_id], $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':v_products_description:', $v_products_description[$lang_id], $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':v_products_short_desc:', $v_products_short_desc[$lang_id], $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':v_products_url:', $v_products_url[$lang_id], $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':v_products_name:', (isset($v_products_name_store) ? $v_products_name_store : ''), $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':v_products_description:', (isset($v_products_desc_store) ? $v_products_desc_store : ''), $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':v_products_short_desc:', (isset($v_products_short_desc_store) ? $v_products_short_desc_store : ''), $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':v_products_url:', (isset($v_products_url_store) ? $v_products_url_store : ''), $zc_support_ignore_null);
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_END');
 
           $result = ep_4_query($sql);
@@ -1598,18 +1800,18 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         } else { // already in the description, update it
           $sql = "UPDATE " . TABLE_PRODUCTS_DESCRIPTION . " SET ";
           $update_count = false;
-          if (isset($filelayout['v_products_name_' . $lang_id])) {
+          if (isset($filelayout['v_products_name_' . $lang_id]) || isset($filelayout['v_products_name_' . $lang_id_code])) {
             $sql .= " products_name      = :v_products_name:";
             $update_count = true;
           }
-          if (isset($filelayout['v_products_description_' . $lang_id]) || ( isset($filelayout['v_products_description_' . $lang_id]) && $product_is_new)) {
+          if (isset($filelayout['v_products_description_' . $lang_id]) || isset($filelayout['v_products_description_' . $lang_id_code]) || $product_is_new) {
             $sql .= ($update_count ? ", " : "") . "products_description = :v_products_description:";
             $update_count = true;
           }
-          if ($ep_supported_mods['psd'] == true && isset($v_products_short_desc[$lang_id])) {
+          if ($ep_supported_mods['psd'] == true && (isset($v_products_short_desc[$lang_id]) || isset($v_products_short_desc[$lang_id_code]))) {
             $sql .= ($update_count ? ", " : "") . "products_short_desc = :v_products_short_desc:";
                 }
-          if (isset($filelayout['v_products_url_' . $lang_id])) {
+          if (isset($filelayout['v_products_url_' . $lang_id]) || isset($filelayout['v_products_url_' . $lang_id_code])) {
             $sql .= ($update_count ? ", " : "") . " products_url = :v_products_url: ";
             $update_count = true;
           }
@@ -1622,10 +1824,75 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_UPDATE_WHERE');
 
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_START');
-          $sql = $db->bindVars($sql, ':v_products_name:', $v_products_name[$lang_id], $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':v_products_description:', $v_products_description[$lang_id], $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':v_products_short_desc:', $v_products_short_desc[$lang_id], $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':v_products_url:', $v_products_url[$lang_id], $zc_support_ignore_null);
+
+          $oldPost = $_POST;
+          unset($_POST);
+
+          if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
+            $_POST['products_name'][$lang_id] = $v_products_name[$lang_id];
+          }
+          if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
+            $_POST['products_name'][$lang_id_code] = $v_products_name[$lang_id_code];
+          }
+          if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
+            $_POST['products_description'][$lang_id] = $v_products_description[$lang_id];
+          }
+          if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
+            $_POST['products_description'][$lang_id_code] = $v_products_description[$lang_id_code];
+          }
+          if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
+            $_POST['products_short_description'][$lang_id] = $v_products_short_desc[$lang_id];
+          }
+          if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
+            $_POST['products_short_description'][$lang_id_code] = $v_products_short_desc[$lang_id_code];
+          }
+          if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
+            $_POST['products_url'][$lang_id] = $v_products_url[$lang_id];
+          }
+          if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
+            $_POST['products_url'][$lang_id_code] = $v_products_url[$lang_id_code];
+          }
+
+          if (class_exists('AdminRequestSanitizer')) {
+            $sanitizer = AdminRequestSanitizer::getInstance();
+            $sanitizer->runSanitizers();
+          }
+
+          if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
+            $v_products_name_store = $v_products_name[$lang_id] = $_POST['products_name'][$lang_id];
+          }
+          if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
+            $v_products_name_store = $v_products_name[$lang_id_code] = $_POST['products_name'][$lang_id_code];
+          }
+
+          if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
+            $v_products_desc_store = $v_products_description[$lang_id] = $_POST['products_description'][$lang_id];
+          }
+          if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
+            $v_products_desc_store = $v_products_description[$lang_id_code] = $_POST['products_description'][$lang_id_code];
+          }
+
+          if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
+            $v_products_short_desc_store = $v_products_short_desc[$lang_id] = $_POST['products_short_description'][$lang_id];
+          }
+          if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
+            $v_products_short_desc_store = $v_products_short_desc[$lang_id_code] = $_POST['products_short_description'][$lang_id_code];
+          }
+
+          if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
+            $v_products_url_store = $v_products_url[$lang_id] = $_POST['products_url'][$lang_id];
+          }
+          if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
+            $v_products_url_store = $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
+          }
+
+          $_POST = $oldPost;
+          unset($oldPost);
+
+          $sql = $db->bindVars($sql, ':v_products_name:', (isset($v_products_name_store) ? $v_products_name_store : ''), $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':v_products_description:', (isset($v_products_desc_store) ? $v_products_desc_store : ''), $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':v_products_short_desc:', (isset($v_products_short_desc_store) ? $v_products_short_desc_store : ''), $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':v_products_url:', (isset($v_products_url_store) ? $v_products_url_store : ''), $zc_support_ignore_null);
           $sql = $db->bindVars($sql, ':v_products_id:', $v_products_id, 'integer');
           $sql = $db->bindVars($sql, ':language_id:', $lang_id, 'integer');
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_END');
@@ -1641,6 +1908,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         } // END: already in description, update it
         unset($sql);
         unset($result);
+        unset($v_products_name_store);
+        unset($v_products_desc_store);
+        unset($v_products_short_desc_store);
+        unset($v_products_url_store);
       } // END: foreach on languages
       unset($lang);
     } // END: Products Descriptions End
