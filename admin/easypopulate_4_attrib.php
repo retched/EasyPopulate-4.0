@@ -16,7 +16,7 @@ $new_options_values_name = 0;
 $products_sort_order_increment = 10;
 
 // attribute import loop - read 1 line of data from input file
-while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // while #1 - Main Loop
+while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== false) { // while #1 - Main Loop
   ${$chosen_key} = $contents[$filelayout[$chosen_key]];
 
   // READ products_id and products_model from TABLE_PRODUCTS
@@ -32,7 +32,7 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
   }
 
   // Find the correct product_model to edit
-  while($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) { // BEGIN while #2
+  while(($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) !== false) { // BEGIN while #2
     $v_products_id = $row['products_id'];
 
     // why am I again testing products_model? I used that to query the database in the first place!
