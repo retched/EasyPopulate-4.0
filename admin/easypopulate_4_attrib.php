@@ -89,7 +89,9 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
         $sql_max = "SELECT MAX(products_options_id) + 1 max FROM ".TABLE_PRODUCTS_OPTIONS;
         $result_max = ep_4_query($sql_max);
         $row_max = ($ep_uses_mysqli ? mysqli_fetch_array($result_max) : mysql_fetch_array($result_max));
+        unset($result_max);
         $v_products_options_id = $row_max['max'];
+        unset($row_max);
 //        if (!is_numeric($products_options_id) ) { // i don't think this ever gets executed even when table is empty!!!
 //          $v_products_options_id = 1;
 //        }
@@ -119,8 +121,11 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
       // Get max index id for TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS
       $sql_max2 = "SELECT MAX(products_options_values_to_products_options_id) +1 max FROM ".TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS;
       $result2 = ep_4_query($sql_max2);
+      unset($sql_max2);
       $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+      unset($result2);
       $products_options_values_to_products_options_id = $row2['max'];
+      unset($row2);
 /*      if ( !is_numeric($products_options_values_to_products_options_id) ) {
         $products_options_values_to_products_options_id = 1;
       }*/
@@ -128,8 +133,11 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
       // Get max index id for TABLE_PRODUCTS_OPTIONS_VALUES
       $sql_max3 = "SELECT MAX(products_options_values_id) + 1 max FROM ".TABLE_PRODUCTS_OPTIONS_VALUES;
       $result3 = ep_4_query($sql_max3);
+      unset($sql_max3);
       $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
+      unset($result3);
       $products_options_values_id = $row3['max'];
+      unset($row3);
 /*      if (!is_numeric($products_options_values_id) ) {
         $products_options_values_id = 1;
       }*/
@@ -305,14 +313,20 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
         // Get max index id for TABLE_PRODUCTS_OPTIONS_VALUES
         $sql_max3 = "SELECT MAX(products_options_values_id) + 1 max FROM ".TABLE_PRODUCTS_OPTIONS_VALUES;
         $result3 = ep_4_query($sql_max3);
+        unset($sql_max3);
         $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
+        unset($result3);
         $products_options_values_id = $row3['max'];
+        unset($row3);
 
         // Get max index id for TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS
         $sql_max2 = "SELECT MAX(products_options_values_to_products_options_id) + 1 max FROM ".TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS;
         $result2 = ep_4_query($sql_max2);
+        unset($sql_max2);
         $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+        unset($resul2);
         $products_options_values_to_products_options_id = $row2['max'];
+        unset($row2);
         $values_names_index++;
         // mc12345678: allows for more room in sort order of options names: New = round(old/10)*10 + increment
         // $products_options_values_sort_order = $products_options_values_sort_order + $products_sort_order_increment;
@@ -331,8 +345,10 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
       }
       // END: PRODUCTS OPTIONS VALUES
     } // END: if
+    unset($row);
   }  // END: while #2
   print(str_repeat(" ", 300));
   flush();
+  unset($contents);
 } // END: while #1
 
