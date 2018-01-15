@@ -1254,10 +1254,12 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             if ($chosen_key == 'v_products_model' || ($chosen_key == 'v_products_id' && defined('EP4_DB_FILTER_KEY') && EP4_DB_FILTER_KEY === 'blank_new' && ${$chosen_key} == "")) {
               $v_products_id = $max_product_id;
             }
-            if ($v_artists_name <> '') {
-              $v_products_type = 2; // 2 = music Product - Music
-            } else {
-              $v_products_type = 1; // 1 = standard product
+            if (!isset($filelayout['v_products_type'])) {
+              if ($v_artists_name <> '') {
+                $v_products_type = 2; // 2 = music Product - Music
+              } else {
+                $v_products_type = 1; // 1 = standard product @TODO Allow import of alternate product type
+              }
             }
 
             $zco_notifier->notify('EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE');
