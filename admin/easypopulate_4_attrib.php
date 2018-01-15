@@ -45,8 +45,16 @@ while ($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { // whi
       $v_products_options_type = $contents[$filelayout['v_products_options_type']];
       foreach ($langcode as $key => $lang) { // get each language entry
         $l_id = $lang['id'];
+        $l_id_code = $lang['code'];
         $v_products_options_name[$l_id] = $contents[$filelayout['v_products_options_name_'.$l_id]];
+        // Override in place to use the language identifier code content over the language identifier content.
+        if (isset($filelayout['v_products_options_name_'.$l_id_code]) && (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all')) {
+          $v_products_options_name[$l_id] = $contents[$filelayout['v_products_options_name_'.$l_id_code]];
+        }
         $values_names_array[$l_id] = explode(',',$contents[$filelayout['v_products_options_values_name_'.$l_id]]);
+        if (isset($filelayout['v_products_options_values_name_'.$l_id_code]) && (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all')) {
+          $values_names_array[$l_id] = explode(',',$contents[$filelayout['v_products_options_values_name_'.$l_id_code]]);
+        }
       } // foreach
 
       // PRODUCTS OPTIONS NAMES
