@@ -235,9 +235,9 @@ $custom_fields = array();
 if (strlen(EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS) > 0) {
   $custom_field_names = explode(',', EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS);
   foreach ($custom_field_names as $field) {
-    if (ep_4_check_table_column(TABLE_PRODUCTS, $field)) {
+    if (ep_4_check_table_column(TABLE_PRODUCTS, trim($field))) {
       $custom_field_check[] = TRUE;
-      $custom_fields[] = $field;
+      $custom_fields[] = trim($field);
     } else {
       $custom_field_check[] = FALSE;
     }
