@@ -415,8 +415,9 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
     </style>
   </head>
   <body onLoad="init()">
-       <?php require(DIR_WS_INCLUDES . 'header.php'); 
-       $zco_notifier->notify('EP4_ZC155_AFTER_HEADER');
+      <?php require(DIR_WS_INCLUDES . 'header.php'); 
+      $update = false;
+      $zco_notifier->notify('EP4_ZC155_AFTER_HEADER');
        ?>
 
     <!-- body -->
@@ -426,7 +427,6 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
 
 
       <div style="text-align:right; float:right; width:25%"><?php 
-      $update = false;
       if (!defined('TOOLS_EASYPOPULATE_4_VERSION')) { // database does not have key
         $group_check = $db->Execute("SELECT configuration_group_id FROM " . TABLE_CONFIGURATION_GROUP . " WHERE configuration_group_title = 'Easy Populate 4'");
 
@@ -436,10 +436,11 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
         }
         unset($group_check);
       } else {
-        // If EP4 is installed, is not to the version available on ZC, current version is not the same as the software version (allows an upgrade or a downgrade, but downgrade won't remove admin settings).
-        if (plugin_version_check_for_updates(2069, $curver_detail) !== FALSE && plugin_version_check_for_updates(2069, TOOLS_EASYPOPULATE_4_VERSION) !== FALSE && $curver_detail !== TOOLS_EASYPOPULATE_4_VERSION) {
+        // If EP4 is installed (because of above), database version installed is greater than or equal to the version available on ZC, current database version is not the same as the software version (allows an upgrade or a downgrade, but downgrade won't remove admin settings).
+        if (plugin_version_check_for_updates(2069, TOOLS_EASYPOPULATE_4_VERSION) === FALSE && $curver_detail !== TOOLS_EASYPOPULATE_4_VERSION) {
           $update = true;
         }
+        // If EP4 is installed (because of above), files installed are greater than or equal to the version available on ZC, installed version is behind the version available on ZC.
         if (plugin_version_check_for_updates(2069, $curver_detail) === FALSE && plugin_version_check_for_updates(2069, TOOLS_EASYPOPULATE_4_VERSION) !== FALSE) {
           $update = true;
         }
