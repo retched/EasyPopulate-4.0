@@ -43,7 +43,7 @@ $ep_date_format = EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT;
 $ep_raw_time = EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME;
 $ep_debug_logging = ((EASYPOPULATE_4_CONFIG_DEBUG_LOGGING == 'true') ? true : false);
 $ep_split_records = (int) EASYPOPULATE_4_CONFIG_SPLIT_RECORDS;
-$price_with_tax = ((EASYPOPULATE_4_CONFIG_PRICE_INC_TAX == 'true') ? true : false);
+$price_with_tax = ((EASYPOPULATE_4_CONFIG_PRICE_INC_TAX == 'true') ? 1 : 0);
 $strip_smart_tags = ((EASYPOPULATE_4_CONFIG_SMART_TAGS == 'true') ? true : false);
 $max_qty_discounts = EASYPOPULATE_4_CONFIG_MAX_QTY_DISCOUNTS;
 $ep_feedback = ((EASYPOPULATE_4_CONFIG_VERBOSE == 'true') ? true : false);
