@@ -1212,7 +1212,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 
               // needs to go into a log file chadd 11-14-2011
               if ($ep_feedback == true) {
-                $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT, ${$chosen_key});
+                $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT, ${$chosen_key}, $chosen_key);
                 foreach ($items as $col => $summary) {
                   if ($col == $filelayout[$chosen_key]){
                     continue;
@@ -1241,7 +1241,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               }
               $ep_update_count++;
             } else {
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT_FAIL, ${$chosen_key});
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT_FAIL, ${$chosen_key}, $chosen_key);
               $ep_error_count++;
             }
           } // EOF Update product
