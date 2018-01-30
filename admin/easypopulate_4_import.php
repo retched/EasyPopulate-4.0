@@ -211,7 +211,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         // this gets default values for current v_products_model
         // inputs: $items array (file data by column #); $filelayout array (headings by column #); 
         // $row (current TABLE_PRODUCTS data by heading name)
-        while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) { // chadd - this executes once?? why use while-loop??
+        while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) { // chadd - this executes once?? why use while-loop?? //mc12345678 - This executes for each instance of the product in a category (ie. linked product are included)
           $product_is_new = false; // we found products_model in database
           // Get current products descriptions and categories for this model from database
           // $row at present consists of current product data for above fields only (in $sql)
@@ -470,7 +470,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 
         // if $v_products_quantity is null, set it to: 0
         if (trim($v_products_quantity) == '') {
-          $v_products_quantity = 0; // new products are set to quanitity '0', updated products are set with default_these() values
+          $v_products_quantity = 0; // new products are set to quantity '0', updated products are set with default_these() values
         }
 
         // date variables - chadd ... these should really be products_date_available and products_date_added for clarity
