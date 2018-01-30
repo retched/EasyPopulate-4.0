@@ -419,15 +419,15 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
     <!-- <script language="javascript" src="includes/ep4ajax.js"></script> -->
     <script type="text/javascript">
 <!--
-	 function init()
-	 {
-		 cssjsmenu('navbar');
-		 if (document.getElementById)
-		 {
-			 var kill = document.getElementById('hoverJS');
-			 kill.disabled = true;
-		 }
-	 }
+   function init()
+   {
+     cssjsmenu('navbar');
+     if (document.getElementById)
+     {
+       var kill = document.getElementById('hoverJS');
+       kill.disabled = true;
+     }
+   }
 // -->
     </script>
     <style type="text/css">
@@ -442,7 +442,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
 
     <!-- body -->
     <div style="padding:5px">
-         <?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?>
+        <?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?>
       <div class="pageHeading"><?php echo "Easy Populate $curver"; ?></div>
 
 
@@ -599,7 +599,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
                while ($manufacturers = mysqli_fetch_array($manufacturers_query)) {
                  $manufacturers_array[] = array("id" => $manufacturers['manufacturers_id'], 'text' => $manufacturers['manufacturers_name']);
                }
-			
+      
              } else {
                $manufacturers_query = mysql_query("SELECT manufacturers_id, manufacturers_name FROM " . TABLE_MANUFACTURERS . " ORDER BY manufacturers_name");
                while ($manufacturers = mysql_fetch_array($manufacturers_query)) {
@@ -615,27 +615,27 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
              echo ' ' . zen_draw_pull_down_menu('ep_manufacturer_filter', $manufacturers_array) . ' ';
              echo ' ' . zen_draw_pull_down_menu('ep_status_filter', $status_array) . ' ';
              echo zen_draw_input_field('export', EASYPOPULATE_4_DD_FILTER_EXPORT, ' style="padding: 0px"', false, 'submit');
-             ?>				
+             ?>
           <br /><br />
         </div></form>
   <?php
-	echo zen_draw_form('custom2', FILENAME_EASYPOPULATE_4, '', 'post', 'id="custom2"'); 
-	?>
-	
+  echo zen_draw_form('custom2', FILENAME_EASYPOPULATE_4, '', 'post', 'id="custom2"');
+  ?>
+  
     <div align = "left">
-		<?php	
-		$order_export_type_array  = array(array( "id" => '0', 'text' => EASYPOPULATE_4_ORDERS_DROPDOWN_FIRST ),
-			array( "id" => '1', 'text' => EASYPOPULATE_4_ORDERS_FULL ),
-			array( "id" => '2', 'text' => EASYPOPULATE_4_ORDERS_NEWFULL ),
-			array( "id" => '3', 'text' => EASYPOPULATE_4_ORDERS_NO_ATTRIBS ),
+    <?php
+    $order_export_type_array  = array(array( "id" => '0', 'text' => EASYPOPULATE_4_ORDERS_DROPDOWN_FIRST ),
+      array( "id" => '1', 'text' => EASYPOPULATE_4_ORDERS_FULL ),
+      array( "id" => '2', 'text' => EASYPOPULATE_4_ORDERS_NEWFULL ),
+      array( "id" => '3', 'text' => EASYPOPULATE_4_ORDERS_NO_ATTRIBS ),
       array( "id" => '4', 'text' => EASYPOPULATE_4_ORDERS_ATTRIBS ));
-		$order_status_export_array = array ();
-		echo EASYPOPULATE_4_ORDERS_DROPDOWN_TITLE;
-		
-		echo zen_draw_pull_down_menu('ep_order_export_type', $order_export_type_array) . ' ';
+    $order_status_export_array = array ();
+    echo EASYPOPULATE_4_ORDERS_DROPDOWN_TITLE;
+    
+    echo zen_draw_pull_down_menu('ep_order_export_type', $order_export_type_array) . ' ';
     echo zen_cfg_pull_down_order_statuses(NULL, 'order_status');
-		echo zen_draw_input_field('exportorder', EASYPOPULATE_4_ORDERS_DROPDOWN_EXPORT, ' style="padding: 0px"', false, 'submit');
-		?>				
+    echo zen_draw_input_field('exportorder', EASYPOPULATE_4_ORDERS_DROPDOWN_EXPORT, ' style="padding: 0px"', false, 'submit');
+    ?>
     <br /><br />
     </div></form>
     
@@ -665,8 +665,8 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
           <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=SBAStockProdFilter, $request_type'); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_SBA_STOCK_ASC; ?></a><br />
 
         <?php } /* End SBA1 Addition */ 
-		$zco_notifier->notify('EP4_LINK_SELECTION_END');
-		?>
+    $zco_notifier->notify('EP4_LINK_SELECTION_END');
+    ?>
         <br><?php echo EASYPOPULATE_4_DISPLAY_TITLE_EXPORT_ONLY; ?><br />
         <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=options', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_OPTION_NAMES; ?></a><br />
         <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=values', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_OPTION_VALUES; ?></a><br />
@@ -675,7 +675,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
 // List uploaded files in multifile mode
 // Table header
         echo '<br /><br />';
-//	echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
+//  echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
 // $upload_dir = DIR_FS_CATALOG.$tempdir; // defined above
         if ($dirhandle = opendir($upload_dir)) {
           $files = array();
@@ -704,7 +704,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
             "orders-noattribs-ep"=>ORDERSEXPORT_LINK_SAVE2,
             "orders-onlyAttribs-ep"=>ORDERSEXPORT_LINK_SAVE3
           );
-		  $zco_notifier->notify('EP4_FILENAMES');
+          $zco_notifier->notify('EP4_FILENAMES');
 
           $filetypes = array();
 
@@ -761,8 +761,8 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
               if (EP4_SHOW_ALL_FILETYPES != 'Hidden' || (EP4_SHOW_ALL_FILETYPES == 'Hidden' && ($files[$i] != ".") && ($files[$i] != "..") && preg_match("/\.(sql|gz|csv|txt|log)$/i", $files[$i]) )) {
                 $file_count++;
                 echo '<tr><td>' . $files[$val[$i]] . '</td>
-					<td align="right">' . filesize($upload_dir . $files[$val[$i]]) . '</td>
-					<td align="center">' . date("Y-m-d H:i:s", filemtime($upload_dir . $files[$val[$i]])) . '</td>';
+          <td align="right">' . filesize($upload_dir . $files[$val[$i]]) . '</td>
+          <td align="center">' . date("Y-m-d H:i:s", filemtime($upload_dir . $files[$val[$i]])) . '</td>';
                 $ext = strtolower(end(explode('.', $files[$val[$i]])));
                 // file type
                 switch ($ext) {

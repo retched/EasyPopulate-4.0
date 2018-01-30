@@ -1470,34 +1470,36 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           // the following is common in both the updating an existing product and creating a new product // mc12345678 updated to allow omission of v_products_description in the import file.
     $add_products_description_data = false;
     $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_ADD_OR_CHANGE_DATA');
-    if ((isset($v_products_name) && is_array($v_products_name)) || (isset($v_products_description) && is_array
-            ($v_products_description)) ||
-        ($ep_supported_mods['psd'] == true
-            &&
-            isset
-            ($v_products_short_desc) ) || (isset($v_products_url) && is_array($v_products_url)) ||
-        $add_products_description_data) { //
+    if ((isset($v_products_name) && is_array($v_products_name)) 
+       || (isset($v_products_description) && is_array($v_products_description)) 
+       || ($ep_supported_mods['psd'] == true && isset($v_products_short_desc)) 
+       || (isset($v_products_url) && is_array($v_products_url)) 
+       || $add_products_description_data) { //
       // Effectively need a way to step through all language options, this section to be "accepted" if there is something to be updated.  Prefer the ability to verify update need without having to loop on anything, but just by "presence" of information.
       foreach ($langcode as $lang) {
         // foreach ($v_products_name as $key => $name) {  // Decouple the dependency on the products_name being imported to update the products_name, description, short description and/or URL. //mc12345678 2015-Dec-12
         $lang_id = $lang['id'];
-              $sql = "SELECT * FROM " . TABLE_PRODUCTS_DESCRIPTION . " WHERE
-                        products_id = :products_id: AND
-                        language_id = :language_id:";
-              $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
+        $sql = "SELECT * FROM " . TABLE_PRODUCTS_DESCRIPTION . " WHERE
+                  products_id = :products_id: AND
+                  language_id = :language_id:";
+        $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
         $sql = $db->bindVars($sql, ':language_id:', $lang_id, 'integer');
 
-              $result = ep_4_query($sql);
+        $result = ep_4_query($sql);
         unset($sql);
 
-              if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) {
-                $sql = "INSERT INTO " . TABLE_PRODUCTS_DESCRIPTION . " (
-                            products_id,
-                  " . (isset($filelayout['v_products_name_' . $lang_id]) || $product_is_new ? "products_name, " : "") . 
-                  ((isset($filelayout['v_products_description_' . $lang_id]) || ( isset($filelayout['v_products_description_' . $lang_id]) && $product_is_new) ) ? " products_description, " : "");
+        if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) {
+          $sql = "INSERT INTO " . TABLE_PRODUCTS_DESCRIPTION . " (
+                      products_id,
+            " . (isset($filelayout['v_products_name_' . $lang_id]) || $product_is_new 
+                  ? "products_name, " 
+                  : "") . 
+            ((isset($filelayout['v_products_description_' . $lang_id]) || ( isset($filelayout['v_products_description_' . $lang_id]) && $product_is_new) ) 
+              ? " products_description, " 
+              : "");
           if ($ep_supported_mods['psd'] == true && isset($v_products_short_desc)) {
-                  $sql .= " products_short_desc,";
-                }
+            $sql .= " products_short_desc,";
+          }
           $sql .= (isset($filelayout['v_products_url_' . $lang_id]) ? " products_url, " : "");
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_INSERT_FIELDS');
           $sql .= "
@@ -1505,10 +1507,12 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                             VALUES (
                    :v_products_id:,
                    " . (isset($filelayout['v_products_name_' . $lang_id]) || $product_is_new ? ":v_products_name:, " : "") .
-                   ((isset($filelayout['v_products_description_' . $lang_id]) || ( isset($filelayout['v_products_description_' . $lang_id]) && $product_is_new) ) ? ":v_products_description:, " : "");
+                   ((isset($filelayout['v_products_description_' . $lang_id]) || ( isset($filelayout['v_products_description_' . $lang_id]) && $product_is_new) ) 
+                     ? ":v_products_description:, " 
+                     : "");
           if ($ep_supported_mods['psd'] == true && isset($v_products_short_desc)) {
             $sql .= ":v_products_short_desc:, ";
-                }
+          }
           $sql .= (isset($filelayout['v_products_url_' . $lang_id]) ? ":v_products_url:, " : "");
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_INSERT_FIELDS_VALUES');
           $sql .= "
