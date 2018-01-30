@@ -239,7 +239,26 @@ if (strlen(EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS) > 0) {
       $custom_field_check[] = TRUE;
       $custom_fields[] = trim($field);
     } else {
+      $custom_further = explode(':', $field);
+//      $custom_further[0] // expected to be table;
+//      $custom_further[1] // expected to be field;
+      if (count($custom_further) > 2) {
+        //error message about field entry
+      } else {
+        // Test if table exists
+        $temp_table = /*constant(*/'TABLE_' . strtoupper(trim($custom_further[0]));//);
+        if (defined(/*strtoupper(*/$temp_table))/*)*/ {
+          // then if table exists, test if field exists in table.
+          if(ep_4_check_table_column(constant($temp_table), trim($custom_further[1]))) {
+// mc12345678 commented out for now until can fully address how to handle this.
+//            $custom_field_check[] = TRUE;
+//            $custom_fields[] = trim($custom_further[1]);
+//            continue;
+          }
+        }
+      }
       $custom_field_check[] = FALSE;
+//      $custom_fields[] = NULL;
     }
   }
 }
