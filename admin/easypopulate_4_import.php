@@ -392,8 +392,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           if (isset($filelayout['v_products_name_' . $l_id])) { // do for each language in our upload file if exist
             // check products name length and display warning on error, but still process record
             $v_products_name[$l_id] = ep_4_curly_quotes($items[$filelayout['v_products_name_' . $l_id]]);
-            if ((function_exists('mb_strlen') && mb_strlen($v_products_name[$l_id]) > $products_name_max_len) || (!function_exists('mb_strlen') && strlen($v_products_name[$l_id]) > $products_name_max_len)) {
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG, $v_products_model, $v_products_name[$l_id], $products_name_max_len);
+            if ((function_exists('mb_strlen') && mb_strlen($v_products_name[$l_id]) > $max_len['products_name']) || (!function_exists('mb_strlen') && strlen($v_products_name[$l_id]) > $max_len['products_name'])) {
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG, $v_products_model, $v_products_name[$l_id], $max_len['products_name']);
               $ep_warning_count++;
             }
           } else { // column doesn't exist in the IMPORT file
@@ -421,8 +421,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           if (isset($filelayout['v_products_url_' . $l_id])) { // do for each language in our upload file if exist
             $v_products_url[$l_id] = $items[$filelayout['v_products_url_' . $l_id]];
             // check products url length and display warning on error, but still process record
-            if ((function_exists('mb_strlen') && mb_strlen($v_products_url[$l_id]) > $products_url_max_len) || (!function_exists('mb_strlen') && strlen($v_products_url[$l_id]) > $products_url_max_len)) {
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_URL_LONG, $v_products_model, $v_products_url[$l_id], $products_url_max_len);
+            if ((function_exists('mb_strlen') && mb_strlen($v_products_url[$l_id]) > $max_len['products_url']) || (!function_exists('mb_strlen') && strlen($v_products_url[$l_id]) > $max_len['products_url'])) {
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_URL_LONG, $v_products_model, $v_products_url[$l_id], $max_len['products_url']);
               $ep_warning_count++;
             }
           } else { // column doesn't exist in the IMPORT file
@@ -488,15 +488,15 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         }
 
         // check size of v_products_model, loop on error
-        if ((function_exists('mb_strlen') && mb_strlen($v_products_model) > $products_model_max_len) || (!function_exists('mb_strlen') && strlen($v_products_model) > $products_model_max_len)) {
-          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_MODEL_LONG, $v_products_model, $products_model_max_len);
+        if ((function_exists('mb_strlen') && mb_strlen($v_products_model) > $max_len['products_model']) || (!function_exists('mb_strlen') && strlen($v_products_model) > $max_len['products_model'])) {
+          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_MODEL_LONG, $v_products_model, $max_len['products_model']);
           $ep_error_count++;
           continue; // short-circuit on error
         }
 
         // BEGIN: Manufacturer's Name
         // convert the manufacturer's name into id's for the database
-        if (isset($v_manufacturers_name) && ($v_manufacturers_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_manufacturers_name) <= $manufacturers_name_max_len) || (!function_exists('mb_strlen') && strlen($v_manufacturers_name) <= $manufacturers_name_max_len))) {
+        if (isset($v_manufacturers_name) && ($v_manufacturers_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_manufacturers_name) <= $max_len['manufacturers_name']) || (!function_exists('mb_strlen') && strlen($v_manufacturers_name) <= $max_len['manufacturers_name']))) {
           $sql = "SELECT man.manufacturers_id AS manID FROM " . TABLE_MANUFACTURERS . " AS man WHERE man.manufacturers_name = :manufacturers_name: LIMIT 1";
           $sql = $db->bindVars($sql, ':manufacturers_name:', $v_manufacturers_name, 'string');
           
@@ -531,8 +531,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             }
           }
         } else { // $v_manufacturers_name == '' or name length violation
-          if ((function_exists('mb_strlen') && mb_strlen($v_manufacturers_name) > $manufacturers_name_max_len) || (!function_exists('mb_strlen') && strlen($v_manufacturers_name) > $manufacturers_name_max_len)) {
-            $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_MANUFACTURER_NAME_LONG, $v_manufacturers_name, $manufacturers_name_max_len);
+          if ((function_exists('mb_strlen') && mb_strlen($v_manufacturers_name) > $max_len['manufacturers_name']) || (!function_exists('mb_strlen') && strlen($v_manufacturers_name) > $max_len['manufacturers_name'])) {
+            $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_MANUFACTURER_NAME_LONG, $v_manufacturers_name, $max_len['manufacturers_name']);
             $ep_error_count++;
             continue;
           }
@@ -568,10 +568,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             // get the number of tokens in $categories_names_array[]
             $categories_count[$lang['id']] = count($categories_names_array[$lang['id']]);
             // check category names for length violation. abort on error
-            if ($categories_count[$lang['id']] > 0) { // only check $categories_name_max_len if $categories_count[$lang['id']] > 0
+            if ($categories_count[$lang['id']] > 0) { // only check $max_len['categories_name'] if $categories_count[$lang['id']] > 0
               for ($category_index = 0; $category_index < $categories_count[$lang['id']]; $category_index++) {
-                if ((function_exists('mb_strlen') && mb_strlen($categories_names_array[$lang['id']][$category_index]) > $categories_name_max_len) || (!function_exists('mb_strlen') && strlen($categories_names_array[$lang['id']][$category_index]) > $categories_name_max_len)) {
-                  $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array[$lang['id']][$category_index], $categories_name_max_len);
+                if ((function_exists('mb_strlen') && mb_strlen($categories_names_array[$lang['id']][$category_index]) > $max_len['categories_name']) || (!function_exists('mb_strlen') && strlen($categories_names_array[$lang['id']][$category_index]) > $max_len['categories_name'])) {
+                  $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array[$lang['id']][$category_index], $max_len['categories_name']);
                   $ep_error_count++;
                   continue 3; // skip to next record
                 }
@@ -587,7 +587,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               if (isset(${$v_categories_name_check})) {
                 if (($categories_count_value != $categories_count[$lang['id']]) && ($categories_count[$lang['id']] != 0)) {
                   //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, 
-                  //$v_products_model, $categories_names_array[$lang['id']][$category_index], $categories_name_max_len);
+                  //$v_products_model, $categories_names_array[$lang['id']][$category_index], $max_len['categories_name']);
                   $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['id']]];
                   $ep_error_count++;
                   continue 2; // skip to next record
@@ -709,7 +709,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         // HERE ==========================>
         // BEGIN: record_artists
         if (isset($filelayout['v_artists_name'])) {
-          if (isset($v_artists_name) && ($v_artists_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_artists_name) <= $artists_name_max_len) || (!function_exists('mb_strlen') && strlen($v_artists_name) <= $artists_name_max_len))) {
+          if (isset($v_artists_name) && ($v_artists_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_artists_name) <= $max_len['artists_name']) || (!function_exists('mb_strlen') && strlen($v_artists_name) <= $max_len['artists_name']))) {
             $sql = "SELECT artists_id AS artistsID FROM " . TABLE_RECORD_ARTISTS . " WHERE artists_name = :artists_name: LIMIT 1";
             $sql = $db->bindVars($sql, ':artists_name:', ep_4_curly_quotes($v_artists_name), 'string');
             $result = ep_4_query($sql);
@@ -782,8 +782,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               }
             }
           } else { // $v_artists_name == '' or name length violation
-            if ((function_exists('mb_strlen') && mb_strlen($v_artists_name) > $artists_name_max_len) || (!function_exists('mb_strlen') && strlen($v_artists_name) > $artists_name_max_len)) {
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_ARTISTS_NAME_LONG, $v_artists_name, $artists_name_max_len);
+            if ((function_exists('mb_strlen') && mb_strlen($v_artists_name) > $max_len['artists_name']) || (!function_exists('mb_strlen') && strlen($v_artists_name) > $max_len['artists_name'])) {
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_ARTISTS_NAME_LONG, $v_artists_name, $max_len['artists_name']);
               $ep_error_count++;
               continue;
             }
@@ -795,7 +795,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         // HERE ==========================>
         // BEGIN: record_company
         if (isset($filelayout['v_record_company_name'])) {
-          if (isset($v_record_company_name) && ($v_record_company_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_record_company_name) <= $record_company_name_max_len) || (!function_exists('mb_strlen') && strlen($v_record_company_name) <= $record_company_name_max_len))) {
+          if (isset($v_record_company_name) && ($v_record_company_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_record_company_name) <= $max_len['record_company_name']) || (!function_exists('mb_strlen') && strlen($v_record_company_name) <= $max_len['record_company_name']))) {
             $sql = "SELECT record_company_id AS record_companyID FROM " . TABLE_RECORD_COMPANY . " WHERE record_company_name = :record_company_name: LIMIT 1";
             $sql = $db->bindVars($sql, ':record_company_name:', ep_4_curly_quotes($v_record_company_name), 'string');
             $result = ep_4_query($sql);
@@ -854,8 +854,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               }
             }
           } else { // $v_record_company_name == '' or name length violation
-            if ((function_exists('mb_strlen') && mb_strlen($v_record_company_name) > $record_company_name_max_len) || (!function_exists('mb_strlen') && strlen($v_record_company_name) > $record_company_name_max_len)) {
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_RECORD_COMPANY_NAME_LONG, $v_record_company_name, $record_company_name_max_len);
+            if ((function_exists('mb_strlen') && mb_strlen($v_record_company_name) > $max_len['record_company_name']) || (!function_exists('mb_strlen') && strlen($v_record_company_name) > $max_len['record_company_name'])) {
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_RECORD_COMPANY_NAME_LONG, $v_record_company_name, $max_len['record_company_name']);
               $ep_error_count++;
               continue;
             }
@@ -867,7 +867,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         // HERE ==========================>
         // BEGIN: music_genre
         if (isset($filelayout['v_music_genre_name'])) {
-          if (isset($v_music_genre_name) && ($v_music_genre_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_music_genre_name) <= $music_genre_name_max_len) || (!function_exists('mb_strlen') && strlen($v_music_genre_name) <= $music_genre_name_max_len))) {
+          if (isset($v_music_genre_name) && ($v_music_genre_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_music_genre_name) <= $max_len['music_genre_name']) || (!function_exists('mb_strlen') && strlen($v_music_genre_name) <= $max_len['music_genre_name']))) {
             $sql = "SELECT music_genre_id AS music_genreID FROM " . TABLE_MUSIC_GENRE . " WHERE music_genre_name = :music_genre_name: LIMIT 1";
             $sql = $db->bindVars($sql, ':music_genre_name:', $v_music_genre_name, 'string');
             $result = ep_4_query($sql);
@@ -886,8 +886,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               }
             }
           } else { // $v_music_genre_name == '' or name length violation
-            if ((function_exists('mb_strlen') && mb_strlen($v_music_genre_name) > $music_genre_name_max_len) || (!function_exists('mb_strlen') && strlen($v_music_genre_name) > $music_genre_name_max_len)) {
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_MUSIC_GENRE_NAME_LONG, $v_music_genre_name, $music_genre_name_max_len);
+            if ((function_exists('mb_strlen') && mb_strlen($v_music_genre_name) > $max_len['music_genre_name']) || (!function_exists('mb_strlen') && strlen($v_music_genre_name) > $max_len['music_genre_name'])) {
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_MUSIC_GENRE_NAME_LONG, $v_music_genre_name, $max_len['music_genre_name']);
               $ep_error_count++;
               continue;
             }

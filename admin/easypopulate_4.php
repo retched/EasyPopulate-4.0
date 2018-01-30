@@ -257,6 +257,17 @@ $artists_name_max_len = zen_field_length(TABLE_RECORD_ARTISTS, 'artists_name');
 $record_company_name_max_len = zen_field_length(TABLE_RECORD_COMPANY, 'record_company_name');
 $music_genre_name_max_len = zen_field_length(TABLE_MUSIC_GENRE, 'music_genre_name');
 
+$max_len = array(
+              'categories_name'     => zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name'),
+              'manufacturers_name'  => zen_field_length(TABLE_MANUFACTURERS, 'manufacturers_name'),
+              'products_model'      => zen_field_length(TABLE_PRODUCTS, 'products_model'),
+              'products_name'       => zen_field_length(TABLE_PRODUCTS_DESCRIPTION, 'products_name'),
+              'products_url'        => zen_field_length(TABLE_PRODUCTS_DESCRIPTION, 'products_url'),
+              'artists_name'        => zen_field_length(TABLE_RECORD_ARTISTS, 'artists_name'),
+              'record_company_name' => zen_field_length(TABLE_RECORD_COMPANY, 'record_company_name'),
+              'music_genre_name'    => zen_field_length(TABLE_MUSIC_GENRE, 'music_genre_name')
+           );
+
 $project = PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR;
 
 if ($ep_uses_mysqli) {
@@ -272,6 +283,11 @@ if ($collation == 'utf8') {
 
 if (($collation == 'utf8') && ((substr($project, 0, 5) == "1.3.8") || (substr($project, 0, 5) == "1.3.9"))) {
   //mb_internal_encoding("UTF-8");
+  foreach ($max_len as $key => $value) {
+    $max_len[$key] = $value / 3;
+  }
+  unset ($key);
+  unset ($value);
   $category_strlen_max = $category_strlen_max / 3;
   $categories_name_max_len = $categories_name_max_len / 3;
   $manufacturers_name_max_len = $manufacturers_name_max_len / 3;
@@ -494,10 +510,15 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
            echo EASYPOPULATE_4_DISPLAY_DB_COLL . $collation . '<br />';
 
            echo '<br /><b><u>' . EASYPOPULATE_4_DISPLAY_DB_FLD_LGTH . '</u></b><br />';
-           echo 'categories_name:' . $categories_name_max_len . '<br />';
-           echo 'manufacturers_name:' . $manufacturers_name_max_len . '<br />';
-           echo 'products_model:' . $products_model_max_len . '<br />';
-           echo 'products_name:' . $products_name_max_len . '<br />';
+           foreach ($max_len as $key => $value) {
+             echo $key . ':' . $value . '<br />';
+           }
+           unset($key);
+           unset($value);
+/*           echo 'categories_name:' . $max_len['categories_name'] . '<br />';
+           echo 'manufacturers_name:' . $max_len['manufacturers_name'] . '<br />';
+           echo 'products_model:' . $max_len['products_model'] . '<br />';
+           echo 'products_name:' . $max_len['products_name'] . '<br />';*/
 
            $zco_notifier->notify('EP4_MAX_LEN');
            /*  // some error checking
