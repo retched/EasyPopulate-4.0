@@ -217,7 +217,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           // v_status == 9 is a delete request  
           $continueNextRow = false;
           if ($items[$filelayout['v_status']] == 9) {
-            $chosen_key = '';
+//            $chosen_key = ''; //mc12345678 unnecessary because assigned regardless
             switch (EP4_DB_FILTER_KEY) {
               case 'products_model':
                 $chosen_key = 'v_products_model';
@@ -304,7 +304,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 		
         // inputs: $items; $filelayout; $product_is_new
         // chadd - this first condition cannot exist since we short-circuited on delete above
-        $chosen_key = '';
+//        $chosen_key = ''; //mc12345678 unnecessary because assigned regardless
         switch (EP4_DB_FILTER_KEY) {
           case 'products_model':
             $chosen_key = 'v_products_model';
@@ -896,7 +896,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         }
         // END: music_genre
 
-        $chosen_key = '';
+//        $chosen_key = ''; //mc12345678 - Deemed unnecessary because variable is always set to something.
         switch (EP4_DB_FILTER_KEY) {
           case 'products_model':
             $chosen_key = 'v_products_model';
