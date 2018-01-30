@@ -181,6 +181,52 @@ $ep_supported_mods['gppi'] = ep_4_check_table_column(TABLE_PRODUCTS, 'products_g
 $ep_supported_mods['excl'] = ep_4_check_table_column(TABLE_PRODUCTS, 'products_exclusive'); // exclu = Custom Mod for Exclusive Products: 04-24-2012
 $ep_supported_mods['dual'] = ep_4_check_table_column(TABLE_PRODUCTS_ATTRIBUTES, 'options_values_price_w');
 // END: check for existance of various mods
+$ep_mods_supported = array(
+                        'psd'=>array(
+                          'title'=> EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_SHORT_DESC,
+                          'support' => ep_4_check_table_column(TABLE_PRODUCTS_DESCRIPTION, 'products_short_desc')
+                        ),
+                        'uom'=>array(
+                          'title'=> EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_UNIT_MEAS,
+                          'support' => ep_4_check_table_column(TABLE_PRODUCTS, 'products_price_uom') // uom = unit of measure, added by Chadd
+                        ),
+                        'upc'=>array(
+                          'title'=> EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_UPC,
+                          'support' => ep_4_check_table_column(TABLE_PRODUCTS, 'products_upc')       // upc = UPC Code, added by Chadd
+                        ),
+                        'gpc'=>array(
+                          'title'=> EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_GOOGLE_CAT,
+                          'support' => ep_4_check_table_column(TABLE_PRODUCTS, 'products_gpc') // gpc = google product category for Google Merchant Center, added by Chadd 10-1-2011
+                        ),
+                        'msrp'=>array(
+                          'title'=> EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_MSRP,
+                          'support' => ep_4_check_table_column(TABLE_PRODUCTS, 'products_msrp') // msrp = manufacturer's suggested retail price, added by Chadd 1-9-2012
+                        ),
+                        'map'=>array(
+                          'title'=> EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_MAP,
+                          'support' => (ep_4_check_table_column(TABLE_PRODUCTS, 'map_enabled') && ep_4_check_table_column(TABLE_PRODUCTS, 'map_price'))
+                        ),
+                        'gppi'=>array(
+                          'title'=> EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_GP,
+                          'support' => ep_4_check_table_column(TABLE_PRODUCTS, 'products_group_a_price') // gppi = group pricing per item, added by Chadd 4-24-2012
+                        ),
+                        'excl'=>array(
+                          'title'=> EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_EXCLUSIVE,
+                          'support' => ep_4_check_table_column(TABLE_PRODUCTS, 'products_exclusive') // exclu = Custom Mod for Exclusive Products: 04-24-2012
+                        ),
+                        'dual'=>array(
+                          'title'=> EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_DPM,
+                          'support' => ep_4_check_table_column(TABLE_PRODUCTS_ATTRIBUTES, 'options_values_price_w')
+                        ),
+                        'sba' => array(
+                          'title' => EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_SBA,
+                          'support' => ($ep_4_SBAEnabled != false)
+                        ),
+                        'ceonuri' => array(
+                          'title' => EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_CEON,
+                          'support' => ($ep4CEONURIDoesExist == true)
+                        )
+                      );
 
 // custom products fields check
 $custom_field_names = array();
@@ -199,7 +245,7 @@ if (strlen(EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS) > 0) {
 }
 
 // maximum length for a category in this database
-$category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
+//$category_strlen_max = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name'); // mc12345678 don't see where this is used and therefore being removed.
 
 // maximum length for important fields
 $categories_name_max_len = zen_field_length(TABLE_CATEGORIES_DESCRIPTION, 'categories_name');
