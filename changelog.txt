@@ -352,3 +352,29 @@
                                         remove all of the settings.  Now under certain conditions an upgrade link
                                         appears in the upper right hand corner when applicable.  Otherwise, can also
                                         activate manually like "always".
+4.0.37                          - Product now can be exported by master_categories_id such that
+                                        the product appears only one time in the export file.  The
+                                        category assigned to the product in this export is the category
+                                        that is identified as the master category.
+                                  Modified the ep_supported_mods functionality and collection to
+                                        compress the overall collection of associated data for supported
+                                        modification display.  Existing variables remain in this version;
+                                        however, will be deprecated in the future.
+                                  Added additional variable unset commands to continue to minimize
+                                        the amount of memory used by EP4.
+                                  Improved custom field usage by ignoring spaces that might exist
+                                        in the custom field, began development of incorporating fields
+                                        from other tables in the export.
+                                  Generated an array to capture maximum field length instead of
+                                        individual variables.  Existing variables remain assigned at
+                                        this time, but are to be deprecated in the future.
+                                  Improved the implementation of the update function based on
+                                        internal and ZC site version checking to properly implement
+                                        the conditions when the Update Database option is presented.
+                                  Added a check for an empty file to have been uploaded and
+                                        associated error message.
+                                  Removed pre-assignment of variables ($chosen_key) that will be assigned
+                                        regardless.
+                                  Improved the reporting of the product update to include identifying the
+                                        $chosen_key that was used to update or try to update a product during import.
+                                  Modified alignment of some code for readability and consistency.
