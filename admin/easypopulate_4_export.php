@@ -71,8 +71,12 @@ if (isset($_POST['ep_category_filter'])) {
       $categories_query_addition .= ' OR ptoc.categories_id = :category:';
       $categories_query_addition = $db->bindVars($categories_query_addition, ':category:', $category, 'integer');
     }
+    unset($key);
+    unset($category);
+    unset($sub_categories);
     $categories_query_addition = $db->bindVars($categories_query_addition, ':ep_category_filter:', $_POST['ep_category_filter'], 'integer');
     $sql_filter .= ' AND (' . $categories_query_addition . ')';
+    unset($categories_query_addition);
   }
 }
 
@@ -175,6 +179,7 @@ $EXPORT_FILE .= strftime('%Y%b%d-%H%M%S'); // chadd - changed for hour.minute.se
 // create file name and path and prepare for writing
 $tmpfpath = (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . '' . $tempdir . "$EXPORT_FILE" . (($csv_delimiter == ",") ? ".csv" : ".txt");
 $fp = fopen($tmpfpath, "w+");
+unset($tmpfpath);
 
 $column_headers = ""; // column headers
 
@@ -184,6 +189,10 @@ $filelayout_header = $filelayout;
 foreach ($filelayout_header as $key => $value) {
   $column_headers .= $key . $csv_delimiter;
 }
+unset($key);
+unset($value);
+unset($filelayout_header);
+
 // Trim trailing tab then append end-of-line
 $column_headers = rtrim($column_headers, $csv_delimiter) . "\n";
 //Need to make sure that headers are ready if SBA_basic 
@@ -192,6 +201,8 @@ if ($ep_dltype <> 'SBA_basic') { // mc12345678 - SBA Basic add on.
 } else {
   $dataRow[] = $column_headers; // Hold off on writing column headers
 }
+
+unset($column_headers);
 
 // these variables are for the Attrib_Basic Export
 $active_products_id = ""; // start empty
@@ -228,6 +239,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $dataRow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
 
         fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+        unset($dataRow);
         $ep_export_count++;
 
         $active_options_id = $row['v_options_id'];
@@ -245,6 +257,8 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $dataRow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
 
         fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+        unset($dataRow);
+        
         $ep_export_count++;
         $last_products_id = $active_row['v_products_model'];
       } // end if new model
@@ -293,6 +307,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . ' WHERE products_attributes_id = :products_attributes_id: LIMIT 1';
         $sql2 = $db->bindVars($sql2, ':products_attributes_id:', $row['v_products_attributes_id'], 'integer');
         $result2 = ep_4_query($sql2);
+        unset($sql2);
         $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
         if (($ep_uses_mysqli ? mysqli_num_rows($result2) : mysql_num_rows($result2))) {
           $row['v_products_attributes_filename'] = $row2['products_attributes_filename'];
@@ -303,12 +318,14 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
           $row['v_products_attributes_maxdays'] = '';
           $row['v_products_attributes_maxcount'] = '';
         }
+        unset($row2);
       } // end isset($filelayout['v_products_attributes_filename'])
     } elseif ($ep_dltype == 'SBA_detailed') {
       if (isset($filelayout['v_products_attributes_filename'])) /* Believe this should be an SBA filename; however, need to look at the filename assignment function to see how this works.  */ {
         $sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . ' WHERE products_attributes_id = :products_attributes_id: LIMIT 1';
         $sql2 = $db->bindVars($sql2, ':products_attributes_id:', $row['v_products_attributes_id'], 'integer');
         $result2 = ep_4_query($sql2);
+        unset($sql2);
         $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
         if (($ep_uses_mysqli ? mysqli_num_rows($result2) : mysql_num_rows($result2))) {
           $row['v_products_attributes_filename'] = $row2['products_attributes_filename'];
@@ -319,6 +336,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
           $row['v_products_attributes_maxdays'] = '';
           $row['v_products_attributes_maxcount'] = '';
         }
+        unset($row2);
       } // end isset($filelayout['v_products_attributes_filename'])
     } // end elseif (SBA_detailed)
 
@@ -339,6 +357,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql2 = $db->bindVars($sql2, ':products_id:', $row['v_products_id'], 'integer');
       $sql2 = $db->bindVars($sql2, ':language_id:', $lid2, 'integer');
       $result2 = ep_4_query($sql2);
+      unset($sql2);
       $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
       $row['v_products_name_' . $lid2] = $row2['products_name'];
       $row['v_products_description_' . $lid2] = $row2['products_description'];
@@ -346,6 +365,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $row['v_products_short_desc_' . $lid2] = $row2['products_short_desc'];
       }
       $row['v_products_url_' . $lid2] = $row2['products_url'];
+      unset($row2);
       // metaData start
       // for each language, get the description and set the vals
       $sqlMeta = 'SELECT * FROM ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . ' WHERE products_id = :products_id: AND language_id = :language_id: LIMIT 1 ';
@@ -353,12 +373,17 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sqlMeta = $db->bindVars($sqlMeta, ':language_id:', $lid2, 'integer');
       $resultMeta = ep_4_query($sqlMeta);
       $rowMeta = ($ep_uses_mysqli ? mysqli_fetch_array($resultMeta) : mysql_fetch_array($resultMeta));
+      unset($resultMeta);
       $row['v_metatags_title_' . $lid2] = $rowMeta['metatags_title'];
       $row['v_metatags_keywords_' . $lid2] = $rowMeta['metatags_keywords'];
       $row['v_metatags_description_' . $lid2] = $rowMeta['metatags_description'];
       // metaData end
       $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP');
     } // foreach
+    unset($key2);
+    unset($lang2);
+    unset($lid2);
+    unset($rowMeta);
 
     $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_END');
   } // if($ep_dltype == 'full')
@@ -394,19 +419,26 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sqlMeta = $db->bindVars($sqlMeta, ':language_id:', $lid, 'integer');
       $resultMeta = ep_4_query($sqlMeta) or die(($ep_uses_mysqli ? mysqli_error($db->link) : mysql_error()));
       $rowMeta = ($ep_uses_mysqli ? mysqli_fetch_array($resultMeta) : mysql_fetch_array($resultMeta));
+      unset($resultMeta);
       $row['v_metatags_title_' . $lid] = $rowMeta['metatags_title'];
       $row['v_metatags_keywords_' . $lid] = $rowMeta['metatags_keywords'];
       $row['v_metatags_description_' . $lid] = $rowMeta['metatags_description'];
+      unset($rowMeta);
       // metaData end
       // for each language, get category description and name
       $sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = :categories_id: AND language_id = :language_id: LIMIT 1 ';
       $sql2 = $db->bindVars($sql2, ':categories_id:', $row['v_categories_id'], 'integer');
       $sql2 = $db->bindVars($sql2, ':language_id:', $lid, 'integer');
       $result2 = ep_4_query($sql2);
+      unset($sql2);
       $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
       $row['v_categories_name_' . $lid] = $row2['categories_name'];
       $row['v_categories_description_' . $lid] = $row2['categories_description'];
+      unset($row2);
     } // foreach
+    unset($key);
+    unset($lang);
+    unset($lid);
 
     if (EASYPOPULATE_4_CONFIG_EXPORT_URI != '0') {
       $row['v_html_uri'] = zen_catalog_href_link(FILENAME_DEFAULT, zen_get_path($row['v_categories_id']), 'NONSSL');
@@ -441,10 +473,13 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = :categories_id: ORDER BY language_id';
       $sql2 = $db->bindVars($sql2, ':categories_id:', $thecategory_id, 'integer');
       $result2 = ep_4_query($sql2);
+      unset($sql2);
       while ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2))) {
         $lid = $row2['language_id'];
         $row['v_categories_name_' . $lid] = $row2['categories_name'] . $category_delimiter . $row['v_categories_name_' . $lid];
       } //while
+      unset($row2);
+      unset($lid);
       // look for parent categories ID
       $sql3 = 'SELECT parent_id FROM ' . TABLE_CATEGORIES . ' WHERE categories_id = :categories_id:';
       $sql3 = $db->bindVars($sql3, ':categories_id:', $thecategory_id, 'integer');
@@ -463,6 +498,10 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $lid = $lang['id'];
       $row['v_categories_name_' . $lid] = rtrim($row['v_categories_name_' . $lid], $category_delimiter);
     } // foreach
+    unset($key);
+    unset($lang);
+    unset($lid);
+    
   } // if($ep_dltype == 'full' || $ep_dltype == 'category') delimited categories path
 
   //This will do all of the special work to provide the remaining row data:
@@ -536,13 +575,16 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 				o.language_id       = 1 ORDER BY p.products_id ASC'; /* , a.options_id, v.products_options_values_id'; */
     $sqlAttrib = $db->bindVars($sqlAttrib, ':products_id:', $row['v_products_id'], 'integer');
     $resultAttrib = ep_4_query($sqlAttrib);
+    unset($sqlAttrib);
     $resultAttribCount = ($ep_uses_mysqli ? mysqli_num_rows($resultAttrib) : mysql_num_rows($resultAttrib));
 
     if ($resultAttribCount !== false) {
       while ($rowAttrib = ($ep_uses_mysqli ? mysqli_fetch_assoc($resultAttrib) : mysql_fetch_assoc($resultAttrib))) {
         $row['v_products_attributes'] .= $rowAttrib['v_products_options_name'] . ': ' . $rowAttrib['v_products_options_values_name'] . '; ';
       }
+      unset($rowAttrib);
     }
+    unset($resultAttrib);
     //Combine the option names and option values for this product.
     //Set v_products_attributes to the combined data
     //Assign product_id to v_table_tracker for main product
@@ -564,6 +606,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 				p.products_id = :products_id:';
     $sqlSBA = $db->bindVars($sqlSBA, ':products_id:', $row['v_products_id'], 'integer');
     $resultSBA = ep_4_query($sqlSBA);
+    unset($sqlSBA);
     $resultSBACount = ($ep_uses_mysqli ? mysqli_num_rows($resultSBA) : mysql_num_rows($resultSBA));
 
     if ($resultSBACount !== false && $resultSBACount > 0) {
@@ -584,6 +627,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 
         // encapsulate data in quotes, and escape embedded quotes in data
         $dataRow .= '"' . str_replace('"', '""', $thetext) . '"' . $csv_delimiter;
+        unset($thetext);
         /*
           if ($excel_safe_output == true) { // encapsulate field data with quotes
           // use quoted values and escape the embedded quotes for excel safe output.
@@ -593,12 +637,15 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
           $dataRow .= $thetext . $csv_delimiter;
           } */
       } // End Data Cleanup
-
+      unset($key);
+      unset($value);
+      
       // Remove trailing tab, then append the end-of-line
       $dataRow = rtrim($dataRow, $csv_delimiter) . "\n";
 
       fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
-				
+      unset($dataRow);
+      
       // loop through the SBA data until one before the end
       // Must get the attribute and quantity data from the SBA table
       // While not at the one before end
@@ -629,10 +676,15 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 							a.products_attributes_id = :currentAttrib:';
           $sqlSBAAttributes = $db->bindVars($sqlSBAAttributes, ':currentAttrib:', trim($currentAttrib), 'integer');
           $resultSBAAttributes = ep_4_query($sqlSBAAttributes);
+          unset($sqlSBAAttributes);
           $resultSBACountAttributes = ($ep_uses_mysqli ? mysqli_fetch_assoc($resultSBAAttributes) : mysql_fetch_assoc($resultSBAAttributes));
+          unset($resultSBAAttributes);
 
           $row['v_products_attributes'] .= (is_null($resultSBACountAttributes['v_SBA_value_name']) ? 'Option Does Not Exist' : $resultSBACountAttributes['v_SBA_option_name']) . ': ' . (is_null($resultSBACountAttributes['v_SBA_value_name']) ? 'Value Does Not Exist' : $resultSBACountAttributes['v_SBA_value_name']) . '; ';
+          unset($resultSBACountAttributes);
         }
+        unset($currentAttrib);
+        unset($trackAttribute);
 
         $row['v_products_quantity'] = $rowSBA['v_quantity'];
         $row['v_SBA_tracked'] = 'X';
@@ -661,6 +713,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 
             // encapsulate data in quotes, and escape embedded quotes in data
             $dataRow .= '"' . str_replace('"', '""', $thetext) . '"' . $csv_delimiter;
+            unset($thetext);
             /*
               if ($excel_safe_output == true) { // encapsulate field data with quotes
               // use quoted values and escape the embedded quotes for excel safe output.
@@ -670,15 +723,20 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
               $dataRow .= $thetext . $csv_delimiter;
               } */
           } // End Data Cleanup
+          unset($key);
+          unset($value);
 
           // Remove trailing tab, then append the end-of-line
           $dataRow = rtrim($dataRow, $csv_delimiter) . "\n";
 
           fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+          unset($dataRow);
 
         }
         $resultSBACounter++;
       }
+      unset($rowSBA);
+      unset($resultSBA);
       //  For the last row, assign the data to the $row; however, do not write
       //	it yet.. The end of the below loop will write it.
 
@@ -708,6 +766,10 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $row_record_artists_info = ($ep_uses_mysqli ? mysqli_fetch_array($result_record_artists_info) : mysql_fetch_array($result_record_artists_info));
         $row['v_artists_url_' . $lid] = $row_record_artists_info['artists_url'];
       }
+      unset($key);
+      unset($lang);
+      unset($lid);
+      
     } else {
       $row['v_artists_name'] = ''; // no artists name
       $row['v_artists_image'] = '';
@@ -715,15 +777,22 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $lid = $lang['id'];
         $row['v_artists_url_' . $lid] = '';
       }
+      unset($key);
+      unset($lang);
+      unset($lid);
+      
     }
     // record company
     if (($row_music_extra['record_company_id'] != '0') && ($row_music_extra['record_company_id'] != '')) { // '0' is correct, but '' NULL is possible
       $sql_record_company = 'SELECT * FROM ' . TABLE_RECORD_COMPANY . ' WHERE record_company_id = :record_company_id: LIMIT 1';
       $sql_record_company = $db->bindVars($sql_record_company, ':record_company_id:', $row_music_extra['record_company_id'], 'integer');
       $result_record_company = ep_4_query($sql_record_company);
+      unset($sql_record_company);
       $row_record_company = ($ep_uses_mysqli ? mysqli_fetch_array($result_record_company) : mysql_fetch_array($result_record_company));
+      unset($result_record_company);
       $row['v_record_company_name'] = $row_record_company['record_company_name'];
       $row['v_record_company_image'] = $row_record_company['record_company_image'];
+      unset($row_record_company);
       foreach ($langcode as $key => $lang) {
         $lid = $lang['id'];
         $sql_record_company_info = 'SELECT * FROM ' . TABLE_RECORD_COMPANY_INFO . ' WHERE record_company_id = :record_company_id: AND languages_id = :languages_id: LIMIT 1';
@@ -733,6 +802,13 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $row_record_company_info = ($ep_uses_mysqli ? mysqli_fetch_array($result_record_company_info) : mysql_fetch_array($result_record_company_info));
         $row['v_record_company_url_' . $lid] = $row_record_company_info['record_company_url'];
       }
+      unset($sql_record_company_info);
+      unset($result_record_company_info);
+      unset($row_record_company_info);
+      unset($key);
+      unset($lang);
+      unset($lid);
+      
     } else {
       $row['v_record_company_name'] = '';
       $row['v_record_company_image'] = '';
@@ -742,11 +818,14 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql_music_genre = 'SELECT * FROM ' . TABLE_MUSIC_GENRE . ' WHERE music_genre_id = :music_genre_id: LIMIT 1';
       $sql_music_genre = $db->bindVars($sql_music_genre, ':music_genre_id:', $row_music_extra['music_genre_id'], 'integer');
       $result_music_genre = ep_4_query($sql_music_genre);
+      unset($sql_music_genre);
       $row_music_genre = ($ep_uses_mysqli ? mysqli_fetch_array($result_music_genre) : mysql_fetch_array($result_music_genre));
+      unset($result_music_genre);
       $row['v_music_genre_name'] = $row_music_genre['music_genre_name'];
     } else {
       $row['v_music_genre_name'] = '';
     }
+    unset($row_music_genre);
   } // if (v_artists_name && v_products_type)
 
 
@@ -757,8 +836,11 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql2 = 'SELECT manufacturers_name FROM ' . TABLE_MANUFACTURERS . ' WHERE manufacturers_id = :manufacturers_id:';
       $sql2 = $db->bindVars($sql2, ':manufacturers_id:', $row['v_manufacturers_id'], 'integer');
       $result2 = ep_4_query($sql2);
+      unset($sql2);
       $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+      unset($result2);
       $row['v_manufacturers_name'] = $row2['manufacturers_name'];
+      unset($row2);
     } else {  // this is to fix the error on manufacturers name
       // $row['v_manufacturers_id'] = '0';  blank name mean 0 id - right? chadd 4-7-09
       $row['v_manufacturers_name'] = ''; // no manufacturer name
@@ -775,9 +857,11 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql2 = $db->bindVars($sql2, ':products_id:', $row['v_products_id'], 'integer');
       $sql2 = $db->bindVars($sql2, ':discount_id:', $discount_index, 'integer');
       $result2 = ep_4_query($sql2);
+      unset($sql2);
       $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
       $row['v_discount_price_' . $discount_index] = $row2['discount_price'];
       $row['v_discount_qty_' . $discount_index] = $row2['discount_qty'];
+      unset($row2);
     } //end if v_products_discount_type == 0 then there are no quantity breaks
     $discount_index++;
   } // End While isset v_discount_qty
@@ -792,6 +876,8 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
   $dataRow = ep_4_rmv_chars($filelayout, $row, $csv_delimiter);
 
   fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+  unset($dataRow);
+  unset($row);
   $ep_export_count++;
   } // if $ep_dltype == 'attrib_basic'
 } // while ($row) 
@@ -804,9 +890,12 @@ if ($ep_dltype == 'attrib_basic') { // must write last record
   fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
   $ep_export_count++;
 } // EOF ep_dltype attrib_basic
+unset($active_row);
+unset($dataRow);
 
 
 fclose($fp); // close output file
+unset($fp);
 
 //$display_output .= '<br><u><h3>Export Results</h3></u><br>';
 $display_output .= EASYPOPULATE_4_DISPLAY_EXPORT_RESULTS_TITLE;

@@ -261,6 +261,7 @@ if (strlen(EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS) > 0) {
 //      $custom_fields[] = NULL;
     }
   }
+  unset($field);
 }
 
 // maximum length for a category in this database
@@ -524,11 +525,14 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
              echo $field . ': ' . (($custom_field_check[$i]) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
              $i++;
            }
+           unset($field);
 
            echo '<br /><b><u>' . EASYPOPULATE_4_DISPLAY_INSTALLED_LANG . '</u></b><br />';
            foreach ($langcode as $key => $lang) {
              echo $lang['id'] . '-' . $lang['code'] . ': ' . $lang['name'] . '<br />';
            }
+           unset($key);
+           unset($lang);
            echo EASYPOPULATE_4_DISPLAY_INSTALLED_LANG_DEF . $epdlanguage_id . '-' . $epdlanguage_name . '<br />';
            echo EASYPOPULATE_4_DISPLAY_INT_CHAR_ENC . (function_exists('mb_internal_encoding') ? mb_internal_encoding() : 'mb_internal_encoding not available') . '<br />';
            echo EASYPOPULATE_4_DISPLAY_DB_COLL . $collation . '<br />';
@@ -715,6 +719,8 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
                   break;
                 }
               }
+              unset($key);
+              unset($val);
 
               if ($found == false) {
                 // Treat as an everything else file.
@@ -810,6 +816,8 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
               break;
             }
           } // End foreach filetype 
+          unset($key);
+          unset($val);
           if (EP4_SHOW_ALL_FILETYPES != 'Hidden') {
             echo "</table>\n";
             if (sizeof($filetypes) == 0 && EP4_SHOW_ALL_FILETYPES == 'false') {

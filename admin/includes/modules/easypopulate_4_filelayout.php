@@ -39,6 +39,9 @@ if (!defined('IS_ADMIN_FLAG')) {
 				$filelayout[] = 'v_products_short_desc_'.$l_id;
 			}
 		}
+    unset($key);
+    unset($lang);
+    unset($l_id);
    	$ep_4_SBAEnabled = ep_4_SBA1Exists();
     if ($ep_4_SBAEnabled == '2') {
       $filelayout[] = 'v_customid';
@@ -58,6 +61,8 @@ if (!defined('IS_ADMIN_FLAG')) {
 				  $filelayout_sql .= 'p.'.$field.' as v_'.$field.',';
 			  }
 			}
+      unset($field);
+      unset($custom_fields);
 		}
 		$filelayout_sql .= '
 			p.products_quantity				as v_products_quantity,
@@ -92,6 +97,9 @@ if (!defined('IS_ADMIN_FLAG')) {
 			}
 			$filelayout[] = 'v_products_url_'.$l_id;
 		} 
+    unset($key);
+    unset($lang);
+    unset($l_id);
 		$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
 		
 		$filelayout[] = 'v_specials_price';
@@ -129,6 +137,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 				  $filelayout[] = 'v_'.$field;
 			  }
 			}
+    unset($field);
 		}
 		$filelayout[] = 'v_products_weight';
 		$filelayout[] = 'v_product_is_call';
@@ -146,6 +155,9 @@ if (!defined('IS_ADMIN_FLAG')) {
 			$l_id = $lang['id'];
 			$filelayout[] = 'v_categories_name_'.$l_id;
 		} 
+    unset($key);
+    unset($lang);
+    unset($l_id);
 		$filelayout[] = 'v_tax_class_title';
 		$filelayout[] = 'v_status'; // this should be v_products_status for clarity
 		// metatags - 4-23-2012: added switch
@@ -173,12 +185,18 @@ if (!defined('IS_ADMIN_FLAG')) {
 				$l_id = $lang['id'];
 				$filelayout[] = 'v_artists_url_'.$l_id;
 			}			
+      unset($key);
+      unset($lang);
+      unset($l_id);
 			$filelayout[] = 'v_record_company_name';
 			$filelayout[] = 'v_record_company_image';
 			foreach ($langcode as $key => $lang) { // create variables for each language id
 				$l_id = $lang['id'];
 				$filelayout[] = 'v_record_company_url_'.$l_id;
 			}
+      unset($key);
+      unset($lang);
+      unset($l_id);
 			$filelayout[] = 'v_music_genre_name';
 		}
 		$filelayout_sql = 'SELECT DISTINCT 
@@ -221,6 +239,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 				  $filelayout_sql .= 'p.'.$field.' as v_'.$field.',';
 			  }
 			}
+      unset($field);
 		}
 		$filelayout_sql .= ' p.products_weight as v_products_weight,
 			p.product_is_call				as v_product_is_call,
@@ -365,6 +384,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 			$filelayout[] = 'v_discount_qty_'.$i;
 			$filelayout[] = 'v_discount_price_'.$i;
 		}
+    unset($i);
 		$filelayout_sql = 'SELECT
 			p.products_id     as v_products_id,
 			p.products_status as v_status,
@@ -408,7 +428,11 @@ if (!defined('IS_ADMIN_FLAG')) {
 		foreach ($langcode as $key => $lang) { // create categories variables for each language id
 			$l_id = $lang['id'];
 			$filelayout[] = 'v_categories_name_'.$l_id;
-		} 
+		}
+    unset($key);
+    unset($lang);
+    unset($l_id);
+    
 		$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_SQL_SELECT');
 
 		$filelayout_sql = 'SELECT
@@ -438,7 +462,11 @@ if (!defined('IS_ADMIN_FLAG')) {
 			$filelayout[] = 'v_categories_name_'.$l_id;
 			$filelayout[] = 'v_categories_description_'.$l_id;
 //			$filelayout[] = 'v_uri_' . $l_id;
-		} 
+		}
+    unset($key);
+    unset($lang);
+    unset($l_id);
+    
 		$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_SQL_SELECT');
 
 		foreach ($langcode as $key => $lang) { // create metatags variables for each language id
@@ -447,6 +475,10 @@ if (!defined('IS_ADMIN_FLAG')) {
 			$filelayout[]   = 'v_metatags_keywords_'.$l_id;
 			$filelayout[]   = 'v_metatags_description_'.$l_id;
 		} 
+    unset($key);
+    unset($lang);
+    unset($l_id);
+    
     $filelayout[] = 'v_sort_order';
 		$filelayout_sql = 'SELECT
 			c.categories_id    AS v_categories_id,
@@ -568,10 +600,18 @@ $filelayout_sql .= '
 			$l_id = $lang['id'];
 			$filelayout[] = 'v_products_options_name_'.$l_id;
 		} 
+    unset($key);
+    unset($lang);
+    unset($l_id);
+    
 		foreach ($langcode as $key => $lang) { // create categories variables for each language id
 			$l_id = $lang['id'];
 			$filelayout[] = 'v_products_options_values_name_'.$l_id;
 		}
+    unset($key);
+    unset($lang);
+    unset($l_id);
+    
 		// a = table PRODUCTS_ATTRIBUTES
 		// p = table PRODUCTS
 		// o = table PRODUCTS_OPTIONS
