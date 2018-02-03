@@ -820,8 +820,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 cat.categories_id = des.categories_id AND
                 des.language_id = :language_id: AND
                 des.categories_name = :categories_name: LIMIT 1";
-            $oldPost = $_POST;
-            unset($_POST);
+            if (!empty($_POST)) {
+              $oldPost = $_POST;
+              unset($_POST);
+            }
             $_POST['categories_name'] = array($lid => $thiscategoryname);
 
             if (class_exists('AdminRequestSanitizer')) {
@@ -831,8 +833,11 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             }
 
             $thiscategoryname = $_POST['categories_name'][$lid];
-            $_POST = $oldPost;
-            unset($oldPost);
+            unset($_POST);
+            if (!empty($oldPost)) {
+              $_POST = $oldPost;
+              unset($oldPost);
+            }
             $sql = $db->bindVars($sql, ':language_id:', $lid, 'integer');
             $sql = $db->bindVars($sql, ':parent_id:', $theparent_id, 'integer');
             $sql = $db->bindVars($sql, ':categories_name:', $thiscategoryname, $zc_support_ignore_null);
@@ -857,8 +862,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                     WHERE
                       categories_id   = :categories_id: AND
                       language_id     = :language_id:";
-                  $oldPost = $_POST;
-                  unset($_POST);
+                  if (!empty($_POST)) {
+                    $oldPost = $_POST;
+                    unset($_POST);
+                  }
                   $_POST['categories_name'][$cat_lang_id] = $categories_names_array['id'][$cat_lang_id][$category_index];
 
                   if (class_exists('AdminRequestSanitizer')) {
@@ -868,8 +875,11 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   }
 
                   $categories_names_array['id'][$cat_lang_id][$category_index] = $_POST['categories_name'][$cat_lang_id];
-                  $_POST = $oldPost;
-                  unset($oldPost);
+                  unset($_POST);
+                  if (!empty($oldPost)) {
+                    $_POST = $oldPost;
+                    unset($oldPost);
+                  }
                   $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($categories_names_array['id'][$cat_lang_id][$category_index]), $zc_support_ignore_null);
                   $sql = $db->bindVars($sql, ':categories_id:', $thiscategoryid, 'integer');
                   $sql = $db->bindVars($sql, ':language_id:', $cat_lang_id, 'integer');
@@ -927,8 +937,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 $sql = $db->bindVars($sql, ':language_id:', $cat_lang_id, 'integer');
 
                 if (isset(${$v_categories_name_check['id']})) { // update
-                  $oldPost = $_POST;
-                  unset($_POST);
+                  if (!empty($_POST)) {
+                    $oldPost = $_POST;
+                    unset($_POST);
+                  }
                   $_POST['categories_name'] = $categories_names_array['id'][$cat_lang_id][$category_index];
 
                   if (class_exists('AdminRequestSanitizer')) {
@@ -938,12 +950,17 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   }
 
                   $categories_names_array['id'][$cat_lang_id][$category_index] = $_POST['categories_name'];
-                  $_POST = $oldPost;
-                  unset($oldPost);
+                  unset($_POST);
+                  if (!empty($oldPost)) {
+                    $_POST = $oldPost;
+                    unset($oldPost);
+                  }
                   $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($categories_names_array['id'][$cat_lang_id][$category_index]), $zc_support_ignore_null);
                 } else { // column is missing, so default to defined column's value
-                  $oldPost = $_POST;
-                  unset($_POST);
+                  if (!empty($_POST)) {
+                    $oldPost = $_POST;
+                    unset($_POST);
+                  }
                   $_POST['categories_name'] = $thiscategoryname;
 
                   if (class_exists('AdminRequestSanitizer')) {
@@ -953,8 +970,11 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   }
 
                   $thiscategoryname = $_POST['categories_name'];
-                  $_POST = $oldPost;
-                  unset($oldPost);
+                  unset($_POST);
+                  if (!empty($oldPost)) {
+                    $_POST = $oldPost;
+                    unset($oldPost);
+                  }
                   $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($thiscategoryname), $zc_support_ignore_null);
                 }
                 unset($v_categories_name_check);
@@ -1222,8 +1242,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               $sql .= " WHERE (products_model = :products_model:) LIMIT 1";
               break;
           }*/
-          $oldPost = $_POST;
-          unset($_POST);
+          if (!empty($_POST)) {
+            $oldPost = $_POST;
+            unset($_POST);
+          }
           $_POST['products_model'] = $v_products_model;
 
           if (class_exists('AdminRequestSanitizer')) {
@@ -1233,8 +1255,13 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           }
 
           $v_products_model = $_POST['products_model'];
-          $_POST = $oldPost;
-          unset($oldPost);
+
+          unset($_POST);
+          if (!empty($oldPost)) {
+            $_POST = $oldPost;
+            unset($oldPost);
+          }
+
           $sql = $db->bindVars($sql, ':products_model:', $v_products_model, $zc_support_ignore_null);
           $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
           $result = ep_4_query($sql);
@@ -1782,8 +1809,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 $sql .= "
                          :language_id:)";
 
-                $oldPost = $_POST;
-                unset($_POST);
+                if (!empty($_POST)) {
+                  $oldPost = $_POST;
+                  unset($_POST);
+                }
 
                 if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
                   $_POST['products_name'][$lang_id] = $v_products_name[$lang_id];
@@ -1844,8 +1873,11 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   $v_products_url_store = $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
                 }
 
-                $_POST = $oldPost;
-                unset($oldPost);
+                unset($_POST);
+                if (!empty($oldPost)) {
+                  $_POST = $oldPost;
+                  unset($oldPost);
+                }
 
                 $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_START');
                 $sql = $db->bindVars($sql, ':v_products_id:', $v_products_id, 'integer');
@@ -1890,8 +1922,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 
                 $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_START');
 
-                $oldPost = $_POST;
-                unset($_POST);
+                if (!empty($_POST)) {
+                  $oldPost = $_POST;
+                  unset($_POST);
+                }
 
                 if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
                   $_POST['products_name'][$lang_id] = $v_products_name[$lang_id];
@@ -1952,8 +1986,11 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   $v_products_url_store = $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
                 }
 
-                $_POST = $oldPost;
-                unset($oldPost);
+                unset($_POST);
+                if (!empty($oldPost)) {
+                  $_POST = $oldPost;
+                  unset($oldPost);
+                }
 
                 $sql = $db->bindVars($sql, ':v_products_name:', (isset($v_products_name_store) ? $v_products_name_store : ''), $zc_support_ignore_null);
                 $sql = $db->bindVars($sql, ':v_products_description:', (isset($v_products_desc_store) ? $v_products_desc_store : ''), $zc_support_ignore_null);
