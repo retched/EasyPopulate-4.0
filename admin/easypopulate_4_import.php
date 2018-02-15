@@ -804,7 +804,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         //$lid = $langcode[1]['id'];
         $v_categories_name_var = 'v_categories_name_' . $lid; // ${$v_categories_name_var} >> $v_categories_name_1, $v_categories_name_2, etc.
         $v_categories_name_var_code = 'v_categories_name_' . $lid_code; // ${$v_categories_name_var} >> $v_categories_name_1, $v_categories_name_2, etc.
-        if (isset(${$v_categories_name_var}) || isset(${$v_categories_name_var_code})) { // does column header exist?
+        if (isset($filelayout[${$v_categories_name_var}]) || isset($filelayout[${$v_categories_name_var_code}])) { // does column header exist?
           // start from the highest possible category and work our way down from the parent
           $v_categories_id = 0;
           $theparent_id = 0; // 0 is top level parent
