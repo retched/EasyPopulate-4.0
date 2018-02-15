@@ -894,15 +894,22 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               }
               unset($lang2);
             } else { // otherwise add new category
-              // get next available categoies_id
-              $sql = "SELECT MAX(categories_id) + 1 max FROM " . TABLE_CATEGORIES;
+              // get next available categoies_id (though could replace the last deleted category id..
+              /*$sql = "SELECT MAX(categories_id) + 1 max FROM " . TABLE_CATEGORIES;
               $result = ep_4_query($sql);
               unset($sql);
               $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
               unset($result);
-              $max_category_id = $row['max'];
+              $max_category_id = $row['max'];*/
+              
+              $sql = "SHOW TABLE STATUS LIKE '" . TABLE_CATEGORIES . "'";
+              $result = ep_4_query($sql);
+              unset($sql);
+              $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
+              unset($result);
+              $max_category_id = $row['Auto_increment'];
               // if database is empty, start at 1
-              if (!is_numeric($max_category_id)) {
+              if (!isset($max_category_id) || !is_numeric($max_category_id) || $max_category_id == 0) {
                 $max_category_id = 1;
               }
               // TABLE_CATEGORIES has 1 entry per categories_id
