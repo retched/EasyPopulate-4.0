@@ -479,7 +479,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           } else { // column doesn't exist in the IMPORT file
             // and product is new
             if ($product_is_new) {
-              $v_products_name[$l_id] = "";
+              unset($v_products_name[$l_id]);
             }
           }
           if (isset($filelayout['v_products_name_' . $l_id_code])) { // do for each language in our upload file if exist
@@ -492,7 +492,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           } else { // column doesn't exist in the IMPORT file
             // and product is new
             if ($product_is_new) {
-              $v_products_name[$l_id_code] = "";
+              unset($v_products_name[$l_id_code]);
             }
           }
           if (isset($filelayout['v_products_description_' . $l_id])) { // do for each language in our upload file if exist
@@ -504,10 +504,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           } else { // column doesn't exist in the IMPORT file
             // and product is new
             if ($product_is_new) {
-              $v_products_description[$l_id] = "";
+              unset($v_products_description[$l_id]);
               // if short descriptions exist
               if ($ep_supported_mods['psd'] == true) {
-                $v_products_short_desc[$l_id] = "";
+                unset($v_products_short_desc[$l_id]);
               }
             }
           }
@@ -520,10 +520,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           } else { // column doesn't exist in the IMPORT file
             // and product is new
             if ($product_is_new) {
-              $v_products_description[$l_id_code] = "";
+              unset($v_products_description[$l_id_code]);
               // if short descriptions exist
               if ($ep_supported_mods['psd'] == true) {
-                $v_products_short_desc[$l_id_code] = "";
+                unset($v_products_short_desc[$l_id_code]);
               }
             }
           }
@@ -537,7 +537,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           } else { // column doesn't exist in the IMPORT file
             // and product is new
             if ($product_is_new) {
-              $v_products_url[$l_id] = "";
+              unset($v_products_url[$l_id]);
             }
           }
           if (isset($filelayout['v_products_url_' . $l_id_code])) { // do for each language in our upload file if exist
@@ -550,7 +550,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           } else { // column doesn't exist in the IMPORT file
             // and product is new
             if ($product_is_new) {
-              $v_products_url[$l_id_code] = "";
+              unset($v_products_url[$l_id_code]);
             }
           }
           unset($l_id);
