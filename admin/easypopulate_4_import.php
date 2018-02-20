@@ -10,7 +10,7 @@ if (!defined(EP4_REPLACE_BLANK_IMAGE)) {
 }
 
 // BEGIN: Data Import Module
-if (!is_null($_POST['import']) && isset($_POST['import'])) {
+if (isset($_POST['import']) && $_POST['import'] != '') {
   $time_start = microtime(true); // benchmarking
   $display_output .= EASYPOPULATE_4_DISPLAY_HEADING;
 
