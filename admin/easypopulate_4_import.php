@@ -677,14 +677,14 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
         $categories_name_exists = false; // assume no column defined
         foreach ($langcode as $lang) {
           // test column headers for each language
-          if (zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['id']]]))) { // import column found
+          if (isset($items[$filelayout['v_categories_name_' . $lang['id']]]) && zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['id']]]))) { // import column found
             $categories_name_exists['id'] = true; // at least one language column defined
             break;
           }
         }
         foreach ($langcode as $lang) {
           // test column headers for each language
-          if (zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['code']]]))) { // import column found
+          if (isset($items[$filelayout['v_categories_name_' . $lang['code']]]) && zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['code']]]))) { // import column found
             $categories_name_exists['code'] = true; // at least one language column defined
             break;
           }
@@ -804,7 +804,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
         //$lid = $langcode[1]['id'];
         $v_categories_name_var = 'v_categories_name_' . $lid; // ${$v_categories_name_var} >> $v_categories_name_1, $v_categories_name_2, etc.
         $v_categories_name_var_code = 'v_categories_name_' . $lid_code; // ${$v_categories_name_var} >> $v_categories_name_1, $v_categories_name_2, etc.
-        if (isset($filelayout[${$v_categories_name_var}]) || isset($filelayout[${$v_categories_name_var_code}])) { // does column header exist?
+        if (isset(${$v_categories_name_var}) && isset($filelayout[${$v_categories_name_var}]) || isset(${$v_categories_name_var_code}) && isset($filelayout[${$v_categories_name_var_code}])) { // does column header exist?
           // start from the highest possible category and work our way down from the parent
           $v_categories_id = 0;
           $theparent_id = 0; // 0 is top level parent
