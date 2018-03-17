@@ -299,18 +299,18 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $tracker['v_orders_id'] = $row['v_orders_id'];
       } else {
         $row['v_orders_id'] = NULL; // Clear all things at the beginning so that do not have the extra data to write.
-    $row['v_customers_id'] = NULL;
-    $row['v_customers_name'] = NULL;
-    $row['v_date_purchased'] = NULL;
-    $row['v_orders_status_name'] = NULL;
-    $row['v_customers_company'] = NULL;
-    $row['v_customers_street_address'] = NULL;
-    $row['v_customers_suburb'] = NULL;
-    $row['v_customers_city'] = NULL;
-    $row['v_customers_postcode'] = NULL;
-    $row['v_customers_country'] = NULL;
-    $row['v_customers_telephone'] = NULL;
-    $row['v_customers_email_address'] = NULL;
+        $row['v_customers_id'] = NULL;
+        $row['v_customers_name'] = NULL;
+        $row['v_date_purchased'] = NULL;
+        $row['v_orders_status_name'] = NULL;
+        $row['v_customers_company'] = NULL;
+        $row['v_customers_street_address'] = NULL;
+        $row['v_customers_suburb'] = NULL;
+        $row['v_customers_city'] = NULL;
+        $row['v_customers_postcode'] = NULL;
+        $row['v_customers_country'] = NULL;
+        $row['v_customers_telephone'] = NULL;
+        $row['v_customers_email_address'] = NULL;
       }
       if (isset($row['v_orders_id']) || !isset($tracker['v_products_id']) || (isset($tracker['v_products_id']) && $tracker['v_products_id'] != $row['v_products_id'])) {
         $tracker['v_products_id'] = $row['v_products_id'];
@@ -520,7 +520,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     }
     // $fullcategory = array(); // this will have the entire category path separated by $category_delimiter
 
-  $zco_notifier->notify('EP4_EXPORT_FULL_OR_CAT_FULL_AFTER');
+    $zco_notifier->notify('EP4_EXPORT_FULL_OR_CAT_FULL_AFTER');
 
     // if parent_id is not null ('0'), then follow it up.  Perhaps this could be replaced by Zen's zen_not_null() function?
     while (!empty($thecategory_id)) {
