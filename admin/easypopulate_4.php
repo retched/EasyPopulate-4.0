@@ -356,7 +356,7 @@ if (!defined('DEFAULT_LANGUAGE')) {
   $epdlanguage = ($ep_uses_mysqli ? mysqli_fetch_array($epdlanguage_query) : mysql_fetch_array($epdlanguage_query));
   define('DEFAULT_LANGUAGE', $epdlanguage['code']);
 }
-$epdlanguage_query = ep_4_query("SELECT languages_id, name FROM " . TABLE_LANGUAGES . " WHERE code = '" . DEFAULT_LANGUAGE . "'");
+$epdlanguage_query = ep_4_query("SELECT languages_id, code, name FROM " . TABLE_LANGUAGES . " WHERE code = '" . DEFAULT_LANGUAGE . "'");
 if (($ep_uses_mysqli ? mysqli_num_rows($epdlanguage_query) : mysql_num_rows($epdlanguage_query))) {
   $epdlanguage = ($ep_uses_mysqli ? mysqli_fetch_array($epdlanguage_query) : mysql_fetch_array($epdlanguage_query));
   $epdlanguage_id = $epdlanguage['languages_id'];
