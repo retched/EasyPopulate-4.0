@@ -31,6 +31,8 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
 
   $lid_first = $epdlanguage_id;
   $lid_first_code = $epdlanguage_code;
+  
+  $cat_desc_default = ''; // Should evaluate the database to determine if one is already set and leave it alone if it is.
 
   $zco_notifier->notify('EP4_IMPORT_START');
 
@@ -939,7 +941,8 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 $sql = "INSERT INTO " . TABLE_CATEGORIES_DESCRIPTION . " SET
                     categories_id   = :categories_id:,
                     language_id     = :language_id:,
-                    categories_name = :categories_name:";
+                    categories_name = :categories_name:
+                    categories_description = :categories_description:";
                 $sql = $db->bindVars($sql, ':categories_id:', $max_category_id, 'integer');
                 $sql = $db->bindVars($sql, ':language_id:', $cat_lang_id, 'integer');
 
@@ -983,6 +986,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                     unset($oldPost);
                   }
                   $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($thiscategoryname), $zc_support_ignore_null);
+                  $sql = $db->bindVars($sql, ':categories_description:', $cat_desc_default, $zc_support_ignore_null);
                 }
                 unset($v_categories_name_check);
                 unset($cat_lang_id);
