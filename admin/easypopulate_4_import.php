@@ -966,6 +966,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                     unset($oldPost);
                   }
                   $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($categories_names_array['id'][$cat_lang_id][$category_index]), $zc_support_ignore_null);
+                  $sql = $db->bindVars($sql, ':categories_description:', $cat_desc_default, $zc_support_ignore_null);
                 } else { // column is missing, so default to defined column's value
                   if (!empty($_POST)) {
                     $oldPost = $_POST;
