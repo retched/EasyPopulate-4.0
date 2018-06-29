@@ -15,6 +15,11 @@ $new_options_name = 0;
 $new_options_values_name = 0;
 $products_sort_order_increment = 10;
 
+$chosen_key_sub = $chosen_key;
+if (strpos($chosen_key_sub, 'v_') === 0) {
+  $chosen_key_sub = substr($chosen_key_sub, 2);
+}
+
 // attribute import loop - read 1 line of data from input file
 while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== false) { // while #1 - Main Loop
   ${$chosen_key} = $contents[$filelayout[$chosen_key]];
@@ -22,7 +27,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
   // READ products_id and products_model from TABLE_PRODUCTS
   // Since products_model must be unique (for EP4 at least), this query can be LIMIT 1
   $query ="SELECT * FROM ".TABLE_PRODUCTS." WHERE (" . $chosen_key_sql . ")";
-  $query = $db->bindVars($query, ':' . $chosen_key. ':', ${$chosen_key}, 'string');
+  $query = $db->bindVars($query, ':' . $chosen_key_sub . ':', ${$chosen_key}, 'string');
   $result = ep_4_query($query);
 
   if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0)  { // products_model is not in TABLE_PRODUCTS
