@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4_import.php, v4.0.35.ZC.2 10-03-2016 mc12345678 $
+// $Id: easypopulate_4_import.php, v4.0.36.ZC Patch 1 12-29-2018 mc12345678 $
 
 if (!defined('IS_ADMIN_FLAG')) {
   die('Illegal Access');
@@ -21,6 +21,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
   $ep_import_count = 0; // new products records imported
   $ep_error_count = 0; // errors detected during import
   $ep_warning_count = 0; // warning detected during import
+
+  $cat_desc_default = ''; // Should evaluate the database to determine if one is already set and leave it alone if it is.
 
   $zco_notifier->notify('EP4_IMPORT_START');
   
@@ -681,14 +683,17 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   $sql = "INSERT INTO " . TABLE_CATEGORIES_DESCRIPTION . " SET 
 										categories_id   = :categories_id:,
 										language_id     = :language_id:,
-										categories_name = :categories_name:";
+                    categories_name = :categories_name:,
+                    categories_description = :categories_description:";
                 $sql = $db->bindVars($sql, ':categories_id:', $max_category_id, 'integer');
                 $sql = $db->bindVars($sql, ':language_id:', $cat_lang_id, 'integer');
 
                 if (isset(${$v_categories_name_check})) { // update
                   $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($categories_names_array[$cat_lang_id][$category_index]), 'string');
+                  $sql = $db->bindVars($sql, ':categories_description:', $cat_desc_default, 'string');
                 } else { // column is missing, so default to defined column's value
                   $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($thiscategoryname), 'string');
+                  $sql = $db->bindVars($sql, ':categories_description:', $cat_desc_default, 'string');
                 }
 
                 $result = ep_4_query($sql);
