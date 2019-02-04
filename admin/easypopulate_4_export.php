@@ -49,6 +49,11 @@ if ($ep_dltype == 'fullsingle') {
     $ep_dltype = 'full';
 }
 
+// Cause only 1 instance of product to be exported.
+if ($ep_dltype == 'priceqty') {
+    $sql_filter .= ' AND p.master_categories_id = ptoc.categories_id'; // Complete Products by master_categories_id only (no linked product)
+}
+
 // override for $ep_dltype
 if ( isset($_POST['ep_order_export_type']) ) {
   if ($_POST['ep_order_export_type']=='1') {

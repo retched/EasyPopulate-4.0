@@ -48,11 +48,13 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
   // Error Checking
   if (!file_exists($file_location)) {
     $display_output .='<font color="red"><b>ERROR: Import file does not exist:' . $file_location . '</b></font><br/>';
+    $no_bypass = true;
   } else if (!($handle = fopen($file_location, "r"))) {
     $display_output .= '<font color="red"><b>ERROR: Cannot open import file:' . $file_location . '</b></font><br/>';
+    $no_bypass = true;
   }
 
-  if (function_exists('getFileDelimiter')) {
+  if (!$no_bypass && function_exists('getFileDelimiter')) {
     $csv_delimiter = getFileDelimiter($file_location);
     if (!empty($csv_delimiter) && is_array($csv_delimiter)) {
       if (count($csv_delimiter) == 1) {
@@ -679,7 +681,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
         $categories_name_exists = false; // assume no column defined
         foreach ($langcode as $lang) {
           // test column headers for each language
-          if (isset($items[$filelayout['v_categories_name_' . $lang['id']]]) && zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['id']]]))) { // import column found
+          if (isset($filelayout['v_categories_name_' . $lang['id']]) && isset($items[$filelayout['v_categories_name_' . $lang['id']]]) && zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['id']]]))) { // import column found
             $categories_name_exists['id'] = true; // at least one language column defined
             break;
           }
@@ -692,7 +694,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
           }
         }
         unset($lang);
-        if ($categories_name_exists['id'] || $categories_name_exists['code']) { // we have at least 1 language column
+        if (isset($categories_name_exists['id']) && $categories_name_exists['id'] || isset($categories_name_exists['code']) && $categories_name_exists['code']) { // we have at least 1 language column
           // chadd - 12-14-2010 - $categories_names_array[] has our category names
           // $categories_delimiter = "\x5e"; // add this to configuration variables
           $categories_delimiter = $category_delimiter; // add this to configuration variables
@@ -712,8 +714,16 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
               $categories_names_array['code'][$lang['code']] = explode($categories_delimiter,$items[$filelayout['v_categories_name_'.$lang['code']]]);
             } else {
             // utf-8
-              $categories_names_array['id'][$lang['id']] = mb_split(preg_quote($categories_delimiter), $items[$filelayout['v_categories_name_' . $lang['id']]]);
-              $categories_names_array['code'][$lang['code']] = mb_split(preg_quote($categories_delimiter), $items[$filelayout['v_categories_name_' . $lang['code']]]);
+              $categories_names_array['id'][$lang['id']] = isset($filelayout['v_categories_name_' . $lang['id']]) ? mb_split(preg_quote($categories_delimiter), $items[$filelayout['v_categories_name_' . $lang['id']]]) : array();
+              $categories_names_array['code'][$lang['code']] = isset($filelayout['v_categories_name_' . $lang['code']]) ? mb_split(preg_quote($categories_delimiter), $items[$filelayout['v_categories_name_' . $lang['code']]]) : array();
+            }
+
+            if (isset($filelayout['v_categories_name_' . $lang['id']]) && !isset($filelayout['v_categories_name_' . $lang['code']])) {
+              $categories_names_array['code'][$lang['code']] = $categories_names_array['id'][$lang['id']];
+            }
+
+            if (isset($filelayout['v_categories_name_' . $lang['code']]) && !isset($filelayout['v_categories_name_' . $lang['id']])) {
+              $categories_names_array['id'][$lang['id']] = $categories_names_array['code'][$lang['code']];
             }
 
             // get the number of tokens in $categories_names_array[]
@@ -1433,9 +1443,9 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                     record_company_id = :record_company_id:,
                     music_genre_id    = :music_genre_id:";
                   $query = $db->bindVars($query, ':products_id:', $v_products_id, 'integer');
-                  $query = $db->bindVars($query, ':artists_id:', $v_artists_id, 'integer');
-                  $query = $db->bindVars($query, ':record_company_id:', $v_record_company_id, 'integer');
-                  $query = $db->bindVars($query, ':music_genre_id:', $v_music_genre_id, 'integer');
+                  $query = $db->bindVars($query, ':artists_id:', !empty($v_artists_id) ? $v_artists_id : 0, 'integer');
+                  $query = $db->bindVars($query, ':record_company_id:', !empty($v_record_company_id) ? $v_record_company_id : 0, 'integer');
+                  $query = $db->bindVars($query, ':music_genre_id:', !empty($v_music_genre_id) ? $v_music_genre_id : 0, 'integer');
                   $result = ep_4_query($query);
                   unset($query);
                   if ($result) {
@@ -1599,14 +1609,14 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                     record_company_id = :record_company_id:,
                     music_genre_id    = :music_genre_id:
                     WHERE products_id   = :products_id:";
-                  $query = $db->bindVars($query, ':artists_id:', $v_artists_id, 'integer');
-                  $query = $db->bindVars($query, ':record_company_id:', $v_record_company_id, 'integer');
-                  $query = $db->bindVars($query, ':music_genre_id:', $v_music_genre_id, 'integer');
+                  $query = $db->bindVars($query, ':artists_id:', !empty($v_artists_id) ? $v_artists_id : 0, 'integer');
+                  $query = $db->bindVars($query, ':record_company_id:', !empty($v_record_company_id) ? $v_record_company_id : 0, 'integer');
+                  $query = $db->bindVars($query, ':music_genre_id:', !empty($v_music_genre_id) ? $v_music_genre_id : 0, 'integer');
                   $query = $db->bindVars($query, ':products_id:', $v_products_id, 'integer');
                   $result = ep_4_query($query);
                   unset($query);
                   if ($result) {
-                    zen_record_admin_activity('Updated product music extra ' . (int) $v_artists_id . ' via EP4.', 'info');
+                    zen_record_admin_activity('Updated product music extra ' . (int)$v_products_id . ' via EP4.', 'info');
                   }
                 }
                 unset($sql_music_extra);
@@ -1975,6 +1985,13 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 }
                 if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
                   $v_products_name_store = $v_products_name[$lang_id_code] = $_POST['products_name'][$lang_id_code];
+                  if (empty($v_products_name[$lang_id])) {
+                    $v_products_name[$lang_id] = $v_products_name[$lang_id_code];
+                  }
+                }
+                
+                if (empty($v_products_name[$lang_id_code]) && !empty($v_products_name[$lang_id])) {
+                  $v_products_name[$lang_id_code] = $v_products_name[$lang_id];
                 }
 
                 if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {

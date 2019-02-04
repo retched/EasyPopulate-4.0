@@ -809,7 +809,9 @@ if (((isset($error) && !$error) || !isset($error)) && (isset($_POST["delete"])) 
     echo EASYPOPULATE_4_ORDERS_DROPDOWN_TITLE;
 
     echo zen_draw_pull_down_menu('ep_order_export_type', $order_export_type_array) . ' ';
+    ?><div id="order_status" style="width:10%;"><?php
     echo zen_cfg_pull_down_order_statuses(NULL, 'order_status');
+    ?></div><?php
     echo zen_draw_input_field('exportorder', EASYPOPULATE_4_ORDERS_DROPDOWN_EXPORT, ' style="padding: 0px"', false, 'submit');
     ?>
     <br /><br />
@@ -917,7 +919,7 @@ if (((isset($error) && !$error) || !isset($error)) && (isset($_POST["delete"])) 
           }
 
           foreach ((EP4_SHOW_ALL_FILETYPES != 'false' ? $filenames_merged : $filetypes) as $key => $val) {
-            (EP4_SHOW_ALL_FILETYPES != 'false' ? $val = ((isset($filetypes[$key]) || array_key_exists($key, $filetypes)) ? $filetypes[$key] : NULL) : '');
+            (EP4_SHOW_ALL_FILETYPES != 'false' ? $val = ((isset($filetypes[$key]) || array_key_exists($key, $filetypes)) ? $filetypes[$key] : array()) : '');
             if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
               $val = array();
               for ($i = 0; $i < count($files); $i++) {
@@ -927,13 +929,13 @@ if (((isset($error) && !$error) || !isset($error)) && (isset($_POST["delete"])) 
 
             $file_count = 0;
             //Display the information needed to start use of a filetype.
-            $plural_state = "<strong>" . (count($val) > 1 ? EP_DESC_PLURAL : EP_DESC_SING) . "</strong>";
+            $plural_state = "<strong>" . (!empty($val) && count($val) > 1 ? EP_DESC_PLURAL : EP_DESC_SING) . "</strong>";
             if (EP4_SHOW_ALL_FILETYPES != 'Hidden') {
               echo "<tr><td colspan=\"8\">" . sprintf($filenames_merged[$key], "<strong>" . $key . "</strong>", $plural_state) . "</td></tr>";
               echo "<tr><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_FILENAME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SIZE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DATE_TIME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_TYPE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SPLIT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_IMPORT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DELETE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DOWNLOAD . "</th>\n";
             }
 
-            for ($i = 0; $i < count($val); $i++) {
+            for ($i = 0, $nval = count($val); $i < $nval; $i++) {
               $file_delimiter_error = false;
               if (EP4_SHOW_ALL_FILETYPES != 'Hidden' || (EP4_SHOW_ALL_FILETYPES == 'Hidden' && ($files[$i] != ".") && ($files[$i] != "..") && preg_match("/\.(sql|gz|csv|txt|log)$/i", $files[$i]) )) {
                 $file_count++;
