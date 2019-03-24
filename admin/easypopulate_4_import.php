@@ -688,7 +688,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
         }
         foreach ($langcode as $lang) {
           // test column headers for each language
-          if (isset($items[$filelayout['v_categories_name_' . $lang['code']]]) && zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['code']]]))) { // import column found
+          if (isset($filelayout['v_categories_name_' . $lang['code']]) && isset($items[$filelayout['v_categories_name_' . $lang['code']]]) && zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['code']]]))) { // import column found
             $categories_name_exists['code'] = true; // at least one language column defined
             break;
           }
