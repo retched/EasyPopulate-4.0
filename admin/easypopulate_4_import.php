@@ -22,6 +22,12 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
   $ep_error_count = 0; // errors detected during import
   $ep_warning_count = 0; // warning detected during import
 
+  // Test for system response to see if data type 'stringIgnoreNull' is supported
+  $test_text = 'This is NULL';
+  $test_text_result = $db->bindVars(':test_text:', ':test_text:', $test_text, 'string');
+  $zc_support_ignore_null = (($test_text_result == 'null') ? 'stringIgnoreNull' : 'string');
+  unset($test_text, $test_text_result);
+
   $cat_desc_default = ''; // Should evaluate the database to determine if one is already set and leave it alone if it is.
 
   $zco_notifier->notify('EP4_IMPORT_START');
@@ -500,7 +506,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         // convert the manufacturer's name into id's for the database
         if (isset($v_manufacturers_name) && ($v_manufacturers_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_manufacturers_name) <= $manufacturers_name_max_len) || (!function_exists('mb_strlen') && strlen($v_manufacturers_name) <= $manufacturers_name_max_len))) {
           $sql = "SELECT man.manufacturers_id AS manID FROM " . TABLE_MANUFACTURERS . " AS man WHERE man.manufacturers_name = :manufacturers_name: LIMIT 1";
-          $sql = $db->bindVars($sql, ':manufacturers_name:', $v_manufacturers_name, 'string');
+          $sql = $db->bindVars($sql, ':manufacturers_name:', $v_manufacturers_name, $zc_support_ignore_null);
           
           $result = ep_4_query($sql);
           if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) {
@@ -508,7 +514,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           } else { // It is set to autoincrement, do not need to fetch max id
             $sql = "INSERT INTO " . TABLE_MANUFACTURERS . " (manufacturers_name, date_added, last_modified)
 							VALUES (:manufacturers_name:, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
-            $sql = $db->bindVars($sql, ':manufacturers_name:', ep_4_curly_quotes($v_manufacturers_name), 'string');
+            $sql = $db->bindVars($sql, ':manufacturers_name:', ep_4_curly_quotes($v_manufacturers_name), $zc_support_ignore_null);
             $result = ep_4_query($sql);
             
             $v_manufacturers_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment, so can use this function
@@ -525,7 +531,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 								VALUES (:manufacturers_id:, :languages_id:, :manufacturers_url:)"; // seems we are skipping manufacturers url
               $sql = $db->bindVars($sql, ':manufacturers_id:', $v_manufacturers_id, 'integer');
               $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
-              $sql = $db->bindVars($sql, ':manufacturers_url:', '', 'string');
+              $sql = $db->bindVars($sql, ':manufacturers_url:', '', $zc_support_ignore_null);
               $result = ep_4_query($sql);
               if ($result) {
                 zen_record_admin_activity('Inserted manufacturers info ' . (int) $v_manufacturers_id . ' via EP4.', 'info');
@@ -619,7 +625,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 								des.categories_name = :categories_name: LIMIT 1";
             $sql = $db->bindVars($sql, ':language_id:', $lid, 'integer');
             $sql = $db->bindVars($sql, ':parent_id:', $theparent_id, 'integer');
-            $sql = $db->bindVars($sql, ':categories_name:', $thiscategoryname, 'string');
+            $sql = $db->bindVars($sql, ':categories_name:', $thiscategoryname, $zc_support_ignore_null);
             
             $result = ep_4_query($sql);
             $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
@@ -639,7 +645,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 										WHERE
 											categories_id   = :categories_id: AND
 											language_id     = :language_id:";
-                  $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($categories_names_array[$cat_lang_id][$category_index]), 'string');
+                  $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($categories_names_array[$cat_lang_id][$category_index]), $zc_support_ignore_null);
                   $sql = $db->bindVars($sql, ':categories_id:', $thiscategoryid, 'integer');
                   $sql = $db->bindVars($sql, ':language_id:', $cat_lang_id, 'integer');
                   $result = ep_4_query($sql);
@@ -689,11 +695,11 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 $sql = $db->bindVars($sql, ':language_id:', $cat_lang_id, 'integer');
 
                 if (isset(${$v_categories_name_check})) { // update
-                  $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($categories_names_array[$cat_lang_id][$category_index]), 'string');
-                  $sql = $db->bindVars($sql, ':categories_description:', $cat_desc_default, 'string');
+                  $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($categories_names_array[$cat_lang_id][$category_index]), $zc_support_ignore_null);
+                  $sql = $db->bindVars($sql, ':categories_description:', $cat_desc_default, $zc_support_ignore_null);
                 } else { // column is missing, so default to defined column's value
-                  $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($thiscategoryname), 'string');
-                  $sql = $db->bindVars($sql, ':categories_description:', $cat_desc_default, 'string');
+                  $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($thiscategoryname), $zc_support_ignore_null);
+                  $sql = $db->bindVars($sql, ':categories_description:', $cat_desc_default, $zc_support_ignore_null);
                 }
 
                 $result = ep_4_query($sql);
@@ -716,7 +722,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         if (isset($filelayout['v_artists_name'])) {
           if (isset($v_artists_name) && ($v_artists_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_artists_name) <= $artists_name_max_len) || (!function_exists('mb_strlen') && strlen($v_artists_name) <= $artists_name_max_len))) {
             $sql = "SELECT artists_id AS artistsID FROM " . TABLE_RECORD_ARTISTS . " WHERE artists_name = :artists_name: LIMIT 1";
-            $sql = $db->bindVars($sql, ':artists_name:', ep_4_curly_quotes($v_artists_name), 'string');
+            $sql = $db->bindVars($sql, ':artists_name:', ep_4_curly_quotes($v_artists_name), $zc_support_ignore_null);
             $result = ep_4_query($sql);
             if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) {
               $v_artists_id = $row['artistsID']; // this id goes into the product_music_extra table, the other information is collected from the assignment of ${$key} = $items[$value]
@@ -724,7 +730,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 								artists_image = :artists_image:,
 								last_modified = CURRENT_TIMESTAMP
 								WHERE artists_id = :artists_id:";
-              $sql = $db->bindVars($sql, ':artists_image:', $v_artists_image, 'string');
+              $sql = $db->bindVars($sql, ':artists_image:', $v_artists_image, $zc_support_ignore_null);
               $sql = $db->bindVars($sql, ':artists_id:', $v_artists_id, 'integer');
               $result = ep_4_query($sql);
               if ($result) {
@@ -744,7 +750,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 									artists_url = :artists_url:
 									WHERE artists_id = :artists_id: AND languages_id = :languages_id:";
                 $sql = $db->bindVars($sql, ':artists_id:', $v_artists_id, 'integer');
-                $sql = $db->bindVars($sql, ':artists_url:', $items[$filelayout['v_artists_url_' . $l_id]], 'string');
+                $sql = $db->bindVars($sql, ':artists_url:', $items[$filelayout['v_artists_url_' . $l_id]], $zc_support_ignore_null);
                 $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
                 $result = ep_4_query($sql);
                 if ($result) {
@@ -754,8 +760,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             } else { // It is set to autoincrement, do not need to fetch max id
               $sql = "INSERT INTO " . TABLE_RECORD_ARTISTS . " (artists_name, artists_image, date_added, last_modified)
 								VALUES (:artists_name:, :artists_image:, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
-              $sql = $db->bindVars($sql, ':artists_name:', ep_4_curly_quotes($v_artists_name), 'string');
-              $sql = $db->bindVars($sql, ':artists_image:', $v_artists_image, 'string');
+              $sql = $db->bindVars($sql, ':artists_name:', ep_4_curly_quotes($v_artists_name), $zc_support_ignore_null);
+              $sql = $db->bindVars($sql, ':artists_image:', $v_artists_image, $zc_support_ignore_null);
               $result = ep_4_query($sql);
               
               $v_artists_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment, so can use this function
@@ -779,7 +785,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 									VALUES (:artists_id:, :languages_id:, :artists_url:)"; // seems we are skipping manufacturers url
                 $sql = $db->bindVars($sql, ':artists_id:', $v_artists_id, 'integer');
                 $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
-                $sql = $db->bindVars($sql, ':artists_url:', (isset($filelayout['v_artists_url_' . $l_id]) ? $items[$filelayout['v_artists_url_' . $l_id]] : $items[$filelayout['v_artists_url_' . $lid]]), 'string');
+                $sql = $db->bindVars($sql, ':artists_url:', (isset($filelayout['v_artists_url_' . $l_id]) ? $items[$filelayout['v_artists_url_' . $l_id]] : $items[$filelayout['v_artists_url_' . $lid]]), $zc_support_ignore_null);
                 $result = ep_4_query($sql);
                 if ($result) {
                   zen_record_admin_activity('Inserted record artists info ' . (int) $v_artists_id . ' via EP4.', 'info');
@@ -802,7 +808,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         if (isset($filelayout['v_record_company_name'])) {
           if (isset($v_record_company_name) && ($v_record_company_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_record_company_name) <= $record_company_name_max_len) || (!function_exists('mb_strlen') && strlen($v_record_company_name) <= $record_company_name_max_len))) {
             $sql = "SELECT record_company_id AS record_companyID FROM " . TABLE_RECORD_COMPANY . " WHERE record_company_name = :record_company_name: LIMIT 1";
-            $sql = $db->bindVars($sql, ':record_company_name:', ep_4_curly_quotes($v_record_company_name), 'string');
+            $sql = $db->bindVars($sql, ':record_company_name:', ep_4_curly_quotes($v_record_company_name), $zc_support_ignore_null);
             $result = ep_4_query($sql);
             if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) {
               $v_record_company_id = $row['record_companyID']; // this id goes into the product_music_extra table
@@ -810,7 +816,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 								record_company_image = :record_company_image:,
 								last_modified = CURRENT_TIMESTAMP
 								WHERE record_company_id = :record_company_id:";
-              $sql = $db->bindVars($sql, ':record_company_image:', $v_record_company_image, 'string');
+              $sql = $db->bindVars($sql, ':record_company_image:', $v_record_company_image, $zc_support_ignore_null);
               $sql = $db->bindVars($sql, ':record_company_id:', $v_record_company_id, 'integer');
               $result = ep_4_query($sql);
               if ($result) {
@@ -824,7 +830,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 $sql = "UPDATE " . TABLE_RECORD_COMPANY_INFO . " SET
 									record_company_url = :record_company_url:
 									WHERE record_company_id = :record_company_id: AND languages_id = :languages_id:";
-                $sql = $db->bindVars($sql, ':record_company_url:', $items[$filelayout['v_record_company_url_' . $l_id]], 'string');
+                $sql = $db->bindVars($sql, ':record_company_url:', $items[$filelayout['v_record_company_url_' . $l_id]], $zc_support_ignore_null);
                 $sql = $db->bindVars($sql, ':record_company_id:', $v_record_company_id, 'integer');
                 $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
                 $result = ep_4_query($sql);
@@ -835,8 +841,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             } else { // It is set to autoincrement, do not need to fetch max id
               $sql = "INSERT INTO " . TABLE_RECORD_COMPANY . " (record_company_name, record_company_image, date_added, last_modified)
 								VALUES (:record_company_name:, :record_company_image:, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
-              $sql = $db->bindVars($sql, ':record_company_name:', ep_4_curly_quotes($v_record_company_name), 'string');
-              $sql = $db->bindVars($sql, ':record_company_image:', $v_record_company_image, 'string');
+              $sql = $db->bindVars($sql, ':record_company_name:', ep_4_curly_quotes($v_record_company_name), $zc_support_ignore_null);
+              $sql = $db->bindVars($sql, ':record_company_image:', $v_record_company_image, $zc_support_ignore_null);
               $result = ep_4_query($sql);
               
               $v_record_company_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment, so can use this function
@@ -851,7 +857,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 									VALUES (:record_company_id:, :languages_id:, :record_company_url:)"; // seems we are skipping manufacturers url
                 $sql = $db->bindVars($sql, ':record_company_id:', $v_record_company_id, 'integer');
                 $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
-                $sql = $db->bindVars($sql, ':record_company_url:',  (isset($filelayout['v_record_company_url_' . $l_id]) ? $items[$filelayout['v_record_company_url_' . $l_id]] : $items[$filelayout['v_record_company_url_' . $lid]]), 'string');
+                $sql = $db->bindVars($sql, ':record_company_url:',  (isset($filelayout['v_record_company_url_' . $l_id]) ? $items[$filelayout['v_record_company_url_' . $l_id]] : $items[$filelayout['v_record_company_url_' . $lid]]), $zc_support_ignore_null);
                 $result = ep_4_query($sql);
                 if ($result) {
                   zen_record_admin_activity('Inserted record company info ' . (int) $v_record_company_id . ' via EP4.', 'info');
@@ -874,14 +880,14 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
         if (isset($filelayout['v_music_genre_name'])) {
           if (isset($v_music_genre_name) && ($v_music_genre_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_music_genre_name) <= $music_genre_name_max_len) || (!function_exists('mb_strlen') && strlen($v_music_genre_name) <= $music_genre_name_max_len))) {
             $sql = "SELECT music_genre_id AS music_genreID FROM " . TABLE_MUSIC_GENRE . " WHERE music_genre_name = :music_genre_name: LIMIT 1";
-            $sql = $db->bindVars($sql, ':music_genre_name:', $v_music_genre_name, 'string');
+            $sql = $db->bindVars($sql, ':music_genre_name:', $v_music_genre_name, $zc_support_ignore_null);
             $result = ep_4_query($sql);
             if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) {
               $v_music_genre_id = $row['music_genreID']; // this id goes into the product_music_extra table
             } else { // It is set to autoincrement, do not need to fetch max id
               $sql = "INSERT INTO " . TABLE_MUSIC_GENRE . " (music_genre_name, date_added, last_modified)
 								VALUES (:music_genre_name:, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
-              $sql = $db->bindVars($sql, ':music_genre_name:', $v_music_genre_name, 'string');
+              $sql = $db->bindVars($sql, ':music_genre_name:', $v_music_genre_name, $zc_support_ignore_null);
               $result = ep_4_query($sql);
               
               $v_music_genre_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment
@@ -930,7 +936,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               $sql .= " WHERE (products_model = :products_model:) LIMIT 1";
               break;
           }
-          $sql = $db->bindVars($sql, ':products_model:', $v_products_model, 'string');
+          $sql = $db->bindVars($sql, ':products_model:', $v_products_model, $zc_support_ignore_null);
           $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
           $result = ep_4_query($sql);
           if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) { // new item, insert into products
@@ -993,7 +999,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                   if ($filelayout[$value]) {
                     $query .= ":field: = :value:, ";
                     $query = $db->bindVars($query, ':field:', $field, 'noquotestring');
-                    $query = $db->bindVars($query, ':value:', ${$value}, ('string'));
+                    $query = $db->bindVars($query, ':value:', ${$value}, ($zc_support_ignore_null));
                   }
                 }
               }
@@ -1021,27 +1027,27 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 							metatags_model_status			= :metatags_model_status:,
 							metatags_price_status			= :metatags_price_status:,
 							metatags_title_tagline_status	= :metatags_title_tagline_status:";
-            $query = $db->bindVars($query, ':products_model:', $v_products_model , 'string');
+            $query = $db->bindVars($query, ':products_model:', $v_products_model , $zc_support_ignore_null);
             $query = $db->bindVars($query, ':products_type:', $v_products_type , 'integer');
             $query = $db->bindVars($query, ':products_price:', $v_products_price , 'currency');
             $query = $db->bindVars($query, ':products_price_uom:', $v_products_price_uom , 'currency');
             $query = $db->bindVars($query, ':products_id:', $v_products_id, 'integer');
-            $query = $db->bindVars($query, ':products_upc:', $v_products_upc, 'string');
-            $query = $db->bindVars($query, ':products_gpc:', $v_products_gpc, 'string');
+            $query = $db->bindVars($query, ':products_upc:', $v_products_upc, $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':products_gpc:', $v_products_gpc, $zc_support_ignore_null);
             $query = $db->bindVars($query, ':products_msrp:', $v_products_msrp, 'currency');
-            $query = $db->bindVars($query, ':map_enabled:', $v_map_enabled, 'string');
+            $query = $db->bindVars($query, ':map_enabled:', $v_map_enabled, $zc_support_ignore_null);
             $query = $db->bindVars($query, ':map_price:', $v_map_price, 'currency');
             $query = $db->bindVars($query, ':products_group_a_price:', $v_products_group_a_price, 'currency');
             $query = $db->bindVars($query, ':products_group_b_price:', $v_products_group_b_price, 'currency');
             $query = $db->bindVars($query, ':products_group_c_price:', $v_products_group_c_price, 'currency');
             $query = $db->bindVars($query, ':products_group_d_price:', $v_products_group_d_price, 'currency');
-            $query = $db->bindVars($query, ':products_exclusive:', $v_products_exclusive, 'string');
-            $query = $db->bindVars($query, ':products_image:', $v_products_image, 'string');
+            $query = $db->bindVars($query, ':products_exclusive:', $v_products_exclusive, $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':products_image:', $v_products_image, $zc_support_ignore_null);
             $query = $db->bindVars($query, ':products_weight:', $v_products_weight, 'float');
             $query = $db->bindVars($query, ':products_discount_type:', $v_products_discount_type, 'integer');
             $query = $db->bindVars($query, ':products_discount_type_from:', $v_products_discount_type_from, 'integer');
             $query = $db->bindVars($query, ':product_is_call:', $v_product_is_call, 'integer');
-            $query = $db->bindVars($query, ':products_sort_order:', $v_products_sort_order, 'string');
+            $query = $db->bindVars($query, ':products_sort_order:', $v_products_sort_order, 'integer');
             $query = $db->bindVars($query, ':products_quantity_order_min:', $v_products_quantity_order_min, 'float');
             $query = $db->bindVars($query, ':products_quantity_order_units:', $v_products_quantity_order_units, 'float');
             $query = $db->bindVars($query, ':products_priced_by_attribute:', $v_products_priced_by_attribute, 'integer');
@@ -1070,8 +1076,9 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               $ep_import_count++;
               // PRODUCT_MUSIC_EXTRA
               if ($v_products_type == '2') {
-                $sql_music_extra = ep_4_query("SELECT * FROM " . TABLE_PRODUCT_MUSIC_EXTRA . " WHERE (products_id = :products_id:) LIMIT 1");
+                $sql_music_extra = "SELECT * FROM " . TABLE_PRODUCT_MUSIC_EXTRA . " WHERE (products_id = :products_id:) LIMIT 1";
                 $sql_music_extra = $db->bindVars($sql_music_extra, ':products_id:', $v_products_id, 'integer');
+                $sql_music_extra = ep_4_query($sql_music_extra);
                 if (($ep_uses_mysqli ? mysqli_num_rows($sql_music_extra) : mysql_num_rows($sql_music_extra)) == 0) { // new item, insert into products
                   $query = "INSERT INTO " . TABLE_PRODUCT_MUSIC_EXTRA . " SET
 										products_id			= :products_id:,
@@ -1079,9 +1086,9 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 										record_company_id	= :record_company_id:,
 										music_genre_id		= :music_genre_id:";
                   $query = $db->bindVars($query, ':products_id:', $v_products_id, 'integer');
-                  $query = $db->bindVars($query, ':artists_id:', $v_artists_id, 'integer');
-                  $query = $db->bindVars($query, ':record_company_id:', $v_record_company_id, 'integer');
-                  $query = $db->bindVars($query, ':music_genre_id:', $v_music_genre_id, 'integer');
+                  $query = $db->bindVars($query, ':artists_id:', !empty($v_artists_id) ? $v_artists_id : 0, 'integer');
+                  $query = $db->bindVars($query, ':record_company_id:', !empty($v_record_company_id) ? $v_record_company_id : 0, 'integer');
+                  $query = $db->bindVars($query, ':music_genre_id:', !empty($v_music_genre_id) ? $v_music_genre_id : 0, 'integer');
                   $result = ep_4_query($query);
                   if ($result) {
                     zen_record_admin_activity('Inserted product music extra ' . (int) $v_products_id . ' via EP4.', 'info');
@@ -1147,7 +1154,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
                 if (isset($filelayout[$value])) {
                   $query .= ":field: = :value:, ";
                   $query = $db->bindVars($query, ':field:', $field, 'noquotestring');
-                  $query = $db->bindVars($query, ':value:', ${$value}, 'string');
+                  $query = $db->bindVars($query, ':value:', ${$value}, $zc_support_ignore_null);
                 }
               }
             }
@@ -1174,25 +1181,25 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 							metatags_price_status			= :metatags_price_status:,
 							metatags_title_tagline_status	= :metatags_title_tagline_status:
                      WHERE (products_id = :products_id:)";
-            $query = $db->bindVars($query, ':products_model:', $v_products_model , 'string');
+            $query = $db->bindVars($query, ':products_model:', $v_products_model , $zc_support_ignore_null);
             $query = $db->bindVars($query, ':products_price:', $v_products_price , 'currency');
-            $query = $db->bindVars($query, ':products_price_uom:', $v_products_price_uom , 'currency');
-            $query = $db->bindVars($query, ':products_upc:', $v_products_upc, 'string');
-            $query = $db->bindVars($query, ':products_gpc:', $v_products_gpc, 'string');
-            $query = $db->bindVars($query, ':products_msrp:', $v_products_msrp, 'currency');
-            $query = $db->bindVars($query, ':map_enabled:', $v_map_enabled, 'string');
-            $query = $db->bindVars($query, ':map_price:', $v_map_price, 'currency');
-            $query = $db->bindVars($query, ':products_group_a_price:', $v_products_group_a_price, 'currency');
-            $query = $db->bindVars($query, ':products_group_b_price:', $v_products_group_b_price, 'currency');
-            $query = $db->bindVars($query, ':products_group_c_price:', $v_products_group_c_price, 'currency');
-            $query = $db->bindVars($query, ':products_group_d_price:', $v_products_group_d_price, 'currency');
-            $query = $db->bindVars($query, ':products_exclusive:', $v_products_exclusive, 'string');
-            $query = $db->bindVars($query, ':products_image:', $v_products_image, 'string');
+            $query = $db->bindVars($query, ':products_price_uom:', (isset($v_products_price_uom) ? $v_products_price_uom : '0.00') , 'currency');
+            $query = $db->bindVars($query, ':products_upc:', (isset($v_products_upc) ? $v_products_upc : ''), $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':products_gpc:', (isset($v_products_gpc) ? $v_products_gpc : ''), $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':products_msrp:', (isset($v_products_msrp) ? $v_products_msrp : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':map_enabled:', (isset($v_map_enabled) ? $v_map_enabled : ''), $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':map_price:', (isset($v_map_price) ? $v_map_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_group_a_price:', (isset($v_products_group_a_price) ? $v_products_group_a_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_group_b_price:', (isset($v_products_group_b_price) ? $v_products_group_b_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_group_c_price:', (isset($v_products_group_c_price) ? $v_products_group_c_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_group_d_price:', (isset($v_products_group_d_price) ? $v_products_group_d_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_exclusive:', (isset($v_products_exclusive) ? $v_products_exclusive : ''), $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':products_image:', $v_products_image, $zc_support_ignore_null);
             $query = $db->bindVars($query, ':products_weight:', $v_products_weight, 'float');
             $query = $db->bindVars($query, ':products_discount_type:', $v_products_discount_type, 'integer');
             $query = $db->bindVars($query, ':products_discount_type_from:', $v_products_discount_type_from, 'integer');
             $query = $db->bindVars($query, ':product_is_call:', $v_product_is_call, 'integer');
-            $query = $db->bindVars($query, ':products_sort_order:', $v_products_sort_order, 'string');
+            $query = $db->bindVars($query, ':products_sort_order:', $v_products_sort_order, 'integer');
             $query = $db->bindVars($query, ':products_quantity_order_min:', $v_products_quantity_order_min, 'float');
             $query = $db->bindVars($query, ':products_quantity_order_units:', $v_products_quantity_order_units, 'float');
             $query = $db->bindVars($query, ':products_priced_by_attribute:', $v_products_priced_by_attribute, 'integer');
@@ -1234,9 +1241,9 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 										record_company_id	= :record_company_id:,
 										music_genre_id		= :music_genre_id:
 										WHERE products_id   = :products_id:";
-                  $query = $db->bindVars($query, ':artists_id:', $v_artists_id, 'integer');
-                  $query = $db->bindVars($query, ':record_company_id:', $v_record_company_id, 'integer');
-                  $query = $db->bindVars($query, ':music_genre_id:', $v_music_genre_id, 'integer');
+                  $query = $db->bindVars($query, ':artists_id:', !empty($v_artists_id) ? $v_artists_id : 0, 'integer');
+                  $query = $db->bindVars($query, ':record_company_id:', !empty($v_record_company_id) ? $v_record_company_id : 0, 'integer');
+                  $query = $db->bindVars($query, ':music_genre_id:', !empty($v_music_genre_id) ? $v_music_genre_id : 0, 'integer');
                   $query = $db->bindVars($query, ':products_id:', $v_products_id, 'integer');
                   $result = ep_4_query($query);
                   if ($result) {
@@ -1266,9 +1273,9 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 									metatags_keywords = :metatags_keywords:,
 									metatags_description = :metatags_description:
 									WHERE (products_id = :products_id: AND language_id = :key:)";
-                $sql = $db->bindVars($sql, ':metatags_title:', ep_4_curly_quotes($v_metatags_title[$key]), 'string');
-                $sql = $db->bindVars($sql, ':metatags_keywords:', ep_4_curly_quotes($v_metatags_keywords[$key]), 'string');
-                $sql = $db->bindVars($sql, ':metatags_description:', ep_4_curly_quotes($v_metatags_description[$key]), 'string');
+                $sql = $db->bindVars($sql, ':metatags_title:', ep_4_curly_quotes($v_metatags_title[$key]), $zc_support_ignore_null);
+                $sql = $db->bindVars($sql, ':metatags_keywords:', ep_4_curly_quotes($v_metatags_keywords[$key]), $zc_support_ignore_null);
+                $sql = $db->bindVars($sql, ':metatags_description:', ep_4_curly_quotes($v_metatags_description[$key]), $zc_support_ignore_null);
                 $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
                 $sql = $db->bindVars($sql, ':key:', $key, 'integer');
               } else {
@@ -1279,9 +1286,9 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 									metatags_description = :metatags_description:,
 									products_id = :products_id:,
 									language_id = :key:";
-                $sql = $db->bindVars($sql, ':metatags_title:', ep_4_curly_quotes($v_metatags_title[$key]), 'string');
-                $sql = $db->bindVars($sql, ':metatags_keywords:', ep_4_curly_quotes($v_metatags_keywords[$key]), 'string');
-                $sql = $db->bindVars($sql, ':metatags_description:', ep_4_curly_quotes($v_metatags_description[$key]), 'string');
+                $sql = $db->bindVars($sql, ':metatags_title:', ep_4_curly_quotes($v_metatags_title[$key]), $zc_support_ignore_null);
+                $sql = $db->bindVars($sql, ':metatags_keywords:', ep_4_curly_quotes($v_metatags_keywords[$key]), $zc_support_ignore_null);
+                $sql = $db->bindVars($sql, ':metatags_description:', ep_4_curly_quotes($v_metatags_description[$key]), $zc_support_ignore_null);
                 $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
                 $sql = $db->bindVars($sql, ':key:', $key, 'integer');
               }
@@ -1436,10 +1443,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_START');
           $sql = $db->bindVars($sql, ':v_products_id:', $v_products_id, 'integer');
           $sql = $db->bindVars($sql, ':language_id:', $lang_id, 'integer');
-          $sql = $db->bindVars($sql, ':v_products_name:', $v_products_name[$lang_id], 'string');
-          $sql = $db->bindVars($sql, ':v_products_description:', $v_products_description[$lang_id], 'string');
-          $sql = $db->bindVars($sql, ':v_products_short_desc:', $v_products_short_desc[$lang_id], 'string');
-          $sql = $db->bindVars($sql, ':v_products_url:', $v_products_url[$lang_id], 'string');
+          $sql = $db->bindVars($sql, ':v_products_name:', (isset($v_products_name[$lang_id]) ? $v_products_name[$lang_id] : ''), $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':v_products_description:', (isset($v_products_description[$lang_id]) ? $v_products_description[$lang_id] : ''), $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':v_products_short_desc:', (isset($v_products_short_desc[$lang_id]) ? $v_products_short_desc[$lang_id] : ''), $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':v_products_url:', (isset($v_products_url[$lang_id]) ? $v_products_url[$lang_id] : ''), $zc_support_ignore_null);
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_END');
 
           $result = ep_4_query($sql);
@@ -1473,10 +1480,10 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_UPDATE_WHERE');
                 
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_START');
-          $sql = $db->bindVars($sql, ':v_products_name:', $v_products_name[$lang_id], 'string');
-          $sql = $db->bindVars($sql, ':v_products_description:', $v_products_description[$lang_id], 'string');
-          $sql = $db->bindVars($sql, ':v_products_short_desc:', $v_products_short_desc[$lang_id], 'string');
-          $sql = $db->bindVars($sql, ':v_products_url:', $v_products_url[$lang_id], 'string');
+          $sql = $db->bindVars($sql, ':v_products_name:', (isset($v_products_name[$lang_id]) ? $v_products_name[$lang_id] : ''), $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':v_products_description:', (isset($v_products_description[$lang_id]) ? $v_products_description[$lang_id] : ''), $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':v_products_short_desc:', (isset($v_products_short_desc[$lang_id]) ? $v_products_short_desc[$lang_id] : ''), $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':v_products_url:', (isset($v_products_url[$lang_id]) ? $v_products_url[$lang_id] : ''), $zc_support_ignore_null);
           $sql = $db->bindVars($sql, ':v_products_id:', $v_products_id, 'integer');
           $sql = $db->bindVars($sql, ':language_id:', $lang_id, 'integer');
           $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_FIELDS_BIND_END');
@@ -1503,9 +1510,9 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           FROM
           '.TABLE_PRODUCTS.'
           LEFT JOIN
-          '.TABLE_PRODUCTS_TO_CATEGORIES.' ON ('.TABLE_PRODUCTS.'.products_id = '.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id AND '.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id='.$v_categories_id.')
+          '.TABLE_PRODUCTS_TO_CATEGORIES.' ON ('.TABLE_PRODUCTS.'.products_id = '.TABLE_PRODUCTS_TO_CATEGORIES.'.products_id AND '.TABLE_PRODUCTS_TO_CATEGORIES.'.categories_id='.(int)$v_categories_id.')
           WHERE
-          '.TABLE_PRODUCTS.'.products_id='.$v_products_id);
+          '.TABLE_PRODUCTS.'.products_id='.(int)$v_products_id);
 $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) : mysql_fetch_array($result_incategory));
           if (!zen_not_null($result_incategory['products_id']) || sizeof($result_incategory) <= 0 /* ($ep_uses_mysqli ? mysqli_num_rows($result_incategory) : mysql_num_rows($result_incategory)) == 0 */) { // nope, this is a new category for this product
               if ($items[$filelayout['v_status']] == 7) {
@@ -1522,18 +1529,18 @@ $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) :
                 // if the master_categories_id != categories_id, then for "safety" sake, should successfully insert the product to the category before deleting it from the previous category. Should also verify that the master_categories_id is set, because if it is not then there is a bigger issue.  As part of the verification, if it is not set, then don't try to delete the previous, just add it and provide equivalent information.
                 if ((int) $result_incategory['master_categories_id'] != (int) $v_categories_id) {
                   //move is eminent
-                  if ($result_incategory['master_categories_id'] > 0) {
+                  if ((int)$result_incategory['master_categories_id'] > 0) {
                     //master_category is assigned to the product do the move.
                     // Ensure the product still is on the way to the move and available.
                     $res1 = ep_4_query('INSERT INTO ' . TABLE_PRODUCTS_TO_CATEGORIES . ' (products_id, categories_id)
-            VALUES (' . $v_products_id . ', ' . $v_categories_id . ')');
+            VALUES (' . (int)$v_products_id . ', ' . (int)$v_categories_id . ')');
                     if ($res1) {
                       //Successfully inserted the product to the category, now need to remove the link from the previous category.
-                      $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . $v_categories_id . ' 
-                                 WHERE products_id = ' . $v_products_id);
+                      $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . (int)$v_categories_id . ' 
+                                 WHERE products_id = ' . (int)$v_products_id);
 
-                      $res2 = ep_4_query('DELETE FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' WHERE products_id = ' . $v_products_id . ' AND categories_id = 
-                             ' . $result_incategory['master_categories_id']);
+                      $res2 = ep_4_query('DELETE FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' WHERE products_id = ' . (int)$v_products_id . ' AND categories_id = 
+                             ' . (int)$result_incategory['master_categories_id']);
                       if ($res1 && $res2) {
                         zen_record_admin_activity('Product ' . (int) $v_products_id . ' moved to category ' . (int) $v_categories_id . ' via EP4.', 'info');
                       } else if ($res1 && !$res2) {
@@ -1547,11 +1554,11 @@ $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) :
                   } /* EOF Master Category is set */ else {
                     //master_category is not assigned, assign the category to the master category and do the move.
                     $res1 = ep_4_query('INSERT INTO ' . TABLE_PRODUCTS_TO_CATEGORIES . ' (products_id, categories_id)
-            VALUES (' . $v_products_id . ', ' . $v_categories_id . ')');
+            VALUES (' . (int)$v_products_id . ', ' . (int)$v_categories_id . ')');
                     if ($res1) {
                       //Successfully inserted the product to the category, now need to remove the link from the previous category.
-                      $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . $v_categories_id . ' 
-                                 WHERE products_id = ' . $v_products_id);
+                      $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . (int)$v_categories_id . ' 
+                                 WHERE products_id = ' . (int)$v_products_id);
                       if ($res1) {
                         zen_record_admin_activity('Product ' . (int) $v_products_id . ' moved to category ' . (int) $v_categories_id . ' via EP4.', 'info');
                       } else {
@@ -1562,7 +1569,7 @@ $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) :
                 } // End if master and category different, nothing else to do as no where to go because both are the same...
               } /* EOF status == Move */ else {
                 $res1 = ep_4_query('INSERT INTO ' . TABLE_PRODUCTS_TO_CATEGORIES . ' (products_id, categories_id)
-            VALUES (' . $v_products_id . ', ' . $v_categories_id . ')');
+            VALUES (' . (int)$v_products_id . ', ' . (int)$v_categories_id . ')');
                 if ($res1) {
                   zen_record_admin_activity('Product ' . (int) $v_products_id . ' copied as link to category ' . (int) $v_categories_id . ' via EP4.', 'info');
                 }
@@ -1573,21 +1580,21 @@ $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) :
 
 //do category move action.
                 // if the master_categories_id != categories_id, then for "safety" sake, should successfully insert the product to the category before deleting it from the previous category. Should also verify that the master_categories_id is set, because if it is not then there is a bigger issue.  As part of the verification, if it is not set, then don't try to delete the previous, just add it and provide equivalent information.
-                if ($result_incategory['master_categories_id'] != $result_incategory['categories_id']) {
+                if ((int)$result_incategory['master_categories_id'] != (int)$result_incategory['categories_id']) {
                   //move is eminent
-                  if ($result_incategory['master_categories_id'] > 0) {
+                  if ((int)$result_incategory['master_categories_id'] > 0) {
                     //master_category is assigned to the product complete the move.
                     // Ensure the product still is on the way to the move and available.
                     //      $res1 = ep_4_query('INSERT INTO '.TABLE_PRODUCTS_TO_CATEGORIES.' (products_id, categories_id)
                     //      VALUES ("'.$v_products_id.'", "'.$v_categories_id.'")');
-                    $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . $v_categories_id . ' 
-                                 WHERE products_id = ' . $v_products_id);
+                    $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . (int)$v_categories_id . ' 
+                                 WHERE products_id = ' . (int)$v_products_id);
 
                     /* if ($res1) */
                       //Successfully updated the product to the category, now need to remove the link from the previous category.
 
-                    $res2 = ep_4_query('DELETE FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' WHERE products_id = ' . $v_products_id . ' AND categories_id = 
-                             ' . $result_incategory['master_categories_id']);
+                    $res2 = ep_4_query('DELETE FROM ' . TABLE_PRODUCTS_TO_CATEGORIES . ' WHERE products_id = ' . (int)$v_products_id . ' AND categories_id = 
+                             ' . (int)$result_incategory['master_categories_id']);
                     
                     if ($res1 && $res2) {
                       zen_record_admin_activity('Product ' . (int) $v_products_id . ' moved from category ' . (int)$result_incategory['master_categories_id'] . ' to category ' . (int) $v_categories_id . ' via EP4.', 'info');
@@ -1601,8 +1608,8 @@ $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) :
                     //   $res1 = ep_4_query('INSERT INTO '.TABLE_PRODUCTS_TO_CATEGORIES.' (products_id, categories_id)
                     //      VALUES ("'.$v_products_id.'", "'.$v_categories_id.'")');
                     //Successfully inserted the product to the category, now need to remove the link from the previous category.
-                    $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . $v_categories_id . ' 
-                                 WHERE products_id = ' . $v_products_id);
+                    $res1 = ep_4_query('UPDATE ' . TABLE_PRODUCTS . ' set master_categories_id = ' . (int)$v_categories_id . ' 
+                                 WHERE products_id = ' . (int)$v_products_id);
                     if ($res1) {
                       zen_record_admin_activity('Product ' . (int) $v_products_id . ' master_categories_id established as category ' . (int) $v_categories_id . ' via EP4.', 'info');
                     }
@@ -1631,7 +1638,7 @@ $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) :
             $v_specials_expires_date = ($v_specials_expires_date == true  && $v_specials_expires_date > "0001-01-01") ? date("Y-m-d H:i:s", strtotime($v_specials_expires_date)) : "0001-01-01";
 
             // Check if this product already has a special
-            $special = ep_4_query("SELECT products_id FROM " . TABLE_SPECIALS . " WHERE products_id = " . $v_products_id);
+            $special = ep_4_query("SELECT products_id FROM " . TABLE_SPECIALS . " WHERE products_id = " . (int)$v_products_id);
 
             if (($ep_uses_mysqli ? mysqli_num_rows($special) : mysql_num_rows($special)) == 0) { // not in db
               if ($v_specials_price == '0') { // delete requested, but is not a special

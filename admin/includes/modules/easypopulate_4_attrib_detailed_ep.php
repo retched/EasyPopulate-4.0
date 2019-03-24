@@ -58,6 +58,7 @@
 					options_id = :options_id: AND 
 					options_values_id = :options_values_id:)";
 
+          $sql = $db->bindVars($sql, ':options_values_price:', $items[$filelayout['v_options_values_price']], 'currency');
           $sql = $db->bindVars($sql, ':price_prefix:', $items[$filelayout['v_price_prefix']], 'string');
           $sql = $db->bindVars($sql, ':products_options_sort_order:', $items[$filelayout['v_products_options_sort_order']], 'integer');
           $sql = $db->bindVars($sql, ':product_attribute_is_free:', $items[$filelayout['v_product_attribute_is_free']], 'integer');

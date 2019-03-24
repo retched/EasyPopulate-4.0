@@ -186,9 +186,9 @@ if ($ep_dltype <> 'SBA_basic') { // mc12345678 - SBA Basic add on.
 }
 
 // these variables are for the Attrib_Basic Export
-$active_products_id = ""; // start empty
-$active_options_id = ""; // start empty
-$active_language_id = ""; // start empty
+$active_products_id = 0; // start empty
+$active_options_id = 0; // start empty
+$active_language_id = 0; // start empty
 $active_row = array(); // empty array
 $last_products_id = "";
 $print1 = 0;
@@ -199,20 +199,20 @@ $zco_notifier->notify('EP4_EXPORT_WHILE_START');
 while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
 
   if ($ep_dltype == 'attrib_basic') { // special case 'attrib_basic'
-    if ($row['v_products_id'] == $active_products_id) {
-      if ($row['v_options_id'] == $active_options_id) {
+    if ($row['v_products_id'] == (int)$active_products_id) {
+      if ($row['v_options_id'] == (int)$active_options_id) {
         // collect the products_options_values_name
-        if ($active_language_id <> $row['v_language_id']) {
+        if ($active_language_id <> (int)$row['v_language_id']) {
           $l_id = $row['v_language_id'];
-          $active_row['v_products_options_type'] = $row['v_products_options_type'];
+          $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
           $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
           $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
-          $active_language_id = $row['v_language_id'];
+          $active_language_id = (int)$row['v_language_id'];
         } else {
           $l_id = $row['v_language_id'];
           $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
           $active_row['v_products_options_values_name_' . $l_id] .= "," . $row['v_products_options_values_name'];
-          $active_row['v_products_options_type'] = $row['v_products_options_type'];
+          $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
         }
         continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
       } else { // same product, new attribute - only executes once on new option
@@ -222,12 +222,12 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
         $ep_export_count++;
 
-        $active_options_id = $row['v_options_id'];
-        $active_language_id = $row['v_language_id'];
+        $active_options_id = (int)$row['v_options_id'];
+        $active_language_id = (int)$row['v_language_id'];
         $l_id = $row['v_language_id'];
         $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
         $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
-        $active_row['v_products_options_type'] = $row['v_products_options_type'];
+        $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
         continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
       } // end of options_id check
     } else { // new combo or different product or first time through while-loop
@@ -242,15 +242,15 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       } // end if new model
 
       // get current row of data
-      $active_products_id = $row['v_products_id'];
-      $active_options_id = $row['v_options_id'];
-      $active_language_id = $row['v_language_id'];
+      $active_products_id = (int)$row['v_products_id'];
+      $active_options_id = (int)$row['v_options_id'];
+      $active_language_id = (int)$row['v_language_id'];
 
       $active_row['v_products_model'] = $row['v_products_model'];
       if ($chosen_key != 'v_products_model' && zen_not_null($chosen_key)) {
           $active_row[$chosen_key] = $row[$chosen_key];
       }
-      $active_row['v_products_options_type'] = $row['v_products_options_type'];
+      $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
 
       $l_id = $row['v_language_id'];
       $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
