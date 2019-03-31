@@ -256,8 +256,12 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             p.products_model   = :products_model:";
             break;
         }*/
-        $sql = $db->bindVars($sql, ':products_model:', $items[$filelayout['v_products_model']], $zc_support_ignore_null);
-        $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_products_id']], 'integer');
+        if (isset($filelayout['v_products_model']) && isset($items[$filelayout['v_products_model']])) {
+          $sql = $db->bindVars($sql, ':products_model:', $items[$filelayout['v_products_model']], $zc_support_ignore_null);
+        }
+        if (isset($filelayout['v_products_id']) && isset($items[$filelayout['v_products_id']])) {
+          $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_products_id']], 'integer');
+        }
         $result = ep_4_query($sql);
         unset($sql);
         $product_is_new = true;
@@ -1284,8 +1288,8 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             unset($oldPost);
           }
 
-          $sql = $db->bindVars($sql, ':products_model:', $v_products_model, $zc_support_ignore_null);
-          $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
+          $sql = $db->bindVars($sql, ':products_model:', (!empty($v_products_model) ? $v_products_model : ''), $zc_support_ignore_null);
+          $sql = $db->bindVars($sql, ':products_id:', (!empty($v_products_id) ? $v_products_id : 0), 'integer');
           $result = ep_4_query($sql);
           unset($sql);
           if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) { // new item, insert into products
@@ -1386,18 +1390,18 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             $query = $db->bindVars($query, ':products_model:', $v_products_model , $zc_support_ignore_null);
             $query = $db->bindVars($query, ':products_type:', $v_products_type , 'integer');
             $query = $db->bindVars($query, ':products_price:', $v_products_price , 'currency');
-            $query = $db->bindVars($query, ':products_price_uom:', $v_products_price_uom , 'currency');
+            $query = $db->bindVars($query, ':products_price_uom:', (isset($v_products_price_uom) ? $v_products_price_uom : '0.00') , 'currency');
             $query = $db->bindVars($query, ':products_id:', $v_products_id, 'integer');
-            $query = $db->bindVars($query, ':products_upc:', $v_products_upc, $zc_support_ignore_null);
-            $query = $db->bindVars($query, ':products_gpc:', $v_products_gpc, $zc_support_ignore_null);
-            $query = $db->bindVars($query, ':products_msrp:', $v_products_msrp, 'currency');
-            $query = $db->bindVars($query, ':map_enabled:', $v_map_enabled, $zc_support_ignore_null);
-            $query = $db->bindVars($query, ':map_price:', $v_map_price, 'currency');
-            $query = $db->bindVars($query, ':products_group_a_price:', $v_products_group_a_price, 'currency');
-            $query = $db->bindVars($query, ':products_group_b_price:', $v_products_group_b_price, 'currency');
-            $query = $db->bindVars($query, ':products_group_c_price:', $v_products_group_c_price, 'currency');
-            $query = $db->bindVars($query, ':products_group_d_price:', $v_products_group_d_price, 'currency');
-            $query = $db->bindVars($query, ':products_exclusive:', $v_products_exclusive, $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':products_upc:', (isset($v_products_upc) ? $v_products_upc : ''), $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':products_gpc:', (isset($v_products_gpc) ? $v_products_gpc : ''), $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':products_msrp:', (isset($v_products_msrp) ? $v_products_msrp : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':map_enabled:', (isset($v_map_enabled) ? $v_map_enabled : ''), $zc_support_ignore_null);
+            $query = $db->bindVars($query, ':map_price:', (isset($v_map_price) ? $v_map_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_group_a_price:', (isset($v_products_group_a_price) ? $v_products_group_a_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_group_b_price:', (isset($v_products_group_b_price) ? $v_products_group_b_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_group_c_price:', (isset($v_products_group_c_price) ? $v_products_group_c_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_group_d_price:', (isset($v_products_group_d_price) ? $v_products_group_d_price : '0.00'), 'currency');
+            $query = $db->bindVars($query, ':products_exclusive:', (isset($v_products_exclusive) ? $v_products_exclusive : ''), $zc_support_ignore_null);
             $query = $db->bindVars($query, ':products_image:', $v_products_image, $zc_support_ignore_null);
             $query = $db->bindVars($query, ':products_weight:', $v_products_weight, 'float');
             $query = $db->bindVars($query, ':products_discount_type:', $v_products_discount_type, 'integer');
@@ -2276,7 +2280,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
           // this record is missing the product_model
           $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_NO_MODEL, $chosen_key);
           foreach ($items as $col => $summary) {
-            if ($col == $filelayout[$chosen_key]){
+            if (isset($filelayout[$chosen_key]) && $col == $filelayout[$chosen_key]){
               continue;
             }
             $display_output .= print_el_4($summary);
