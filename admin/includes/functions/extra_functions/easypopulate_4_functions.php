@@ -543,7 +543,7 @@ function ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter = "^") {
 //    $thetext = $active_row[$key];
     // remove carriage returns, newlines, and tabs - needs review
     $thetext = '';
-    if (array_key_exists($key, $active_row)) {
+    if (isset($active_row[$key]) || array_key_exists($key, $active_row)) {
       $thetext = str_replace($problem_chars, ' ', $active_row[$key]);
     }
     // encapsulate data in quotes, and escape embedded quotes in data
