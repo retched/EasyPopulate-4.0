@@ -965,7 +965,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                     $oldPost = $_POST;
                     unset($_POST);
                   }
-                  $_POST['categories_name'] = $categories_names_array['id'][$cat_lang_id][$category_index];
+                  $_POST['categories_name'][$cat_lang_id] = $categories_names_array['id'][$cat_lang_id][$category_index];
 
                   if (class_exists('AdminRequestSanitizer')) {
                     $sanitizer = AdminRequestSanitizer::getInstance();
@@ -973,7 +973,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                     unset($sanitizer);
                   }
 
-                  $categories_names_array['id'][$cat_lang_id][$category_index] = $_POST['categories_name'];
+                  $categories_names_array['id'][$cat_lang_id][$category_index] = $_POST['categories_name'][$cat_lang_id];
                   unset($_POST);
                   if (!empty($oldPost)) {
                     $_POST = $oldPost;
