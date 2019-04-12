@@ -84,7 +84,7 @@ class EP4CeonURIMappingAdminEZPagePages extends CeonURIMappingAdminEZPages
 	 * 
 	 * @access  public
 	 */
-	function EP4CeonURIMappingAdminEZPagePages()
+	function __construct() // EP4CeonURIMappingAdminEZPagePages
 	{
 		// Load the language definition file for the current language
 		@include_once(DIR_WS_LANGUAGES . $_SESSION['language'] . '/' . 'ceon_uri_mapping_ezpage_pages.php');
@@ -94,7 +94,7 @@ class EP4CeonURIMappingAdminEZPagePages extends CeonURIMappingAdminEZPages
 			@include_once(DIR_WS_LANGUAGES . 'english/' . 'ceon_uri_mapping_ezpage_pages.php');
 		}
 		
-		parent::CeonURIMappingAdminEZPages();
+		parent::__construct();
 	}
 	
 	// }}}

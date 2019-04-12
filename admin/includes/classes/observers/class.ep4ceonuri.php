@@ -8,6 +8,8 @@
 class ep4ceonuri extends base {
 
 //  private $_product = array();
+private $curver; // Current Version of the software.
+
 private $ep4CEONURIDoesExist;
 
   function __construct() { // ep4ceonuri if this class has difficulty loading
@@ -15,6 +17,7 @@ private $ep4CEONURIDoesExist;
     $notifyme = array();
 
     $notifyme[] = 'EP4_START';
+    $notifyme[] = 'EP4_ZC155_AFTER_HEADER';
     $notifyme[] = 'EP4_FILENAMES';
     $notifyme[] = 'EP4_LINK_SELECTION_END';
     $notifyme[] = 'EP4_EXPORT_FILE_ARRAY_START';
@@ -43,10 +46,40 @@ private $ep4CEONURIDoesExist;
   function updateEP4Start(&$callingClass, $notifier, $paramsArray){
     global $curver;
     $curver .= "<br />";
-    $curver .= "w/ CEON URI v1.2";
+    $this->curver = "w/ CEON URI v1.4";
+    $curver .= $this->curver;
     if (ep_4_CEONURIExists() == true) {
       $this->ep4CEONURIDoesExist = true;
       require(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_ceon.php');
+    }
+  }
+
+  // EP4_ZC155_AFTER_HEADER
+  function updateEP4ZC155AfterHeader(&$callingClass, $notifier, $paramsArray) {
+    global $update, $db;
+
+    $db->Execute("INSERT IGNORE INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
+      ('EP4-version', 'TOOLS_EASYPOPULATE_4C_VERSION', '" . $this->curver . "', 'This is the version of EP4 installed.', 6, '70', NULL, now(), NULL, 'zen_cfg_select_option(array(\'" . $this->curver . "\'),')
+      ON DUPLICATE KEY UPDATE configuration_value = '" . $this->curver . "', set_function = 'zen_cfg_select_option(array(\'" . $this->curver . "\'),'");
+
+
+    if (!defined('TOOLS_EASYPOPULATE_4C_VERSION')) { // database does not have key
+      $group_check = $db->Execute("SELECT configuration_group_id FROM " . TABLE_CONFIGURATION_GROUP . " WHERE configuration_group_title = 'Easy Populate 4'");
+
+      // But EP4 is already installed
+      if (!$group_check->EOF && $group_check->RecordCount() > 0 && $group_check->fields['configuration_group_id'] > 0) {
+        $update = true;
+      }
+      unset($group_check);
+    } else {
+      // If EP4 is installed (because of above), database version installed is greater than or equal to the version available on ZC, current database version is not the same as the software version (allows an upgrade or a downgrade, but downgrade won't remove admin settings).
+      if (/*plugin_version_check_for_updates(2069, TOOLS_EASYPOPULATE_4C_VERSION) === FALSE &&*/ $this->curver !== TOOLS_EASYPOPULATE_4C_VERSION) {
+        $update = true;
+      }
+      // If EP4 is installed (because of above), files installed are greater than or equal to the version available on ZC, installed version is behind the version available on ZC.
+/*      if (plugin_version_check_for_updates(2069, $this->curver) === FALSE && plugin_version_check_for_updates(2069, TOOLS_EASYPOPULATE_4C_VERSION) !== FALSE) {
+        $update = true;
+      }*/
     }
   }
 
@@ -390,114 +423,114 @@ private $ep4CEONURIDoesExist;
   function updateEP4ExportFileArrayStart(&$callingClass, $notifier, $paramsArray) { // mc12345678 doesn't work on ZC 1.5.1 and below
     global $ep_dltype, $filelayout_sql, $ep_uses_mysqli, $filelayout, $row;
 // Need to identify the extent of the array to make the SBA_basic table.
-  if ($ep_dltype == 'SBA_basic') {
-    // these variablels are for the Attrib_Basic Export
-    $active_products_id = ""; // start empty
-    $active_options_id = ""; // start empty
-    $active_language_id = ""; // start empty
-    $active_row = array(); // empty array
-    $last_products_id = "";
+    if ($ep_dltype == 'SBA_basic') {
+     // these variablels are for the Attrib_Basic Export
+      $active_products_id = ""; // start empty
+      $active_options_id = ""; // start empty
+      $active_language_id = ""; // start empty
+      $active_row = array(); // empty array
+      $last_products_id = "";
   
-    $result7 = ep_4_query($filelayout_sql);
-    $NumProducts = 0;
-    $Values = 0;
-    $MaxValues = 0;
-    $Options = 0;
-    $MaxOptions = 0;
-    $SBABasicArray = array();
-    $SBABasicArray['NumProducts'] = $NumProducts;
+      $result7 = ep_4_query($filelayout_sql);
+      $NumProducts = 0;
+      $Values = 0;
+      $MaxValues = 0;
+      $Options = 0;
+      $MaxOptions = 0;
+      $SBABasicArray = array();
+      $SBABasicArray['NumProducts'] = $NumProducts;
   
-    while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result7) : mysql_fetch_array($result7))) {
-      if ($row['v_products_id'] == $active_products_id) {
-        if ($row['v_options_id'] == $active_options_id) { //On a given Option but new value.
-          $Values++;
-          if ($Values > $MaxValues) {
-            $MaxValues = $Values;
+      while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result7) : mysql_fetch_array($result7))) {
+        if ($row['v_products_id'] == $active_products_id) {
+          if ($row['v_options_id'] == $active_options_id) { //On a given Option but new value.
+            $Values++;
+            if ($Values > $MaxValues) {
+              $MaxValues = $Values;
+            }
+            //Set Number of Values +1 for current Value of Current Option of a Product (ProdXOpYNumVals)
+            $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals'] ++;
+    //        echo 'Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals' . ' 1<br />';
+            //Set Value Name for current Value of Current Option of a Product (ProdXOpYValZ = Value)
+            $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals']] = $row['v_products_options_values_name'];
+    //        echo 'Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals'] . ' 2<br />';
+            $active_row['v_products_options_name_' /* . $l_id */] = $row['v_products_options_name'];
+            $active_row['v_products_options_values_name_' /* . $l_id */] .= "," . $row['v_products_options_values_name'];
+            $active_row['v_products_options_type'] = $row['v_products_options_type'];
+            continue;
+          } else { // same product, new Option  - only executes once on new option
+            // Clean the texts that could break CSV file formatting
+            $Options++;
+            if ($Options > $MaxOptions) {
+              $MaxOptions = $Options;
+            }
+            $ep_export_count++;
+    
+            //Set NumOptions to 0 for current product (ProdXNumOps)
+            $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] ++;
+    //        echo 'Prod' . $SBABasicArray['NumProducts'] . 'NumOps' . ' 1<br />';
+            //Set Option Name for current Option of a Product (ProdXOpY = Option)
+            $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps']] = $row['v_products_options_name'];
+            //Set Option Type for current Option of a Product (ProdXOpYType = Option Type)
+            $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Type'] = $row['v_products_options_type'];    //Set Value Name for current Value of Current Option of a Product (ProdXOpYValZ = Value)
+            $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals']] = $row['v_products_options_values_name'];
+            $active_options_id = $row['v_options_id'];
+    //        $active_language_id = $row['v_language_id'];
+    //        $l_id = $row['v_language_id'];
+            $active_row['v_products_options_name_' /* . $l_id */] = $row['v_products_options_name'];
+            $active_row['v_products_options_values_name_' /* . $l_id */] = $row['v_products_options_values_name'];
+            $active_row['v_products_options_type'] = $row['v_products_options_type'];
+            continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
           }
-          //Set Number of Values +1 for current Value of Current Option of a Product (ProdXOpYNumVals)
-          $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals'] ++;
-  //        echo 'Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals' . ' 1<br />';
-          //Set Value Name for current Value of Current Option of a Product (ProdXOpYValZ = Value)
-          $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals']] = $row['v_products_options_values_name'];
-  //        echo 'Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals'] . ' 2<br />';
-          $active_row['v_products_options_name_' /* . $l_id */] = $row['v_products_options_name'];
-          $active_row['v_products_options_values_name_' /* . $l_id */] .= "," . $row['v_products_options_values_name'];
-          $active_row['v_products_options_type'] = $row['v_products_options_type'];
-          continue;
-        } else { // same product, new Option  - only executes once on new option
-          // Clean the texts that could break CSV file formatting
-          $Options++;
-          if ($Options > $MaxOptions) {
-            $MaxOptions = $Options;
+        } else { // new combo or different product or first time through while-loop
+          if ($active_row['v_products_model'] <> $last_products_id) {
+            if ($ep_export_count > 0) {
+              $SBABasicArray['NumProducts'] ++;
+              $Products ++;
+            }
+            $ep_export_count++;
+            $last_products_id = $active_row['v_products_model'];
+          } elseif ($active_row['v_products_model'] == "" && $ep_export_count == 0) {
+            $Products ++;
+            $SBABasicArray['NumProducts'] ++;
+            $ep_export_count++;
           }
-          $ep_export_count++;
   
-          //Set NumOptions to 0 for current product (ProdXNumOps)
-          $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] ++;
-  //        echo 'Prod' . $SBABasicArray['NumProducts'] . 'NumOps' . ' 1<br />';
+          //Set NumOptions to 1 for current product (ProdXNumOps)
+          $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] = 1;
+          //Set Product ID to current product ('ProdXName' = products_id)
+          $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'ID'] = $row['v_products_id'];
+          //Set Product Model to current product ('ProdXName' = products_id)
+          $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Model'] = $row['v_products_model'];
+          $Options = 1;
           //Set Option Name for current Option of a Product (ProdXOpY = Option)
           $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps']] = $row['v_products_options_name'];
           //Set Option Type for current Option of a Product (ProdXOpYType = Option Type)
-          $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Type'] = $row['v_products_options_type'];    //Set Value Name for current Value of Current Option of a Product (ProdXOpYValZ = Value)
+          $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Type'] = $row['v_products_options_type'];
+          //Set Number of Values to 1 for current Value of Current Option of a Product (ProdXOpYNumVals)
+          $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals'] = 1;
+          $Values = 1;
+          //Set Value Name for current Value of Current Option of a Product (ProdXOpYValZ = Value)
           $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals']] = $row['v_products_options_values_name'];
+          // get current row of data
+          $active_products_id = $row['v_products_id'];
           $active_options_id = $row['v_options_id'];
-  //        $active_language_id = $row['v_language_id'];
-  //        $l_id = $row['v_language_id'];
+          $active_language_id = $row['v_language_id'];
+    
+          $active_row['v_products_model'] = $row['v_products_model'];
+          $active_row['v_products_options_type'] = $row['v_products_options_type'];
+    
+  //      $l_id = $row['v_language_id'];
           $active_row['v_products_options_name_' /* . $l_id */] = $row['v_products_options_name'];
           $active_row['v_products_options_values_name_' /* . $l_id */] = $row['v_products_options_values_name'];
-          $active_row['v_products_options_type'] = $row['v_products_options_type'];
-          continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
-        }
-      } else { // new combo or different product or first time through while-loop
-        if ($active_row['v_products_model'] <> $last_products_id) {
-          if ($ep_export_count > 0) {
-            $SBABasicArray['NumProducts'] ++;
-            $Products ++;
-          }
-          $ep_export_count++;
-          $last_products_id = $active_row['v_products_model'];
-        } elseif ($active_row['v_products_model'] == "" && $ep_export_count == 0) {
-          $Products ++;
-          $SBABasicArray['NumProducts'] ++;
-          $ep_export_count++;
-        }
-
-        //Set NumOptions to 1 for current product (ProdXNumOps)
-        $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] = 1;
-        //Set Product ID to current product ('ProdXName' = products_id)
-        $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'ID'] = $row['v_products_id'];
-        //Set Product Model to current product ('ProdXName' = products_id)
-        $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Model'] = $row['v_products_model'];
-        $Options = 1;
-        //Set Option Name for current Option of a Product (ProdXOpY = Option)
-        $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps']] = $row['v_products_options_name'];
-        //Set Option Type for current Option of a Product (ProdXOpYType = Option Type)
-        $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Type'] = $row['v_products_options_type'];
-        //Set Number of Values to 1 for current Value of Current Option of a Product (ProdXOpYNumVals)
-        $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals'] = 1;
-        $Values = 1;
-        //Set Value Name for current Value of Current Option of a Product (ProdXOpYValZ = Value)
-        $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'Val' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'Op' . $SBABasicArray['Prod' . $SBABasicArray['NumProducts'] . 'NumOps'] . 'NumVals']] = $row['v_products_options_values_name'];
-        // get current row of data
-        $active_products_id = $row['v_products_id'];
-        $active_options_id = $row['v_options_id'];
-        $active_language_id = $row['v_language_id'];
-  
-        $active_row['v_products_model'] = $row['v_products_model'];
-        $active_row['v_products_options_type'] = $row['v_products_options_type'];
-  
-//      $l_id = $row['v_language_id'];
-        $active_row['v_products_options_name_' /* . $l_id */] = $row['v_products_options_name'];
-        $active_row['v_products_options_values_name_' /* . $l_id */] = $row['v_products_options_values_name'];
-      } // end of special case 'attrib_basic'
+        } // end of special case 'attrib_basic'
+      }
+      //Add the applicable headers to the file layout
+      for ($i = 1; $i <= $MaxOptions; $i++) {
+        $filelayout[] = 'v_products_options_type_' . $i; // 0-drop down, 1=text , 2=radio , 3=checkbox, 4=file, 5=read only 
+        $filelayout[] = 'v_products_options_name_' . $i; // (Actually want to add these in as the highest order of the options is identified and then also the values
+        $filelayout[] = 'v_products_options_values_name_' . $i;
+      }
     }
-    //Add the applicable headers to the file layout
-    for ($i = 1; $i <= $MaxOptions; $i++) {
-      $filelayout[] = 'v_products_options_type_' . $i; // 0-drop down, 1=text , 2=radio , 3=checkbox, 4=file, 5=read only 
-      $filelayout[] = 'v_products_options_name_' . $i; // (Actually want to add these in as the highest order of the options is identified and then also the values
-      $filelayout[] = 'v_products_options_values_name_' . $i;
-    }
-  }
   }
 
   // 'EP4_EXPORT_CASE_EXPORT_FILE_END'
@@ -552,8 +585,8 @@ private $ep4CEONURIDoesExist;
 
     //Start of CEON URI Addon - mc12345678
     if ($this->ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_FROM_BLANK == '0' && EP4_AUTORECREATE_EXISTING == '0')) {
-    foreach ($langcode as $key => $lang) {
-      $lid = $lang['id'];
+      foreach ($langcode as $key => $lang) {
+        $lid = $lang['id'];
         $ceon_uri_mapping_admin = new EP4CeonURIMappingAdminProductPages();
 
         //$prev_uri_mappings should = $uri_mappings, because previous mappings appears to be used to undo the new $uri_mappings.  These two values would be gathered from above.  $uri_mapping_autogen is used to automatically create a new mapping and is likely to be associated with an admin Constant.  Ideally, if the fields are present then if there is a value in the field will not auto create, if there is null then would want to autocreate.  If the fields are not present, then probably want a flag that says to autocreate the path assuming that it does not already exist.  $pID is the product id which should be gathered from above. "All" mappings need to be posted, ie, if there is more than one language, and only one mapping is passed in then the other mapping should be set to NULL at least eventually if there is nothing already there/rules of import... 
@@ -565,6 +598,7 @@ private $ep4CEONURIDoesExist;
           $ceon_uri_mapping_admin->_prev_uri_mappings[$lid2] = $prev_uri_mappings[$lid2];
           $ceon_uri_mapping_admin->_uri_mappings[$lid2] = $uri_mappings[$lid2];
         } //Cycle through Languages
+        unset($key2, $lang2, $lid2);
 
         $pID = $row['v_products_id'];
         $ceon_uri_mapping_admin->collectInfoHandler($prev_uri_mappings, $uri_mappings, NULL, $pID); // Automatically pulls the most recent information from the database regardless of other settings.  This will return data for a product that has already had a uri rewritten.
@@ -603,6 +637,7 @@ private $ep4CEONURIDoesExist;
               $uri_mappings[$lid2] = $prev_uri_mappings[$lid2];
             }
           } //Cycle through Languages
+          unset($key2, $lang2, $lid2);
         }
 
         if (EP4_AUTOCREATE_FROM_BLANK == '1' && (EP4_AUTORECREATE_EXISTING == '0')) {
@@ -613,12 +648,15 @@ private $ep4CEONURIDoesExist;
               $uri_mappings[$lid2] = $prev_uri_mappings[$lid2];
             }
           } //Cycle through Languages
+          unset($key2, $lang2, $lid2);
         }
 
         $sqlselectpt = 'SELECT pt.type_handler FROM ' . TABLE_PRODUCT_TYPES . ' as pt INNER JOIN ' . TABLE_PRODUCTS . ' as p ON pt.type_id = p.products_type WHERE p.products_id = :products_id:;';
         $sqlselectpt = $db->bindVars($sqlselectpt, ':products_id:', $row['v_products_id'], 'integer');
         $resultselectpt = ep_4_query($sqlselectpt);
+        unset($sqlselectpt);
         $rowselectpt = ($ep_uses_mysqli ? mysqli_fetch_array($resultselectpt) : mysql_fetch_array($resultselectpt));
+        unset($resultselectpt);
 //Capture the data for the record before it is updated.  I guess, it could always be captured here, and then overwritten below if so desired.
         // Check to see if mapping is supposed to be autogenerated from previous data.
         //Effective desire: if the option is to autogenerate data, and
@@ -639,8 +677,9 @@ private $ep4CEONURIDoesExist;
         } else {
           $row['v_uri_' . $lid] = $ceon_uri_mapping_admin->_uri_mappings[$lid];
         }
-    } // foreach
-      } // End of CEON Insert for Export mc12345678
+      } // foreach
+      unset($key, $lang, $lid);
+    } // End of CEON Insert for Export mc12345678
     $messageStack->reset();
   }
 
@@ -649,11 +688,11 @@ private $ep4CEONURIDoesExist;
   function updateEP4ExportSpecialsAfter(&$callingClass, $notifier, $paramsArray) {
     global $ep_dltype, $ceon_uri_EZmapping_admin, $langcode, $row, $thecategory_id, $theparent_id, $ep_uses_mysqli;
   // EZ-Pages - mc12345678
-  if ($ep_dltype == 'CEON_EZPages' && !(EP4_AUTOCREATE_EZ_FROM_BLANK == '0' && EP4_AUTORECREATE_EZ_EXISTING == '0')) {
-    if ($this->ep4CEONURIDoesExist == true) {
-      $EZ_prev_uri_mappings = array();
-      $EZ_uri_mappings = array();
-    }
+    if ($ep_dltype == 'CEON_EZPages' && !(EP4_AUTOCREATE_EZ_FROM_BLANK == '0' && EP4_AUTORECREATE_EZ_EXISTING == '0')) {
+      if ($this->ep4CEONURIDoesExist == true) {
+        $EZ_prev_uri_mappings = array();
+        $EZ_uri_mappings = array();
+      }
 
 //    foreach ($langcode as $key2 => $lang2) {
 //      $lid2 = $lang2['id'];
@@ -664,42 +703,44 @@ private $ep4CEONURIDoesExist;
 //      $products_name[$lid2] = $row['v_products_name_' . $lid2];
 //    } // End modification for CEON URI Rewriter mc12345678
 
-    if ($this->ep4CEONURIDoesExist == true) {
-      $ceon_uri_EZmapping_admin = new EP4CeonURIMappingAdminEZPagePages();
+      if ($this->ep4CEONURIDoesExist == true) {
+        $ceon_uri_EZmapping_admin = new EP4CeonURIMappingAdminEZPagePages();
 
-      foreach ($langcode as $key2 => $lang2) {
-        $lid2 = $lang2['id'];
-        $EZ_prev_uri_mappings[$lid2] = NULL;
-        $EZ_uri_mappings[$lid2] = NULL;
-        $ceon_uri_EZmapping_admin->_prev_uri_mappings[$lid2] = $EZ_prev_uri_mappings[$lid2];
-        $ceon_uri_EZmapping_admin->_uri_mappings[$lid2] = $EZ_uri_mappings[$lid2];
-      } //Cycle through Languages
+        foreach ($langcode as $key2 => $lang2) {
+          $lid2 = $lang2['id'];
+          $EZ_prev_uri_mappings[$lid2] = NULL;
+          $EZ_uri_mappings[$lid2] = NULL;
+          $ceon_uri_EZmapping_admin->_prev_uri_mappings[$lid2] = $EZ_prev_uri_mappings[$lid2];
+          $ceon_uri_EZmapping_admin->_uri_mappings[$lid2] = $EZ_uri_mappings[$lid2];
+        } //Cycle through Languages
+        unset($key2, $lang2, $lid2);
 
-      $ezID = $row['v_pages_id'];
+        $ezID = $row['v_pages_id'];
 
-      $EZ_uri_mappings = $ceon_uri_EZmapping_admin->configureEnvironment($ezID, $EZ_prev_uri_mappings, $EZ_uri_mappings); // Populates past
+        $EZ_uri_mappings = $ceon_uri_EZmapping_admin->configureEnvironment($ezID, $EZ_prev_uri_mappings, $EZ_uri_mappings); // Populates past
 //        $EZ_prev_uri_mappings = $ceon_uri_EZmapping_admin->$_prev_uri_mappings;
 //        $EZ_uri_mappings = $ceon_uri_EZmapping_admin->$_uri_mappings;
-      $EZ_prev_uri_mappings = $EZ_uri_mappings;
+        $EZ_prev_uri_mappings = $EZ_uri_mappings;
 
-      $page_title = $row['v_pages_title'];
+        $page_title = $row['v_pages_title'];
 
-      /* $page_titles_array; // Need to populate this/identify how to... */
-      $page_titles_array = NULL;
+        /* $page_titles_array; // Need to populate this/identify how to... */
+        $page_titles_array = NULL;
 
-      $EZ_uri_mappings = $ceon_uri_EZmapping_admin->insertUpdateHandler($ezID, $page_title, $EZ_prev_uri_mappings, $EZ_uri_mappings, $page_titles_array);
+        $EZ_uri_mappings = $ceon_uri_EZmapping_admin->insertUpdateHandler($ezID, $page_title, $EZ_prev_uri_mappings, $EZ_uri_mappings, $page_titles_array);
 
 
-      if (true /* Write to file */) {
-        foreach ($langcode as $key2 => $lang2) {
-          $row['v_uri_' . $lang2['id']] = $EZ_uri_mappings[$lang2['id']];
+        if (true /* Write to file */) {
+          foreach ($langcode as $key2 => $lang2) {
+            $row['v_uri_' . $lang2['id']] = $EZ_uri_mappings[$lang2['id']];
+          }
+          unset($key2, $lang2);
+          $row['v_main_page'] = FILENAME_EZPAGES;
+          $row['v_associated_db'] = $ezID;
+          $row['v_alternate_url'] = (zen_not_null($row['v_alternate_url']) ? $row['v_alt_url'] : $row['v_alt_url_external']);
+          $row['v_redirection_type_code'] = $row['v_redirection_type_code'];
+          $row['v_date_added'] = $row['v_date_added'];
         }
-        $row['v_main_page'] = FILENAME_EZPAGES;
-        $row['v_associated_db'] = $ezID;
-        $row['v_alternate_url'] = (zen_not_null($row['v_alternate_url']) ? $row['v_alt_url'] : $row['v_alt_url_external']);
-        $row['v_redirection_type_code'] = $row['v_redirection_type_code'];
-        $row['v_date_added'] = $row['v_date_added'];
-      }
 
 
       /* if (!(EP4_EXPORT_ONLY) && $uri_mapping_autogen && ($returned != $ceon_uri_EZmapping_admin->_prev_uri_mappings)) {
@@ -710,46 +751,53 @@ private $ep4CEONURIDoesExist;
         $row['v_associated_db_id'] = $ezID;
         $row['v_date_added'] = $row['v_date_added'];
         //        $row['v_products_model'] = $row['v_products_model']; */
-    } // End of CEON Insert for Export mc12345678
-  } //End EZ-Pages - mc12345678
+      } // End of CEON Insert for Export mc12345678
+    } //End EZ-Pages - mc12345678
 
-  if ($ep_dltype == 'categorymeta') {
-    // names and descriptions require that we loop thru all languages that are turned on in the store
-    if ($this->ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && EP4_AUTORECREATE_CAT_EXISTING == '0')) {
-      $thecategory_id = $row['v_categories_id']; // starting category_id
-      $ceon_uri_cat_mapping = new EP4CeonURIMappingAdminCategoryPages();
-      foreach ($langcode as $key2 => $lang2) {
-        $categories_name[$lang2['id']] = '';
-        $cat_prev_uri_mappings[$lang2['id']] = NULL;
-        $cat_uri_mappings[$lang2['id']] = NULL;
-      }
-
-      $cat_uri_mappings = $ceon_uri_cat_mapping->addURIMappingFieldsToEditCategoryFieldsArray ($thecategory_id);
-      $cat_prev_uri_mappings = $cat_uri_mappings;
-
-      $sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = ' . $thecategory_id . ' ORDER BY language_id';
-      $result2 = ep_4_query($sql2);
-      while ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2))) {
-        $categories_name[$row2['language_id']] = $row2['categories_name'];
-      } //while
-      $sql3 = 'SELECT parent_id FROM ' . TABLE_CATEGORIES . ' WHERE categories_id = ' . $thecategory_id;
-      $result3 = ep_4_query($sql3);
-      $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
-      $theparent_id = $row3['parent_id'];
-
-
-      $cat_uri_mappings = $ceon_uri_cat_mapping->insertUpdateHandler($thecategory_id, $theparent_id, $cat_prev_uri_mappings, $cat_uri_mappings, $categories_name, true);
-
-      if (true /*Write to file*/) {
+    if ($ep_dltype == 'categorymeta') {
+      // names and descriptions require that we loop thru all languages that are turned on in the store
+      if ($this->ep4CEONURIDoesExist == true && !(EP4_AUTOCREATE_CAT_FROM_BLANK == '0' && EP4_AUTORECREATE_CAT_EXISTING == '0')) {
+        $thecategory_id = $row['v_categories_id']; // starting category_id
+        $ceon_uri_cat_mapping = new EP4CeonURIMappingAdminCategoryPages();
         foreach ($langcode as $key2 => $lang2) {
-          $row['v_uri_' . $lang2['id']] = $cat_uri_mappings[$lang2['id']];
+          $categories_name[$lang2['id']] = '';
+          $cat_prev_uri_mappings[$lang2['id']] = NULL;
+          $cat_uri_mappings[$lang2['id']] = NULL;
         }
-        $row['v_main_page'] = FILENAME_DEFAULT;
-        $row['v_associated_db'] = NULL;
-        $row['v_master_categories_id'] = $theparent_id;
-      }
+        unset($key2, $lang2);
 
-    }
+        $cat_uri_mappings = $ceon_uri_cat_mapping->addURIMappingFieldsToEditCategoryFieldsArray ($thecategory_id);
+        $cat_prev_uri_mappings = $cat_uri_mappings;
+
+        $sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = ' . $thecategory_id . ' ORDER BY language_id';
+        $result2 = ep_4_query($sql2);
+        unset($sql2);
+        while ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2))) {
+          $categories_name[$row2['language_id']] = $row2['categories_name'];
+        } //while
+        unset($row2);
+        $sql3 = 'SELECT parent_id FROM ' . TABLE_CATEGORIES . ' WHERE categories_id = ' . $thecategory_id;
+        $result3 = ep_4_query($sql3);
+        unset($sql3);
+        $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
+        unset($result3);
+        $theparent_id = $row3['parent_id'];
+        unset($row3);
+
+
+        $cat_uri_mappings = $ceon_uri_cat_mapping->insertUpdateHandler($thecategory_id, $theparent_id, $cat_prev_uri_mappings, $cat_uri_mappings, $categories_name, true);
+
+        if (true /*Write to file*/) {
+          foreach ($langcode as $key2 => $lang2) {
+            $row['v_uri_' . $lang2['id']] = $cat_uri_mappings[$lang2['id']];
+          }
+          unset($key2, $lang2);
+          $row['v_main_page'] = FILENAME_DEFAULT;
+          $row['v_associated_db'] = NULL;
+          $row['v_master_categories_id'] = $theparent_id;
+        }
+
+      }
 
     }
   }
@@ -765,19 +813,25 @@ private $ep4CEONURIDoesExist;
         $cat_prev_uri_mappings[$lang2['id']] = NULL;
         $cat_uri_mappings[$lang2['id']] = NULL;
       }
+      unset($key2, $lang2);
 
       $cat_uri_mappings = $ceon_uri_cat_mapping->addURIMappingFieldsToEditCategoryFieldsArray($thecategory_id);
       $cat_prev_uri_mappings = $cat_uri_mappings;
 
       $sql2 = 'SELECT * FROM ' . TABLE_CATEGORIES_DESCRIPTION . ' WHERE categories_id = ' . $thecategory_id . ' ORDER BY language_id';
       $result2 = ep_4_query($sql2);
+      unset($sql2);
       while ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2))) {
         $categories_name[$row2['language_id']] = $row2['categories_name'];
       } //while
+      unset($result2);
       $sql3 = 'SELECT parent_id FROM ' . TABLE_CATEGORIES . ' WHERE categories_id = ' . $thecategory_id;
       $result3 = ep_4_query($sql3);
+      unset($sql3);
       $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
+      unset($result3);
       $theparent_id = $row3['parent_id'];
+      unset($row3);
 
 
       $cat_uri_mappings = $ceon_uri_cat_mapping->insertUpdateHandler($thecategory_id, $theparent_id, $cat_prev_uri_mappings, $cat_uri_mappings, $categories_name, true);
@@ -786,6 +840,7 @@ private $ep4CEONURIDoesExist;
         foreach ($langcode as $key2 => $lang2) {
           $row['v_uri_' . $lang2['id']] = $cat_uri_mappings[$lang2['id']];
         }
+        unset($key2, $lang2);
         $row['v_main_page'] = FILENAME_DEFAULT;
         $row['v_associated_db'] = NULL;
         $row['v_master_categories_id'] = $theparent_id;

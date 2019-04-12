@@ -55,7 +55,7 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 	 * 
 	 * @access  public
 	 */
-	function EP4CeonURIMappingAdminCategoryPages()
+	function __construct() // EP4CeonURIMappingAdminCategoryPages
 	{
 		// Load the language definition file for the current language
 		@include_once(DIR_WS_LANGUAGES . $_SESSION['language'] . '/' . 'ceon_uri_mapping_category_pages.php');
@@ -65,7 +65,7 @@ class EP4CeonURIMappingAdminCategoryPages extends CeonURIMappingAdminCategories
 			@include_once(DIR_WS_LANGUAGES . 'english/' . 'ceon_uri_mapping_category_pages.php');
 		}
 		
-		parent::CeonURIMappingAdminCategories();
+		parent::__construct();
 	}
 	
 	// }}}

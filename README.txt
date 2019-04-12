@@ -7,7 +7,7 @@ I recommend that you first enter a couple Categories and Products through the no
 
 Things of Importance:
 
-1) EP4 works only with CSV data files, and for best cross platform compatibility please use OpenOffice to Export your CSV file.
+1) EP4 works only with CSV data files, and for best cross platform compatibility please use OpenOffice to Export/save your CSV file.
 You should select the Comma as your field delimiter, and the Double Quote as your text delimiter. You may not get proper results using Excel.
 
 2) You MUST use products_models to distinguish your products for import. Any record with a blank v_products_model entry will be skipped.
