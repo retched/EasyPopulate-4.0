@@ -307,11 +307,11 @@ $max_len = array(
 $project = PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR;
 
 if ($ep_uses_mysqli) {
-  $collation = mysqli_character_set_name($db->link); // should be either latin1 or utf8
+  $collation = mysqli_character_set_name($db->link); // should be either latin1, utf8 or utf8mb4
 } else {
-  $collation = mysql_client_encoding(); // should be either latin1 or utf8
+  $collation = mysql_client_encoding(); // should be either latin1, utf8, or utf8mb4
 }
-if ($collation == 'utf8') {
+if (substr($collation, 0, 4) == 'utf8') {
   if (function_exists('mb_internal_encoding')) {
     mb_internal_encoding("UTF-8");
   }
