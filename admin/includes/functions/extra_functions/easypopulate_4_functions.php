@@ -1006,3 +1006,24 @@ function register_globals_vars_check_4 () {
   global $HTTP_POST_FILES;
   print "HTTP_POST_FILES: "; print_r($HTTP_POST_FILES); echo '<br />';
 }
+
+// Added function to evaluate the presence of a field in the $filelayout variable
+//   where $filelayout is intended to identify the fields in the file.
+function ep4_field_in_file($field_name) {
+  if (is_null($field_name)) {
+    return false;
+  }
+  
+  if ( (isset($GLOBALS['filelayout'][$field_name])
+         || array_key_exists($field_name, $GLOBALS['filelayout'])
+       )
+     &&
+       (isset($GLOBALS['items'][$GLOBALS['filelayout'][$field_name]])
+         || array_key_exists($GLOBALS['filelayout'][$field_name], $GLOBALS['items'])
+       )
+     ) {
+      return true;
+  }
+  
+  return false;
+}
