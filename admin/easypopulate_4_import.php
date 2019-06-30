@@ -1840,28 +1840,28 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   unset($_POST);
                 }
 
-                if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
+                if (isset($v_products_name[$lang_id]) || (!empty($v_products_name) && (array_key_exists($lang_id, $v_products_name)))) {
                   $_POST['products_name'][$lang_id] = $v_products_name[$lang_id];
                 }
-                if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
+                if (isset($v_products_name[$lang_id_code]) || (!empty($v_products_name) && (array_key_exists($lang_id_code, $v_products_name)))) {
                   $_POST['products_name'][$lang_id_code] = $v_products_name[$lang_id_code];
                 }
-                if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
+                if (isset($v_products_description[$lang_id]) || (!empty($v_products_description) && (array_key_exists($lang_id, $v_products_description)))) {
                   $_POST['products_description'][$lang_id] = $v_products_description[$lang_id];
                 }
-                if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
+                if (isset($v_products_description[$lang_id_code]) || (!empty($v_products_description) && (array_key_exists($lang_id_code, $v_products_description)))) {
                   $_POST['products_description'][$lang_id_code] = $v_products_description[$lang_id_code];
                 }
-                if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
+                if (isset($v_products_short_desc[$lang_id]) || (!empty($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
                   $_POST['products_short_description'][$lang_id] = $v_products_short_desc[$lang_id];
                 }
-                if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
+                if (isset($v_products_short_desc[$lang_id_code]) || (!empty($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
                   $_POST['products_short_description'][$lang_id_code] = $v_products_short_desc[$lang_id_code];
                 }
-                if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
+                if (isset($v_products_url[$lang_id]) || (!empty($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
                   $_POST['products_url'][$lang_id] = $v_products_url[$lang_id];
                 }
-                if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
+                if (isset($v_products_url[$lang_id_code]) || (!empty($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
                   $_POST['products_url'][$lang_id_code] = $v_products_url[$lang_id_code];
                 }
 
@@ -1871,53 +1871,50 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   unset($sanitizer);
                 }
 
-                if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
+                if (isset($v_products_name[$lang_id]) || (!empty($v_products_name) && array_key_exists($lang_id, $v_products_name))) {
                   $v_products_name_store = $v_products_name[$lang_id] = $_POST['products_name'][$lang_id];
                 }
-                if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
+                if (isset($v_products_name[$lang_id_code]) || (!empty($v_products_name) && array_key_exists($lang_id_code, $v_products_name))) {
                   $v_products_name_store = $v_products_name[$lang_id_code] = $_POST['products_name'][$lang_id_code];
+                  // Prioritize that if the $lang_id is also present for this language that this content rules/overrides.
                 }
 
-                if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
+                // Ensure that $lang_id version of variable is populated for other uses.
+                if (!ep4_field_in_file('v_products_name_' . $lang_id) && ep4_field_in_file('v_products_name_' . $lang_id_code)) {
+                  $v_products_name[$lang_id] = $v_products_name[$lang_id_code];
+                }
+
+                if (isset($v_products_description[$lang_id]) || (!empty($v_products_description) && array_key_exists($lang_id, $v_products_description))) {
                   $v_products_desc_store = $v_products_description[$lang_id] = $_POST['products_description'][$lang_id];
                 }
-                if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
+                if (isset($v_products_description[$lang_id_code]) || (!empty($v_products_description) && array_key_exists($lang_id_code, $v_products_description))) {
                   $v_products_desc_store = $v_products_description[$lang_id_code] = $_POST['products_description'][$lang_id_code];
-                  if (empty($v_products_description[$lang_id])) {
-                    $v_products_description[$lang_id] = $v_products_description[$lang_id_code];
-                  }
                 }
 
-                if (empty($v_products_description[$lang_id_code]) && !empty($v_products_description[$lang_id])) {
-                  $v_products_description[$lang_id_code] = $v_products_description[$lang_id];
+                if (!ep4_field_in_file('v_products_description_' . $lang_id) && ep4_field_in_file('v_products_description_' . $lang_id_code)) {
+                  $v_products_description[$lang_id] = $v_products_description[$lang_id_code];
                 }
 
-                if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
+                if (isset($v_products_short_desc[$lang_id]) || (!empty($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
                   $v_products_short_desc_store = $v_products_short_desc[$lang_id] = $_POST['products_short_description'][$lang_id];
                 }
-                if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
+                if (isset($v_products_short_desc[$lang_id_code]) || (!empty($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
                   $v_products_short_desc_store = $v_products_short_desc[$lang_id_code] = $_POST['products_short_description'][$lang_id_code];
-                  if (empty($v_products_short_desc[$lang_id])) {
-                    $v_products_short_desc[$lang_id] = $v_products_short_desc[$lang_id_code];
-                  }
                 }
 
-                if (empty($v_products_short_desc[$lang_id_code]) && !empty($v_products_short_desc[$lang_id])) {
-                  $v_products_short_desc[$lang_id_code] = $v_products_short_desc[$lang_id];
+                if (!ep4_field_in_file('v_products_short_desc_' . $lang_id) && ep4_field_in_file('v_products_short_desc_' . $lang_id_code)) {
+                  $v_products_short_desc[$lang_id] = $v_products_short_desc[$lang_id_code];
                 }
 
-                if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
+                if (isset($v_products_url[$lang_id]) || (!empty($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
                   $v_products_url_store = $v_products_url[$lang_id] = $_POST['products_url'][$lang_id];
                 }
-                if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
+                if (isset($v_products_url[$lang_id_code]) || (!empty($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
                   $v_products_url_store = $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
-                  if (empty($v_products_url[$lang_id])) {
-                    $v_products_url[$lang_id] = $v_products_url[$lang_id_code];
-                  }
                 }
 
-                if (empty($v_products_url[$lang_id_code]) && !empty($v_products_url[$lang_id])) {
-                  $v_products_url[$lang_id_code] = $v_products_url[$lang_id];
+                if (!ep4_field_in_file('v_products_url_' . $lang_id) && ep4_field_in_file('v_products_url_' . $lang_id_code)) {
+                  $v_products_url[$lang_id] = $v_products_url[$lang_id_code];
                 }
 
                 unset($_POST);
@@ -1973,29 +1970,31 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   $oldPost = $_POST;
                   unset($_POST);
                 }
+                // POST data needs to be what is going to be stored, further
+                //  it needs to be sanitized before being used.
 
-                if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
+                if (isset($v_products_name[$lang_id]) || (!empty($v_products_name) && (array_key_exists($lang_id, $v_products_name)))) {
                   $_POST['products_name'][$lang_id] = $v_products_name[$lang_id];
                 }
-                if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
+                if (isset($v_products_name[$lang_id_code]) || (!empty($v_products_name) && (array_key_exists($lang_id_code, $v_products_name)))) {
                   $_POST['products_name'][$lang_id_code] = $v_products_name[$lang_id_code];
                 }
-                if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
+                if (isset($v_products_description[$lang_id]) || (!empty($v_products_description) && (array_key_exists($lang_id, $v_products_description)))) {
                   $_POST['products_description'][$lang_id] = $v_products_description[$lang_id];
                 }
-                if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
+                if (isset($v_products_description[$lang_id_code]) || (!empty($v_products_description) && (array_key_exists($lang_id_code, $v_products_description)))) {
                   $_POST['products_description'][$lang_id_code] = $v_products_description[$lang_id_code];
                 }
-                if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
+                if (isset($v_products_short_desc[$lang_id]) || (!empty($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
                   $_POST['products_short_description'][$lang_id] = $v_products_short_desc[$lang_id];
                 }
-                if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
+                if (isset($v_products_short_desc[$lang_id_code]) || (!empty($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
                   $_POST['products_short_description'][$lang_id_code] = $v_products_short_desc[$lang_id_code];
                 }
-                if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
+                if (isset($v_products_url[$lang_id]) || (!empty($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
                   $_POST['products_url'][$lang_id] = $v_products_url[$lang_id];
                 }
-                if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
+                if (isset($v_products_url[$lang_id_code]) || (!empty($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
                   $_POST['products_url'][$lang_id_code] = $v_products_url[$lang_id_code];
                 }
 
@@ -2005,60 +2004,51 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   unset($sanitizer);
                 }
 
-                if (isset($v_products_name[$lang_id]) || array_key_exists($lang_id, $v_products_name)) {
+                if (isset($v_products_name[$lang_id]) || (!empty($v_products_name) && array_key_exists($lang_id, $v_products_name))) {
                   $v_products_name_store = $v_products_name[$lang_id] = $_POST['products_name'][$lang_id];
                 }
-                if (isset($v_products_name[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_name)) {
+
+                if (isset($v_products_name[$lang_id_code]) || (!empty($v_products_name) && array_key_exists($lang_id_code, $v_products_name))) {
                   $v_products_name_store = $v_products_name[$lang_id_code] = $_POST['products_name'][$lang_id_code];
-                  if (empty($v_products_name[$lang_id])) {
-                    $v_products_name[$lang_id] = $v_products_name[$lang_id_code];
-                  }
+                  // Prioritize that if the $lang_id is also present for this language that this content rules/overrides.
                 }
                 
-                if (empty($v_products_name[$lang_id_code]) && !empty($v_products_name[$lang_id])) {
-                  $v_products_name[$lang_id_code] = $v_products_name[$lang_id];
+                // Ensure that $lang_id version of variable is populated for other uses.
+                if (!ep4_field_in_file('v_products_name_' . $lang_id) && ep4_field_in_file('v_products_name_' . $lang_id_code)) {
+                  $v_products_name[$lang_id] = $v_products_name[$lang_id_code];
                 }
 
-                if (isset($v_products_description[$lang_id]) || array_key_exists($lang_id, $v_products_description)) {
+                if (isset($v_products_description[$lang_id]) || (!empty($v_products_description) && array_key_exists($lang_id, $v_products_description))) {
                   $v_products_desc_store = $v_products_description[$lang_id] = $_POST['products_description'][$lang_id];
                 }
-                if (isset($v_products_description[$lang_id_code]) || array_key_exists($lang_id_code, $v_products_description)) {
+                if (isset($v_products_description[$lang_id_code]) || (!empty($v_products_description) && array_key_exists($lang_id_code, $v_products_description))) {
                   $v_products_desc_store = $v_products_description[$lang_id_code] = $_POST['products_description'][$lang_id_code];
-                  if (empty($v_products_description[$lang_id])) {
-                    $v_products_description[$lang_id] = $v_products_description[$lang_id_code];
-                  }
                 }
 
-                if (empty($v_products_description[$lang_id_code]) && !empty($v_products_description[$lang_id])) {
-                  $v_products_description[$lang_id_code] = $v_products_description[$lang_id];
+                if (!ep4_field_in_file('v_products_description_' . $lang_id) && ep4_field_in_file('v_products_description_' . $lang_id_code)) {
+                  $v_products_description[$lang_id] = $v_products_description[$lang_id_code];
                 }
 
-                if (isset($v_products_short_desc[$lang_id]) || (isset($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
+                if (isset($v_products_short_desc[$lang_id]) || (!empty($v_products_short_desc) && array_key_exists($lang_id, $v_products_short_desc))) {
                   $v_products_short_desc_store = $v_products_short_desc[$lang_id] = $_POST['products_short_description'][$lang_id];
                 }
-                if (isset($v_products_short_desc[$lang_id_code]) || (isset($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
+                if (isset($v_products_short_desc[$lang_id_code]) || (!empty($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
                   $v_products_short_desc_store = $v_products_short_desc[$lang_id_code] = $_POST['products_short_description'][$lang_id_code];
-                  if (empty($v_products_short_desc[$lang_id])) {
-                    $v_products_short_desc[$lang_id] = $v_products_short_desc[$lang_id_code];
-                  }
                 }
 
-                if (empty($v_products_short_desc[$lang_id_code]) && !empty($v_products_short_desc[$lang_id])) {
-                  $v_products_short_desc[$lang_id_code] = $v_products_short_desc[$lang_id];
+                if (!ep4_field_in_file('v_products_short_desc_' . $lang_id) && ep4_field_in_file('v_products_short_desc_' . $lang_id_code)) {
+                  $v_products_short_desc[$lang_id] = $v_products_short_desc[$lang_id_code];
                 }
 
-                if (isset($v_products_url[$lang_id]) || (isset($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
+                if (isset($v_products_url[$lang_id]) || (!empty($v_products_url) && array_key_exists($lang_id, $v_products_url))) {
                   $v_products_url_store = $v_products_url[$lang_id] = $_POST['products_url'][$lang_id];
                 }
-                if (isset($v_products_url[$lang_id_code]) || (isset($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
+                if (isset($v_products_url[$lang_id_code]) || (!empty($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
                   $v_products_url_store = $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
-                  if (empty($v_products_url[$lang_id])) {
-                    $v_products_url[$lang_id] = $v_products_url[$lang_id_code];
-                  }
                 }
 
-                if (empty($v_products_url[$lang_id_code]) && !empty($v_products_url[$lang_id])) {
-                  $v_products_url[$lang_id_code] = $v_products_url[$lang_id];
+                if (!ep4_field_in_file('v_products_url_' . $lang_id) && ep4_field_in_file('v_products_url_' . $lang_id_code)) {
+                  $v_products_url[$lang_id] = $v_products_url[$lang_id_code];
                 }
 
                 unset($_POST);
