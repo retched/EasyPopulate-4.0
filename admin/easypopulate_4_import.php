@@ -294,7 +294,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 break;
             }*/
 
-            $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DELETED, $items[$filelayout[$chosen_key]]);
+            $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DELETED, $items[$filelayout[$chosen_key]], $chosen_key);
             ep_4_remove_product($items[$filelayout[$chosen_key]]);
 
             $continueNextRow = true;
@@ -394,7 +394,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
 
         if ($items[$filelayout['v_status']] == 9 && zen_not_null($items[$filelayout[$chosen_key]])) {
           // cannot delete product that is not found
-          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DELETE_NOT_FOUND, $items[$filelayout[$chosen_key]]);
+          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DELETE_NOT_FOUND, $items[$filelayout[$chosen_key]], $chosen_key);
           continue;
         }
 
@@ -413,7 +413,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             unset($lang);
             if (!$categories_name_exists) {
               // let's skip this new product without a master category..
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NOT_FOUND, $items[$filelayout[$chosen_key]], ' new');
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NOT_FOUND, $items[$filelayout[$chosen_key]], ' new', $chosen_key);
               $ep_error_count++;
               continue; // error, loop to next record
             }
@@ -427,7 +427,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             if (!zen_not_null($items[$filelayout['v_categories_name_1']]) && isset($filelayout['v_categories_name_1'])) {
             // let's skip this existing product without a master category but has the column heading
             // or should we just update it to result of $row (it's current category..)??
-            $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NOT_FOUND, $items[$filelayout['v_products_model']], '');
+            $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NOT_FOUND, $items[$filelayout['v_products_model']], '', $chosen_key);
             foreach ($items as $col => $summary) {
             if ($col == $filelayout['v_products_model']) continue;
             $display_output .= print_el_4($summary);
@@ -481,7 +481,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             // check products name length and display warning on error, but still process record
             $v_products_name[$l_id] = ep_4_curly_quotes($items[$filelayout['v_products_name_' . $l_id]]);
             if ((function_exists('mb_strlen') && mb_strlen($v_products_name[$l_id]) > $max_len['products_name']) || (!function_exists('mb_strlen') && strlen($v_products_name[$l_id]) > $max_len['products_name'])) {
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG, $v_products_model, $v_products_name[$l_id], $max_len['products_name']);
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG, ${$chosen_key}, $v_products_name[$l_id], $max_len['products_name'], $chosen_key);
               $ep_warning_count++;
             }
           } else { // column doesn't exist in the IMPORT file
@@ -494,7 +494,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             // check products name length and display warning on error, but still process record
             $v_products_name[$l_id_code] = ep_4_curly_quotes($items[$filelayout['v_products_name_' . $l_id_code]]);
             if ((function_exists('mb_strlen') && mb_strlen($v_products_name[$l_id_code]) > $max_len['products_name']) || (!function_exists('mb_strlen') && strlen($v_products_name[$l_id_code]) > $max_len['products_name'])) {
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG, $v_products_model, $v_products_name[$l_id_code], $max_len['products_name']);
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG, ${$chosen_key}, $v_products_name[$l_id_code], $max_len['products_name'], $chosen_key);
               $ep_warning_count++;
             }
           } else { // column doesn't exist in the IMPORT file
@@ -539,7 +539,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             $v_products_url[$l_id] = $items[$filelayout['v_products_url_' . $l_id]];
             // check products url length and display warning on error, but still process record
             if ((function_exists('mb_strlen') && mb_strlen($v_products_url[$l_id]) > $max_len['products_url']) || (!function_exists('mb_strlen') && strlen($v_products_url[$l_id]) > $max_len['products_url'])) {
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_URL_LONG, $v_products_model, $v_products_url[$l_id], $max_len['products_url']);
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_URL_LONG, ${$chosen_key}, $v_products_url[$l_id], $max_len['products_url'], $chosen_key);
               $ep_warning_count++;
             }
           } else { // column doesn't exist in the IMPORT file
@@ -552,7 +552,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             $v_products_url[$l_id_code] = $items[$filelayout['v_products_url_' . $l_id_code]];
             // check products url length and display warning on error, but still process record
             if ((function_exists('mb_strlen') && mb_strlen($v_products_url[$l_id_code]) > $max_len['products_url']) || (!function_exists('mb_strlen') && strlen($v_products_url[$l_id_code]) > $max_len['products_url'])) {
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_URL_LONG, $v_products_model, $v_products_url[$l_id_code], $max_len['products_url']);
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_URL_LONG, ${$chosen_key}, $v_products_url[$l_id_code], $max_len['products_url'], $chosen_key);
               $ep_warning_count++;
             }
           } else { // column doesn't exist in the IMPORT file
@@ -623,7 +623,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
 
         // check size of v_products_model, loop on error
         if ((function_exists('mb_strlen') && mb_strlen($v_products_model) > $max_len['products_model']) || (!function_exists('mb_strlen') && strlen($v_products_model) > $max_len['products_model'])) {
-          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_MODEL_LONG, $v_products_model, $max_len['products_model']);
+          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_MODEL_LONG, ${$chosen_key}, $max_len['products_model'], $chosen_key);
           $ep_error_count++;
           unset($lang);
           continue; // short-circuit on error
@@ -737,7 +737,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             if ($categories_count['id'][$lang['id']] > 0) { // only check $max_len['categories_name'] if $categories_count['id'][$lang['id']] > 0
               for ($category_index = 0; $category_index < $categories_count['id'][$lang['id']]; $category_index++) {
                 if ((function_exists('mb_strlen') && mb_strlen($categories_names_array['id'][$lang['id']][$category_index]) > $max_len['categories_name']) || (!function_exists('mb_strlen') && strlen($categories_names_array['id'][$lang['id']][$category_index]) > $max_len['categories_name'])) {
-                  $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name']);
+                  $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name'], $chosen_key);
                   $ep_error_count++;
                   unset($lang);
                   continue 3; // skip to next record don't attempt further processing of current record.
@@ -747,7 +747,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             if ($categories_count['code'][$lang['code']] > 0) { // only check $max_len['categories_name'] if $categories_count['code'][$lang['id']] > 0
               for ($category_index = 0; $category_index < $categories_count['code'][$lang['code']]; $category_index++) {
                 if ((function_exists('mb_strlen') && mb_strlen($categories_names_array['code'][$lang['code']][$category_index]) > $max_len['categories_name']) || (!function_exists('mb_strlen') && strlen($categories_names_array['code'][$lang['code']][$category_index]) > $max_len['categories_name'])) {
-                  $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array['code'][$lang['code']][$category_index], $max_len['categories_name']);
+                  $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array['code'][$lang['code']][$category_index], $max_len['categories_name'], $chosen_key);
                   $ep_error_count++;
                   unset($lang);
                   continue 3; // skip to next record don't attempt further processing of current record.
@@ -765,7 +765,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
               if (isset(${$v_categories_name_check['id']})) {
                 if (($categories_count_value['id'] != $categories_count['id'][$lang['id']]) && ($categories_count['id'][$lang['id']] != 0)) {
                   //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG,
-                  //$v_products_model, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name']);
+                  //${$chosen_key}, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name'], $chosen_key);
                   $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['id']]];
                   $ep_error_count++;
                   unset($lang);
@@ -782,7 +782,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
               if (isset(${$v_categories_name_check['code']})) {
                 if (($categories_count_value['code'] != $categories_count['code'][$lang['code']]) && ($categories_count['code'][$lang['code']] != 0)) {
                   //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG,
-                  //$v_products_model, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name']);
+                  //${$chosen_key}, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name'], $chosen_key);
                   $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['code']]];
                   $ep_error_count++;
                   unset($lang);
@@ -1432,7 +1432,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
               zen_record_admin_activity('New product ' . (int) $v_products_id . ' added via EP4.', 'info');
 
               if ($ep_feedback == true) {
-                $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT, ${$chosen_key});
+                $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT, ${$chosen_key}, $chosen_key);
               }
               $ep_import_count++;
               // PRODUCT_MUSIC_EXTRA
@@ -1460,7 +1460,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 unset($sql_music_extra);
               }
             } else {
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT_FAIL, ${$chosen_key});
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT_FAIL, ${$chosen_key}, $chosen_key);
               $ep_error_count++;
               continue; // new categories however have been created by now... Adding into product table needs to be 1st action?
             }
@@ -2218,7 +2218,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
           /* Specials - if a null value in specials price, do not add or update. If price = 0, let's delete it */
           if (isset($v_specials_price) && zen_not_null($v_specials_price)) {
             if ($v_specials_price >= $v_products_price) {
-              $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_PRICE_FAIL, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10));
+              $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_PRICE_FAIL, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $chosen_key);
               // available function: zen_set_specials_status($specials_id, $status)
               // could alternatively make status inactive, and still upload..
               continue;
@@ -2236,7 +2236,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
 
             if (($ep_uses_mysqli ? mysqli_num_rows($special) : mysql_num_rows($special)) == 0) { // not in db
               if ($v_specials_price == '0') { // delete requested, but is not a special
-                $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_DELETE_FAIL, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10));
+                $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_DELETE_FAIL, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $chosen_key);
                 continue;
               }
               // insert new into specials
@@ -2263,7 +2263,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
               if ($result) {
                 zen_record_admin_activity('Inserted special ' . (int) $v_products_id . ' via EP4.', 'info');
               }
-              $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_NEW, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price, $v_specials_price);
+              $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_NEW, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price, $v_specials_price, $chosen_key);
             } else { // existing product
               if ($v_specials_price < 0 || (defined('EASYPOPULATE_4_CONFIG_SPECIALS_REMOVE_AT') && EASYPOPULATE_4_CONFIG_SPECIALS_REMOVE_AT == 'zero' && $v_specials_price == '0')) { // delete of existing requested with negative number or option to do so when 0.
                 $db->Execute("DELETE FROM " . TABLE_SPECIALS . " WHERE products_id = " . (int) $v_products_id);
@@ -2288,7 +2288,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 zen_record_admin_activity('Updated special ' . (int) $v_products_id . ' via EP4.', 'info');
               }
               unset($result);
-              $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_UPDATE, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price, $v_specials_price);
+              $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_UPDATE, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price, $v_specials_price, $chosen_key);
             } // we still have our special here
           } // end specials for this product
 
