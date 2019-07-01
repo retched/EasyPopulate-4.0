@@ -9,6 +9,10 @@ if (!defined('EP4_REPLACE_BLANK_IMAGE')) {
   define('EP4_REPLACE_BLANK_IMAGE', 'false'); // Values to be 'true' and 'false' true, if on import the image path evaluates to '' then if true, stores the value of PRODUCTS_IMAGE_NO_IMAGE as the image, otherwise will leave it as blank.;
 }
 
+if (!defined('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE')) {
+  define('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_code');
+}
+
 // BEGIN: Data Import Module
 if (isset($_POST['import']) && $_POST['import'] != '') {
   $time_start = microtime(true); // benchmarking
@@ -405,7 +409,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             $categories_name_exists = false; // assume no column defined
             foreach ($langcode as $lang) {
               // test column headers for each language
-              if (zen_not_null($items[$filelayout['v_categories_name_' . $lang['id']]])) { // import column found
+              if (zen_not_null($items[$filelayout['v_categories_name_' . $lang['id']]]) || zen_not_null($items[$filelayout['v_categories_name_' . $lang['code']]])) { // import column found
                 $categories_name_exists = true;
                 break;
               }
@@ -727,6 +731,10 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             }
 
             if (isset($filelayout['v_categories_name_' . $lang['code']]) && !isset($filelayout['v_categories_name_' . $lang['id']])) {
+              $categories_names_array['id'][$lang['id']] = $categories_names_array['code'][$lang['code']];
+            }
+
+            if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' && isset($filelayout['v_categories_name_' . $lang['code']]) && isset($filelayout['v_categories_name_' . $lang['id']])) {
               $categories_names_array['id'][$lang['id']] = $categories_names_array['code'][$lang['code']];
             }
 
@@ -1875,7 +1883,10 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   $v_products_name_store = $v_products_name[$lang_id] = $_POST['products_name'][$lang_id];
                 }
                 if (isset($v_products_name[$lang_id_code]) || (!empty($v_products_name) && array_key_exists($lang_id_code, $v_products_name))) {
-                  $v_products_name_store = $v_products_name[$lang_id_code] = $_POST['products_name'][$lang_id_code];
+                  $v_products_name[$lang_id_code] = $_POST['products_name'][$lang_id_code];
+                  if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_products_name_' . $lang_id)) {
+                    $v_products_name_store = $v_products_name[$lang_id_code];
+                  }
                   // Prioritize that if the $lang_id is also present for this language that this content rules/overrides.
                 }
 
@@ -1888,7 +1899,10 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   $v_products_desc_store = $v_products_description[$lang_id] = $_POST['products_description'][$lang_id];
                 }
                 if (isset($v_products_description[$lang_id_code]) || (!empty($v_products_description) && array_key_exists($lang_id_code, $v_products_description))) {
-                  $v_products_desc_store = $v_products_description[$lang_id_code] = $_POST['products_description'][$lang_id_code];
+                  $v_products_description[$lang_id_code] = $_POST['products_description'][$lang_id_code];
+                  if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_products_description_' . $lang_id)) {
+                    $v_products_desc_store = $v_products_name[$lang_id_code];
+                  }
                 }
 
                 if (!ep4_field_in_file('v_products_description_' . $lang_id) && ep4_field_in_file('v_products_description_' . $lang_id_code)) {
@@ -1899,7 +1913,10 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   $v_products_short_desc_store = $v_products_short_desc[$lang_id] = $_POST['products_short_description'][$lang_id];
                 }
                 if (isset($v_products_short_desc[$lang_id_code]) || (!empty($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
-                  $v_products_short_desc_store = $v_products_short_desc[$lang_id_code] = $_POST['products_short_description'][$lang_id_code];
+                  $v_products_short_desc[$lang_id_code] = $_POST['products_short_description'][$lang_id_code];
+                  if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_products_short_desc_' . $lang_id)) {
+                    $v_products_short_desc_store = $v_products_short_desc[$lang_id_code];
+                  }
                 }
 
                 if (!ep4_field_in_file('v_products_short_desc_' . $lang_id) && ep4_field_in_file('v_products_short_desc_' . $lang_id_code)) {
@@ -1910,7 +1927,10 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   $v_products_url_store = $v_products_url[$lang_id] = $_POST['products_url'][$lang_id];
                 }
                 if (isset($v_products_url[$lang_id_code]) || (!empty($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
-                  $v_products_url_store = $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
+                  $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
+                  if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_products_url_' . $lang_id)) {
+                    $v_products_url_store = $$v_products_url[$lang_id_code];
+                  }
                 }
 
                 if (!ep4_field_in_file('v_products_url_' . $lang_id) && ep4_field_in_file('v_products_url_' . $lang_id_code)) {
@@ -2009,7 +2029,10 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 }
 
                 if (isset($v_products_name[$lang_id_code]) || (!empty($v_products_name) && array_key_exists($lang_id_code, $v_products_name))) {
-                  $v_products_name_store = $v_products_name[$lang_id_code] = $_POST['products_name'][$lang_id_code];
+                  $v_products_name[$lang_id_code] = $_POST['products_name'][$lang_id_code];
+                  if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_products_name_' . $lang_id)) {
+                    $v_products_name_store = $v_products_name[$lang_id_code];
+                  }
                   // Prioritize that if the $lang_id is also present for this language that this content rules/overrides.
                 }
                 
@@ -2022,7 +2045,10 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   $v_products_desc_store = $v_products_description[$lang_id] = $_POST['products_description'][$lang_id];
                 }
                 if (isset($v_products_description[$lang_id_code]) || (!empty($v_products_description) && array_key_exists($lang_id_code, $v_products_description))) {
-                  $v_products_desc_store = $v_products_description[$lang_id_code] = $_POST['products_description'][$lang_id_code];
+                  $v_products_description[$lang_id_code] = $_POST['products_description'][$lang_id_code];
+                  if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_products_description_' . $lang_id)) {
+                    $v_products_desc_store = $v_products_name[$lang_id_code];
+                  }
                 }
 
                 if (!ep4_field_in_file('v_products_description_' . $lang_id) && ep4_field_in_file('v_products_description_' . $lang_id_code)) {
@@ -2033,7 +2059,10 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   $v_products_short_desc_store = $v_products_short_desc[$lang_id] = $_POST['products_short_description'][$lang_id];
                 }
                 if (isset($v_products_short_desc[$lang_id_code]) || (!empty($v_products_short_desc) && array_key_exists($lang_id_code, $v_products_short_desc))) {
-                  $v_products_short_desc_store = $v_products_short_desc[$lang_id_code] = $_POST['products_short_description'][$lang_id_code];
+                  $v_products_short_desc[$lang_id_code] = $_POST['products_short_description'][$lang_id_code];
+                  if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_products_short_desc_' . $lang_id)) {
+                    $v_products_short_desc_store = $v_products_short_desc[$lang_id_code];
+                  }
                 }
 
                 if (!ep4_field_in_file('v_products_short_desc_' . $lang_id) && ep4_field_in_file('v_products_short_desc_' . $lang_id_code)) {
@@ -2044,7 +2073,10 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   $v_products_url_store = $v_products_url[$lang_id] = $_POST['products_url'][$lang_id];
                 }
                 if (isset($v_products_url[$lang_id_code]) || (!empty($v_products_url) && array_key_exists($lang_id_code, $v_products_url))) {
-                  $v_products_url_store = $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
+                  $v_products_url[$lang_id_code] = $_POST['products_url'][$lang_id_code];
+                  if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_products_url_' . $lang_id)) {
+                    $v_products_url_store = $$v_products_url[$lang_id_code];
+                  }
                 }
 
                 if (!ep4_field_in_file('v_products_url_' . $lang_id) && ep4_field_in_file('v_products_url_' . $lang_id_code)) {
