@@ -13,6 +13,7 @@ define('EASYPOPULATE_4_DISPLAY_LOCAL_FILE_SPEC','<p class=smallText><b>Filename:
 define('EASYPOPULATE_4_DISPLAY_RESULT_DELETED','<br /><font color="fuchsia"><b>DELETED! - %2$s:</b> %1$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_DELETE_NOT_FOUND','<br /><font color="darkviolet"><b>NOT FOUND! - %2$s:</b> %1$s - cant delete...</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NOT_FOUND', '<br /><font color="red"><b>SKIPPED! - %3$s:</b> %1$s - No category provided for this%2$s product</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_ID_NOT_FOUND', '<br /><font color="red"><b>SKIPPED! - Category ID: </b>%1$s - Not Found!</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG','<br /><font color="red"><b>SKIPPED! - %4$s:</b> %1$s - Category name: "%2$s" exceeds max. length: %3$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_URL_LONG','<br /><font color="red"><b>WARNING! - %4$s:</b> %1$s - URL: "%2$s" exceeds max. length: %3$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_MANUFACTURER_NAME_LONG','<br /><font color="red"><b>MANUFACTURER SKIPPED! - Manufacturer:</b> %1$s - Manufacturer name exceeds max. length: %2$s</font>');
