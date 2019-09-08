@@ -160,8 +160,15 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
     if (( strtolower(substr($file['name'], 0, 15)) <> "categorymeta-ep") && ( strtolower(substr($file['name'], 0, 7)) <> "attrib-") && ($ep_4_SBAEnabled != false ? ( strtolower(substr($file['name'], 0, 4)) <> "sba-") : true )) { //  temporary solution here... 12-06-2010
       $zco_notifier->notify('EP4_IMPORT_GENERAL_FILE_ALL');
 
+      $missing_key = false;
+      if (!isset($filelayout[$chosen_key])) {
+        $missing_key = true;
+        $messageStack->add('Missing primary key from file', 'warning');
+        $ep_error_count++;
+      }
+
       // Main IMPORT loop For Product Related Data. v_products_id is the main key
-      while (($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== false) { // read 1 line of data
+      while (!$missing_key && ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== false) { // read 1 line of data
 
         @set_time_limit($ep_execution);
 
