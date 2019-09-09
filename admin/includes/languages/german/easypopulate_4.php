@@ -73,17 +73,17 @@ define('EASYPOPULATE_4_SPECIALS_FOOTER', '</p>'); // close paragraph
 
 define('EP_DESC_PLURAL', 'Sie werden');
 define('EP_DESC_SING', 'Es wird');
-define('FEATURED_EP_DESC','Prefix: %1$s. %2$s durch die featured Filter ausgefuehrt werden.');
-define('PRICEQTY_EP_DESC','Prefix: %1$s. %2$s durch die Price Quantity Filter ausgefuehrt werden.');
-define('PRICEBREAKS_EP_DESC','Prefix: %1$s. %2$s durch die Price Breaks Filter ausgefuehrt werden.');
-define('CATEGORY_EP_DESC','Prefix: %1$s. %2$s durch die Category Filter ausgefuehrt werden.');
-define('CATEGORYMETA_EP_DESC','Prefix: %1$s. %2$s durch die Category Meta Filter ausgefuehrt werden.');
-define('ATTRIB_BASIC_EP','Prefix: %1$s. %2$s durch die Basic Attribute Filter ausgefuehrt werden.');
-define('ATTRIB_DETAILED_EP_DESC','Prefix: %1$s. %2$s durch die Detailed Attributes Filter ausgefuehrt werden.');
-define('SBA_DETAILED_EP_DESC','Prefix: %1$s. %2$s durch die Detailed Stock by Attributes Filter ausgefuehrt werden.');
-define('SBA_STOCK_EP_DESC','Prefix: %1$s. %2$s durch die Stock by Attributes Stock Modification Filter ausgefuehrt werden.');
+define('FEATURED_EP_DESC','Prefix: %1$s. %2$s durch die featured Filter ausgeführt werden.');
+define('PRICEQTY_EP_DESC','Prefix: %1$s. %2$s durch die Price Quantity Filter ausgeführt werden.');
+define('PRICEBREAKS_EP_DESC','Prefix: %1$s. %2$s durch die Price Breaks Filter ausgeführt werden.');
+define('CATEGORY_EP_DESC','Prefix: %1$s. %2$s durch die Category Filter ausgeführt werden.');
+define('CATEGORYMETA_EP_DESC','Prefix: %1$s. %2$s durch die Category Meta Filter ausgeführt werden.');
+define('ATTRIB_BASIC_EP','Prefix: %1$s. %2$s durch die Basic Attribute Filter ausgeführt werden.');
+define('ATTRIB_DETAILED_EP_DESC','Prefix: %1$s. %2$s durch die Detailed Attributes Filter ausgeführt werden.');
+define('SBA_DETAILED_EP_DESC','Prefix: %1$s. %2$s durch die Detailed Stock by Attributes Filter ausgeführt werden.');
+define('SBA_STOCK_EP_DESC','Prefix: %1$s. %2$s durch die Stock by Attributes Stock Modification Filter ausgeführt werden.');
 define('ORDERS_EP_DESC', 'Prefix: %1$s. %2$s will not be processed for import.');
-define('CATCHALL_EP_DESC', 'Alle anderen. %2$s durch die upload of a full data file Filter ausgefuehrt werden.');
+define('CATCHALL_EP_DESC', 'Alle anderen. %2$s durch die upload ein full data file Filter ausgeführt werden.');
 define('ORDERSEXPORT_LINK_SAVE1', 'ORDERSEXPORT_LINK_SAVE1');
 define('ORDERSEXPORT_LINK_SAVE1B', 'ORDERSEXPORT_LINK_SAVE1B');
 define('ORDERSEXPORT_LINK_SAVE2', 'ORDERSEXPORT_LINK_SAVE2');
@@ -146,7 +146,7 @@ define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DOWNLOAD', 'Download');
 define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED', '<b>Keine unterstützten Exportdateien vorhanden</b>');
 define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_ERROR_FOLDER_OPEN', '<b>Fehler beim Öffnen des Exportverzeichnisses:</b>');
 
-define('EASYPOPULATE_4_DISPLAY_EXPORT_TYPE_ERROR','error: Kein Exporttyp gewdhlt - Drücken Sie die Backspace Taste um zurückzugehen.');
+define('EASYPOPULATE_4_DISPLAY_EXPORT_TYPE_ERROR','error: Kein Exporttyp gewöhlt - Drücken Sie die Backspace Taste um zurückzugehen.');
 
 define('EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_FILENAME', 'Dateiname');
 define('EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SIZE', 'Größe');
@@ -161,16 +161,16 @@ define('EASYPOPULATE_4_DISPLAY_EXPORT_RESULTS_TITLE','<br><u><h3>Export Ergebnis
 define('EASYPOPULATE_4_DISPLAY_EXPORT_RESULTS_NUM_RECORDS','<br>Exportierte Einträge: %d<br>');
 define('EASYPOPULATE_4_DISPLAY_EXPORT_RESULTS_MEM_USE','<br>Speicherverbrauch: %d');
 define('EASYPOPULATE_4_DISPLAY_EXPORT_RESULTS_MEM_PEAK','<br>Speicherverbrauch Spitzenwert: %d');
-define('EASYPOPULATE_4_DISPLAY_EXPORT_RESULTS_EXEC_TIME','<br>Ausf|hrungszeit: %d seconds.');
+define('EASYPOPULATE_4_DISPLAY_EXPORT_RESULTS_EXEC_TIME','<br>Ausführungszeit: %d seconds.');
 
 define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_TITLE','<h3>Verarbeitung des Importdatei abgeschlossen</h3>');
-define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_NUM_RECORDS_UPDATE','<br/>Aktualisierte EintrÃ¤ge: %d');
-define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_NUM_RECORDS_IMPORT','<br/>Neu importierte EintrÃ¤ge: %d');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_NUM_RECORDS_UPDATE','<br/>Aktualisierte Einträge: %d');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_NUM_RECORDS_IMPORT','<br/>Neu importierte Einträge: %d');
 define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_NUM_ERRORS','<br/>Entdeckte Fehler: %d');
 define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_NUM_WARNINGS','<br/>Entdeckte Warnungen: %d');
 define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_MEM_USE','<br/>Speicherverbrauch: %d');
 define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_MEM_PEAK','<br/>Speicherverbrauch Spitzenwert: %d');
-define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_EXEC_TIME','<br/>AusfÃ¼hrungszeit: %d seconds');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_EXEC_TIME','<br/>Ausfährungszeit: %d seconds');
 define('EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE_ISSUES','Dateiimport mit Problemen abgeschlossen.');
 define('EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE','Dateiimport ohne Probleme abgeschlossen.');
 define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_PRODUCTS_NAME','<br />Längstes products_name: %1$s');
