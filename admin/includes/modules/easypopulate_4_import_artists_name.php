@@ -1,6 +1,7 @@
 <?php
 
-          if (isset($v_artists_name) && ($v_artists_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_artists_name) <= $max_len['artists_name']) || (!function_exists('mb_strlen') && strlen($v_artists_name) <= $max_len['artists_name']))) {
+          $art_name_str_len = isset($v_artists_name) && ($v_artists_name != '') ? (function_exists('mb_strlen') ? mb_strlen($v_artists_name) : strlen($v_artists_name)) : false;
+          if ($art_name_str_len !== false && ($art_name_str_len <= $max_len['artists_name'])) {
             $sql = "SELECT artists_id AS artistsID FROM " . TABLE_RECORD_ARTISTS . " WHERE artists_name = :artists_name: LIMIT 1";
             $sql = $db->bindVars($sql, ':artists_name:', ep_4_curly_quotes($v_artists_name), 'string');
             $result = ep_4_query($sql);
@@ -90,11 +91,25 @@
               unset($lang);
             }
           } else { // $v_artists_name == '' or name length violation
-            if ((function_exists('mb_strlen') && mb_strlen($v_artists_name) > $max_len['artists_name']) || (!function_exists('mb_strlen') && strlen($v_artists_name) > $max_len['artists_name'])) {
+            if ($art_name_str_len !== false && ($art_name_str_len > $max_len['artists_name'])) {
               $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_ARTISTS_NAME_LONG, $v_artists_name, $max_len['artists_name']);
-              $ep_error_count++;
-              continue;
+              if (empty($max_len['artists_name_found']) || $max_len['artists_name_found'] < $art_name_str_len) {
+                $max_len['artists_name_found'] = $art_name_str_len;
+
+                if(EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD === 'false') {
+                  $ep_error_count++;
+                  unset($art_name_str_len);
+                  continue;
+                }
+                $update_artists_name_sql = "ALTER TABLE " . TABLE_RECORD_ARTISTS . " CHANGE record_artists_name record_artists_name VARCHAR(" . $art_name_str_len . ") NOT NULL DEFAULT '';";
+                $update_artists_name = $db->Execute($update_artists_name_sql);
+
+                zen_record_admin_activity('Extended table ' . TABLE_RECORD_COMPANY . ' field record_artists_name via EP4 from ' . zen_db_input($max_len['record_artists_name']) . ' to ' . zen_db_input($art_name_str_len) . '.', 'info');
+
+                $max_len['artists_name'] = $art_name_str_len;
+              }
             }
             $v_artists_id = 0; // chadd - zencart uses artists_id = '0' for no assisgned artists
           }
+          unset($art_name_str_len);
 

@@ -13,6 +13,10 @@ if (!defined('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE')) {
   define('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_code');
 }
 
+if (!defined('EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD')) {
+  define('EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD', 'false');
+}
+
 // BEGIN: Data Import Module
 if (isset($_POST['import']) && $_POST['import'] != '') {
   $time_start = microtime(true); // benchmarking
@@ -495,9 +499,27 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
           if (isset($filelayout['v_products_name_' . $l_id])) { // do for each language in our upload file if exist
             // check products name length and display warning on error, but still process record
             $v_products_name[$l_id] = ep_4_curly_quotes($items[$filelayout['v_products_name_' . $l_id]]);
-            if ((function_exists('mb_strlen') && mb_strlen($v_products_name[$l_id]) > $max_len['products_name']) || (!function_exists('mb_strlen') && strlen($v_products_name[$l_id]) > $max_len['products_name'])) {
+            $products_name_str_len = (function_exists('mb_strlen')) ? mb_strlen($v_products_name[$l_id]) : strlen($v_products_name[$l_id]);
+            if ($products_name_str_len > $max_len['products_name']) {
               $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG, ${$chosen_key}, $v_products_name[$l_id], $max_len['products_name'], $chosen_key);
-              $ep_warning_count++;
+              if (empty($max_len['products_name_found']) || $max_len['products_name_found'] < $products_name_str_len) {
+                $max_len['products_name_found'] = $products_name_str_len;
+                if (EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD !== 'false' /* Expand products_name field to fit new name */ ) {
+                  $update_products_sql = "ALTER TABLE " . TABLE_PRODUCTS_DESCRIPTION . " CHANGE products_name products_name VARCHAR(" . $products_name_str_len . ") NOT NULL DEFAULT '';";
+                  $update_products = $db->Execute($update_products_sql);
+
+                  zen_record_admin_activity('Extended table ' . TABLE_PRODUCTS_DESCRIPTION . ' field products_name via EP4 from ' . zen_db_input($max_len['products_name']) . ' to ' . zen_db_input($products_name_str_len) . '.', 'info');
+
+                  $update_orders_products_sql = "ALTER TABLE " . TABLE_ORDERS_PRODUCTS . " CHANGE products_name products_name VARCHAR(" . $products_name_str_len . ") NOT NULL DEFAULT '';";
+                  $update_orders_products = $db->Execute($update_orders_products_sql);
+
+                  zen_record_admin_activity('Extended table ' . TABLE_ORDERS_PRODUCTS . ' field products_name via EP4 from ' . zen_db_input($max_len['products_name']) . ' to ' . zen_db_input($products_name_str_len) . '.', 'info');
+
+                  $max_len['products_name'] = $products_name_str_len;
+                } else {
+                  $ep_warning_count++;
+                }
+              }
             }
           } else { // column doesn't exist in the IMPORT file
             // and product is new
@@ -508,10 +530,29 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
           if (isset($filelayout['v_products_name_' . $l_id_code])) { // do for each language in our upload file if exist
             // check products name length and display warning on error, but still process record
             $v_products_name[$l_id_code] = ep_4_curly_quotes($items[$filelayout['v_products_name_' . $l_id_code]]);
-            if ((function_exists('mb_strlen') && mb_strlen($v_products_name[$l_id_code]) > $max_len['products_name']) || (!function_exists('mb_strlen') && strlen($v_products_name[$l_id_code]) > $max_len['products_name'])) {
+            $products_name_str_len = (function_exists('mb_strlen')) ? mb_strlen($v_products_name[$l_id_code]) : strlen($v_products_name[$l_id_code]);
+            if ($products_name_str_len > $max_len['products_name']) {
               $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG, ${$chosen_key}, $v_products_name[$l_id_code], $max_len['products_name'], $chosen_key);
-              $ep_warning_count++;
+              if (empty($max_len['products_name_found']) || $max_len['products_name_found'] < $products_name_str_len) {
+                $max_len['products_name_found'] = $products_name_str_len;
+                if (EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD !== 'false' /* Expand products_name field to fit new name */ ) {
+                  $update_products_sql = "ALTER TABLE " . TABLE_PRODUCTS_DESCRIPTION . " CHANGE products_name products_name VARCHAR(" . $products_name_str_len . ") NOT NULL DEFAULT '';";
+                  $update_products = $db->Execute($update_products_sql);
+
+                  zen_record_admin_activity('Extended table ' . TABLE_PRODUCTS_DESCRIPTION . ' field products_name via EP4 from ' . zen_db_input($max_len['products_name']) . ' to ' . zen_db_input($products_name_str_len) . '.', 'info');
+
+                  $update_orders_products_sql = "ALTER TABLE " . TABLE_ORDERS_PRODUCTS . " CHANGE products_name products_name VARCHAR(" . $products_name_str_len . ") NOT NULL DEFAULT '';";
+                  $update_orders_products = $db->Execute($update_orders_products_sql);
+
+                  zen_record_admin_activity('Extended table ' . TABLE_ORDERS_PRODUCTS . ' field products_name via EP4 from ' . zen_db_input($max_len['products_name']) . ' to ' . zen_db_input($products_name_str_len) . '.', 'info');
+
+                  $max_len['products_name'] = $products_name_str_len;
+                } else {
+                  $ep_warning_count++;
+                }
+              }
             }
+            unset($products_name_str_len);
           } else { // column doesn't exist in the IMPORT file
             // and product is new
             if ($product_is_new) {
@@ -553,10 +594,24 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
           if (isset($filelayout['v_products_url_' . $l_id])) { // do for each language in our upload file if exist
             $v_products_url[$l_id] = $items[$filelayout['v_products_url_' . $l_id]];
             // check products url length and display warning on error, but still process record
-            if ((function_exists('mb_strlen') && mb_strlen($v_products_url[$l_id]) > $max_len['products_url']) || (!function_exists('mb_strlen') && strlen($v_products_url[$l_id]) > $max_len['products_url'])) {
+            $products_url_str_len = (function_exists('mb_strlen')) ? mb_strlen($v_products_url[$l_id]) : strlen($v_products_url[$l_id]);
+            if ($products_url_str_len > $max_len['products_url']) {
               $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_URL_LONG, ${$chosen_key}, $v_products_url[$l_id], $max_len['products_url'], $chosen_key);
-              $ep_warning_count++;
+              if (empty($max_len['products_url_found']) || $max_len['products_url_found'] < $products_url_str_len) {
+                $max_len['products_url_found'] = $products_url_str_len;
+                if (EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD !== 'false' /* Expand products_name field to fit new name */ ) {
+                  $update_products_url_sql = "ALTER TABLE " . TABLE_PRODUCTS_DESCRIPTION . " CHANGE products_url products_url VARCHAR(" . $products_url_str_len . ") DEFAULT NULL;";
+                  $update_products_url = $db->Execute($update_products_url_sql);
+
+                  zen_record_admin_activity('Extended table ' . TABLE_PRODUCTS_DESCRIPTION . ' field products_url via EP4 from ' . zen_db_input($max_len['products_url']) . ' to ' . zen_db_input($products_url_str_len) . '.', 'info');
+
+                  $max_len['products_url'] = $products_url_str_len;
+                } else {
+                  $ep_warning_count++;
+                }
+              }
             }
+            unset($products_url_str_len);
           } else { // column doesn't exist in the IMPORT file
             // and product is new
             if ($product_is_new) {
@@ -566,10 +621,24 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
           if (isset($filelayout['v_products_url_' . $l_id_code])) { // do for each language in our upload file if exist
             $v_products_url[$l_id_code] = $items[$filelayout['v_products_url_' . $l_id_code]];
             // check products url length and display warning on error, but still process record
-            if ((function_exists('mb_strlen') && mb_strlen($v_products_url[$l_id_code]) > $max_len['products_url']) || (!function_exists('mb_strlen') && strlen($v_products_url[$l_id_code]) > $max_len['products_url'])) {
+            $products_url_str_len = (function_exists('mb_strlen')) ? mb_strlen($v_products_url[$l_id_code]) : strlen($v_products_url[$l_id_code]);
+            if ($products_url_str_len > $max_len['products_url']) {
               $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_URL_LONG, ${$chosen_key}, $v_products_url[$l_id_code], $max_len['products_url'], $chosen_key);
-              $ep_warning_count++;
+              if (empty($max_len['products_url_found']) || $max_len['products_url_found'] < $products_url_str_len) {
+                $max_len['products_url_found'] = $products_url_str_len;
+                if (EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD !== 'false' /* Expand field to fit new data */ ) {
+                  $update_products_url_sql = "ALTER TABLE " . TABLE_PRODUCTS_DESCRIPTION . " CHANGE products_url products_url VARCHAR(" . $products_url_str_len . ") DEFAULT NULL;";
+                  $update_products_url = $db->Execute($update_products_url_sql);
+
+                  zen_record_admin_activity('Extended table ' . TABLE_PRODUCTS_DESCRIPTION . ' field products_url via EP4 from ' . zen_db_input($max_len['products_url']) . ' to ' . zen_db_input($products_url_str_len) . '.', 'info');
+
+                  $max_len['products_url'] = $products_url_str_len;
+                } else {
+                  $ep_warning_count++;
+                }
+              }
             }
+            unset($products_url_str_len);
           } else { // column doesn't exist in the IMPORT file
             // and product is new
             if ($product_is_new) {
@@ -637,16 +706,33 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
         }
 
         // check size of v_products_model, loop on error
-        if ((function_exists('mb_strlen') && mb_strlen($v_products_model) > $max_len['products_model']) || (!function_exists('mb_strlen') && strlen($v_products_model) > $max_len['products_model'])) {
+        $model_str_len = (function_exists('mb_strlen')) ? mb_strlen($v_products_model) : strlen($v_products_model);
+        if ($model_str_len > $max_len['products_model']) {
           $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_MODEL_LONG, ${$chosen_key}, $max_len['products_model'], $chosen_key);
-          $ep_error_count++;
-          unset($lang);
-          continue; // short-circuit on error
+          if (empty($max_len['products_model_found']) || $max_len['products_model_found'] < $model_str_len) {
+            $max_len['products_model_found'] = $model_str_len;
+            if (EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD === 'false') {
+              $ep_error_count++;
+              unset($lang);
+              unset($model_str_len);
+              continue; // short-circuit on error
+            }
+
+            $update_products_model_sql = "ALTER TABLE " . TABLE_PRODUCTS . " CHANGE products_model products_model VARCHAR(" . $model_str_len . ") DEFAULT NULL;";
+            $update_products_model = $db->Execute($update_products_model_sql);
+
+            zen_record_admin_activity('Extended table ' . TABLE_PRODUCTS . ' field products_model via EP4 from ' . zen_db_input($max_len['products_model']) . ' to ' . zen_db_input($model_str_len) . '.', 'info');
+
+            $max_len['products_model'] = $model_str_len;
+          }
+          unset($model_str_len);
         }
+        unset($model_str_len);
 
         // BEGIN: Manufacturer's Name
         // convert the manufacturer's name into id's for the database
-        if (isset($v_manufacturers_name) && ($v_manufacturers_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_manufacturers_name) <= $max_len['manufacturers_name']) || (!function_exists('mb_strlen') && strlen($v_manufacturers_name) <= $max_len['manufacturers_name']))) {
+        $manf_str_len = (isset($v_manufacturers_name) && ($v_manufacturers_name != '')) ? ((function_exists('mb_strlen')) ? mb_strlen($v_manufacturers_name) : strlen($v_manufacturers_name)) : false;
+        if ($manf_str_len !== false && ($manf_str_len <= $max_len['manufacturers_name'])) {
           $sql = "SELECT man.manufacturers_id AS manID FROM " . TABLE_MANUFACTURERS . " AS man WHERE man.manufacturers_name = :manufacturers_name: LIMIT 1";
           $sql = $db->bindVars($sql, ':manufacturers_name:', $v_manufacturers_name, $zc_support_ignore_null);
 
@@ -688,13 +774,27 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             unset($lang);
           }
         } else { // $v_manufacturers_name == '' or name length violation
-          if ((function_exists('mb_strlen') && mb_strlen($v_manufacturers_name) > $max_len['manufacturers_name']) || (!function_exists('mb_strlen') && strlen($v_manufacturers_name) > $max_len['manufacturers_name'])) {
+          if ($manf_str_len !== false && ($manf_str_len > $max_len['manufacturers_name'])) {
             $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_MANUFACTURER_NAME_LONG, $v_manufacturers_name, $max_len['manufacturers_name']);
-            $ep_error_count++;
-            continue;
+            if (empty($max_len['manufacturers_name_found']) || $max_len['manufacturers_name_found'] < $manf_str_len) {
+              $max_len['manufacturers_name_found'] = $manf_str_len;
+              if (EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD === 'false') {
+                $ep_error_count++;
+                unset($manf_str_len);
+                continue;
+              }
+
+              $update_manufacturers_name_sql = "ALTER TABLE " . TABLE_MANUFACTURERS . " CHANGE manufacturers_name manufacturers_name VARCHAR(" . $manf_str_len . ") DEFAULT NULL;";
+              $update_manufacturers_name = $db->Execute($update_manufacturers_name_sql);
+
+              zen_record_admin_activity('Extended table ' . TABLE_MANUFACTURERS . ' field manufacturers_name via EP4 from ' . zen_db_input($max_len['manufacturers_name']) . ' to ' . zen_db_input($manf_str_len) . '.', 'info');
+
+              $max_len['manufacturers_name'] = $manf_str_len;
+            }
           }
           $v_manufacturers_id = 0; // chadd - zencart uses manufacturer's id = '0' for no assisgned manufacturer
         } // END: Manufacturer's Name
+        unset($manf_str_len);
 
         // BEGIN: CATEGORIES2 ===============================================================================================
         $categories_name_exists = false; // assume no column defined
@@ -755,22 +855,57 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             // check category names for length violation. abort on error
             if ($categories_count['id'][$lang['id']] > 0) { // only check $max_len['categories_name'] if $categories_count['id'][$lang['id']] > 0
               for ($category_index = 0; $category_index < $categories_count['id'][$lang['id']]; $category_index++) {
-                if ((function_exists('mb_strlen') && mb_strlen($categories_names_array['id'][$lang['id']][$category_index]) > $max_len['categories_name']) || (!function_exists('mb_strlen') && strlen($categories_names_array['id'][$lang['id']][$category_index]) > $max_len['categories_name'])) {
+                $cat_str_len = (function_exists('mb_strlen')) ? mb_strlen($categories_names_array['id'][$lang['id']][$category_index]) : strlen($categories_names_array['id'][$lang['id']][$category_index]);
+                if ($cat_str_len > $max_len['categories_name']) {
                   $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name'], $chosen_key);
-                  $ep_error_count++;
-                  unset($lang);
-                  continue 3; // skip to next record don't attempt further processing of current record.
+
+
+                  if (empty($max_len['categories_name_found']) || $max_len['categories_name_found'] < $cat_str_len) {
+                    $max_len['categories_name_found'] = $cat_str_len;
+
+                    if (EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD === 'false' /* Prevent expansion of categories_name field to fit new name */ ) {
+                      $ep_error_count++;
+                      unset($lang);
+                      unset($cat_str_len);
+                      continue 3; // skip to next record don't attempt further processing of current record.
+                    }
+
+                    $update_categories_sql = "ALTER TABLE " . TABLE_CATEGORIES_DESCRIPTION . " CHANGE categories_name categories_name VARCHAR(" . $cat_str_len . ") NOT NULL DEFAULT '';";
+                    $update_categories = $db->Execute($update_categories_sql);
+
+                    zen_record_admin_activity('Extended table ' . TABLE_CATEGORIES_DESCRIPTION . ' field categories_name via EP4 from ' . zen_db_input($max_len['categories_name']) . ' to ' . zen_db_input($cat_str_len) . '.', 'info');
+
+                    $max_len['categories_name'] = $cat_str_len;
+                  }
                 }
+                unset($cat_str_len);
               }
             }
             if ($categories_count['code'][$lang['code']] > 0) { // only check $max_len['categories_name'] if $categories_count['code'][$lang['id']] > 0
               for ($category_index = 0; $category_index < $categories_count['code'][$lang['code']]; $category_index++) {
-                if ((function_exists('mb_strlen') && mb_strlen($categories_names_array['code'][$lang['code']][$category_index]) > $max_len['categories_name']) || (!function_exists('mb_strlen') && strlen($categories_names_array['code'][$lang['code']][$category_index]) > $max_len['categories_name'])) {
+                $cat_str_len = (function_exists('mb_strlen')) ? mb_strlen($categories_names_array['code'][$lang['code']][$category_index]) : strlen($categories_names_array['code'][$lang['code']][$category_index]);
+                if ($cat_str_len > $max_len['categories_name']) {
                   $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array['code'][$lang['code']][$category_index], $max_len['categories_name'], $chosen_key);
-                  $ep_error_count++;
-                  unset($lang);
-                  continue 3; // skip to next record don't attempt further processing of current record.
+
+                  if (empty($max_len['categories_name_found']) || $max_len['categories_name_found'] < $cat_str_len) {
+                    $max_len['categories_name_found'] = $cat_str_len;
+
+                    if (EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD === 'false' /* Prevent expansion of categories_name field to fit new name */ ) {
+                      $ep_error_count++;
+                      unset($lang);
+                      unset($cat_str_len);
+                      continue 3; // skip to next record don't attempt further processing of current record.
+                    }
+
+                    $update_categories_sql = "ALTER TABLE " . TABLE_CATEGORIES_DESCRIPTION . " CHANGE categories_name categories_name VARCHAR(" . $cat_str_len . ") NOT NULL DEFAULT '';";
+                    $update_categories = $db->Execute($update_categories_sql);
+
+                    zen_record_admin_activity('Extended table ' . TABLE_CATEGORIES_DESCRIPTION . ' field categories_name via EP4 from ' . zen_db_input($max_len['categories_name']) . ' to ' . zen_db_input($cat_str_len) . '.', 'info');
+
+                    $max_len['categories_name'] = $cat_str_len;
+                  }
                 }
+                unset($cat_str_len);
               }
             }
           } // foreach
@@ -1009,6 +1144,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
 
                   if (class_exists('AdminRequestSanitizer')) {
                     $sanitizer = AdminRequestSanitizer::getInstance();
+
                     $sanitizer->runSanitizers();
                     unset($sanitizer);
                   }
@@ -2356,6 +2492,30 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
 //    $display_output .= '<h3>Finished Processing Import File</h3>';
     $display_output .= EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_TITLE;
 
+    if (!empty($max_len['products_name_found'])) {
+      $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_PRODUCTS_NAME, $max_len['products_name_found']);
+    }
+    if (!empty($max_len['products_url_found'])) {
+      $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_PRODUCTS_URL, $max_len['products_url_found']);
+    }
+    if (!empty($max_len['products_model_found'])) {
+      $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_PRODUCTS_MODEL, $max_len['products_model_found']);
+    }
+    if (!empty($max_len['manufacturers_name_found'])) {
+      $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_MANUFACTURERS_NAME, $max_len['manufacturers_name_found']);
+    }
+    if (!empty($max_len['categories_name_found'])) {
+      $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_CATEGORIES_NAME, $max_len['categories_name_found']);
+    }
+    if (!empty($max_len['artists_name_found'])) {
+      $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_ARTISTS_NAME, $max_len['artists_name_found']);
+    }
+    if (!empty($max_len['music_genre_name_found'])) {
+      $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_MUSIC_GENRE_NAME, $max_len['music_genre_name_found']);
+    }
+    if (!empty($max_len['record_company_name_found'])) {
+      $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_RECORD_COMPANY_NAME, $max_len['record_company_name_found']);
+    }
 //    $display_output .= '<br/>Updated records: ' . $ep_update_count;
     $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_NUM_RECORDS_UPDATE, $ep_update_count);
 //    $display_output .= '<br/>New Imported records: ' . $ep_import_count;

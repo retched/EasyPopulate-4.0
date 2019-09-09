@@ -1,6 +1,7 @@
 <?php
 
-          if (isset($v_music_genre_name) && ($v_music_genre_name != '') && ((function_exists('mb_strlen') && mb_strlen($v_music_genre_name) <= $max_len['music_genre_name']) || (!function_exists('mb_strlen') && strlen($v_music_genre_name) <= $max_len['music_genre_name']))) {
+          $music_genre_name_str_len = isset($v_music_genre_name) && ($v_music_genre_name != '') ? (function_exists('mb_strlen') ? mb_strlen($v_music_genre_name) : strlen($v_music_genre_name)) : false;
+          if ($music_genre_name_str_len !== false && ($music_genre_name_str_len <= $max_len['music_genre_name'])) {
             $sql = "SELECT music_genre_id AS music_genreID FROM " . TABLE_MUSIC_GENRE . " WHERE music_genre_name = :music_genre_name: LIMIT 1";
             $sql = $db->bindVars($sql, ':music_genre_name:', $v_music_genre_name, 'string');
             $result = ep_4_query($sql);
@@ -19,10 +20,23 @@
               }
             }
           } else { // $v_music_genre_name == '' or name length violation
-            if ((function_exists('mb_strlen') && mb_strlen($v_music_genre_name) > $max_len['music_genre_name']) || (!function_exists('mb_strlen') && strlen($v_music_genre_name) > $max_len['music_genre_name'])) {
+            if ($music_genre_name_str_len !== false && $music_genre_name_str_len > $max_len['music_genre_name'])) {
               $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_MUSIC_GENRE_NAME_LONG, $v_music_genre_name, $max_len['music_genre_name']);
-              $ep_error_count++;
-              continue;
+              if (empty($max_len['music_genre_name_found']) || $max_len['music_genre_name_found'] < $music_genre_name_str_len) {
+                $max_len['music_genre_name_found'] = $music_genre_name_str_len;
+                if (false) {
+                  $ep_error_count++;
+                  unset($music_genre_name_str_len);
+                  continue;
+                }
+                $update_music_genre_name_sql = "ALTER TABLE " . TABLE_MUSIC_GENRE . " CHANGE music_genre_name music_genre_name VARCHAR(" . $music_genre_name_str_len . ") NOT NULL DEFAULT '';";
+                $update_music_genre_name = $db->Execute($update_music_genre_name_sql);
+
+                zen_record_admin_activity('Extended table ' . TABLE_MUSIC_GENRE . ' field music_genre_name via EP4 from ' . zen_db_input($max_len['music_genre_name']) . ' to ' . zen_db_input($music_genre_name_str_len) . '.', 'info');
+
+                $max_len['music_genre_name'] = $music_genre_name_str_len;
+              }
             }
             $v_music_genre_id = 0; // chadd - zencart uses genre_id = '0' for no assisgned artists
           }
+          unset($music_genre_name_str_len);

@@ -173,3 +173,11 @@ define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_MEM_PEAK','<br/>Speicherverbrauch 
 define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_EXEC_TIME','<br/>AusfÃ¼hrungszeit: %d seconds');
 define('EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE_ISSUES','Dateiimport mit Problemen abgeschlossen.');
 define('EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE','Dateiimport ohne Probleme abgeschlossen.');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_PRODUCTS_NAME','<br />Längstes products_name: %1$s');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_PRODUCTS_URL','<br />Längstes products_url: %1$s');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_PRODUCTS_MODEL','<br />Längstes products_model: %1$s');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_MANUFACTURERS_NAME','<br />Längstes manufacturers_name: %1$s');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_CATEGORIES_NAME','<br />Längstes categories_name: %1$s');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_ARTISTS_NAME','<br />Längstes artists_name: %1$s');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_MUSIC_GENRE_NAME','<br />Längstes music_genre_name: %1$s');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_LEN_RECORD_COMPANY_NAME','<br />Längstes record_company_name: %1$s');
