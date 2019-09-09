@@ -417,6 +417,7 @@
                                         installation of ZC and expectation that the language directory be that of the
                                         English equivalent.
                                   Reworked the detailed attributes import to support omitting columns when importing data.
+4.0.37.8                        - Added product code override for category and product import.
 4.0.37.10                       - Added language constant for when a category_id is not found.
                                   Prevent looping through the file if it does not have the primary key.
                                   Go to the next file record if the current record does not have appropriate data.
