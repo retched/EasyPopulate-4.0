@@ -180,6 +180,10 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
         }
         unset($thisvar);
 
+        if (!(defined('EP4_DB_FILTER_KEY') && EP4_DB_FILTER_KEY === 'blank_new') && !zen_not_null($items[$filelayout[$chosen_key]])) { // products_model exists!
+          continue;
+        }
+
         // now do a query to get the record's current contents
         // chadd - 12-14-2010 - redefining this variable everytime it loops must be very inefficient! must be a better way!
         $sql = 'SELECT
