@@ -417,6 +417,22 @@
                                         installation of ZC and expectation that the language directory be that of the
                                         English equivalent.
                                   Reworked the detailed attributes import to support omitting columns when importing data.
+4.0.37.7                        - Moved version information from the main file to a sub-file.
+                                  Updated database check to possibly expect utf8mb4 as a collation.
+                                  Added the name of the language to $epdlanguage_query.
+                                  Adjust formatting of plugin's admin screen for Zen Cart 1.5.6.
+                                  Provide corrections for more stricter php processing.
+                                  Added primary key operations to attribute processing.
+                                  Added import of language dependent columns by language code (DE, EN, Etc...)
+                                  Changed process of identifying maximum values to ensure result always was greater than 0.
+                                  Add ability to export only one instance of each product by master category instead of including linked items.
+                                  Added a default category description value to account for stricter php requirements and that Zen Cart did not have a default.
+                                  Removed excess trim when using Zen Cart's zen_not_null.
+                                  Further incorporated the Zen Cart admin sanitizer.
+                                  Corrected handling of some missing columns.
+                                  Corrected sequence of query statements for handling music fields.
+                                  Corrected output messaging to generically support alternate primary keys.
+                                  Added a function to identify if a field was loaded from the file to reduce code duplication.
 4.0.37.8                        - Added product code override for category and product import.
 4.0.37.9                        - Update import record company with ability to process language_code.
 4.0.37.10                       - Added language constant for when a category_id is not found.
