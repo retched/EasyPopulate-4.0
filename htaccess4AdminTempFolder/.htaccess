@@ -1,7 +1,7 @@
 #
-# @copyright Copyright 2003-2013 Zen Cart Development Team
+# @copyright Copyright 2003-2016 Zen Cart Development Team
 # @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
-# @version GIT: $Id: Author: DrByte  Sat Dec 21 17:00:00 2013 -0500 Modified in v1.5.3 and for EP4$
+# @version $Id: .htaccess 19328 Modified in v1.5.5 and for EP4 $
 #
 # This is used with Apache WebServers
 #
@@ -19,22 +19,39 @@
 DirectoryIndex index.php
 
 # deny *everything*
-<FilesMatch ".*\..*">
-  Order Allow,Deny
-  Deny from all
+<FilesMatch ".*">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order Allow,Deny
+    Deny from all
+  </IfModule>
 </FilesMatch>
 
 # but now allow just *certain* necessary files:
-<FilesMatch "(?i).*\.(csv|CSV|txt|TXT)$">
-  Order Allow,Deny
-  Allow from all
+# BOF EP4 edit to allow CSV and TXT files to be downloaded
+<FilesMatch "(?i).*\.(csv|txt)$">
+# EOF EP4 edit to allow CSV and TXT files to be downloaded
+  <IfModule mod_authz_core.c>
+    Require all granted
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order Allow,Deny
+    Allow from all
+  </IfModule>
 </FilesMatch>
 
 IndexIgnore */*
 
 <limit POST PUT>
-order deny,allow
-deny from All
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order Allow,Deny
+    Deny from all
+  </IfModule>
 </limit>
 
 
@@ -52,7 +69,7 @@ deny from All
   FileETag None
   Header unset ETag
   #Header set Cache-Control "no-transform"
-  <FilesMatch "(?i).*\.(ico|jpe?g|gif|otf|webp|png|swf|flv|svg|svgz)$">
+  <FilesMatch "(?i).*\.(ico|jpe?g|gif|webp|png|otf|swf|flv|ttf|woff|eot|svg|svgz)$">
     Header set Cache-control "max-age=864000, public, must-revalidate"
     Header unset Last-Modified
   </FilesMatch>
@@ -90,4 +107,3 @@ deny from All
 #turn off X-PHP-Originating-Script header when sending emails from admin
 #uncomment to activate:
 # php_flag mail.add_x_header Off
-
