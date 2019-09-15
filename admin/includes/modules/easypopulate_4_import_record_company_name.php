@@ -28,6 +28,9 @@
                 $l_id = $lang['id'];
                 $l_id_code = $lang['id_code'];
                 if (!isset($filelayout['v_record_company_url_' . $l_id]) && !isset($filelayout['v_record_company_url_' . $l_id_code])) {
+                  unset($l_id);
+                  unset($l_id_code);
+                  unset($lang);
                   continue;
                 }
                 
