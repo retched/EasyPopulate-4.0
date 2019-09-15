@@ -417,6 +417,17 @@
                                         installation of ZC and expectation that the language directory be that of the
                                         English equivalent.
                                   Reworked the detailed attributes import to support omitting columns when importing data.
+4.0.37.6                        - Realign code in the export file.
+                                  Support import of categories_names using both language_code and default language_id.
+                                  Add a default categories_description when adding a new product.
+                                  Correct SQL error where multiple fields in a query.
+                                  Incorporate use of $chosen_key into attribute import.
+                                  Corrected use of a constant in a define test.
+                                  Further address PHP notices (during strict mode) and incorporate some general PHP improvements.
+                                  Support import with language_code instead of language_id but use language_code as default
+                                        if both are provided.
+                                  Added a cron file to try to feed initial conditions to support cron operation.
+                                  Added version file to make version tracking/testing easier from outside of the base file.
 4.0.37.7                        - Moved version information from the main file to a sub-file.
                                   Updated database check to possibly expect utf8mb4 as a collation.
                                   Added the name of the language to $epdlanguage_query.
