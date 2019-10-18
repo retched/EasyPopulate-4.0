@@ -947,7 +947,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
   $row_tax_multiplier = ep_4_get_tax_class_rate(((isset($row['v_tax_class_id']) || array_key_exists('v_tax_class_id', $row)) ? $row['v_tax_class_id'] : 0));
   $row['v_tax_class_title'] = zen_get_tax_class_title(((isset($row['v_tax_class_id']) || array_key_exists('v_tax_class_id', $row)) ? $row['v_tax_class_id'] : 0));
   if (isset($row['v_products_price']) || array_key_exists('v_products_price', $row)) {
-    $row['v_products_price'] = round($row['v_products_price'] + ($price_with_tax * $row['v_products_price'] * $row_tax_multiplier / 100), 2);
+    $row['v_products_price'] = round($row['v_products_price'] + ($price_with_tax * $row['v_products_price'] * $row_tax_multiplier / 100), defined('EASYPOPULATE_4_CONFIG_DECIMAL_EXPORT') ? EASYPOPULATE_4_CONFIG_DECIMAL_EXPORT : 2);
   }
 
   // Clean the texts that could break CSV file formatting
