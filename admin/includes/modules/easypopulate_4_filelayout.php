@@ -454,13 +454,26 @@ if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CO
     $filelayout[] = 'v_products_discount_type';
     $filelayout[] = 'v_products_discount_type_from';
     // discount quantities base on $max_qty_discounts
-    // must be a better way to get the maximum discounts used at any given time
-    for ($i=1;$i<EASYPOPULATE_4_CONFIG_MAX_QTY_DISCOUNTS+1;$i++) {
+    // Allow continued use of the manually set number of discounts to export.
+    $num_discounts = (int)EASYPOPULATE_4_CONFIG_MAX_QTY_DISCOUNTS;
+    
+    if (empty($num_discounts)) {
+      $num_discounts = 3; // Default quantity from EASYPOPULATE_4_CONFIG_MAX_QTY_DISCOUNTS in case no results return from query.
+      
+      $num_query = $db->Execute('SELECT COUNT(*) AS c, products_id FROM ' . TABLE_PRODUCTS_DISCOUNT_QUANTITY . ' GROUP BY products_id ORDER BY c DESC LIMIT 1;');
+      
+      // Ensure at least the minimum number of columns are included where the minimum is identified above as the default value for $num_discounts.
+      if (!$num_query->EOF && !empty($num_query->fields['c']) && ($num_query->fields['c'] > $num_discounts)) {
+        $num_discounts = $num_query->fields['c'];
+      }
+      unset($num_query);
+    }
+    for ($i = 1; $i <= $num_discounts; $i++) {
       // $filelayout[] = 'v_discount_id_' . $i; // chadd - no longer needed
       $filelayout[] = 'v_discount_qty_'.$i;
       $filelayout[] = 'v_discount_price_'.$i;
     }
-    unset($i);
+    unset($i, $num_discounts);
     $filelayout_sql = 'SELECT
       p.products_id     as v_products_id,
       p.products_status as v_status,
