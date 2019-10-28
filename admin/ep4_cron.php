@@ -114,6 +114,14 @@ if (defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(FI
 
   $ep_debug_logging_all = false;
 
+  // Try to load early enough to not cause notices about missing values.
+  if(isset($_SESSION['language']) && file_exists(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4.php'))
+  {
+      require DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4.php';
+  } else {
+      require DIR_FS_ADMIN . DIR_WS_LANGUAGES . 'english' . '/easypopulate_4.php';
+  }
+
   $curver_detail = '4.0.37.6';
   if (file_exists(DIR_WS_MODULES . 'easypopulate_4_version.php')) {
     require DIR_WS_MODULES . 'easypopulate_4_version.php';
