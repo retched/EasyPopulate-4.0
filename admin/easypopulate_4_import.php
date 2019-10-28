@@ -298,7 +298,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
           // let's check and delete it if requested
           // v_status == 9 is a delete request
           $continueNextRow = false;
-          if ($items[$filelayout['v_status']] == 9) {
+          if (isset($filelayout['v_status']) && isset($items[$filelayout['v_status']]) && $items[$filelayout['v_status']] == 9) {
 //            $chosen_key = ''; //mc12345678 unnecessary because assigned regardless
             /*switch (EP4_DB_FILTER_KEY) {
               case 'products_model':
@@ -411,7 +411,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             break;
         }*/
 
-        if ($items[$filelayout['v_status']] == 9 && zen_not_null($items[$filelayout[$chosen_key]])) {
+        if (isset($filelayout['v_status']) && isset($items[$filelayout['v_status']]) && $items[$filelayout['v_status']] == 9 && zen_not_null($items[$filelayout[$chosen_key]])) {
           // cannot delete product that is not found
           $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DELETE_NOT_FOUND, $items[$filelayout[$chosen_key]], $chosen_key);
           continue;
@@ -2278,7 +2278,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
               p.products_id='.(int)$v_products_id);
             $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) : mysql_fetch_array($result_incategory));
             if (!zen_not_null($result_incategory['products_id']) || count($result_incategory) <= 0 /* ($ep_uses_mysqli ? mysqli_num_rows($result_incategory) : mysql_num_rows($result_incategory)) == 0 */) { // nope, this is a new category for this product
-              if ($items[$filelayout['v_status']] == 7) {
+              if (isset($filelayout['v_status']) && isset($items[$filelayout['v_status']]) && $items[$filelayout['v_status']] == 7) {
 
                 /* $result_incategory = ep_4_query('SELECT
                   '.TABLE_PRODUCTS.'.master_categories_id
@@ -2338,7 +2338,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 }
               } // Don't move the product
             } else { // already in this category, nothing to do! // Though may need to do the move action so there is still possibly something to do...
-              if ($items[$filelayout['v_status']] == 7) {
+              if (isset($filelayout['v_status']) && isset($items[$filelayout['v_status']]) && $items[$filelayout['v_status']] == 7) {
 //                $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) : mysql_fetch_array($result_incategory));
 
 //do category move action.
