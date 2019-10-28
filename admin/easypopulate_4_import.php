@@ -2542,8 +2542,12 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
     zen_expire_specials();
   }
   if (($ep_warning_count > 0) || ($ep_error_count > 0)) {
-    $messageStack->add(EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE_ISSUES, 'warning');
+    if (!empty($messageStack) && is_object($messageStack)) {
+      $messageStack->add(EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE_ISSUES, 'warning');
+    }
   } else {
-    $messageStack->add(EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE, 'success');
+    if (!empty($messageStack) && is_object($messageStack)) {
+      $messageStack->add(EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE, 'success');
+    }
   }
 } // END FILE UPLOADS
