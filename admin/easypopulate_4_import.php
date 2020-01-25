@@ -2541,13 +2541,4 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
   if ($has_specials == true) { // specials were in upload so check for expired specials
     zen_expire_specials();
   }
-  if (($ep_warning_count > 0) || ($ep_error_count > 0)) {
-    if (!empty($messageStack) && is_object($messageStack)) {
-      $messageStack->add(EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE_ISSUES, 'warning');
-    }
-  } else {
-    if (!empty($messageStack) && is_object($messageStack)) {
-      $messageStack->add(EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE, 'success');
-    }
-  }
 } // END FILE UPLOADS

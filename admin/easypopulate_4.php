@@ -545,6 +545,15 @@ if (isset($_POST['export']) || isset($_GET['export']) || isset($_POST['exportord
 }
 if (isset($_POST['import'])) {
   include_once('easypopulate_4_import.php'); // this file contains all data import code
+
+  if ($_POST['import'] != '') {
+    if (empty($ep_warning_count) && empty($ep_error_count)) {
+      $messageStack->add(EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE, 'success');
+    } else {
+      $messageStack->add(EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE_ISSUES, 'warning');
+    }
+  }
+
 }
 if (isset($_POST['split'])) {
   include_once('easypopulate_4_split.php'); // this file has split code
