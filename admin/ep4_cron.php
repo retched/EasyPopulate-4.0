@@ -61,9 +61,14 @@ if ($result == FALSE)  die("Error: application_top not found.\nMake sure you hav
 $_SERVER['HTTP_USER_AGENT'] = 'Zen Cart update';
 // $_SERVER['REMOTE_ADDR'] = DB_SERVER;
 // echo 'PHP_SAPI = ' . PHP_SAPI . "\n";
+
+// Report inability to execute and exit operation with appropriate response.
+if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(FILENAME_EASYPOPULATE_4, '.php') ? FILENAME_EASYPOPULATE_4 . '.php' : FILENAME_EASYPOPULATE_4))))
+  echo "Error: File not found: " . (!strstr(FILENAME_EASYPOPULATE_4, '.php') ? FILENAME_EASYPOPULATE_4 . '.php' : FILENAME_EASYPOPULATE_4) . ".\nMake sure you have placed the ep4_cron.php file in your (renamed) Admin folder and that Easy Populate V4 is properly installed.\n\n";
+  exit(1);
+}
+
 // main execution area identifying if EP4 is installed
-if (defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(FILENAME_EASYPOPULATE_4, '.php') ? FILENAME_EASYPOPULATE_4 . '.php' : FILENAME_EASYPOPULATE_4)))
-{
   if (IS_CLI == 'VERBOSE' && $is_browser) echo '<br><pre>' . "\n";
   if (IS_CLI == 'VERBOSE') echo 'Importing file: ' . $ep4_import_file . '... ' . "\n";
 
@@ -341,7 +346,3 @@ if (defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(FI
  // zen_update_currencies(IS_CLI == 'VERBOSE');
   if (IS_CLI == 'VERBOSE') echo 'Done.' . "\n\n";
   exit(0); // returns 0 status code, which means successful
-} else {
-  echo "Error: File not found: " . (!strstr(FILENAME_EASYPOPULATE_4, '.php') ? FILENAME_EASYPOPULATE_4 . '.php' : FILENAME_EASYPOPULATE_4) . ".\nMake sure you have placed the ep4_cron.php file in your (renamed) Admin folder and that Easy Populate V4 is properly installed.\n\n";
-  exit(1);
-}
