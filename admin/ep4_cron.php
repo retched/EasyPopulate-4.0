@@ -85,8 +85,8 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(
   $csv_delimiter = ","; // "\t" = tab AND "," = COMMA
   $csv_enclosure = '"';
   $category_delimiter = "\x5e";
-  define(EP4_DB_FILTER_KEY, 'products_model');
-  define('EP4_ADMIN_TEMP_DIRECTORY', 'true');
+  if (!defined('EP4_DB_FILTER_KEY')) define(EP4_DB_FILTER_KEY, 'products_model');
+  if (!defined('EP4_ADMIN_TEMP_DIRECTORY')) define('EP4_ADMIN_TEMP_DIRECTORY', 'true');
 
   $tempdir = EASYPOPULATE_4_CONFIG_TEMP_DIR; // This ideally should not actually include the Admin Directory in the variable.
   $ep_date_format = EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT;
