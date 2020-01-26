@@ -1959,6 +1959,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
               $result = ep_4_query($sql);
               unset($sql);
 
+              // Product not found, must add the product.
               if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) {
                   unset($result);
                 $sql = "INSERT INTO " . TABLE_PRODUCTS_DESCRIPTION . " (
@@ -2287,6 +2288,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   zen_record_admin_activity('Product ' . (int) $v_products_id . ' copied as link to category ' . (int) $v_categories_id . ' via EP4.', 'info');
                 }
               }
+              // Product is not in category and product's master category is being changed.
               if (ep4_field_in_file('v_status') && $items[$filelayout['v_status']] == 7) {
 
                 /* $result_incategory = ep_4_query('SELECT
