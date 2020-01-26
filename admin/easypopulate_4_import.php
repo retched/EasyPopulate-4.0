@@ -1769,7 +1769,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 if (isset($v_products_description[$lang_id_code]) || (!empty($v_products_description) && array_key_exists($lang_id_code, $v_products_description))) {
                   $v_products_description[$lang_id_code] = $_POST['products_description'][$lang_id_code];
                   if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_products_description_' . $lang_id)) {
-                    $v_products_desc_store = $v_products_name[$lang_id_code];
+                    $v_products_desc_store = $v_products_description[$lang_id_code];
                   }
                 }
 
