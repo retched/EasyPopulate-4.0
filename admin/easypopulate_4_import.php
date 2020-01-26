@@ -2278,6 +2278,15 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
               p.products_id='.(int)$v_products_id);
             $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) : mysql_fetch_array($result_incategory));
             if (!zen_not_null($result_incategory['products_id']) || count($result_incategory) <= 0 /* ($ep_uses_mysqli ? mysqli_num_rows($result_incategory) : mysql_num_rows($result_incategory)) == 0 */) { // nope, this is a new category for this product
+              // Product is new to the category, category is not being changed for product, and product should be added to category
+              // Don't move the product
+              if (!ep4_field_in_file('v_status') || ($items[$filelayout['v_status']] != 7 )) {
+                $res1 = ep_4_query('INSERT INTO ' . TABLE_PRODUCTS_TO_CATEGORIES . ' (products_id, categories_id)
+            VALUES (' . (int)$v_products_id . ', ' . (int)$v_categories_id . ')');
+                if ($res1) {
+                  zen_record_admin_activity('Product ' . (int) $v_products_id . ' copied as link to category ' . (int) $v_categories_id . ' via EP4.', 'info');
+                }
+              }
               if (isset($filelayout['v_status']) && isset($items[$filelayout['v_status']]) && $items[$filelayout['v_status']] == 7) {
 
                 /* $result_incategory = ep_4_query('SELECT
@@ -2330,13 +2339,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                     }
                   } // EOF Master category is not defined.
                 } // End if master and category different, nothing else to do as no where to go because both are the same...
-              } /* EOF status == Move */ else {
-                $res1 = ep_4_query('INSERT INTO ' . TABLE_PRODUCTS_TO_CATEGORIES . ' (products_id, categories_id)
-            VALUES (' . (int)$v_products_id . ', ' . (int)$v_categories_id . ')');
-                if ($res1) {
-                  zen_record_admin_activity('Product ' . (int) $v_products_id . ' copied as link to category ' . (int) $v_categories_id . ' via EP4.', 'info');
-                }
-              } // Don't move the product
+              } /* EOF status == Move */
             } else { // already in this category, nothing to do! // Though may need to do the move action so there is still possibly something to do...
               if (isset($filelayout['v_status']) && isset($items[$filelayout['v_status']]) && $items[$filelayout['v_status']] == 7) {
 //                $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) : mysql_fetch_array($result_incategory));
