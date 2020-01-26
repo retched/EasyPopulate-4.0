@@ -1967,12 +1967,12 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                         ? "products_name, "
                         : "") .
                   ((isset($filelayout['v_products_description_' . $lang_id]) || isset($filelayout['v_products_description_' . $lang_id_code]) || $product_is_new)
-                    ? " products_description, "
+                    ? "products_description, "
                     : "");
                 if ($ep_supported_mods['psd'] == true && isset($v_products_short_desc)) {
-                  $sql .= " products_short_desc,";
+                  $sql .= "products_short_desc, ";
                 }
-                $sql .= (isset($filelayout['v_products_url_' . $lang_id]) || isset($filelayout['v_products_url_' . $lang_id_code]) ? " products_url, " : "");
+                $sql .= (isset($filelayout['v_products_url_' . $lang_id]) || isset($filelayout['v_products_url_' . $lang_id_code]) ? "products_url, " : "");
                 $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_INSERT_FIELDS');
                 $sql .= "
                          language_id )
@@ -2109,7 +2109,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 $sql = "UPDATE " . TABLE_PRODUCTS_DESCRIPTION . " SET ";
                 $update_count = false;
                 if (isset($filelayout['v_products_name_' . $lang_id]) || isset($filelayout['v_products_name_' . $lang_id_code])) {
-                  $sql .= " products_name      = :v_products_name:";
+                  $sql .= "products_name      = :v_products_name:";
                   $update_count = true;
                 }
                 if (isset($filelayout['v_products_description_' . $lang_id]) || isset($filelayout['v_products_description_' . $lang_id_code]) || $product_is_new) {
@@ -2120,7 +2120,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   $sql .= ($update_count ? ", " : "") . "products_short_desc = :v_products_short_desc:";
                 }
                 if (isset($filelayout['v_products_url_' . $lang_id]) || isset($filelayout['v_products_url_' . $lang_id_code])) {
-                  $sql .= ($update_count ? ", " : "") . " products_url = :v_products_url: ";
+                  $sql .= ($update_count ? ", " : "") . "products_url = :v_products_url: ";
                   $update_count = true;
                 }
                 // If using this notifier to add to the $sql, the when something is added be sure to
