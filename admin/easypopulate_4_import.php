@@ -275,10 +275,10 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             p.products_model   = :products_model:";
             break;
         }*/
-        if (isset($filelayout['v_products_model']) && isset($items[$filelayout['v_products_model']])) {
+        if (ep4_field_in_file('v_products_model')) {
           $sql = $db->bindVars($sql, ':products_model:', $items[$filelayout['v_products_model']], $zc_support_ignore_null);
         }
-        if (isset($filelayout['v_products_id']) && isset($items[$filelayout['v_products_id']])) {
+        if (ep4_field_in_file('v_products_id')) {
           $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_products_id']], 'integer');
         }
         $result = ep_4_query($sql);
@@ -298,7 +298,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
           // let's check and delete it if requested
           // v_status == 9 is a delete request
           $continueNextRow = false;
-          if (isset($filelayout['v_status']) && isset($items[$filelayout['v_status']]) && $items[$filelayout['v_status']] == 9) {
+          if (ep4_field_in_file('v_status') && $items[$filelayout['v_status']] == 9) {
 //            $chosen_key = ''; //mc12345678 unnecessary because assigned regardless
             /*switch (EP4_DB_FILTER_KEY) {
               case 'products_model':
@@ -411,7 +411,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             break;
         }*/
 
-        if (isset($filelayout['v_status']) && isset($items[$filelayout['v_status']]) && $items[$filelayout['v_status']] == 9 && zen_not_null($items[$filelayout[$chosen_key]])) {
+        if (ep4_field_in_file('v_status') && $items[$filelayout['v_status']] == 9 && zen_not_null($items[$filelayout[$chosen_key]])) {
           // cannot delete product that is not found
           $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DELETE_NOT_FOUND, $items[$filelayout[$chosen_key]], $chosen_key);
           continue;
@@ -800,14 +800,14 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
         $categories_name_exists = false; // assume no column defined
         foreach ($langcode as $lang) {
           // test column headers for each language
-          if (isset($filelayout['v_categories_name_' . $lang['id']]) && isset($items[$filelayout['v_categories_name_' . $lang['id']]]) && zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['id']]]))) { // import column found
+          if (ep4_field_in_file('v_categories_name_' . $lang['id']) && zen_not_null($items[$filelayout['v_categories_name_' . $lang['id']]])) { // import column found
             $categories_name_exists['id'] = true; // at least one language column defined
             break;
           }
         }
         foreach ($langcode as $lang) {
           // test column headers for each language
-          if (isset($filelayout['v_categories_name_' . $lang['code']]) && isset($items[$filelayout['v_categories_name_' . $lang['code']]]) && zen_not_null(trim($items[$filelayout['v_categories_name_' . $lang['code']]]))) { // import column found
+          if (ep4_field_in_file('v_categories_name_' . $lang['code']) && zen_not_null($items[$filelayout['v_categories_name_' . $lang['code']]])) { // import column found
             $categories_name_exists['code'] = true; // at least one language column defined
             break;
           }
@@ -2287,7 +2287,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   zen_record_admin_activity('Product ' . (int) $v_products_id . ' copied as link to category ' . (int) $v_categories_id . ' via EP4.', 'info');
                 }
               }
-              if (isset($filelayout['v_status']) && isset($items[$filelayout['v_status']]) && $items[$filelayout['v_status']] == 7) {
+              if (ep4_field_in_file('v_status') && $items[$filelayout['v_status']] == 7) {
 
                 /* $result_incategory = ep_4_query('SELECT
                   '.TABLE_PRODUCTS.'.master_categories_id
@@ -2341,7 +2341,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 } // End if master and category different, nothing else to do as no where to go because both are the same...
               } /* EOF status == Move */
             } else { // already in this category, nothing to do! // Though may need to do the move action so there is still possibly something to do...
-              if (isset($filelayout['v_status']) && isset($items[$filelayout['v_status']]) && $items[$filelayout['v_status']] == 7) {
+              if (ep4_field_in_file('v_status') && $items[$filelayout['v_status']] == 7) {
 //                $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) : mysql_fetch_array($result_incategory));
 
 //do category move action.
