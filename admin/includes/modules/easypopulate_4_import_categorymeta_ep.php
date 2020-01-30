@@ -99,8 +99,8 @@
             $sql = $db->bindVars($sql, ':metatags_description:', ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $lid]]), 'string');
             $sql = $db->bindVars($sql, ':categories_id:', $items[$filelayout['v_categories_id']], 'integer');
             $sql = $db->bindVars($sql, ':language_id:', $lid, 'integer');
-            if (($row && (isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid]))) || !$row) {
-            $result = ep_4_query($sql);
+            if (!$row || (isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid]))) {
+              $result = ep_4_query($sql);
             }
             if ($result) {
               zen_record_admin_activity('Inserted/Updated category metatag information ' . (int) $items[(int) $filelayout['v_categories_id']] . ' via EP4.', 'info');
