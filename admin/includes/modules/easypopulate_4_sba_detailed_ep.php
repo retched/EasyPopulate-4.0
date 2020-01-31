@@ -93,7 +93,7 @@
           }
           $ep_update_count++;
         } else { // error Attribute entry not found - needs work!
-          $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Attribute Entry on ' . substr($chosen_key, 2) . 'Model: </b>%s - Not Found!</font>', $items[$filelayout[$chosen_key]]);
+          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_SBA_DETAIL_NOT_FOUND, $items[$filelayout[$chosen_key]], $chosen_key);
           $ep_error_count++;
         } // if
         print(str_repeat(" ", 300));
