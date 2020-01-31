@@ -8,6 +8,7 @@ define('EASYPOPULATE_4_DISPLAY_MANUFACTURERS', 'Hersteller');
 define('EASYPOPULATE_4_DISPLAY_FILTERABLE_EXPORTS', 'Filterbare Exporte:');
 define('EASYPOPULATE_4_DISPLAY_PRODUCTS_PRICE_EXPORT_OPTION', 'Artikel &amp; Preis Export/Import Optionen:');
 define('EASYPOPULATE_4_DISPLAY_COMPLETE_PRODUCTS', '<b>Alle Artikel</b> (mit Metatags falls in der Konfiguration aktiviert)');
+define('EASYPOPULATE_4_DISPLAY_COMPLETE_PRODUCTS_SINGLE', '<b>Alle Artikel an master_categories_id (ohne Linked)</b> (mit Metatags)');
 define('EASYPOPULATE_4_DISPLAY_PRICE_QTY', '<b>Artikelnummer/Preis/Anzahl</b> (mit Sonderangeboten)');
 define('EASYPOPULATE_4_DISPLAY_PRICE_BREAKS', '<b>Artikelnummer/Preis/Staffeklpreise</b>');
 define('EASYPOPULATE_4_DISPLAY_FEATURED', '<b>Empfohlene Artikel</b>');
