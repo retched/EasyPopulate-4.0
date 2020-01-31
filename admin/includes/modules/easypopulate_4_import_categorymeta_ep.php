@@ -29,32 +29,69 @@
           }
           foreach ($langcode as $key => $lang) {
             $lid = $lang['id'];
+            $lid_code = $lang['id_code'];
             // $items[$filelayout['v_categories_name_'.$lid]];
             // $items[$filelayout['v_categories_description_'.$lid]];
-          if (isset($filelayout['v_categories_name_' . $lid]) || isset($filelayout['v_categories_description_' . $lid])) {
-            $sql = "UPDATE " . TABLE_CATEGORIES_DESCRIPTION . " SET ";
+            if (isset($filelayout['v_categories_name_' . $lid]) || isset($filelayout['v_categories_description_' . $lid]) || isset($filelayout['v_categories_name_' . $lid_code]) || isset($filelayout['v_categories_description_' . $lid_code])) {
+              $sql = "UPDATE " . TABLE_CATEGORIES_DESCRIPTION . " SET ";
               $update_count = false;
-              if (isset($filelayout['v_categories_name_' . $lid])) {
+              if (isset($filelayout['v_categories_name_' . $lid]) || isset($filelayout['v_categories_name_' . $lid_code])) {
                 $sql .= "categories_name        = :categories_name:";
                 $update_count = true;
               }
-              if (isset($filelayout['v_categories_description_' . $lid])) {
+              if (isset($filelayout['v_categories_description_' . $lid]) || isset($filelayout['v_categories_description_' . $lid_code])) {
                 $sql .= ($update_count ? ", " : "") . "categories_description = :categories_description: ";
                 $update_count = true;
               }
               $sql .= "
-              WHERE
-              (categories_id = :categories_id: AND language_id = :language_id:)";
+                WHERE
+                (categories_id = :categories_id: AND language_id = :language_id:)";
 
-            $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($items[$filelayout['v_categories_name_' . $lid]]), 'string');
-            $sql = $db->bindVars($sql, ':categories_description:', ep_4_curly_quotes($items[$filelayout['v_categories_description_' . $lid]]), 'string');
-            $sql = $db->bindVars($sql, ':categories_id:', $items[$filelayout['v_categories_id']], 'integer');
-            $sql = $db->bindVars($sql, ':language_id:', $lid, 'integer');
-            $result = ep_4_query($sql);
-            if ($result) {
-              zen_record_admin_activity('Updated category description ' . (int) $items[$filelayout['v_categories_id']] . ' via EP4.', 'info');
+              // Need to admin sanitize the categories_name and categories_description and handle both languages id and  code.
+
+              if (!empty($_POST)) {
+                $oldCatMetaPost = $_POST;
+                unset($_POST);
+              }
+              
+              if (ep4_field_in_file('v_categories_name_' . $lid)) {
+                $_POST['categories_name'][$lid] = ep_4_curly_quotes($items[$filelayout['v_categories_name_' . $lid]]);
+              }
+              if (ep4_field_in_file('v_categories_name_' . $lid_code) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_categories_name_' . $lid))) {
+                $_POST['categories_name'][$lid] = ep_4_curly_quotes($items[$filelayout['v_categories_name_' . $lid_code]]);
+              }
+              
+              if (ep4_field_in_file('v_categories_description_' . $lid)) {
+                $_POST['categories_description'][$lid] = ep_4_curly_quotes($items[$filelayout['v_categories_description_' . $lid]]);
+              }
+              if (ep4_field_in_file('v_categories_description_' . $lid_code) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_categories_description_' . $lid))) {
+                $_POST['categories_description'][$lid] = ep_4_curly_quotes($items[$filelayout['v_categories_description_' . $lid_code]]);
+              }
+              
+              if (class_exists('AdminRequestSanitizer')) {
+                $sanitizer = AdminRequestSanitizer::getInstance();
+                $sanitizer->runSanitizers();
+                unset($sanitizer);
+              }
+              
+              $thiscategorymetaname = $_POST['categories_name'][$lid];
+              $thiscategorymetadescription = $_POST['categories_description'][$lid];
+              
+              unset($_POST);
+              if (!empty($oldCatMetaPost)) {
+                $_POST = $oldCatMetaPost;
+                unset($oldCatMetaPost);
+              }
+              
+              $sql = $db->bindVars($sql, ':categories_name:', $thiscategorymetaname, 'string');
+              $sql = $db->bindVars($sql, ':categories_description:', $thiscategorymetadescription, 'string');
+              $sql = $db->bindVars($sql, ':categories_id:', $items[$filelayout['v_categories_id']], 'integer');
+              $sql = $db->bindVars($sql, ':language_id:', $lid, 'integer');
+              $result = ep_4_query($sql);
+              if ($result) {
+                zen_record_admin_activity('Updated category description ' . (int) $items[$filelayout['v_categories_id']] . ' via EP4.', 'info');
+              }
             }
-          }
             // $items[$filelayout['v_metatags_title_'.$lid]];
             // $items[$filelayout['v_metatags_keywords_'.$lid]];
             // $items[$filelayout['v_metatags_description_'.$lid]];
@@ -66,25 +103,25 @@
             $result = ep_4_query($sql);
             if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
               // UPDATE
-            if (isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid])) {
-              $sql = "UPDATE " . TABLE_METATAGS_CATEGORIES_DESCRIPTION . " SET ";
-                $update_count = false;
-                if (isset($filelayout['v_metatags_title_' . $lid])) {
-                  $sql .= "metatags_title    = :metatags_title: ";
-                  $update_count = true;
-                }
-                if (isset($filelayout['v_metatags_keywords_' . $lid])) {
-                  $sql .= ($update_count ? ", " : "") . "metatags_keywords   = :metatags_keywords:";
-                  $update_count = true;
-                }
-                if (isset($filelayout['v_metatags_description_' . $lid])) {
-                  $sql .= ($update_count ? ", " : "") . "metatags_description = :metatags_description:";
-                  $update_count = true;
-                }
-              $sql .= "
-              WHERE
-              (categories_id = :categories_id: AND language_id = :language_id:)";
-            }
+              if (isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid]) || isset($filelayout['v_metatags_title_' . $lid_code]) || isset($filelayout['v_metatags_keywords_' . $lid_code]) || isset($filelayout['v_metatags_description_' . $lid_code])) {
+                $sql = "UPDATE " . TABLE_METATAGS_CATEGORIES_DESCRIPTION . " SET ";
+                  $update_count = false;
+                  if (isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_title_' . $lid_code])) {
+                    $sql .= "metatags_title    = :metatags_title: ";
+                    $update_count = true;
+                  }
+                  if (isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid_code])) {
+                    $sql .= ($update_count ? ", " : "") . "metatags_keywords   = :metatags_keywords:";
+                    $update_count = true;
+                  }
+                  if (isset($filelayout['v_metatags_description_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid_code])) {
+                    $sql .= ($update_count ? ", " : "") . "metatags_description = :metatags_description:";
+                    $update_count = true;
+                  }
+                $sql .= "
+                WHERE
+                (categories_id = :categories_id: AND language_id = :language_id:)";
+              }
             } else {
               // NEW - this should not happen
               $sql = "INSERT INTO " . TABLE_METATAGS_CATEGORIES_DESCRIPTION . " SET
@@ -94,9 +131,53 @@
                 categories_id    = :categories_id:,
                 language_id      = :language_id:";
             }
-            $sql = $db->bindVars($sql, ':metatags_title:', ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $lid]]), 'string');
-            $sql = $db->bindVars($sql, ':metatags_keywords:', ep_4_curly_quotes($items[$filelayout['v_metatags_keywords_' . $lid]]), 'string');
-            $sql = $db->bindVars($sql, ':metatags_description:', ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $lid]]), 'string');
+            
+            // Need to admin sanitize the categories_name and categories_description and handle both languages id and  code.
+            if (!empty($_POST)) {
+              $oldCatMetaPost = $_POST;
+              unset($_POST);
+            }
+            
+            if (ep4_field_in_file('v_metatags_title_' . $lid)) {
+              $_POST['metatags_title'][$lid] = ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $lid]]);
+            }
+            if (ep4_field_in_file('v_metatags_title_' . $lid_code) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_metatags_title_' . $lid))) {
+              $_POST['metatags_title'][$lid] = ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $lid_code]]);
+            }
+            
+            if (ep4_field_in_file('v_metatags_keywords_' . $lid)) {
+              $_POST['metatags_keywords'][$lid] = ep_4_curly_quotes($items[$filelayout['v_metatags_keywords_' . $lid]]);
+            }
+            if (ep4_field_in_file('v_metatags_keywords_' . $lid_code) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_metatags_keywords_' . $lid))) {
+              $_POST['metatags_keywords'][$lid] = ep_4_curly_quotes($items[$filelayout['v_metatags_keywords_' . $lid_code]]);
+            }
+            
+            if (ep4_field_in_file('v_metatags_description_' . $lid)) {
+              $_POST['metatags_description'][$lid] = ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $lid]]);
+            }
+            if (ep4_field_in_file('v_metatags_description_' . $lid_code) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_metatags_description_' . $lid))) {
+              $_POST['metatags_description'][$lid] = ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $lid_code]]);
+            }
+            
+            if (class_exists('AdminRequestSanitizer')) {
+              $sanitizer = AdminRequestSanitizer::getInstance();
+              $sanitizer->runSanitizers();
+              unset($sanitizer);
+            }
+            
+            $thiscategorymetatagstitle = $_POST['metatags_title'][$lid];
+            $thiscategorymetatagskeywords = $_POST['metatags_keywords'][$lid];
+            $thiscategorymetadtagsescription = $_POST['metatags_description'][$lid];
+            
+            unset($_POST);
+            if (!empty($oldCatMetaPost)) {
+              $_POST = $oldCatMetaPost;
+              unset($oldCatMetaPost);
+            }
+            
+            $sql = $db->bindVars($sql, ':metatags_title:', $thiscategorymetatagstitle, 'string');
+            $sql = $db->bindVars($sql, ':metatags_keywords:', $thiscategorymetatagskeywords, 'string');
+            $sql = $db->bindVars($sql, ':metatags_description:', $thiscategorymetatagsdescription, 'string');
             $sql = $db->bindVars($sql, ':categories_id:', $items[$filelayout['v_categories_id']], 'integer');
             $sql = $db->bindVars($sql, ':language_id:', $lid, 'integer');
             if (!$row || (isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid]))) {
