@@ -26,7 +26,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
 
   // READ products_id and products_model from TABLE_PRODUCTS
   // Since products_model must be unique (for EP4 at least), this query can be LIMIT 1
-  $query ="SELECT * FROM ".TABLE_PRODUCTS." WHERE (" . $chosen_key_sql . ")";
+  $query ="SELECT p.* FROM " . TABLE_PRODUCTS . " p WHERE (" . $chosen_key_sql . ")";
   $query = $db->bindVars($query, ':' . $chosen_key_sub . ':', ${$chosen_key}, 'string');
   $result = ep_4_query($query);
 
@@ -80,8 +80,8 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
 
 // HERE ==> language 1 is main key, and assumbed
       $l_id = $language_id; // temporary check - should this be the default language id?
-      $query  = "SELECT products_options_id, products_options_name FROM ".TABLE_PRODUCTS_OPTIONS."
-        WHERE products_options_name = :v_products_options_name: AND language_id = :language_id:";
+      $query  = "SELECT po.products_options_id, po.products_options_name FROM " . TABLE_PRODUCTS_OPTIONS . " po
+        WHERE po.products_options_name = :v_products_options_name: AND po.language_id = :language_id:";
       $query = $db->bindVars($query, ':v_products_options_name:', $v_products_options_name[$l_id], 'string');
       $query = $db->bindVars($query, ':language_id:', $l_id, 'integer');
       $result = ep_4_query($query);
@@ -91,7 +91,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
         $v_products_options_id = $row['products_options_id']; // this is not getting used for anything!
       // get current products_options_id
       } else { // products_options_name is not in TABLE_PRODUCTS so ADD it
-        $sql_max = "SELECT MAX(products_options_id) + 1 max FROM ".TABLE_PRODUCTS_OPTIONS;
+        $sql_max = "SELECT MAX(po.products_options_id) + 1 max FROM " . TABLE_PRODUCTS_OPTIONS . " po";
         $result_max = ep_4_query($sql_max);
         $row_max = ($ep_uses_mysqli ? mysqli_fetch_array($result_max) : mysql_fetch_array($result_max));
         unset($result_max);
@@ -124,7 +124,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
       $products_options_values_sort_order = 1;
 
       // Get max index id for TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS
-      $sql_max2 = "SELECT MAX(products_options_values_to_products_options_id) +1 max FROM ".TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS;
+      $sql_max2 = "SELECT MAX(povtpo.products_options_values_to_products_options_id) + 1 max FROM " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " povtpo";
       $result2 = ep_4_query($sql_max2);
       unset($sql_max2);
       $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
@@ -136,7 +136,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
       }*/
 
       // Get max index id for TABLE_PRODUCTS_OPTIONS_VALUES
-      $sql_max3 = "SELECT MAX(products_options_values_id) + 1 max FROM ".TABLE_PRODUCTS_OPTIONS_VALUES;
+      $sql_max3 = "SELECT MAX(pov.products_options_values_id) + 1 max FROM " . TABLE_PRODUCTS_OPTIONS_VALUES . " pov";
       $result3 = ep_4_query($sql_max3);
       unset($sql_max3);
       $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
@@ -161,17 +161,17 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
           // for multi-language values names
           $l_id = $language_id; // first defined language is main key - mandatory
           $sql = "SELECT
-            a.products_options_id,
-            a.products_options_values_id,
-            b.products_options_values_id,
-            b.products_options_values_name
+            povtpo.products_options_id,
+            povtpo.products_options_values_id,
+            pov.products_options_values_id,
+            pov.products_options_values_name
             FROM "
-            .TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS." as a, "
-            .TABLE_PRODUCTS_OPTIONS_VALUES." as b
+            . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " as povtpo, "
+            . TABLE_PRODUCTS_OPTIONS_VALUES . " as pov
             WHERE
-            a.products_options_id = :v_products_options_id: AND
-            a.products_options_values_id = b.products_options_values_id AND
-            b.products_options_values_name = :values_name:";
+            povtpo.products_options_id = :v_products_options_id: AND
+            povtpo.products_options_values_id = pov.products_options_values_id AND
+            pov.products_options_values_name = :values_name:";
           $sql = $db->bindVars($sql, ':v_products_options_id:', $v_products_options_id, 'integer');
           $sql = $db->bindVars($sql, ':values_name:', $values_names_array[$l_id][$values_names_index], 'string');
           $result4 = ep_4_query($sql);
@@ -208,13 +208,13 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
         // Now associate "product_options_values_id" with "product_options_id" so the names can be associated with a product_id
         if (in_array($v_products_options_type, $exclude_array)) { // excluded type get special TABLE_PRODUCTS_OPTIONS_VALUES id=0 (a TEXT type)
           $sql5 = "SELECT
-            products_options_id,
-            products_options_values_id
+            povtpo.products_options_id,
+            povtpo.products_options_values_id
             FROM "
-            .TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS."
+            . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " povtpo
             WHERE
-            products_options_id =  :v_products_options_id: AND
-            products_options_values_id = '0'";
+            povtpo.products_options_id =  :v_products_options_id: AND
+            povtpo.products_options_values_id = 0";
           $sql5 = $db->bindVars($sql5, ':v_products_options_id:', $v_products_options_id, 'integer');
           $result5 = ep_4_query($sql5);
           // if $result5 == 0, combination not found
@@ -228,17 +228,17 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
         } else { // add $products_options_values_id
           $l_id = $language_id; // default first language is main key
           $sql5 = "SELECT
-            a.products_options_id,
-            a.products_options_values_id,
-            b.products_options_values_id,
-            b.products_options_values_name
+            povtpo.products_options_id,
+            povtpo.products_options_values_id,
+            pov.products_options_values_id,
+            pov.products_options_values_name
             FROM "
-            .TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS. " as a, "
-            .TABLE_PRODUCTS_OPTIONS_VALUES. " as b
+            . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " as povtpo, "
+            . TABLE_PRODUCTS_OPTIONS_VALUES . " as pov
             WHERE
-            a.products_options_id = :v_products_options_id: AND
-            a.products_options_values_id = b.products_options_values_id AND
-            b.products_options_values_name = :values_name:";
+            povtpo.products_options_id = :v_products_options_id: AND
+            povtpo.products_options_values_id = pov.products_options_values_id AND
+            pov.products_options_values_name = :values_name:";
           $sql5 = $db->bindVars($sql5, ':v_products_options_id:', $v_products_options_id, 'integer');
           $sql5 = $db->bindVars($sql5, ':values_name:', $values_names_array[$l_id][$values_names_index], 'string');
           $result5 = ep_4_query($sql5);
@@ -261,17 +261,17 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
         } else {
           $l_id = $language_id; // default first language is main key
           $sql5 = "SELECT
-            a.products_options_id,
-            a.products_options_values_id,
-            b.products_options_values_id,
-            b.products_options_values_name
+            povtpo.products_options_id,
+            povtpo.products_options_values_id,
+            pov.products_options_values_id,
+            pov.products_options_values_name
             FROM "
-            .TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS. " as a, "
-            .TABLE_PRODUCTS_OPTIONS_VALUES. " as b
+            . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " as povtpo, "
+            . TABLE_PRODUCTS_OPTIONS_VALUES . " as pov
             WHERE
-            a.products_options_id = :v_products_options_id: AND
-            a.products_options_values_id = b.products_options_values_id AND
-            b.products_options_values_name = :values_name:";
+            povtpo.products_options_id = :v_products_options_id: AND
+            povtpo.products_options_values_id = pov.products_options_values_id AND
+            pov.products_options_values_name = :values_name:";
           $sql5 = $db->bindVars($sql5, ':v_products_options_id:', $v_products_options_id, 'integer');
           $sql5 = $db->bindVars($sql5, ':values_name:', $values_names_array[$l_id][$values_names_index], 'string');
           $result5 = ep_4_query($sql5);
@@ -283,12 +283,12 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
 // HERE ==========> // INSERT vs UPDATE!!!
           // need to query the v_products_id, v_products_options_id, and a_products_options_values_id
           // if found update, else insert new values
-          $sql6 = "SELECT * FROM "
-            .TABLE_PRODUCTS_ATTRIBUTES. "
+          $sql6 = "SELECT pa.* FROM "
+            . TABLE_PRODUCTS_ATTRIBUTES . " pa
             WHERE
-            products_id = :v_products_id: AND
-            options_id = :v_products_options_id: AND
-            options_values_id = :a_products_options_values_id:";
+            pa.products_id = :v_products_id: AND
+            pa.options_id = :v_products_options_id: AND
+            pa.options_values_id = :a_products_options_values_id:";
           $sql6 = $db->bindVars($sql6, ':v_products_id:', $v_products_id, 'integer');
           $sql6 = $db->bindVars($sql6, ':v_products_options_id:', $v_products_options_id, 'integer');
           $sql6 = $db->bindVars($sql6, ':a_products_options_values_id:', $a_products_options_values_id, 'integer');
@@ -316,7 +316,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
         }
 
         // Get max index id for TABLE_PRODUCTS_OPTIONS_VALUES
-        $sql_max3 = "SELECT MAX(products_options_values_id) + 1 max FROM ".TABLE_PRODUCTS_OPTIONS_VALUES;
+        $sql_max3 = "SELECT MAX(pov.products_options_values_id) + 1 max FROM " . TABLE_PRODUCTS_OPTIONS_VALUES . " pov";
         $result3 = ep_4_query($sql_max3);
         unset($sql_max3);
         $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
@@ -325,7 +325,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
         unset($row3);
 
         // Get max index id for TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS
-        $sql_max2 = "SELECT MAX(products_options_values_to_products_options_id) + 1 max FROM ".TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS;
+        $sql_max2 = "SELECT MAX(povtpo.products_options_values_to_products_options_id) + 1 max FROM " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " povtpo";
         $result2 = ep_4_query($sql_max2);
         unset($sql_max2);
         $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
