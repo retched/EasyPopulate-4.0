@@ -9,23 +9,49 @@
 
         @set_time_limit($ep_execution);
 
+        if (!ep4_field_in_file('v_categories_id')) {
+          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_ID_NOT_FOUND, '0');
+          $ep_error_count++;
+          print(str_repeat(" ", 300));
+          flush();
+          break;
+        } // if category found
+
         // $items[$filelayout['v_categories_id']];
         // $items[$filelayout['v_categories_image']];
         $sql = 'SELECT categories_id FROM ' . TABLE_CATEGORIES . ' WHERE (categories_id = :categories_id:) LIMIT 1';
         $sql = $db->bindVars($sql, ':categories_id:', $items[$filelayout['v_categories_id']], 'integer');
         $result = ep_4_query($sql);
-        if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
+        
+        $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
+        
+        if (!$row) {
+          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_ID_NOT_FOUND, $items[$filelayout['v_categories_id']]);
+          $ep_error_count++;
+          print(str_repeat(" ", 300));
+          flush();
+          continue;
+        }
+        
+//        if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
           // UPDATE
           $sql = "UPDATE " . TABLE_CATEGORIES . " SET
             categories_image = :categories_image:,
           last_modified    = CURRENT_TIMESTAMP " . (array_key_exists('v_sort_order', $filelayout) ? ", sort_order = :sort_order:" : "" ) . "
             WHERE (categories_id = :categories_id:)";
-          $sql = $db->bindVars($sql, ':categories_image:', $items[$filelayout['v_categories_image']], 'string');
-          $sql = $db->bindVars($sql, ':sort_order:', $items[$filelayout['v_sort_order']], 'integer');
-          $sql = $db->bindVars($sql, ':categories_id:', $items[$filelayout['v_categories_id']], 'integer');
-          $result = ep_4_query($sql);
-          if ($result) {
-            zen_record_admin_activity('Updated category ' . (int) $items[$filelayout['v_categories_id']] . ' via EP4.', 'info');
+          if (ep4_field_in_file('v_categories_image') || ep4_field_in_file('v_sort_order')) {
+            if (ep4_field_in_file('v_categories_image')) {
+              $sql = $db->bindVars($sql, ':categories_image:', $items[$filelayout['v_categories_image']], 'string');
+            }
+            if (ep4_field_in_file('v_sort_order')) {
+              $sql = $db->bindVars($sql, ':sort_order:', $items[$filelayout['v_sort_order']], 'integer');
+            }
+            $sql = $db->bindVars($sql, ':categories_id:', $items[$filelayout['v_categories_id']], 'integer');
+            $result = ep_4_query($sql);
+            
+            if ($result) {
+              zen_record_admin_activity('Updated category ' . (int) $items[$filelayout['v_categories_id']] . ' via EP4.', 'info');
+            }
           }
           foreach ($langcode as $key => $lang) {
             $lid = $lang['id'];
@@ -124,11 +150,24 @@
               }
             } else {
               // NEW - this should not happen
-              $sql = "INSERT INTO " . TABLE_METATAGS_CATEGORIES_DESCRIPTION . " SET
-                metatags_title     = :metatags_title:,
-                metatags_keywords  = :metatags_keywords:,
-                metatags_description = :metatags_description:,
-                categories_id    = :categories_id:,
+              $sql = "INSERT INTO " . TABLE_METATAGS_CATEGORIES_DESCRIPTION . " SET ";
+              $update_count = false;
+              if (isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_title_' . $lid_code])) {
+                $sql .= "metatags_title    = :metatags_title:";
+                $update_count = true;
+              }
+              if (isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid_code])) {
+                $sql .= ($update_count ? ", " : "") . "metatags_keywords   = :metatags_keywords:";
+                $update_count = true;
+              }
+              if (isset($filelayout['v_metatags_description_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid_code])) {
+                $sql .= ($update_count ? ", " : "") . "metatags_description = :metatags_description:";
+                $update_count = true;
+              }
+              $sql .= ",
+                ";
+              $sql .=
+                "categories_id    = :categories_id:,
                 language_id      = :language_id:";
             }
             
@@ -188,10 +227,10 @@
             }
             $ep_update_count++;
           }
-        } else { // error Category ID not Found
+/*        } else { // error Category ID not Found
           $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_ID_NOT_FOUND, $items[$filelayout['v_categories_id']]);
           $ep_error_count++;
-        } // if category found
+        } // if category found*/
         print(str_repeat(" ", 300));
         flush();
       } // while
