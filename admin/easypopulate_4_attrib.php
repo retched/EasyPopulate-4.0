@@ -24,6 +24,13 @@ if (strpos($chosen_key_sub, 'v_') === 0) {
 
 // attribute import loop - read 1 line of data from input file
 while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== false) { // while #1 - Main Loop
+  if (!(isset($filelayout[$chosen_key]) && isset($contents[$filelayout[$chosen_key]]))) {
+    // primary key is not present in file, so can not process anything.
+    $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_NO_PRIMARY_KEY,
+                    $chosen_key);
+    $ep_error_count++; // records updated
+    break;
+  }
   ${$chosen_key} = $contents[$filelayout[$chosen_key]];
 
   // READ products_id and products_model from TABLE_PRODUCTS

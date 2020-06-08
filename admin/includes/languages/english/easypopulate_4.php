@@ -35,6 +35,7 @@ define('EASYPOPULATE_4_DISPLAY_RESULT_SBA_DETAIL_NOT_FOUND','<br /><font color="
 define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_NEW','<br /><font color="green"><b>NEW ATTRIBUTE! - %1$s:</b> %2$s, <b>Option:</b> %3$s, <b>Values:</b> %4$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_UPDATE','<br /><font color="blue"><b>UPDATED ATTRIBUTE! - %1$s:</b> %2$s <b>Option:</b> %3$s, <b>Values:</b> %4$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_SKIPPED', '<br /><font color="red"><b>SKIPPED! - Primary key: %1$s:</b>%2$s - Not Found! Unable to apply attributes.</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_NO_PRIMARY_KEY', '<br /><font color="red"><b>SKIPPED! - Primary key: %1$s:</b> - Not Found in the file! Unable to import attributes.</font>');
 
 // $messageStack defines
 // checks - msg stack alerts - output via $messageStack
