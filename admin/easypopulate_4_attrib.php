@@ -312,7 +312,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
               products_id = :v_products_id: AND
               options_id = :v_products_options_id: AND
               options_values_id = :a_products_options_values_id:";
-            $sql7 = $db->bindVars($sql7, ':values_names_index:', $values_names_index, 'integer');
+            $sql7 = $db->bindVars($sql7, ':values_names_index:', $products_options_values_sort_order, 'integer');
             $sql7 = $db->bindVars($sql7, ':v_products_id:', $v_products_id, 'integer');
             $sql7 = $db->bindVars($sql7, ':v_products_options_id:', $v_products_options_id, 'integer');
             $sql7 = $db->bindVars($sql7, ':a_products_options_values_id:', $a_products_options_values_id, 'integer');
