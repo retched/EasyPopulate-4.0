@@ -48,6 +48,8 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
       // echo "values_names: ".$contents[$filelayout['v_products_options_values_name']]."<br>";
 
       $v_products_options_type = $contents[$filelayout['v_products_options_type']];
+      $v_products_options_name = array();
+      $values_names_array = array();
       foreach ($langcode as $key => $lang) { // get each language entry
         $l_id = $lang['id'];
         $l_id_code = $lang['code'];
