@@ -40,8 +40,12 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
   while(($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) !== ($ep_uses_mysqli ? null : false)) { // BEGIN while #2
     $v_products_id = $row['products_id'];
 
-    // why am I again testing products_model? I used that to query the database in the first place!
-    if ($contents[$filelayout[$chosen_key]] == $row[$chosen_key_sub]) {
+    // why am I again testing the primary key ($contents)? I used that to query the database in the first place ($row)!
+    if ($contents[$filelayout[$chosen_key]] != $row[$chosen_key_sub]) {
+      unset($row);
+      continue;
+    }
+//    if ($contents[$filelayout[$chosen_key]] == $row[$chosen_key_sub]) {
       // echo "model: ".$contents[$filelayout['v_products_model']]."<br>";
       // echo "options_name: ".$contents[$filelayout['v_products_options_name']]."<br>";
       // echo "options_type: ".$contents[$filelayout['v_products_options_type']]."<br>";
@@ -351,7 +355,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
         $ep_update_count++; // records updated
       }
       // END: PRODUCTS OPTIONS VALUES
-    } // END: if
+    //} // END: if
     unset($row);
   }  // END: while #2
   print(str_repeat(" ", 300));
