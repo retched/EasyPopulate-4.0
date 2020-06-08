@@ -289,7 +289,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
         }
 
         // TABLE_PRODUCTS_ATTRIBUTES
-        // Finish up by associating the correct set of options with as an attribute_id
+        // Finish up by associating the correct set of options with an attribute_id
         if (in_array($v_products_options_type, $exclude_array)) { //
           $errorcheck = ep_4_query("INSERT INTO ".TABLE_PRODUCTS_ATTRIBUTES."
           (products_id, options_id, options_values_id)
