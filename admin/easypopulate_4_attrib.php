@@ -9,7 +9,8 @@ if (!defined('IS_ADMIN_FLAG')) {
 // Database default values
 $products_options_id  = 1; // this needs to auto increment for NEW products options
 $language_id          = $epdlanguage_id; // default 1=english
-$product_options_type = 0; // default 0=Dropdown, 1=Text, 2=Radio, 3=Checkbox, 4=File, 5=Read Only
+// Default product_options_type to be used in absence of one provided in the file.
+$product_options_type = PRODUCTS_OPTIONS_TYPE_SELECT; // default PRODUCTS_OPTIONS_TYPE_SELECT=0=Dropdown, PRODUCTS_OPTIONS_TYPE_TEXT=1=Text, PRODUCTS_OPTIONS_TYPE_RADIO=2=Radio, PRODUCTS_OPTIONS_TYPE_RADIO=3=Checkbox, PRODUCTS_OPTIONS_TYPE_FILE=4=File, PRODUCTS_OPTIONS_TYPE_READONLY=5=Read Only
 $products_options_values_id = 1;
 $new_options_name = 0;
 $new_options_values_name = 0;
@@ -52,7 +53,11 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
       // echo "options_type: ".$contents[$filelayout['v_products_options_type']]."<br>";
       // echo "values_names: ".$contents[$filelayout['v_products_options_values_name']]."<br>";
 
-      $v_products_options_type = $contents[$filelayout['v_products_options_type']];
+      $v_products_options_type = $product_options_type; // Assign to default
+      if (isset($filelayout['v_products_options_type']) && isset($contents[$filelayout['v_products_options_type']])) {
+        // Use file's version
+        $v_products_options_type = $contents[$filelayout['v_products_options_type']];
+      }
       $v_products_options_name = array();
       $values_names_array = array();
       foreach ($langcode as $key => $lang) { // get each language entry
@@ -87,7 +92,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
 
 // HERE ==> language 1 is main key, and assumbed
       $l_id = $language_id; // temporary check - should this be the default language id?
-      $query  = "SELECT po.products_options_id, po.products_options_name FROM " . TABLE_PRODUCTS_OPTIONS . " po
+      $query  = "SELECT po.products_options_id, po.products_options_name, po.products_options_type FROM " . TABLE_PRODUCTS_OPTIONS . " po
         WHERE po.products_options_name = :v_products_options_name: AND po.language_id = :language_id:";
       $query = $db->bindVars($query, ':v_products_options_name:', $v_products_options_name[$l_id], 'string');
       $query = $db->bindVars($query, ':language_id:', $l_id, 'integer');
@@ -96,6 +101,18 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
       // insert new products_options_name
       if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result1) : mysql_fetch_array($result1)))  {
         $v_products_options_id = $row['products_options_id']; // this is not getting used for anything!
+        // If the option name was in the database but the type is not in the file, then set it to what it was.
+        if (!(isset($filelayout['v_products_options_type']) && isset($contents[$filelayout['v_products_options_type']]))) {
+          $v_products_options_type = $row['products_options_type'];
+        } else if ($v_products_options_type != $row['products_options_type']) {
+          // This will update all product option names that have this same name in the given language without discrimination...
+          $sql_po = "UPDATE " . TABLE_PRODUCTS_OPTION . " po SET po.products_options_type = " . (int)$v_products_options_type .
+                    " WHERE po.products_options_name = :v_products_options_name:
+                            AND po.language_id = :language_id:";
+          $sql_po = $db->bindVars($sql_po, ':v_products_options_name:', $v_products_options_name[$l_id], 'string');
+          $sql_po = $db->bindVars($sql_po, ':language_id:', $l_id, 'integer');
+          $result1 = ep_4_query($sql_po);
+        }
       // get current products_options_id
       } else { // products_options_name is not in TABLE_PRODUCTS so ADD it
         $sql_max = "SELECT MAX(po.products_options_id) + 1 max FROM " . TABLE_PRODUCTS_OPTIONS . " po";
@@ -154,7 +171,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
         $products_options_values_id = 1;
       }*/
 
-      $exclude_array = array(1, 4); // exclude 1=TEXT, 4=FILE are special cases and are assigned products_options_values=0
+      $exclude_array = array(PRODUCTS_OPTIONS_TYPE_TEXT, PRODUCTS_OPTIONS_TYPE_FILE); // exclude 1=TEXT, 4=FILE are special cases and are assigned products_options_values=0
 
       while ($values_names_index < $number_of_elements) { // BEGIN: while #3: process each element in $values_names_array[]
         // TABLE: products_options_values
