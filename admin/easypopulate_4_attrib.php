@@ -14,6 +14,7 @@ $products_options_values_id = 1;
 $new_options_name = 0;
 $new_options_values_name = 0;
 $products_sort_order_increment = 10;
+$products_sort_order_start = 0;
 
 $chosen_key_sub = $chosen_key;
 if (strpos($chosen_key_sub, 'v_') === 0) {
@@ -127,9 +128,9 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
 // HERE ==> multi language products_options_values_name
       $number_of_elements = count($values_names_array[$language_id]); // all elements count must be the same
       $values_names_index = 0; // values_names index - array indexes start at zero
-      $products_options_values_sort_order = 1;
+      $products_options_values_sort_order = $products_sort_order_start;.
 
-      // Get max index id for TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS
+      // Get max index id for TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS in case others have updated the database during this operation
       $sql_max2 = "SELECT MAX(povtpo.products_options_values_to_products_options_id) + 1 max FROM " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " povtpo";
       $result2 = ep_4_query($sql_max2);
       unset($sql_max2);
@@ -141,7 +142,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
         $products_options_values_to_products_options_id = 1;
       }*/
 
-      // Get max index id for TABLE_PRODUCTS_OPTIONS_VALUES
+      // Get max index id for TABLE_PRODUCTS_OPTIONS_VALUES in case others have updated the database during this operation
       $sql_max3 = "SELECT MAX(pov.products_options_values_id) + 1 max FROM " . TABLE_PRODUCTS_OPTIONS_VALUES . " pov";
       $result3 = ep_4_query($sql_max3);
       unset($sql_max3);
