@@ -31,7 +31,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
   $result = ep_4_query($query);
 
   if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0)  { // products_model is not in TABLE_PRODUCTS
-    $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Primary key: %s:</b>%s - Not Found! Unable to apply attributes.</font>', $chosen_key, ${$chosen_key});
+    $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_SKIPPED, $chosen_key, ${$chosen_key});
     $ep_error_count++;
     continue; // skip current record (returns to while #1)
   }
@@ -339,13 +339,13 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
       } // END: while #3
       if (!$table_products_attributes_update) {
         // FEEDBACK ========> implode(",", $values_names_array[1])
-        $display_output .= sprintf('<br /><font color="green"><b>NEW ATTRIBUTE! - Model:</b> %s, <b>Option:</b> %s, <b>Values:</b> %s</font>',
-                     ${$chosen_key}, $v_products_options_name[$language_id], implode(",", $values_names_array[$language_id]));
+        $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_NEW,
+                     $chosen_key_sub, ${$chosen_key}, $v_products_options_name[$language_id], implode(",", $values_names_array[$language_id]));
         $ep_import_count++; // record inserted
       } else {
         // FEEDBACK =======>
-        $display_output .= sprintf('<br /><font color="blue"><b>UPDATED ATTRIBUTE! - Model:</b> %s <b>Option:</b> %s, <b>Values:</b> %s</font>',
-                    ${$chosen_key}, $v_products_options_name[$language_id], implode(",", $values_names_array[$language_id]));
+        $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_UPDATE,
+                    $chosen_key_sub, ${$chosen_key}, $v_products_options_name[$language_id], implode(",", $values_names_array[$language_id]));
         $ep_update_count++; // records updated
       }
       // END: PRODUCTS OPTIONS VALUES

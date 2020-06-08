@@ -32,6 +32,9 @@ define('EASYPOPULATE_4_DISPLAY_RESULT_ARTISTS_NAME_LONG','<br /><font color="red
 define('EASYPOPULATE_4_DISPLAY_RESULT_RECORD_COMPANY_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Record Company Name:</b> %1$s - exceeds max. length: %2$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_MUSIC_GENRE_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Music Genre Name:</b> %1$s - exceeds max. length: %2$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_SBA_DETAIL_NOT_FOUND','<br /><font color="red"><b>SKIPPED! - Attribute Entry on %2$s: </b>%1$s - Not Found!</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_NEW','<br /><font color="green"><b>NEW ATTRIBUTE! - %1$s:</b> %2$s, <b>Option:</b> %3$s, <b>Values:</b> %4$s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_UPDATE','<br /><font color="blue"><b>UPDATED ATTRIBUTE! - %1$s:</b> %2$s <b>Option:</b> %3$s, <b>Values:</b> %4$s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_SKIPPED', '<br /><font color="red"><b>SKIPPED! - Primary key: %1$s:</b>%2$s - Not Found! Unable to apply attributes.</font>');
 
 // $messageStack defines
 // checks - msg stack alerts - output via $messageStack
