@@ -304,7 +304,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
             $errorcheck = ep_4_query("INSERT INTO ".TABLE_PRODUCTS_ATTRIBUTES."
               (products_id, options_id, options_values_id)
               VALUES (".(int)$v_products_id.", ".(int)$v_products_options_id.",".(int)$a_products_options_values_id.")");
-            $table_products_attributes_update = 0;
+            $table_products_attributes_update = false;
           } else { // UPDATE
             $sql7 ="UPDATE ".TABLE_PRODUCTS_ATTRIBUTES." SET
               products_options_sort_order = :values_names_index:
@@ -317,7 +317,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
             $sql7 = $db->bindVars($sql7, ':v_products_options_id:', $v_products_options_id, 'integer');
             $sql7 = $db->bindVars($sql7, ':a_products_options_values_id:', $a_products_options_values_id, 'integer');
             $errorcheck = ep_4_query($sql7);
-            $table_products_attributes_update = 1;
+            $table_products_attributes_update = true;
           }
         }
 
