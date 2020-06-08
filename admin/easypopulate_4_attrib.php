@@ -37,11 +37,11 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
   }
 
   // Find the correct product_model to edit
-  while(($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) !== false) { // BEGIN while #2
+  while(($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) !== ($ep_uses_mysqli ? null : false)) { // BEGIN while #2
     $v_products_id = $row['products_id'];
 
     // why am I again testing products_model? I used that to query the database in the first place!
-    if ($contents[$filelayout[$chosen_key]] == $row[$chosen_key]) {
+    if ($contents[$filelayout[$chosen_key]] == $row[$chosen_key_sub]) {
       // echo "model: ".$contents[$filelayout['v_products_model']]."<br>";
       // echo "options_name: ".$contents[$filelayout['v_products_options_name']]."<br>";
       // echo "options_type: ".$contents[$filelayout['v_products_options_type']]."<br>";
@@ -84,10 +84,10 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
         WHERE po.products_options_name = :v_products_options_name: AND po.language_id = :language_id:";
       $query = $db->bindVars($query, ':v_products_options_name:', $v_products_options_name[$l_id], 'string');
       $query = $db->bindVars($query, ':language_id:', $l_id, 'integer');
-      $result = ep_4_query($query);
+      $result1 = ep_4_query($query);
 
       // insert new products_options_name
-      if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result)))  {
+      if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result1) : mysql_fetch_array($result1)))  {
         $v_products_options_id = $row['products_options_id']; // this is not getting used for anything!
       // get current products_options_id
       } else { // products_options_name is not in TABLE_PRODUCTS so ADD it
