@@ -36,6 +36,7 @@ define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_NEW','<br /><font color="gree
 define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_UPDATE','<br /><font color="blue"><b>UPDATED ATTRIBUTE! - %1$s:</b> %2$s <b>Option:</b> %3$s, <b>Values:</b> %4$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_SKIPPED', '<br /><font color="red"><b>SKIPPED! - Primary key: %1$s:</b>%2$s - Not Found! Unable to apply attributes.</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_NO_PRIMARY_KEY', '<br /><font color="red"><b>SKIPPED! - Primary key: %1$s:</b> - Not Found in the file! Unable to import attributes.</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_NEW_PRODUCT_OPTION_NO_PRODUCTS_OPTIONS_TYPE', '<br /><font color="blue"><b>WARNING! - Primary key: %1$s:</b>%2$S - File did not have a v_products_attributes_type field. Using default of %3$d.</font>');
 
 // $messageStack defines
 // checks - msg stack alerts - output via $messageStack

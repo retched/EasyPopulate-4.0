@@ -143,6 +143,11 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
           $sql = $db->bindVars($sql, ':v_products_options_name:', $v_products_options_name[$l_id], 'string');
           $sql = $db->bindVars($sql, ':v_products_options_type:', $v_products_options_type, 'integer');
           $errorcheck = ep_4_query($sql);
+          if (!(isset($filelayout['v_products_options_type']) && isset($contents[$filelayout['v_products_options_type']]))) {
+            $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_NEW_PRODUCT_OPTION_NO_PRODUCTS_OPTIONS_TYPE,
+                            $chosen_key, ${$chosen_key}, (int)$v_products_options_type);
+            $ep_warning_count++;
+          }
         }
         $new_options_name++;
       }
