@@ -157,7 +157,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
 // HERE ==> multi language products_options_values_name
       $number_of_elements = count($values_names_array[$language_id]); // all elements count must be the same
       $values_names_index = 0; // values_names index - array indexes start at zero
-      $products_options_values_sort_order = $products_sort_order_start;.
+      $products_options_values_sort_order = $products_sort_order_start;
 
       // Get max index id for TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS in case others have updated the database during this operation
       $sql_max2 = "SELECT MAX(povtpo.products_options_values_to_products_options_id) + 1 max FROM " . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " povtpo";
