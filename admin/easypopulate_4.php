@@ -25,7 +25,7 @@ if (!defined('EP4_DB_FILTER_KEY')) {
   //   of a blank product_id field to a new product in here.  Currently
   //   expecting three choices: products_model, products_id, and blank_new
   //   with model as default
-  define(EP4_DB_FILTER_KEY, 'products_model'); // This could/should apply to both
+  define('EP4_DB_FILTER_KEY', 'products_model'); // This could/should apply to both
   //  import and export files, so here is a good location for it.
 }
 if (!defined('EP4_ADMIN_TEMP_DIRECTORY')) {
@@ -575,7 +575,9 @@ if (isset($_FILES['uploadfile'])) {
     if (is_uploaded_file($file['tmp_name'])) {
       ep_4_copy_uploaded_file($file, (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . $tempdir);
     }
-    $messageStack->add(sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_COMPLETE, $file['name'], /*"<td align=center>" .*/ (strtolower(end(explode('.', $file['name']))) == 'csv' ? zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), '', 'post', '', $request_type == 'SSL') . zen_draw_hidden_field('import', urlencode($file['name']), '') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT, '', false, 'submit') . EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_IMPORT . "</form>\n" /*</td>\n"*/ : EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_NO_CSV)), 'success');
+    $message_file_ext = explode('.', $file['name']);
+    $message_data =  (strtolower(end($message_file_ext)) == 'csv' ? zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), '', 'post', '', $request_type == 'SSL') . zen_draw_hidden_field('import', /*$message_data2*/ urlencode($file['name']), '') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT, '', false, 'submit') . EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_IMPORT . "</form>\n"  : EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_NO_CSV);
+    $messageStack->add(sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_COMPLETE, $file['name'], $message_data), 'success');
   }
 }
 
