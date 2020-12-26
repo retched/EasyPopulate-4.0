@@ -33,8 +33,8 @@
 
         //$sql .= " LIMIT 1";
 
-        $sql = $db->bindVars($sql, ':products_model:', $items[$filelayout['v_products_model']], 'string');
-        $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_products_id']], 'string');
+        $sql = $db->bindVars($sql, ':products_model:', $items[$filelayout['v_products_model']], $zc_support_ignore_null);
+        $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_products_id']], $zc_support_ignore_null);
         if (!in_array($chosen_key, array('v_products_id', 'v_products_model'))) {
           $chosen_key_sub = $chosen_key;
           if (strpos($chosen_key_sub, 'v_') === 0) {
