@@ -492,23 +492,26 @@ function ep_4_check_table_column($table_name,$column_name) {
 }
 
 function ep_4_remove_product($product_model) {
-  global $db, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error;
+  global $db, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error, $zco_notifier, $zc_support_ignore_null;
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
   $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
-  $sql = "SELECT products_id FROM ".TABLE_PRODUCTS;
+  $sql = "SELECT p.products_id FROM ".TABLE_PRODUCTS . " p";
   switch (EP4_DB_FILTER_KEY) {
     case 'products_model':
-      $sql .= " WHERE products_model = :products_model:";
-      $sql = $db->bindVars($sql, ':products_model:', $product_model, 'string');
+      $sql .= " WHERE p.products_model = :products_model:";
+      $sql = $db->bindVars($sql, ':products_model:', $product_model, $zc_support_ignore_null);
       break;
     case 'blank_new':
     case 'products_id':
-      $sql .= " WHERE products_id = :products_id:";
-      $sql = $db->bindVars($sql, ':products_id:', $product_model, 'string');
+      $sql .= " WHERE p.products_id = :products_id:";
+      $sql = $db->bindVars($sql, ':products_id:', $product_model, 'integer');
       break;
     default:
-      $sql .= " WHERE products_model = :products_model:";
-      $sql = $db->bindVars($sql, ':products_model:', $product_model, 'string');
+      $sql_add = " WHERE p.products_model = :products_model:";
+      $zco_notifier->notify('EP4_FUNCTION_REMOVE_PRODUCT', $product_model, $sql_add);
+      $sql .= $sql_add;
+      unset($sql_add);
+      $sql = $db->bindVars($sql, ':products_model:', $product_model, $zc_support_ignore_null);
       break;
   }
   $products = $db->Execute($sql);

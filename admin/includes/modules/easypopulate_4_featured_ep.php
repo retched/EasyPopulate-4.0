@@ -35,6 +35,13 @@
 
         $sql = $db->bindVars($sql, ':products_model:', $items[$filelayout['v_products_model']], 'string');
         $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_products_id']], 'string');
+        if (!in_array($chosen_key, array('v_products_id', 'v_products_model'))) {
+          $chosen_key_sub = $chosen_key;
+          if (strpos($chosen_key_sub, 'v_') === 0) {
+            $chosen_key_sub = substr($chosen_key_sub, 2);
+          }
+          $sql = $db->bindVars($sql, ':' . $chosen_key_sub . ':', $items[$filelayout[$chosen_key]], $zc_support_ignore_null);
+        }
         $result = ep_4_query($sql);
         if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
           $v_products_id = $row['products_id'];

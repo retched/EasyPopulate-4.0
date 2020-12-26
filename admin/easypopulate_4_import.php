@@ -114,8 +114,11 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
         $chosen_key_sql = "
             p.products_model   = :products_model:";
         $chosen_key_sql_limit = " WHERE (products_model = :products_model:) LIMIT 1";
+        $zco_notifier->notify('EP4_IMPORT_DEFAULT_EP4_DB_FILTER_KEY_DATA', EP4_DB_FILTER_KEY, $chosen_key, $chosen_key_sql, $chosen_key_sql_limit);
         break;
     }
+
+    $zco_notifier->notify('EP4_IMPORT_AFTER_EP4_DB_FILTER_KEY');
 
     // Featured Products 5-2-2012
     if (strtolower(substr($file['name'], 0, 11)) == "featured-ep") {
@@ -265,6 +268,15 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
         }
         if (ep4_field_in_file('v_products_id')) {
           $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_products_id']], 'integer');
+        }
+        if (ep4_field_in_file($chosen_key) && !in_array($chosen_key, array('v_products_id', 'v_products_model'))){
+          if (!in_array($chosen_key, array('v_products_id', 'v_products_model'))) {
+            $chosen_key_sub = $chosen_key;
+            if (strpos($chosen_key_sub, 'v_') === 0) {
+              $chosen_key_sub = substr($chosen_key_sub, 2);
+            }
+            $sql = $db->bindVars($sql, ':' . $chosen_key_sub . ':', $items[$filelayout[$chosen_key]], $zc_support_ignore_null);
+          }
         }
         $result = ep_4_query($sql);
         unset($sql);
@@ -1187,6 +1199,13 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
 
           $sql = $db->bindVars($sql, ':products_model:', (!empty($v_products_model) ? $v_products_model : ''), $zc_support_ignore_null);
           $sql = $db->bindVars($sql, ':products_id:', (!empty($v_products_id) ? $v_products_id : 0), 'integer');
+          if (!in_array($chosen_key, array('v_products_id', 'v_products_model'))) {
+            $chosen_key_sub = $chosen_key;
+            if (strpos($chosen_key_sub, 'v_') === 0) {
+              $chosen_key_sub = substr($chosen_key_sub, 2);
+            }
+            $sql = $db->bindVars($sql, ':' . $chosen_key_sub . ':', (!empty(${$chosen_key}) ? ${$chosen_key} : ''), $zc_support_ignore_null);
+          }
           $result = ep_4_query($sql);
           unset($sql);
           if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) { // new item, insert into products
@@ -1598,6 +1617,13 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
 
                 $sql = $db->bindVars($sql, ':products_model:', $v_products_model, $zc_support_ignore_null);
                 $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
+                if (!in_array($chosen_key, array('v_products_id', 'v_products_model'))) {
+                  $chosen_key_sub = $chosen_key;
+                  if (strpos($chosen_key_sub, 'v_') === 0) {
+                    $chosen_key_sub = substr($chosen_key_sub, 2);
+                  }
+                  $sql = $db->bindVars($sql, ':' . $chosen_key_sub . ':', (!empty(${$chosen_key}) ? ${$chosen_key} : ''), $zc_support_ignore_null);
+                }
                 $result = ep_4_query($sql);
                 unset($sql);
                 if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) != 0) { // found entry
@@ -1644,6 +1670,13 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
 
                 $sql = $db->bindVars($sql, ':products_model:', $v_products_model, $zc_support_ignore_null);
                 $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
+                if (!in_array($chosen_key, array('v_products_id', 'v_products_model'))) {
+                  $chosen_key_sub = $chosen_key;
+                  if (strpos($chosen_key_sub, 'v_') === 0) {
+                    $chosen_key_sub = substr($chosen_key_sub, 2);
+                  }
+                  $sql = $db->bindVars($sql, ':' . $chosen_key_sub . ':', (!empty(${$chosen_key}) ? ${$chosen_key} : ''), $zc_support_ignore_null);
+                }
                 $result = ep_4_query($sql);
                 if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) != 0) { // found entry
                   $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
