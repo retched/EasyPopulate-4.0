@@ -451,3 +451,23 @@
                                   Go to the next file record if the current record does not have appropriate data.
                                   Allow auto-expansion of fields that have lengths that are tracked.
                                   Provide a minor correction for display of German characters and some words.
+4.0.37.11                       - corrected the define of EP4_DB_FILTER_KEY if it had not been obtained from the database.
+                                - moved `$messageStack` messaging from within the easypopulate_4_import.php file to after the file.  This was to further improve the possibility of running cron tasks.
+                                - addressed PHP 7.3+ system warning as a result of using a function's result within the php function `end()`.
+                                - In the basic attribute import file, changed from the typically hard coded value for an option type select (dropdown) to the variable/constant that actually represents an option type of select, `PRODUCTS_OPTIONS_TYPE_SELECT`.
+                                - Added an error message to the basic attributes import file if primary_key is not present in the import file.
+                                - Standardized sql statements (added table alias) to improve predefined variable use that can work in each instance without further modification.
+                                - Further removed hard coded text content and placed for a constant.
+                                - Improved basic import to possibly support not including the v_products_options_type column.
+                                - In the basic attributes import, revised the sort order for products_options_values so that it did not always start at 1, but would continue to be incremented.
+                                - On export of price, value is now rounded to the number of digits set within the configuration, or if not defined then to the default of 2 decimals.
+                                - Added notifiers to support using an alternate primary key (default primary keys are products_model, products_id, or if on import and the products_id is empty then to create a new product with that record).
+                                - Began implementing a new function for testing the presence of data (ep4_field_in_file)
+                                - Refactored import code to move repetitive code up to centralize the operation.
+                                - Removed some commented out code that has been incorporated into admin/includes/modules files. This helps clean up the import file a little more.
+                                - Corrected product description and url assignment when using the language code instead of the default language id.
+                                - Updated admin/ep4_cron.php to further address more stringent PHP requirements to eliminate notices and to prevent errrors associated with attempting to push the messageStack to the cron task.
+                                - Updated discount export operation to ensure that a minimum number of columns are included in the export; however, to auto-identify the number of columns expected. This removes the need to know or to try to discover the maximum number of discounts. A significant difference is that the number of discount columns is no longer limited to the value entered so there may be those that wish to delete columns from their file.
+                                - Improved the import of the category meta data to allow the omission of some of the columns.
+                                - Added import recognition of language related fields to use the language code (e.g., en, de, es, etc..) instead of the language id and provide override capability if both are included in the import file.
+                                - Further incorporated data sanitization in the category meta data import file to work like when using manual operation in the admin.
