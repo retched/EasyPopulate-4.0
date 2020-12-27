@@ -94,7 +94,7 @@ if (IS_ADMIN_FLAG) {
 }
 
 // Current EP Version - Modded by mc12345678 after Chadd had done so much
-$curver              = $curver_detail . ' - 02-08-2017' . $message;
+$curver              = $curver_detail . ' - 12-24-2020' . $message;
 $display_output = ''; // results of import displayed after script run
 $ep_dltype = NULL;
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
