@@ -13,25 +13,29 @@
         @set_time_limit($ep_execution);
 
 //Need to validate that the four file records are present or else can do nothing.
-        if (isset($filelayout['v_products_attributes_id']) && isset($filelayout['v_products_id']) && isset($filelayout['v_options_id']) && isset($filelayout['v_options_values_id'])) {
-          $attrib_key_set = true;
-          $sql = 'SELECT * FROM ' . TABLE_PRODUCTS_ATTRIBUTES . '
-            WHERE (
-            products_attributes_id = :products_attributes_id: AND
-            products_id = :products_id: AND
-            options_id = :options_id: AND
-            options_values_id = :options_values_id:
-            ) LIMIT 1';
-          $sql = $db->bindVars($sql, ':products_attributes_id:', $items[$filelayout['v_products_attributes_id']], 'integer');
-          $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_products_id']], 'integer');
-          $sql = $db->bindVars($sql, ':options_id:', $items[$filelayout['v_options_id']], 'integer');
-          $sql = $db->bindVars($sql, ':options_values_id:', $items[$filelayout['v_options_values_id']], 'integer');
-          $result = ep_4_query($sql);
-        } else {
-          $attrib_key_set = false;
+        if (!(isset($filelayout['v_products_attributes_id']) && isset($filelayout['v_products_id']) && isset($filelayout['v_options_id']) && isset($filelayout['v_options_values_id']))) {
+          // error Attribute entry not found or the file does not contain necessary records - needs work!
+          $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Attribute Entry on ' . substr($chosen_key, 2) . ': </b>%s - Not Found!</font>', $items[$filelayout[$chosen_key]]);
+          $ep_error_count++;
+          print(str_repeat(" ", 300));
+          flush();
+          continue;
         }
+
+        $sql = 'SELECT * FROM ' . TABLE_PRODUCTS_ATTRIBUTES . '
+          WHERE (
+          products_attributes_id = :products_attributes_id: AND
+          products_id = :products_id: AND
+          options_id = :options_id: AND
+          options_values_id = :options_values_id:
+          ) LIMIT 1';
+        $sql = $db->bindVars($sql, ':products_attributes_id:', $items[$filelayout['v_products_attributes_id']], 'integer');
+        $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_products_id']], 'integer');
+        $sql = $db->bindVars($sql, ':options_id:', $items[$filelayout['v_options_id']], 'integer');
+        $sql = $db->bindVars($sql, ':options_values_id:', $items[$filelayout['v_options_values_id']], 'integer');
+        $result = ep_4_query($sql);
         
-        if ($attrib_key_set && $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
+        if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
           // UPDATE
           $sql = "UPDATE " . TABLE_PRODUCTS_ATTRIBUTES . " SET
           options_values_price              = :options_values_price:, ";
