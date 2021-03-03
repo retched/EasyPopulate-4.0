@@ -2153,11 +2153,34 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             // Check if this product already has a special
             $special = ep_4_query("SELECT products_id FROM " . TABLE_SPECIALS . " WHERE products_id = " . (int)$v_products_id);
 
-            if (($ep_uses_mysqli ? mysqli_num_rows($special) : mysql_num_rows($special)) == 0) { // not in db
-              if ($v_specials_price == '0') { // delete requested, but is not a special
+            if ((($ep_uses_mysqli ? mysqli_num_rows($special) : mysql_num_rows($special)) == 0) || defined('EASYPOPULATE_4_CONFIG_SPECIALS_MULTIPLE') && EASYPOPULATE_4_CONFIG_SPECIALS_MULTIPLE === 'Yes') { // not in db or permitted to insert multiple specials to a single product.
+              
+              if (($ep_uses_mysqli ? mysqli_num_rows($special) : mysql_num_rows($special)) == 0) && $v_specials_price == '0') { // delete requested, but is not a special
                 $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_DELETE_FAIL, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $chosen_key);
                 continue;
               }
+              if (($ep_uses_mysqli ? mysqli_num_rows($special) : mysql_num_rows($special)) > 0) {
+                if ($v_specials_price < 0 || (defined('EASYPOPULATE_4_CONFIG_SPECIALS_REMOVE_AT') && EASYPOPULATE_4_CONFIG_SPECIALS_REMOVE_AT == 'zero' && $v_specials_price == '0')) { // delete of existing requested with negative number or option to do so when 0.
+                  $db->Execute("DELETE FROM " . TABLE_SPECIALS . " WHERE products_id = " . (int) $v_products_id);
+                  $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_DELETE, ${$chosen_key}, ${$chosen_key});
+                  continue;
+                }
+                // Seems appropriate to evaluate the existing data to determine if there will be an overlap of special dates. Ideally would also have a setting to
+                //   determine which date(s) would take priority. I.e. if a new record starts while one is already in place, does the old record now end when the new starts
+                //   or does the new one start only once the old has been completed? Should this be a field in the file? In the database, or a little of both? What if the
+                //   end date is ongoing, does this record get broken into multiple instances with a newly generated end date, adding a record to give it a start date with
+                //   then no end date? Much of this would be better "controlled" on the operations of the specials system and some additional field for the special.
+
+                // To accomplish this, would need to pull all of the specials for the product (assuming that the above was not 0), and then, compare the new record to each
+                //   of the existing records looking for if/when/how they overlap and set the associated dates accordingly, understanding that the new record is intended to
+                //   be added. Overall complication to this though exists for readding the same special back in, especially if it occurs later in the file than previous
+                //   insertions and there is overlap...
+                if (function_exists('zen_datetime_overlap')) {
+                }
+
+              }
+
+              
               // insert new into specials
               $sql = "INSERT INTO " . TABLE_SPECIALS . "
               (products_id,
@@ -2189,25 +2212,34 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_DELETE, ${$chosen_key}, ${$chosen_key});
                 continue;
               }
-              // just make an update
-              $sql = "UPDATE " . TABLE_SPECIALS . " SET
-              specials_new_products_price = :specials_price:,
-              specials_last_modified    = now(),
-              specials_date_available   = :specials_date_avail:,
-              expires_date        = :specials_expires_date:,
-              status            = '1'
-              WHERE products_id     = :products_id:";
-              $sql = $db->bindVars($sql, ':specials_price:', $v_specials_price, 'float');
-              $sql = $db->bindVars($sql, ':specials_date_avail:', $v_specials_date_avail, 'string');
-              $sql = $db->bindVars($sql, ':specials_expires_date:', $v_specials_expires_date, 'string');
-              $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
-              $result = ep_4_query($sql);
-              unset($sql);
-              if ($result) {
-                zen_record_admin_activity('Updated special ' . (int) $v_products_id . ' via EP4.', 'info');
+              if (/*(($ep_uses_mysqli ? mysqli_num_rows($special) : mysql_num_rows($special)) > 1) && */defined('EASYPOPULATE_4_CONFIG_SPECIALS_MULTIPLE') && EASYPOPULATE_4_CONFIG_SPECIALS_MULTIPLE === 'Yes') { // Already in db and wanting multiple to exist
+                
+              } else { // just update the product's specials
+                if (($ep_uses_mysqli ? mysqli_num_rows($special) : mysql_num_rows($special)) > 1) {
+                  // Keep the latest available special regardless of quantity of
+                  $db->Execute("DELETE FROM " . TABLE_SPECIALS . " WHERE products_id = " . (int)$v_products_id . " AND specials_id NOT IN (SELECT * FROM (SELECT MAX(specials_date_avail) FROM " . TABLE_SPECIALS . " s WHERE s.products_id = " . (int)$v_products_id . " GROUP BY s.products_id) x LIMIT 1)");
+                  zen_record_admin_activity('Deleted via EP4 all specials except the one with the latest available date for product ID: ' . (int)$v_products_id, 'info');
+                }
+                // just make an update
+                $sql = "UPDATE " . TABLE_SPECIALS . " SET
+                specials_new_products_price = :specials_price:,
+                specials_last_modified    = now(),
+                specials_date_available   = :specials_date_avail:,
+                expires_date        = :specials_expires_date:,
+                status            = '1'
+                WHERE products_id     = :products_id:";
+                $sql = $db->bindVars($sql, ':specials_price:', $v_specials_price, 'float');
+                $sql = $db->bindVars($sql, ':specials_date_avail:', $v_specials_date_avail, 'string');
+                $sql = $db->bindVars($sql, ':specials_expires_date:', $v_specials_expires_date, 'string');
+                $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
+                $result = ep_4_query($sql);
+                unset($sql);
+                if ($result) {
+                  zen_record_admin_activity('Updated special ' . (int) $v_products_id . ' via EP4.', 'info');
+                }
+                unset($result);
+                $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_UPDATE, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price, $v_specials_price, $chosen_key);
               }
-              unset($result);
-              $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_UPDATE, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price, $v_specials_price, $chosen_key);
             } // we still have our special here
           } // end specials for this product
 
