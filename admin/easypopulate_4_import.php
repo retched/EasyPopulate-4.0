@@ -2175,7 +2175,239 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 //   of the existing records looking for if/when/how they overlap and set the associated dates accordingly, understanding that the new record is intended to
                 //   be added. Overall complication to this though exists for readding the same special back in, especially if it occurs later in the file than previous
                 //   insertions and there is overlap...
-                if (function_exists('zen_datetime_overlap')) {
+                if (!function_exists('zen_datetime_overlap')) {
+                  /**
+                   * function to evaluate two date spans and identify if they overlap or not.
+                   * Returns true (overlap) if:
+                   *  A datespan is provided as an array and that array does not have the key 'start' nor 'end' (warning log entry also made by trigger_error).
+                   *  When seeking overlaps in the future:
+                   *  -  If the date spans both never end, OR
+                   *  -  If one date span never ends then if the maximum of the two start dates is less than the known to be future end
+                   *       date where the start date for a forever in the past date range was set to the earliest of the current date or associated end date. OR
+                   *  -  If the end dates are specified, then if the end dates occur in the future and the maximum start date is less
+                   *       than the minimum end date where the start date for a forever in the past date range was set to the earliest of the current date or associated end date.
+                   *  When seeking overlaps in the past:
+                   *  -  If the date spans both never end and they both started before today, OR
+                   *  -  If they both started forever in the past
+                   *  -  If the end dates are specified, then if the start dates occur in the past and the maximum start date is less
+                   *       than the minimum end date.
+                   *  Otherwise when seeking the presence of overlap at all (and the basis for the above logic), then basically
+                   *    if the maximum start date (last date range) is before the earliest end date, then that indicates that the
+                   *    two were active at the same time.
+                   *
+                   * Returns false (no overlap) otherwise:
+                   *
+                   * Usage: zen_datetime_overlap(array('start'=>$startdate, 'end'=>$enddate), array('start'=>$startdate, 'end'=>$enddate));
+                   *        zen_datetime_overlap(array('start'=>$startdate, 'end'=>$enddate), array('start'=>$startdate, 'end'=>$enddate), null, null, {default:true, false, 'past'});
+                   *        (if dates provided where null is in line above, they will be disregarded because of the array in positions 1 and 2.)
+                   *        zen_datetime_overlap($startdate1, array('start'=>$startdate, 'end'=>$enddate), $enddate1, null, {default:true, false, 'past'});
+                   *        zen_datetime_overlap(array('start'=>$startdate, 'end'=>$enddate), $startdate2, null, $enddate2, {default:true, false, 'past'});
+                   *        zen_datetime_overlap($startdate1, $startdate2, $enddate1, $enddate2, {default:true, false, 'past'});
+                   *        Providing $future_only of true (or as default not providing anything), the dates are inspected for overlap
+                   *
+                   * $start1 array() with keys 'start' and 'end' or as a raw_datetime or raw_date, or if null then this datetime is considered as in place forever in the past.
+                   * $start2 array() with keys 'start' and 'end' or as a raw_datetime or raw_date, or if null then this datetime is considered as in place forever in the past.
+                   * $end1 raw_datetime, raw_date or effectively blank (if $start1 is array, the value here is replaced, otherwise this datetime is considered eternally effective)
+                   * $end2 raw_datetime, raw_date or effectively blank (if $start2 is array, the value here is replaced, otherwise this datetime is considered eternally effective)
+                   * $future_only boolean or string of 'past': values should be true, false, or 'past'
+                   * returns a boolean true/false.  In error case of array provided without proper keys true returned and warning log also generated
+                   **/
+
+                  function zen_datetime_overlap($start1, $start2, $end1 = NULL, $end2 = NULL, $future_only = true) {
+                    $cur_datetime = date("Y-m-d h:i:s", time());
+
+                    // BOF if variable is provided as an array, validate properly setup and if so, assign and replace the other applicable values.
+                    if (is_array($start1)) {
+                      if (!array_key_exists('start', $start1) || !array_key_exists('end', $start1)) {
+                        trigger_error('Missing date/time array key(s) start and/or end.', E_USER_WARNING);
+                        // array is not properly defined to support further operation, therefore to prevent potential downstream issues fail safe and identify that an overlap has occurred.
+                        return true;
+                      }
+                      $end1 = $start1['start'];
+                      $start1 = $start1['end'];
+                    }
+                    if (is_array($start2)) {
+                      if (!array_key_exists('start', $start2) || !array_key_exists('end', $start2)) {
+                        trigger_error('Missing date/time array key(s) start and/or end.', E_USER_WARNING);
+                        // array is not properly defined to support further operation, therefore to prevent potential downstream issues fail safe and identify that an overlap has occurred.
+                        return true;
+                      }
+                      $end2 = $start2['start'];
+                      $start2 = $start2['end'];
+                    }
+                    // EOF if variable is provided as an array, validate properly setup and if so, assign and replace the other applicable values.
+
+                    // BOF ensure all variables have a non-null value
+                    if (!isset($start1)) {
+                      $start1 = '0001-01-01 00:00:00';
+                    }
+                    if (!isset($start2)) {
+                      $start2 = '0001-01-01 00:00:00';
+                    }
+                    if (!isset($end1)) {
+                      $end1 = '0001-01-01 00:00:00';
+                    }
+                    if (!isset($end2)) {
+                      $end2 = '0001-01-01 00:00:00';
+                    }
+                    // EOF ensure all variables have a non-null value
+
+                    // BOF check for and correct condition where known dates are provided but swapped as in start date happens after the end date.
+                    if ($start1 > '0001-01-01 00:00:00' && $end1 > '0001-01-01 00:00:00' && $end1 < $start1) {
+                      $swap = $end1;
+                      $end1 = $start1;
+                      $start1 = $swap;
+                    }
+                    if ($start2 > '0001-01-01 00:00:00' && $end2 > '0001-01-01 00:00:00' && $end2 < $start2) {
+                      $swap = $end2;
+                      $end2 = $start2;
+                      $start2 = $swap;
+                    }
+                    // EOF check for and correct condition where known dates are provided but swapped as in start date happens after the end date.
+
+                    // Consider how to use forever start dates with regards to $future only....
+                    // Area of concern is for example a date span was entered in the past with an end date only.
+                    //  If later a date span is entered also with an end date only, both spans could be evaluated as overlapping
+                    //  in the past because they were "always" applicable.  But in regards to e-commerce, they could not be made
+                    //  effective until they were in the database.  ZC typically considers this ever available in the past condition
+                    //  for even initial entry and does not "require" that the date be entered of when it was first added and in
+                    //  some cases will prevent that date from being stored if it results in the event being effective in the past.
+                    if ($future_only === true && $start1 <= '0001-01-01 00:00:00') {
+                      $start1 = min($end1, $cur_datetime);
+                    }
+                    if ($future_only === true && $start2 <= '0001-01-01 00:00:00') {
+                      $start2 = min($end2, $cur_datetime);
+                    }
+
+                    $end_max = max($end1, $end2);
+                    $start_min = min($start1, $start2);
+                    
+                    $compare = min($end1, $end2); // if the latest starting date occurs before the earliest known date, then they overlap, if not, then they are disjointed.
+                    // if either date ends in the forever future, evaluate the condition.
+                    if ($end1 <= '0001-01-01 00:00:00' || $end2 <= '0001-01-01 00:00:00') {
+                      if (($future_only !== 'past' || $start1 < $cur_datetime && $start2 < $cur_datetime) && $end1 <= '0001-01-01 00:00:00' && $end2 <= '0001-01-01 00:00:00') {
+                        return true; // both dates extend out to the future and therefore do or will at some point overlap.
+                      }
+
+//                      $end = max($end1, $end2); //one date extends out to the future, but overlap only occurs up to the point of the known date.
+                      $compare = $end_max;
+//                      $overlap = max($start1, $start2) < $end; // if the latest starting date occurs before the earliest known date, then they overlap, if not, then they are disjointed.
+                    }
+
+                    if ($future_only === true && $end_max <= $cur_datetime || $future_only === 'past' && $start_min > $cur_datetime) {
+                      return false; //dates may overlap in the past, but because not in the present when considering future_only do not overlap.
+                      // OR: // with both end dates known, and both on or before today, then when considering future overlaps only an overlap in the future does not exist.
+                    }
+
+                    return max($start1, $start2) < $compare;
+                  }
+                }
+                $sql = "SELECT * FROM " . TABLE_SPECIALS . " WHERE products_id = " . (int)$v_products_id;
+                $result = ep_4_query($sql);
+                $array_add = array('start'=>$v_specials_date_avail, 'end'=>$v_specials_expires_date);
+                while ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2)) {
+                  $array_test = array('start'=>$row2['specials_date_available'], 'end'=>$row2['expires_date']);
+                  if (!zen_datetime_overlap($array_add, $array_test)) {
+                    continue;
+                  }
+                  // There is an overlap into the future. Question is what to do about it.
+                  // If skip entry because of overlap, then need to break out of this process because .
+                  if (defined('EASYPOPULATE_4_CONFIG_SPECIALS_SKIP') && EASYPOPULATE_4_CONFIG_SPECIALS_SKIP === 'Yes') {
+                    // @TODO: provide message that there is an overlap, and edit of existing data not allowed
+                    if (!defined('EASYPOPULATE_4_SPECIALS_SKIP_OVERLAP')) {
+                      define('EASYPOPULATE_4_SPECIALS_SKIP_OVERLAP', '<font color="red"><b>SKIPPED Date Overlaps and Set to Skip! - %5$s:</b> %1$s</font> | %2$s | %3$s | <font color="red"><b>%4$s</b></font> |<br />');
+                    }
+                    $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_SKIP_OVERLAP, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $v_products_price, $v_specials_price, $chosen_key);
+                    continue 2;
+                  }
+                  if (defined('EASYPOPULATE_4_CONFIG_SPECIALS_SKIP') && EASYPOPULATE_4_CONFIG_SPECIALS_SKIP === 'Keep New') {
+                    // Need to revise the old record to fit "around" the new.
+                    // If old end is <= "0001-01-01 00:00:00" and new end <= "0001-01-01 00:00:00" then old end set to new start and then continue;
+                    // The new record was to begin "always" in the past and the new record was to never expire
+                    if (/*$row2['expires_date'] <= '0001-01-01 00:00:00' &&*/ $array_add['start'] <= '0001-01-01 00:00:00' && $array_add['end'] <= '0001-01-01 00:00:00') {
+                      // Update $row2 stored data to end "now".
+                      $sql = "UPDATE " . TABLE_SPECIALS . " SET expires_date = NOW() WHERE specials_id = " . (int)$row2['specials_id'];
+                      $result2 = ep_4_query($sql);
+                      
+                      // @TODO: Should give message that updated the previous record to end now.
+                      continue;
+                    }
+                    // new start date is identified, but new record never expires.
+                    if (/*$row2['expires_date'] <= '0001-01-01 00:00:00' &&*/ $array_add['end'] <= '0001-01-01 00:00:00') {
+                      // Update $row2 stored data to end when new record starts.
+                      $sql = "UPDATE " . TABLE_SPECIALS . " SET expires_date = :array_add_start: WHERE specials_id = " . (int)$row2['specials_id'];
+                      $sql = $db->bindVars($sql, ':array_add_start:', $array_add['start'], 'date');
+                      $result2 = ep_4_query($sql);
+                      
+                      // @TODO: Should give message that updated the previous record to end now.
+                      continue;
+                    }
+                    // To address:
+                    // 1. New and old record always active. // Done Truncate to now
+                    // 2. New record has a start date but never expires. // Done Truncate to new start
+                    // 2.a. old record has a start date < new start, truncate to new start date.
+                    // 2.b. old record has a start date >= new start. // cancel record.
+                    // 3. New record always started, but has an end date.
+                    // 3.a. old record has started and never expires. Truncate now and Add new record starting at new end.
+                    // 3.b. old record hasn't started and never expires. Set start at new end.
+                    // 3.c. old record has started and end date less than new end date. Truncate end to now.
+                    // 3.d. old record hasn't started and end date less than new end date. Delete basically
+                    // 3.e. old record has started and end date greater than new end date. 
+                    // 3.d. old record has an end date greater than new end date. Truncate to now and add new record starting at new end and ending at old end.
+                    // 4. New record has a start and end date.
+                    // 4.a. old record never expires. Truncate to new start and add new record starting at new end and ending indefinite.
+                    // 4.b. old record has end date <= new end date and old record start < new record start. Truncate to new start.
+                    // 4.c. old record has end date <= new end date. Basically indefinitely disable special as will not be in effect under this configuration.
+                    // 4.d. old record has end date > new end date and old record start >= new record start. Set old start to new end
+                    // 4.e. old record has end date > new end date. Set old end to new start and add new record with start set to new end and end to old end.
+                    // 4.f. 
+                    // New record start date is defined
+                    if ($row2['expires_date'] > '0001-01-01 00:00:00' && $array_add['end'] <= '0001-01-01 00:00:00' ) {
+                      // Update $row2 stored data to end where the new record starts as new record start date is defined and new record does not expire.
+                      $sql = "UPDATE " . TABLE_SPECIALS . " SET expires_date = :array_add_start: WHERE specials_id = " . (int)$row2['specials_id'];
+                      $sql = $db->bindVars($sql, ':array_add_start:', $array_add['start'], 'date');
+                      $result2 = ep_4_query($sql);
+                      
+                      // @TODO: Should give message that updated the previous record to end where the new record starts.
+                      continue;
+                    }
+                    // Have dealt with the cases where 
+                    //    1. the new record was "always" active.
+                    //    2. The new record never expires.
+                    // Need to address old record expires before new record
+                    // New record start date is defined
+                    if ($row2['expires_date'] > '0001-01-01 00:00:00' && $row2['expires_date'] < $array_add['end']) {
+                      // Update $row2 stored data to end where the new record starts as new record start date is defined and new record does not expire.
+                      $sql = "UPDATE " . TABLE_SPECIALS . " SET expires_date = :array_add_start: WHERE specials_id = " . (int)$row2['specials_id'];
+                      $sql = $db->bindVars($sql, ':array_add_start:', $array_add['start'], 'date');
+                      $result2 = ep_4_query($sql);
+                      
+                      // @TODO: Should give message that updated the previous record to end where the new record starts.
+                      continue;
+                    }
+                    
+                    // Need to generate additional records because new record is within old record.
+                    
+                    
+                    
+                    
+                    // The old record is set to never expire and the new record was to never expire.
+                    if ($row2['expires_date'] <= '0001-01-01 00:00:00' && $array_add['end'] <= '0001-01-01 00:00:00') {
+                      // Update $row2 stored data to 
+                      $sql = "UPDATE " . TABLE_SPECIALS . " SET expires_date = :array_add_start: WHERE specials_id = " . (int)$row2['specials_id'];
+                      $sql = $db->bindVars($sql, ':array_add_start:', $array_add['start'], 'date');
+                      $result2 = ep_4_query($sql);
+                      
+                      // @TODO: Should give message that updated the previous record to end where the new record starts.
+                      continue;
+                    }
+
+                    // If old end is <= "0001-01-01 00:00:00" and new end > "0001-01-01 00:00:00" then old end set to new start, add record with start at new end and end at old end.
+                    
+                  }
+                  if (defined('EASYPOPULATE_4_CONFIG_SPECIALS_SKIP') && EASYPOPULATE_4_CONFIG_SPECIALS_SKIP === 'Keep Old') {
+                    // Need to revise the new record to fit "around" the old.
+                  }
                 }
 
               }
