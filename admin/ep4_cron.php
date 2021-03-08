@@ -291,7 +291,7 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(
   } else {
     $collation = mysql_client_encoding(); // should be either latin1 or utf8
   }
-  if ($collation == 'utf8') {
+  if (substr($collation, 0, 4) == 'utf8') {
     if (function_exists('mb_internal_encoding')) {
       mb_internal_encoding("UTF-8");
     }
