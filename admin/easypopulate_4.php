@@ -152,16 +152,16 @@ if ($ep_debug_logging_all == true) {
   fclose($fp);
 }
 
+// /temp is the default folder - check if it exists & has writeable permissions
+if ((!defined('EASYPOPULATE_4_CONFIG_TEMP_DIR') || EASYPOPULATE_4_CONFIG_TEMP_DIR === 'EASYPOPULATE_4_CONFIG_TEMP_DIR') && (!isset($_GET['epinstaller']) || $_GET['epinstaller'] != 'install')) { // admin area config not installed
+  $messageStack->add(sprintf(EASYPOPULATE_4_MSGSTACK_INSTALL_KEYS_FAIL, '<a href="' . zen_href_link(FILENAME_EASYPOPULATE_4, 'epinstaller=install') . '">', '</a>'), 'warning');
+}
+
 // Pre-flight checks start here
 $chmod_check = ep_4_chmod_check($tempdir);
 //if ($chmod_check == false) { // test for temporary folder and that it is writable
   // $messageStack->add(EASYPOPULATE_4_MSGSTACK_INSTALL_CHMOD_FAIL, 'caution');
 //}
-
-// /temp is the default folder - check if it exists & has writeable permissions
-if ((!defined('EASYPOPULATE_4_CONFIG_TEMP_DIR') || EASYPOPULATE_4_CONFIG_TEMP_DIR === 'EASYPOPULATE_4_CONFIG_TEMP_DIR') && (!isset($_GET['epinstaller']) || $_GET['epinstaller'] != 'install')) { // admin area config not installed
-  $messageStack->add(sprintf(EASYPOPULATE_4_MSGSTACK_INSTALL_KEYS_FAIL, '<a href="' . zen_href_link(FILENAME_EASYPOPULATE_4, 'epinstaller=install') . '">', '</a>'), 'warning');
-}
 
 // installation start
 if (isset($_GET['epinstaller']) && ($_GET['epinstaller'] == 'install' || $_GET['epinstaller'] == 'update')) {
