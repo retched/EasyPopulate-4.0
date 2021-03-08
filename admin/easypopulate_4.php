@@ -43,20 +43,20 @@ if (!defined('EP4_SHOW_ALL_FILETYPES')) {
   define('EP4_SHOW_ALL_FILETYPES', 'true');
 }
 /* Configuration Variables from Admin Interface  */
-$tempdir = EASYPOPULATE_4_CONFIG_TEMP_DIR; // This ideally should not actually include the Admin Directory in the variable.
-$ep_date_format = EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT;
-$ep_raw_time = EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME;
-$ep_debug_logging = ((EASYPOPULATE_4_CONFIG_DEBUG_LOGGING == 'true') ? true : false);
-$ep_split_records = (int) EASYPOPULATE_4_CONFIG_SPLIT_RECORDS;
-$price_with_tax = ((EASYPOPULATE_4_CONFIG_PRICE_INC_TAX == 'true') ? 1 : 0);
-$strip_smart_tags = ((EASYPOPULATE_4_CONFIG_SMART_TAGS == 'true') ? true : false);
-$max_qty_discounts = EASYPOPULATE_4_CONFIG_MAX_QTY_DISCOUNTS;
-$ep_feedback = ((EASYPOPULATE_4_CONFIG_VERBOSE == 'true') ? true : false);
-$ep_execution = (int) EASYPOPULATE_4_CONFIG_EXECUTION_TIME;
-$ep_curly_quotes = (int) EASYPOPULATE_4_CONFIG_CURLY_QUOTES;
-$ep_char_92 = (int) EASYPOPULATE_4_CONFIG_CHAR_92;
-$ep_metatags = (int) EASYPOPULATE_4_CONFIG_META_DATA; // 0-Disable, 1-Enable
-$ep_music = (int) EASYPOPULATE_4_CONFIG_MUSIC_DATA; // 0-Disable, 1-Enable
+$tempdir = defined('EASYPOPULATE_4_CONFIG_TEMP_DIR') ? EASYPOPULATE_4_CONFIG_TEMP_DIR : 'EASYPOPULATE_4_CONFIG_TEMP_DIR'; // This ideally should not actually include the Admin Directory in the variable.
+$ep_date_format = defined('EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT') ? EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT : 'm-d-y';
+$ep_raw_time = defined('EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME') ? EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME : '09:00:00';
+$ep_debug_logging = ((!defined('EASYPOPULATE_4_CONFIG_DEBUG_LOGGING') || EASYPOPULATE_4_CONFIG_DEBUG_LOGGING === 'true') ? true : false);
+$ep_split_records = defined('EASYPOPULATE_4_CONFIG_SPLIT_RECORDS') ? (int) EASYPOPULATE_4_CONFIG_SPLIT_RECORDS : 2000;
+$price_with_tax = ((defined('EASYPOPULATE_4_CONFIG_PRICE_INC_TAX') && EASYPOPULATE_4_CONFIG_PRICE_INC_TAX === 'true') ? 1 : 0);
+$strip_smart_tags = ((!defined('EASYPOPULATE_4_CONFIG_SMART_TAGS') || EASYPOPULATE_4_CONFIG_SMART_TAGS == 'true') ? true : false);
+$max_qty_discounts = defined('EASYPOPULATE_4_CONFIG_MAX_QTY_DISCOUNTS') ? EASYPOPULATE_4_CONFIG_MAX_QTY_DISCOUNTS : '0';
+$ep_feedback = ((!defined('EASYPOPULATE_4_CONFIG_VERBOSE') || EASYPOPULATE_4_CONFIG_VERBOSE == 'true') ? true : false);
+$ep_execution = defined('EASYPOPULATE_4_CONFIG_EXECUTION_TIME') ? (int) EASYPOPULATE_4_CONFIG_EXECUTION_TIME : 60;
+$ep_curly_quotes = defined('EASYPOPULATE_4_CONFIG_CURLY_QUOTES') ? (int) EASYPOPULATE_4_CONFIG_CURLY_QUOTES : 0;
+$ep_char_92 = defined('EASYPOPULATE_4_CONFIG_CHAR_92') ? (int) EASYPOPULATE_4_CONFIG_CHAR_92 : 1;
+$ep_metatags = defined('EASYPOPULATE_4_CONFIG_META_DATA') ? (int) EASYPOPULATE_4_CONFIG_META_DATA : 1; // 0-Disable, 1-Enable
+$ep_music = defined('EASYPOPULATE_4_CONFIG_MUSIC_DATA') ? (int) EASYPOPULATE_4_CONFIG_MUSIC_DATA : 0; // 0-Disable, 1-Enable
 $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3' ? true : false);
 
 @set_time_limit($ep_execution);  // executin limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
@@ -159,7 +159,7 @@ $chmod_check = ep_4_chmod_check($tempdir);
 //}
 
 // /temp is the default folder - check if it exists & has writeable permissions
-if (EASYPOPULATE_4_CONFIG_TEMP_DIR === 'EASYPOPULATE_4_CONFIG_TEMP_DIR' && (is_null($_GET['epinstaller']) && !isset($_GET['epinstaller']) && $_GET['epinstaller'] != 'install')) { // admin area config not installed
+if ((!defined('EASYPOPULATE_4_CONFIG_TEMP_DIR') || EASYPOPULATE_4_CONFIG_TEMP_DIR === 'EASYPOPULATE_4_CONFIG_TEMP_DIR') && (!isset($_GET['epinstaller']) || $_GET['epinstaller'] != 'install')) { // admin area config not installed
   $messageStack->add(sprintf(EASYPOPULATE_4_MSGSTACK_INSTALL_KEYS_FAIL, '<a href="' . zen_href_link(FILENAME_EASYPOPULATE_4, 'epinstaller=install') . '">', '</a>'), 'warning');
 }
 
@@ -248,7 +248,7 @@ $ep_mods_supported = array(
 $custom_field_names = array();
 $custom_field_check = array();
 $custom_fields = array();
-if (strlen(EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS) > 0) {
+if (defined('EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS') && strlen(EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS) > 0) {
   $custom_field_names = explode(',', EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS);
   foreach ($custom_field_names as $field) {
     if (ep_4_check_table_column(TABLE_PRODUCTS, trim($field))) {
@@ -867,7 +867,7 @@ if (((isset($error) && !$error) || !isset($error)) && (isset($_POST["delete"])) 
         echo '<br /><br />';
 //  echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
 // $upload_dir = DIR_FS_CATALOG.$tempdir; // defined above
-        if ($dirhandle = opendir($upload_dir)) {
+        if (defined('EASYPOPULATE_4_CONFIG_TEMP_DIR') && EASYPOPULATE_4_CONFIG_TEMP_DIR !== 'EASYPOPULATE_4_CONFIG_TEMP_DIR' && $dirhandle = opendir($upload_dir)) {
           $files = array();
           while (false !== ($files[] = readdir($dirhandle))); // get directory contents
           closedir($dirhandle);
@@ -948,6 +948,7 @@ if (((isset($error) && !$error) || !isset($error)) && (isset($_POST["delete"])) 
             }
 
             for ($i = 0, $nval = count($val); $i < $nval; $i++) {
+              if (!defined('EASYPOPULATE_4_CONFIG_TEMP_DIR') || EASYPOPULATE_4_CONFIG_TEMP_DIR === 'EASYPOPULATE_4_CONFIG_TEMP_DIR') break;
               $file_delimiter_error = false;
               if (EP4_SHOW_ALL_FILETYPES != 'Hidden' || (EP4_SHOW_ALL_FILETYPES == 'Hidden' && ($files[$i] != ".") && ($files[$i] != "..") && preg_match("/\.(sql|gz|csv|txt|log)$/i", $files[$i]) )) {
                 $file_count++;
