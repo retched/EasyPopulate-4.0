@@ -61,7 +61,7 @@ $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3'
 
 @set_time_limit($ep_execution);  // executin limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
 
-if ((isset($error) && !$error) || !isset($error)) {
+if (!isset($error) || !$error) {
   $upload_max_filesize = ini_get("upload_max_filesize");
   if (preg_match("/([0-9]+)K/i", $upload_max_filesize, $tempregs)) {
     $upload_max_filesize = $tempregs[1] * 1024;
@@ -582,7 +582,7 @@ if (isset($_FILES['uploadfile'])) {
 }
 
 // Handle file deletion (delete only in the current directory for security reasons)
-if (((isset($error) && !$error) || !isset($error)) && (isset($_POST["delete"])) && !is_null($_SERVER["SCRIPT_FILENAME"]) && $_POST["delete"] != basename($_SERVER["SCRIPT_FILENAME"])) {
+if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVER["SCRIPT_FILENAME"]) && $_POST["delete"] != basename($_SERVER["SCRIPT_FILENAME"])) {
   if (preg_match("/(\.(sql|gz|csv|txt|log))$/i", $_POST["delete"]) && @unlink($upload_dir . basename($_POST["delete"]))) {
     // $messageStack->add(sprintf($_POST["delete"]." was deleted successfully"), 'success');
     zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
@@ -974,7 +974,7 @@ if (((isset($error) && !$error) || !isset($error)) && (isset($_POST["delete"])) 
                   $file_text = substr($file_text, 0, -3);
                 }
 
-                if (isset($file_delimiter) && is_array($file_delimiter) || !isset($file_delimiter)) {
+                if (!isset($file_delimiter) || is_array($file_delimiter)) {
                   $file_delimiter = $file_text . EASYPOPULATE_4_DELIMITER_UNKNOWN;
                   $file_delimiter_error = true;
                 }
