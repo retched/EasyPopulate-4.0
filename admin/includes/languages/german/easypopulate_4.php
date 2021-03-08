@@ -7,6 +7,7 @@
 define('EASYPOPULATE_4_DISPLAY_SPLIT_LOCATION','You can also download your split files from your %s directory<br />');
 define('EASYPOPULATE_4_DISPLAY_HEADING','<br /><h3><u>Import Results</u></h3><br />');
 define('EASYPOPULATE_4_DISPLAY_UPLOADED_FILE_SPEC','<p class=smallText>File uploaded.<br />Temporary filename: %s<br /><b>User filename: %s</b><br />Size: %s<br />'); // open paragraph
+define('EASYPOPULATE_4_DISPLAY_UPLOADED_FILE_TOO_LARGE', '<br /><b>Uploaded file is too large (%1$d bytes) and exceeds the Maximum File Upload Size of %2$d bytes. If necessary, split the file, increase the size limit or check settings.</b>');
 define('EASYPOPULATE_4_DISPLAY_LOCAL_FILE_SPEC','<p class=smallText><b>Filename: %s</b><br />'); // open paragraph
 
 // upload results display - output via $display_output

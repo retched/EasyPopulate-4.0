@@ -569,7 +569,9 @@ $upload_dir = (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATA
 //  UPLOAD FILE isset($_FILES['usrfl'])
 if (isset($_FILES['uploadfile'])) {
   $file = ep_4_get_uploaded_file('uploadfile');
-  if (!strlen($file['tmp_name']) || !$file['size']){
+  if (!empty($file['size']) && ($file['size'] > MAX_FILE_UPLOAD_SIZE)) {
+    $messageStack->add(sprintf(EASYPOPULATE_4_DISPLAY_UPLOADED_FILE_TOO_LARGE, $file['size'], MAX_FILE_UPLOAD_SIZE), 'warning');
+  } else if (!strlen($file['tmp_name']) || !$file['size']){
     $messageStack->add(EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_EMPTY, 'warning');
   } else {
     if (is_uploaded_file($file['tmp_name'])) {
