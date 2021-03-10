@@ -477,9 +477,9 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $resultMeta = ep_4_query($sqlMeta) or die(($ep_uses_mysqli ? mysqli_error($db->link) : mysql_error()));
       $rowMeta = ($ep_uses_mysqli ? mysqli_fetch_array($resultMeta) : mysql_fetch_array($resultMeta));
       unset($resultMeta);
-      $row['v_metatags_title_' . $lid_code] = $row['v_metatags_title_' . $lid] = $rowMeta['metatags_title'];
-      $row['v_metatags_keywords_' . $lid_code] = $row['v_metatags_keywords_' . $lid] = $rowMeta['metatags_keywords'];
-      $row['v_metatags_description_' . $lid_code] = $row['v_metatags_description_' . $lid] = $rowMeta['metatags_description'];
+      $row['v_metatags_title_' . $lid_code] = $row['v_metatags_title_' . $lid] = (isset($rowMeta['metatags_title']) ? $rowMeta['metatags_title'] : '');
+      $row['v_metatags_keywords_' . $lid_code] = $row['v_metatags_keywords_' . $lid] = (isset($rowMeta['metatags_keywords']) ? $rowMeta['metatags_keywords'] : '');
+      $row['v_metatags_description_' . $lid_code] = $row['v_metatags_description_' . $lid] = (isset($rowMeta['metatags_description']) ? $rowMeta['metatags_description'] : '');
       unset($rowMeta);
       // metaData end
       // for each language, get category description and name
