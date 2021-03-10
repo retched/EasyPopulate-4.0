@@ -55,7 +55,7 @@
           }
           foreach ($langcode as $key => $lang) {
             $lid = $lang['id'];
-            $lid_code = $lang['id_code'];
+            $lid_code = $lang['code'];
             // $items[$filelayout['v_categories_name_'.$lid]];
             // $items[$filelayout['v_categories_description_'.$lid]];
             if (isset($filelayout['v_categories_name_' . $lid]) || isset($filelayout['v_categories_description_' . $lid]) || isset($filelayout['v_categories_name_' . $lid_code]) || isset($filelayout['v_categories_description_' . $lid_code])) {
