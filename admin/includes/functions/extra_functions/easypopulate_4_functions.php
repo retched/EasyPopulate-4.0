@@ -111,13 +111,9 @@ function ep_4_SBA1Exists () {
       while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($colsarray) : mysql_fetch_array($colsarray))){
         switch ($row['Field']) {
           case 'stock_id':
-            break;
           case 'products_id':
-            break;
           case 'stock_attributes':
-            break;
           case 'quantity':
-            break;
           case 'sort':
             break;
           default:
@@ -145,20 +141,10 @@ function ep_4_SBA1Exists () {
       while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($colsarray) : mysql_fetch_array($colsarray))){
         switch ($row['Field']) {
           case 'stock_id':
-            $desired++;
-            break;
           case 'products_id':
-            $desired++;
-            break;
           case 'stock_attributes':
-            $desired++;
-            break;
           case 'quantity':
-            $desired++;
-            break;
           case 'sort':
-            $desired++;
-            break;
           case 'customid';
             $desired++;
             break;
@@ -212,21 +198,13 @@ function ep_4_CEONURIExists () {
       while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($colsarray) : mysql_fetch_array($colsarray))){
         switch ($row['Field']) {
           case 'uri':
-            break;
           case 'language_id':
-            break;
           case 'current_uri':
-            break;
           case 'main_page':
-            break;
           case 'query_string_parameters':
-            break;
           case 'associated_db_id':
-            break;
           case 'alternate_uri':
-            break;
           case 'redirection_type_code':
-            break;
           case 'date_added':
             break;
           default:
