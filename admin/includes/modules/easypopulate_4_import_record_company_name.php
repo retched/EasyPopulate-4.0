@@ -53,7 +53,7 @@
                 $sql = "UPDATE " . TABLE_RECORD_COMPANY_INFO . " SET
                   record_company_url = :record_company_url:
                   WHERE record_company_id = :record_company_id: AND languages_id = :languages_id:";
-                $sql = $db->bindVars($sql, ':record_company_url:', $v_record_company_url_store], 'string');
+                $sql = $db->bindVars($sql, ':record_company_url:', $v_record_company_url_store, 'string');
                 $sql = $db->bindVars($sql, ':record_company_id:', $v_record_company_id, 'integer');
                 $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
                 $result = ep_4_query($sql);
