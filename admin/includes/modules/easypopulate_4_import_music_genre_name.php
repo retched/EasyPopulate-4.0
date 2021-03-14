@@ -20,7 +20,7 @@
               }
             }
           } else { // $v_music_genre_name == '' or name length violation
-            if ($music_genre_name_str_len !== false && $music_genre_name_str_len > $max_len['music_genre_name'])) {
+            if ($music_genre_name_str_len !== false && ($music_genre_name_str_len > $max_len['music_genre_name'])) {
               $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_MUSIC_GENRE_NAME_LONG, $v_music_genre_name, $max_len['music_genre_name']);
               if (empty($max_len['music_genre_name_found']) || $max_len['music_genre_name_found'] < $music_genre_name_str_len) {
                 $max_len['music_genre_name_found'] = $music_genre_name_str_len;
