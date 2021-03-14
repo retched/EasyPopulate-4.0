@@ -908,24 +908,30 @@ function ep_4_chmod_check($tempdir) {
   return $chmod_check;
 }
 
+function ep4_non_admin_temp() {
+  if (EP4_ADMIN_TEMP_DIRECTORY === 'true') {
+    return;
+  }
+  if (strpos(DIR_FS_CATALOG . $ep_debug_log_path, DIR_FS_ADMIN) === 0) {
+    global $db;
+    
+    $temp_rem = substr(DIR_FS_CATALOG . $ep_debug_log_path, strlen(DIR_FS_ADMIN));
+    $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'true\' where configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', "1", false, 0, true);
+
+    $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'' . $temp_rem . '\' WHERE configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', "1", false, 0, true);
+    unset($temp_rem);
+    // need a message to  be displayed...
+//    zen_redirect(zen_href_link(FILENAME_CONFIGURATION /*, $parameters*/));
+    // zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
+  }
+
+}
+
 function ep4_directory_check($ep_debug_log_path) {
   global $db;
 
-  if (EP4_ADMIN_TEMP_DIRECTORY !== 'true') {
-
-    if (strpos(DIR_FS_CATALOG . $ep_debug_log_path, DIR_FS_ADMIN) === 0) {
-
-      $temp_rem = substr(DIR_FS_CATALOG . $ep_debug_log_path, strlen(DIR_FS_ADMIN));
-      $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'true\' where configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', false, false, 0, true);
-
-      $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'' . $temp_rem . '\' WHERE configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', false, false, 0, true);
-      unset($temp_rem);
-      // need a message to  be displayed...
-//      zen_redirect(zen_href_link(FILENAME_CONFIGURATION /*, $parameters*/));
-      // zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
-    }
-  }
-  $ep_debug_log_path = $db->Execute('SELECT configuration_value FROM ' . TABLE_CONFIGURATION . ' where configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', false, false, 0, true);
+  ep4_non_admin_temp();
+  $ep_debug_log_path = $db->Execute('SELECT configuration_value FROM ' . TABLE_CONFIGURATION . ' WHERE configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', '1', false, 0, true);
 
   return $ep_debug_log_path->fields['configuration_value'];
 }
@@ -962,21 +968,8 @@ function ep4_directory_choice_check($ep_debug_log_path) {
 
   //$temp_dir = $db->Execute('SELECT configuration_value FROM ' . TABLE_CONFIGURATION . ' where configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', false, false, 0, true);
 
-  if (EP4_ADMIN_TEMP_DIRECTORY !== 'true') {
-
-    if (strpos(DIR_FS_CATALOG . $ep_debug_log_path, DIR_FS_ADMIN) === 0) {
-
-      $temp_rem = substr(DIR_FS_CATALOG . $ep_debug_log_path, strlen(DIR_FS_ADMIN));
-      $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'true\' where configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', false, false, 0, true);
-
-      $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'' . $temp_rem . '\' WHERE configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', false, false, 0, true);
-      unset($temp_rem);
-      // need a message to  be displayed...
-//      zen_redirect(zen_href_link(FILENAME_CONFIGURATION /*, $parameters*/));
-      // zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
-    }
-  }
-  $ep_debug_log_path = $db->Execute('SELECT configuration_value FROM ' . TABLE_CONFIGURATION . ' where configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', false, false, 0, true);
+  ep4_non_admin_temp();
+  $ep_debug_log_path = $db->Execute('SELECT configuration_value FROM ' . TABLE_CONFIGURATION . ' WHERE configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', '1', false, 0, true);
 
   return ($ep_debug_log_path->fields['configuration_value'] == 'true' ? 'true' : 'false');
 }
