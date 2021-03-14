@@ -365,7 +365,7 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
         $result2 = ep_4_query($sql_max2);
         unset($sql_max2);
         $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
-        unset($resul2);
+        unset($result2);
         $products_options_values_to_products_options_id = $row2['max'];
         unset($row2);
         $values_names_index++;
