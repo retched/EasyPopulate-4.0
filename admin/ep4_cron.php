@@ -14,7 +14,7 @@ $is_browser = (isset($_SERVER['HTTP_HOST']) || PHP_SAPI != 'cli');
 if ($is_browser && isset($_SERVER["REMOTE_ADDR"]) && ($_SERVER["REMOTE_ADDR"] != $_SERVER["SERVER_ADDR"])){
   echo ' ERROR: Permission denied.';
   exit(1);
-};
+}
 // Some servers' PHP configuration doesn't know where to find the mysql socket correctly (evidenced by getting errors about mysqli and mysql.sock, esp when running cron or command-line scripts, such as this one)
 // uncomment the following line ONLY if your server's configuration requires it and you don't already have this in your configure.php file
 // define('DB_SOCKET', '/tmp/mysql.sock');
@@ -63,7 +63,7 @@ $_SERVER['HTTP_USER_AGENT'] = 'Zen Cart update';
 // echo 'PHP_SAPI = ' . PHP_SAPI . "\n";
 
 // Report inability to execute and exit operation with appropriate response.
-if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(FILENAME_EASYPOPULATE_4, '.php') ? FILENAME_EASYPOPULATE_4 . '.php' : FILENAME_EASYPOPULATE_4))))
+if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(FILENAME_EASYPOPULATE_4, '.php') ? FILENAME_EASYPOPULATE_4 . '.php' : FILENAME_EASYPOPULATE_4)))) {
   echo "Error: File not found: " . (!strstr(FILENAME_EASYPOPULATE_4, '.php') ? FILENAME_EASYPOPULATE_4 . '.php' : FILENAME_EASYPOPULATE_4) . ".\nMake sure you have placed the ep4_cron.php file in your (renamed) Admin folder and that Easy Populate V4 is properly installed.\n\n";
   exit(1);
 }
