@@ -136,7 +136,7 @@
             $ep_import_count++;
             }
           }
-        } else { // ERROR: This products_model doen't exist!
+        } else { // ERROR: This products_model doesn't exist!
           $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - ' . $chosen_key . ': </b>%s - Not Found!</font>', $items[$filelayout[$chosen_key]]);
           $ep_error_count++;
         }
