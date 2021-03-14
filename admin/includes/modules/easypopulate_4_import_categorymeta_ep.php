@@ -219,7 +219,7 @@
             $sql = $db->bindVars($sql, ':metatags_description:', $thiscategorymetatagsdescription, 'string');
             $sql = $db->bindVars($sql, ':categories_id:', $items[$filelayout['v_categories_id']], 'integer');
             $sql = $db->bindVars($sql, ':language_id:', $lid, 'integer');
-            if (!$row || (isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_title_' . $lid_code]) || isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid_code]) || isset($filelayout['v_metatags_description_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid_code]))) {
+            if (!$row || isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid]) || isset($filelayout['v_metatags_title_' . $lid_code]) || isset($filelayout['v_metatags_keywords_' . $lid_code]) || isset($filelayout['v_metatags_description_' . $lid_code])) {
               $result = ep_4_query($sql);
             }
             if ($result) {
