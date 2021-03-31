@@ -158,51 +158,37 @@
             }
             
             // Need to admin sanitize the categories_name and categories_description and handle both languages id and  code.
-            if (!empty($_POST)) {
-              $oldCatMetaPost = $_POST;
-              unset($_POST);
-            }
+              $post_array = array(
+                'metatags_title' => array(
+                  'lang' => array(
+                    'lid' => array($lid => array('v_metatags_title_' . $lid => ep4_field_in_file('v_metatags_title_' . $lid) ? $items[$filelayout['v_metatags_title_' . $lid]] : ''),),
+                    'code' => array($lid_code => array('v_metatags_title_' . $lid_code => ep4_field_in_file('v_metatags_title_' . $lid_code) ? $items[$filelayout['v_metatags_title_' . $lid_code]] : ''),),
+                    'var' => array('thiscategorymetatagstitle' => $items[$filelayout['v_categories_id']]), //compact('v_categories_name'),
+                  ),
+                ),
+                'metatags_keywords' => array(
+                  'lang' => array(
+                    'lid' => array($lid => array('v_metatags_keywords_' . $lid => ep4_field_in_file('v_metatags_keywords_' . $lid) ? $items[$filelayout['v_metatags_keywords_' . $lid]] : ''),),
+                    'code' => array($lid_code => array('v_metatags_keywords_' . $lid_code => ep4_field_in_file('v_metatags_keywords_' . $lid_code) ? $items[$filelayout['v_metatags_keywords_' . $lid_code]] : ''),),
+                    'var' => array('thiscategorymetatagskeywords' => $items[$filelayout['v_categories_id']]), //compact('v_categories_description'),
+                  ),
+                ),
+                'metatags_description' => array(
+                  'lang' => array(
+                    'lid' => array($lid => array('v_metatags_description_' . $lid => ep4_field_in_file('v_metatags_description_' . $lid) ? $items[$filelayout['v_metatags_description_' . $lid]] : ''),),
+                    'code' => array($lid_code => array('v_metatags_description_' . $lid_code => ep4_field_in_file('v_metatags_description_' . $lid_code) ? $items[$filelayout['v_metatags_description_' . $lid_code]] : ''),),
+                    'var' => array('thiscategorymetatagsdescription' => $items[$filelayout['v_categories_id']]), //compact('v_categories_description'),
+                  ),
+                ),
+              );
+              
+              $data_array = ep4_post_sanitize($post_array);
+              
+              extract($data_array, EXTR_OVERWRITE);
             
-            if (ep4_field_in_file('v_metatags_title_' . $lid)) {
-              $_POST['metatags_title'][$lid] = ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $lid]]);
-            }
-            if (ep4_field_in_file('v_metatags_title_' . $lid_code) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_metatags_title_' . $lid))) {
-              $_POST['metatags_title'][$lid] = ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $lid_code]]);
-            }
-            
-            if (ep4_field_in_file('v_metatags_keywords_' . $lid)) {
-              $_POST['metatags_keywords'][$lid] = ep_4_curly_quotes($items[$filelayout['v_metatags_keywords_' . $lid]]);
-            }
-            if (ep4_field_in_file('v_metatags_keywords_' . $lid_code) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_metatags_keywords_' . $lid))) {
-              $_POST['metatags_keywords'][$lid] = ep_4_curly_quotes($items[$filelayout['v_metatags_keywords_' . $lid_code]]);
-            }
-            
-            if (ep4_field_in_file('v_metatags_description_' . $lid)) {
-              $_POST['metatags_description'][$lid] = ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $lid]]);
-            }
-            if (ep4_field_in_file('v_metatags_description_' . $lid_code) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_metatags_description_' . $lid))) {
-              $_POST['metatags_description'][$lid] = ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $lid_code]]);
-            }
-            
-            if (class_exists('AdminRequestSanitizer')) {
-              $sanitizer = AdminRequestSanitizer::getInstance();
-              $sanitizer->runSanitizers();
-              unset($sanitizer);
-            }
-            
-            $thiscategorymetatagstitle = $_POST['metatags_title'][$lid];
-            $thiscategorymetatagskeywords = $_POST['metatags_keywords'][$lid];
-            $thiscategorymetatagsdescription = $_POST['metatags_description'][$lid];
-            
-            unset($_POST);
-            if (!empty($oldCatMetaPost)) {
-              $_POST = $oldCatMetaPost;
-              unset($oldCatMetaPost);
-            }
-            
-            $sql = $db->bindVars($sql, ':metatags_title:', $thiscategorymetatagstitle, 'string');
-            $sql = $db->bindVars($sql, ':metatags_keywords:', $thiscategorymetatagskeywords, 'string');
-            $sql = $db->bindVars($sql, ':metatags_description:', $thiscategorymetatagsdescription, 'string');
+            $sql = $db->bindVars($sql, ':metatags_title:', $thiscategorymetatagstitle[$lid], 'string');
+            $sql = $db->bindVars($sql, ':metatags_keywords:', $thiscategorymetatagskeywords[$lid], 'string');
+            $sql = $db->bindVars($sql, ':metatags_description:', $thiscategorymetatagsdescription[$lid], 'string');
             $sql = $db->bindVars($sql, ':categories_id:', $items[$filelayout['v_categories_id']], 'integer');
             $sql = $db->bindVars($sql, ':language_id:', $lid, 'integer');
             if (!$row || isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid]) || isset($filelayout['v_metatags_title_' . $lid_code]) || isset($filelayout['v_metatags_keywords_' . $lid_code]) || isset($filelayout['v_metatags_description_' . $lid_code])) {
