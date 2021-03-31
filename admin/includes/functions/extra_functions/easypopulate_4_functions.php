@@ -1016,3 +1016,83 @@ function ep4_field_in_file($field_name) {
   
   return false;
 }
+
+function ep4_post_sanitize($post_array) {
+
+  $return_val = array();
+  
+  if (empty($post_array) || !is_array($post_array)) {
+    return array();
+  }
+  
+  if (!empty($_POST)) {
+    $tempData = $_POST;
+    unset($_POST);
+  }
+
+  $lang_vars = array('lid', 'code');
+  foreach ($post_array as $post_key => $val) {
+    if (array_key_exists('lang', $val)) {
+      $vari = $val['lang']['var'];
+      foreach ($lang_vars as $lang) {
+        $data[$lang] = $val['lang'][$lang];
+        ${$lang} = key($data[$lang]);
+        $var[$lang] = key($data[$lang][${$lang}]);
+        $vals[$lang] = $data[$lang][${$lang}][$var[$lang]];
+      }
+
+      if (ep4_field_in_file($var['lid'])) {
+        $_POST[$post_key][$lid] = ep_4_curly_quotes($vals['lid']);
+      }
+      if (ep4_field_in_file($var['code']) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file($var['lid']))) {
+        $_POST[$post_key][$lid] = ep_4_curly_quotes($vals['code']);
+      }
+      
+      continue;
+    }
+    
+    foreach ($val as $field_title => $var) {
+      $var_name = key($var);
+      if (ep4_field_in_file($field_title)) {
+        $_POST[$post_key] = ep_4_curly_quotes($var[$var_name]);
+      }
+    }
+  }
+  
+  if (class_exists('AdminRequestSanitizer')) {
+    $sanitizer = AdminRequestSanitizer::getInstance();
+    $sanitizer->runSanitizers();
+    unset($sanitizer);
+  }
+  
+  foreach ($post_array as $post_key => $val) {
+    if (array_key_exists('lang', $val)) {
+
+      $vari = $val['lang']['var'];
+      foreach ($lang_vars as $lang) {
+        $data[$lang] = $val['lang'][$lang];
+        ${$lang} = key($data[$lang]);
+        $var[$lang] = key($data[$lang][${$lang}]);
+        $vals[$lang] = $data[$lang][${$lang}][$var[$lang]];
+
+        $return_val[key($vari)] = $_POST[$post_key];
+      }
+      continue;
+    }
+  
+    foreach ($val as $field_name => $var) {
+      $var_name = key($var);
+      if (ep4_field_in_file($field_name)) {
+        $return_val[$var_name] = $_POST[$post_key];
+      }
+    }
+  }
+  
+  unset($_POST);
+  if (!empty($tempData)) {
+    $_POST = $tempData;
+    unset($tempData);
+  }
+  
+  return $return_val;
+}
