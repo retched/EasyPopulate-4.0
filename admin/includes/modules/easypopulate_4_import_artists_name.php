@@ -1,11 +1,63 @@
 <?php
 
+          if (isset($v_artists_name) && ($v_artists_name != '')) {
+            if (!empty($_POST)) {
+              $oldArtPost = $_POST;
+              unset($_POST);
+            }
+          
+            if (ep4_field_in_file('v_artists_name')) {
+              $_POST['artists_name'] = ep_4_curly_quotes($v_artists_name);
+            }
+          
+            if (class_exists('AdminRequestSanitizer')) {
+              $sanitizer = AdminRequestSanitizer::getInstance();
+              $sanitizer->runSanitizers();
+              unset($sanitizer);
+            }
+          
+            $v_artists_name = $_POST['artists_name'];
+          
+            unset($_POST);
+            if (!empty($oldArtPost)) {
+              $_POST = $oldArtPost;
+              unset($oldArtPost);
+            }
+          }
           $art_name_str_len = isset($v_artists_name) && ($v_artists_name != '') ? (function_exists('mb_strlen') ? mb_strlen($v_artists_name) : strlen($v_artists_name)) : false;
-          if ($art_name_str_len !== false && ($art_name_str_len <= $max_len['artists_name'])) {
+          if ($art_name_str_len === false) {
+            $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_ARTISTS_NAME_EMPTY, $items[$filelayout[$chosen_key]], $chosen_key);
+            $v_artists_id = 0; // chadd - zencart uses artists_id = '0' for no assisgned artists
+            return;
+          }
+          if ($art_name_str_len <= $max_len['artists_name']) {
             $sql = "SELECT artists_id AS artistsID FROM " . TABLE_RECORD_ARTISTS . " WHERE artists_name = :artists_name: LIMIT 1";
-            $sql = $db->bindVars($sql, ':artists_name:', ep_4_curly_quotes($v_artists_name), 'string');
+            $sql = $db->bindVars($sql, ':artists_name:', $v_artists_name, $zc_support_ignore_null);
             $result = ep_4_query($sql);
             unset($sql);
+            
+            if (!empty($_POST)) {
+              $artImage = $_POST;
+              unset($_POST);
+            }
+            if (ep4_field_in_file('v_artists_image')) {
+              $_POST['artists_image'] = ep_4_curly_quotes($items[$filelayout['v_artists_image']]);
+            }
+            
+            if (class_exists('AdminRequestSanitizer')) {
+              $sanitizer = AdminRequestSanitizer::getInstance();
+              $sanitizer->runSanitizers();
+              unset($sanitizer);
+            }
+            
+            $v_artists_image = $_POST['artists_image'];
+            
+            unset($_POST);
+            if (!empty($artImage)) {
+              $_POST = $artImage;
+              unset($artImage);
+            }
+            
             if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) {
               unset($result);
               $v_artists_id = $row['artistsID']; // this id goes into the product_music_extra table, the other information is collected from the assignment of ${$key} = $items[$value]
@@ -13,7 +65,7 @@
                 artists_image = :artists_image:,
                 last_modified = CURRENT_TIMESTAMP
                 WHERE artists_id = :artists_id:";
-              $sql = $db->bindVars($sql, ':artists_image:', $v_artists_image, 'string');
+              $sql = $db->bindVars($sql, ':artists_image:', $v_artists_image, $zc_support_ignore_null);
               $sql = $db->bindVars($sql, ':artists_id:', $v_artists_id, 'integer');
               $result = ep_4_query($sql);
               unset($sql);
@@ -67,7 +119,7 @@
                 }
                 
                 $sql = $db->bindVars($sql, ':artists_id:', $v_artists_id, 'integer');
-                $sql = $db->bindVars($sql, ':artists_url:', $thisartistsurl, 'string');
+                $sql = $db->bindVars($sql, ':artists_url:', $thisartistsurl, $zc_support_ignore_null);
                 $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
                 $result = ep_4_query($sql);
                 unset($sql);
@@ -85,33 +137,33 @@
 
                 // Need to admin sanitize the and handle both languages id and  code.
 
-                if (!empty($_POST)) {
-                  $oldArtPost = $_POST;
-                  unset($_POST);
-                }
-                
-                if (ep4_field_in_file('v_artists_name')) {
-                  $_POST['artists_name'] = ep_4_curly_quotes($items[$filelayout['v_artists_name']]);
-                }
-                
-                if (class_exists('AdminRequestSanitizer')) {
-                  $sanitizer = AdminRequestSanitizer::getInstance();
-                  $sanitizer->runSanitizers();
-                  unset($sanitizer);
-                }
-                
-                $thisartistsname = $_POST['artists_name'];
-                
+              if (!empty($_POST)) {
+                $oldArtPost = $_POST;
                 unset($_POST);
-                if (!empty($oldArtPost)) {
-                  $_POST = $oldArtPost;
-                  unset($oldArtPost);
-                }
+              }
+              
+              if (ep4_field_in_file('v_artists_name')) {
+                $_POST['artists_name'] = ep_4_curly_quotes($items[$filelayout['v_artists_name']]);
+              }
+              
+              if (class_exists('AdminRequestSanitizer')) {
+                $sanitizer = AdminRequestSanitizer::getInstance();
+                $sanitizer->runSanitizers();
+                unset($sanitizer);
+              }
+              
+              $thisartistsname = $_POST['artists_name'];
+              
+              unset($_POST);
+              if (!empty($oldArtPost)) {
+                $_POST = $oldArtPost;
+                unset($oldArtPost);
+              }
 
 
 
-              $sql = $db->bindVars($sql, ':artists_name:', $thisartistsname, 'string');
-              $sql = $db->bindVars($sql, ':artists_image:', $v_artists_image, 'string');
+              $sql = $db->bindVars($sql, ':artists_name:', $thisartistsname, $zc_support_ignore_null);
+              $sql = $db->bindVars($sql, ':artists_image:', $v_artists_image, $zc_support_ignore_null);
               $result = ep_4_query($sql);
               unset($sql);
 
@@ -165,7 +217,7 @@
                 
                 $sql = $db->bindVars($sql, ':artists_id:', $v_artists_id, 'integer');
                 $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
-                $sql = $db->bindVars($sql, ':artists_url:', $thisartistsurl, 'string');
+                $sql = $db->bindVars($sql, ':artists_url:', $thisartistsurl, $zc_support_ignore_null);
                 $result = ep_4_query($sql);
                 unset($sql);
                 if ($result) {
@@ -176,8 +228,8 @@
               }
               unset($lang);
             }
-          } else { // $v_artists_name == '' or name length violation
-            if ($art_name_str_len !== false && ($art_name_str_len > $max_len['artists_name'])) {
+          } else { // $v_artists_name name length violation
+            if ($art_name_str_len > $max_len['artists_name']) {
               $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_ARTISTS_NAME_LONG, $v_artists_name, $max_len['artists_name']);
               if (empty($max_len['artists_name_found']) || $max_len['artists_name_found'] < $art_name_str_len) {
                 $max_len['artists_name_found'] = $art_name_str_len;
@@ -185,7 +237,8 @@
                 if(EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD === 'false') {
                   $ep_error_count++;
                   unset($art_name_str_len);
-                  continue;
+                  $v_artists_id = 0; // chadd - zencart uses artists_id = '0' for no assisgned artists
+                  return;
                 }
                 $update_artists_name_sql = "ALTER TABLE " . TABLE_RECORD_ARTISTS . " CHANGE record_artists_name record_artists_name VARCHAR(" . (int)$art_name_str_len . ") NOT NULL DEFAULT '';";
                 $update_artists_name = $db->Execute($update_artists_name_sql);
