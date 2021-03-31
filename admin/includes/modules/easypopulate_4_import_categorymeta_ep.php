@@ -74,43 +74,29 @@
                 (categories_id = :categories_id: AND language_id = :language_id:)";
 
               // Need to admin sanitize the categories_name and categories_description and handle both languages id and  code.
+              $post_array = array(
+                'categories_name' => array(
+                  'lang' => array(
+                    'lid' => array($lid => array('v_categories_name_' . $lid => ep4_field_in_file('v_categories_name_' . $lid) ? $items[$filelayout['v_categories_name_' . $lid]] : ''),),
+                    'code' => array($lid_code => array('v_categories_name_' . $lid_code => ep4_field_in_file('v_categories_name_' . $lid_code) ? $items[$filelayout['v_categories_name_' . $lid_code]] : ''),),
+                    'var' => array('thiscategorymetaname' => $items[$filelayout['v_categories_id']]), //compact('v_categories_name'),
+                  ),
+                ),
+                'categories_description' => array(
+                  'lang' => array(
+                    'lid' => array($lid => array('v_categories_description_' . $lid => ep4_field_in_file('v_categories_description_' . $lid) ? $items[$filelayout['v_categories_description_' . $lid]] : ''),),
+                    'code' => array($lid_code => array('v_categories_description_' . $lid_code => ep4_field_in_file('v_categories_description_' . $lid_code) ? $items[$filelayout['v_categories_description_' . $lid_code]] : ''),),
+                    'var' => array('thiscategorymetadescription' => $items[$filelayout['v_categories_id']]), //compact('v_categories_description'),
+                  ),
+                ),
+              );
 
-              if (!empty($_POST)) {
-                $oldCatMetaPost = $_POST;
-                unset($_POST);
-              }
+              $data_array = ep4_post_sanitize($post_array);
+      
+              extract($data_array, EXTR_OVERWRITE);
               
-              if (ep4_field_in_file('v_categories_name_' . $lid)) {
-                $_POST['categories_name'][$lid] = ep_4_curly_quotes($items[$filelayout['v_categories_name_' . $lid]]);
-              }
-              if (ep4_field_in_file('v_categories_name_' . $lid_code) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_categories_name_' . $lid))) {
-                $_POST['categories_name'][$lid] = ep_4_curly_quotes($items[$filelayout['v_categories_name_' . $lid_code]]);
-              }
-              
-              if (ep4_field_in_file('v_categories_description_' . $lid)) {
-                $_POST['categories_description'][$lid] = ep_4_curly_quotes($items[$filelayout['v_categories_description_' . $lid]]);
-              }
-              if (ep4_field_in_file('v_categories_description_' . $lid_code) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_categories_description_' . $lid))) {
-                $_POST['categories_description'][$lid] = ep_4_curly_quotes($items[$filelayout['v_categories_description_' . $lid_code]]);
-              }
-              
-              if (class_exists('AdminRequestSanitizer')) {
-                $sanitizer = AdminRequestSanitizer::getInstance();
-                $sanitizer->runSanitizers();
-                unset($sanitizer);
-              }
-              
-              $thiscategorymetaname = $_POST['categories_name'][$lid];
-              $thiscategorymetadescription = $_POST['categories_description'][$lid];
-              
-              unset($_POST);
-              if (!empty($oldCatMetaPost)) {
-                $_POST = $oldCatMetaPost;
-                unset($oldCatMetaPost);
-              }
-              
-              $sql = $db->bindVars($sql, ':categories_name:', $thiscategorymetaname, 'string');
-              $sql = $db->bindVars($sql, ':categories_description:', $thiscategorymetadescription, 'string');
+              $sql = $db->bindVars($sql, ':categories_name:', $thiscategorymetaname[$lid], 'string');
+              $sql = $db->bindVars($sql, ':categories_description:', $thiscategorymetadescription[$lid], 'string');
               $sql = $db->bindVars($sql, ':categories_id:', $items[$filelayout['v_categories_id']], 'integer');
               $sql = $db->bindVars($sql, ':language_id:', $lid, 'integer');
               $result = ep_4_query($sql);
