@@ -227,7 +227,7 @@ $result = ep_4_query($filelayout_sql);
 
 $zco_notifier->notify('EP4_EXPORT_WHILE_START');
 
-while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
+while ($row = $ep_4_fetch_array($result)) {
 
   @set_time_limit($ep_execution);
 
@@ -244,18 +244,15 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     if ($row['v_products_id'] == (int)$active_products_id) {
       if ($row['v_options_id'] == (int)$active_options_id) {
         // collect the products_options_values_name
+        $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
+        $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
         if ($active_language_id <> (int)$row['v_language_id']) {
 
-          $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
-          $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
           $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
           $active_language_id = (int)$row['v_language_id'];
         } else {
-          $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
           $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] .= "," . $row['v_products_options_values_name'];
-          $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
         }
-        continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
       } else { // same product, new attribute - only executes once on new option
         // Clean the texts that could break CSV file formatting
         $dataRow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
@@ -269,35 +266,36 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
         $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
         $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
-        continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
       } // end of options_id check
-    } else { // new combo or different product or first time through while-loop
-      if (isset($active_row['v_products_id']) && ($active_row['v_products_id'] <> $last_products_id)) {
-        // Clean the texts that could break CSV file formatting
+      continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
+    }
+    // new combo or different product or first time through while-loop
+    if (isset($active_row['v_products_id']) && ($active_row['v_products_id'] <> $last_products_id)) {
+      // Clean the texts that could break CSV file formatting
 
-        $dataRow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
+      $dataRow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
 
-        fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
-        unset($dataRow);
+      fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+      unset($dataRow);
 
-        $ep_export_count++;
-        $last_products_id = ((isset($active_row['v_products_id']) || array_key_exists('v_products_id', $active_row)) ? (int)$active_row['v_products_id'] : 0);
-      } // end if new model
+      $ep_export_count++;
+      $last_products_id = ((isset($active_row['v_products_id']) || array_key_exists('v_products_id', $active_row)) ? (int)$active_row['v_products_id'] : 0);
+    } // end if new model
 
-      // get current row of data
-      $active_products_id = (int)$row['v_products_id'];
-      $active_options_id = (int)$row['v_options_id'];
-      $active_language_id = (int)$row['v_language_id'];
+    // get current row of data
+    $active_products_id = (int)$row['v_products_id'];
+    $active_options_id = (int)$row['v_options_id'];
+    $active_language_id = (int)$row['v_language_id'];
 
-      $active_row['v_products_model'] = $row['v_products_model'];
-      if ($chosen_key != 'v_products_model' && zen_not_null($chosen_key)) {
-          $active_row[$chosen_key] = $row[$chosen_key];
-      }
-      $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
+    $active_row['v_products_model'] = $row['v_products_model'];
+    if ($chosen_key != 'v_products_model' && zen_not_null($chosen_key)) {
+        $active_row[$chosen_key] = $row[$chosen_key];
+    }
+    $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
 
-      $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
-      $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
-    } // end of special case 'attrib_basic'
+    $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
+    $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
+    // end of special case 'attrib_basic'
   } else { // standard export processing // end of special case 'attrib_basic'
     if ($ep_dltype == 'orders_1' || $ep_dltype == 'orders_2' || $ep_dltype == 'orders_3' || $ep_dltype == 'orders_4') {
       if ((!isset($tracker['v_orders_id']) && !zen_not_null($tracker['v_orders_id'])) || $row['v_orders_id'] != $tracker['v_orders_id']) {
@@ -328,8 +326,8 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $sql2 = $db->bindVars($sql2, ':products_attributes_id:', $row['v_products_attributes_id'], 'integer');
         $result2 = ep_4_query($sql2);
         unset($sql2);
-        $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
-        if (($ep_uses_mysqli ? mysqli_num_rows($result2) : mysql_num_rows($result2))) {
+        $row2 = $ep_4_fetch_array($result2);
+        if ($ep_4_num_rows($result2)) {
           $row['v_products_attributes_filename'] = $row2['products_attributes_filename'];
           $row['v_products_attributes_maxdays'] = $row2['products_attributes_maxdays'];
           $row['v_products_attributes_maxcount'] = $row2['products_attributes_maxcount'];
@@ -346,8 +344,8 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $sql2 = $db->bindVars($sql2, ':products_attributes_id:', $row['v_products_attributes_id'], 'integer');
         $result2 = ep_4_query($sql2);
         unset($sql2);
-        $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
-        if (($ep_uses_mysqli ? mysqli_num_rows($result2) : mysql_num_rows($result2))) {
+        $row2 = $ep_4_fetch_array($result2);
+        if ($ep_4_num_rows($result2)) {
           $row['v_products_attributes_filename'] = $row2['products_attributes_filename'];
           $row['v_products_attributes_maxdays'] = $row2['products_attributes_maxdays'];
           $row['v_products_attributes_maxcount'] = $row2['products_attributes_maxcount'];
@@ -379,7 +377,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql2 = $db->bindVars($sql2, ':language_id:', $lid2, 'integer');
       $result2 = ep_4_query($sql2);
       unset($sql2);
-      $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+      $row2 = $ep_4_fetch_array($result2);
       $row['v_products_name_' . $lid2_code] = $row['v_products_name_' . $lid2] = $row2['products_name'];
       $row['v_products_description_' . $lid2_code] = $row['v_products_description_' . $lid2] = $row2['products_description'];
       if ($ep_supported_mods['psd'] == true) { // products short descriptions mod
@@ -393,11 +391,11 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sqlMeta = $db->bindVars($sqlMeta, ':products_id:', $row['v_products_id'], 'integer');
       $sqlMeta = $db->bindVars($sqlMeta, ':language_id:', $lid2, 'integer');
       $resultMeta = ep_4_query($sqlMeta);
-      $rowMeta = ($ep_uses_mysqli ? mysqli_fetch_array($resultMeta) : mysql_fetch_array($resultMeta));
+      $rowMeta = $ep_4_fetch_array($resultMeta);
       unset($resultMeta);
-      $row['v_metatags_title_' . $lid2] = $rowMeta['metatags_title'];
-      $row['v_metatags_keywords_' . $lid2] = $rowMeta['metatags_keywords'];
-      $row['v_metatags_description_' . $lid2] = $rowMeta['metatags_description'];
+      $row['v_metatags_title_' . $lid2] = !empty($rowMeta['metatags_title']) ? $rowMeta['metatags_title'] : '';
+      $row['v_metatags_keywords_' . $lid2] = !empty($rowMeta['metatags_keywords']) ? $rowMeta['metatags_keywords'] : '';
+      $row['v_metatags_description_' . $lid2] = !empty($rowMeta['metatags_description']) ? $rowMeta['metatags_description'] : '';
       // metaData end
       $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP');
     } // foreach
@@ -416,8 +414,8 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
             TABLE_SPECIALS . ' WHERE products_id = :products_id:';
     $specials_query = $db->bindVars($specials_query, ':products_id:', $row['v_products_id'], 'integer');
     $specials_query = ep_4_query($specials_query);
-    if (($ep_uses_mysqli ? mysqli_num_rows($specials_query) : mysql_num_rows($specials_query))) {  // special
-      $ep_specials = ($ep_uses_mysqli ? mysqli_fetch_array($specials_query) : mysql_fetch_array($specials_query));
+    if ($ep_4_num_rows($specials_query)) {  // special
+      $ep_specials = $ep_4_fetch_array($specials_query);
       $row['v_specials_price'] = $ep_specials['specials_new_products_price'];
       $row['v_specials_date_avail'] = $ep_specials['specials_date_available'];
       $row['v_specials_expires_date'] = $ep_specials['expires_date'];
@@ -440,7 +438,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql2 = $db->bindVars($sql2, ':categories_id:', $thecategory_id, 'integer');
       $result2 = ep_4_query($sql2);
       unset($sql2);
-      while ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2))) {
+      while ($row2 = $ep_4_fetch_array($result2)) {
         $lid = $row2['language_id'];
         foreach ($langcode as $key => $lang) {
           if ($lang['id'] == $lid) {
@@ -458,7 +456,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql3 = 'SELECT parent_id FROM ' . TABLE_CATEGORIES . ' WHERE categories_id = :categories_id:';
       $sql3 = $db->bindVars($sql3, ':categories_id:', $thecategory_id, 'integer');
       $result3 = ep_4_query($sql3);
-      $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
+      $row3 = $ep_4_fetch_array($result3);
       $theparent_id = $row3['parent_id'];
       if (!empty($theparent_id)) { // Found parent ID, set thecategoryid to get the next level
         $thecategory_id = $theparent_id;
@@ -474,8 +472,8 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sqlMeta = 'SELECT * FROM ' . TABLE_METATAGS_CATEGORIES_DESCRIPTION . ' WHERE categories_id = :categories_id: AND language_id = :language_id: LIMIT 1 ';
       $sqlMeta = $db->bindVars($sqlMeta, ':categories_id:', $row['v_categories_id'], 'integer');
       $sqlMeta = $db->bindVars($sqlMeta, ':language_id:', $lid, 'integer');
-      $resultMeta = ep_4_query($sqlMeta) or die(($ep_uses_mysqli ? mysqli_error($db->link) : mysql_error()));
-      $rowMeta = ($ep_uses_mysqli ? mysqli_fetch_array($resultMeta) : mysql_fetch_array($resultMeta));
+      $resultMeta = ep_4_query($sqlMeta) or die($ep_4_error(($ep_uses_mysqli ? $db->link : null)) );
+      $rowMeta = $ep_4_fetch_array($resultMeta);
       unset($resultMeta);
       $row['v_metatags_title_' . $lid_code] = $row['v_metatags_title_' . $lid] = (isset($rowMeta['metatags_title']) ? $rowMeta['metatags_title'] : '');
       $row['v_metatags_keywords_' . $lid_code] = $row['v_metatags_keywords_' . $lid] = (isset($rowMeta['metatags_keywords']) ? $rowMeta['metatags_keywords'] : '');
@@ -488,7 +486,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql2 = $db->bindVars($sql2, ':language_id:', $lid, 'integer');
       $result2 = ep_4_query($sql2);
       unset($sql2);
-      $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+      $row2 = $ep_4_fetch_array($result2);
       $row['v_categories_name_' . $lid_code] = $row['v_categories_name_' . $lid] = $row2['categories_name'];
       $row['v_category_path_' . $lid] = rtrim($row['v_category_path_' . $lid], $category_delimiter);
       $row['v_categories_description_' . $lid_code] = $row['v_categories_description_' . $lid] = $row2['categories_description'];
@@ -534,7 +532,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql2 = $db->bindVars($sql2, ':categories_id:', $thecategory_id, 'integer');
       $result2 = ep_4_query($sql2);
       unset($sql2);
-      while ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2))) {
+      while ($row2 = $ep_4_fetch_array($result2)) {
         $lid = $row2['language_id'];
         foreach ($langcode as $key => $lang) {
           if ($lang['id'] == $lid) {
@@ -551,7 +549,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql3 = 'SELECT parent_id FROM ' . TABLE_CATEGORIES . ' WHERE categories_id = :categories_id:';
       $sql3 = $db->bindVars($sql3, ':categories_id:', $thecategory_id, 'integer');
       $result3 = ep_4_query($sql3);
-      $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result3) : mysql_fetch_array($result3));
+      $row3 = $ep_4_fetch_array($result3);
       $theparent_id = $row3['parent_id'];
       if (!empty($theparent_id)) { // Found parent ID, set thecategoryid to get the next level
         $thecategory_id = $theparent_id;
@@ -646,10 +644,10 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     $sqlAttrib = $db->bindVars($sqlAttrib, ':products_id:', $row['v_products_id'], 'integer');
     $resultAttrib = ep_4_query($sqlAttrib);
     unset($sqlAttrib);
-    $resultAttribCount = ($ep_uses_mysqli ? mysqli_num_rows($resultAttrib) : mysql_num_rows($resultAttrib));
+    $resultAttribCount = $ep_4_num_rows($resultAttrib);
 
     if ($resultAttribCount !== false) {
-      while ($rowAttrib = ($ep_uses_mysqli ? mysqli_fetch_assoc($resultAttrib) : mysql_fetch_assoc($resultAttrib))) {
+      while ($rowAttrib = $ep_4_fetch_assoc($resultAttrib)) {
         $row['v_products_attributes'] .= $rowAttrib['v_products_options_name'] . ': ' . $rowAttrib['v_products_options_values_name'] . '; ';
       }
       unset($rowAttrib);
@@ -677,7 +675,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     $sqlSBA = $db->bindVars($sqlSBA, ':products_id:', $row['v_products_id'], 'integer');
     $resultSBA = ep_4_query($sqlSBA);
     unset($sqlSBA);
-    $resultSBACount = ($ep_uses_mysqli ? mysqli_num_rows($resultSBA) : mysql_num_rows($resultSBA));
+    $resultSBACount = $ep_4_num_rows($resultSBA);
 
     if ($resultSBACount !== false && $resultSBACount > 0) {
       //If product is tracked by SBA
@@ -722,7 +720,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       //  clean the data then
       //  Store the data.
       $resultSBACounter = 1;
-      while ($rowSBA = ($ep_uses_mysqli ? mysqli_fetch_assoc($resultSBA) : mysql_fetch_assoc($resultSBA))) {
+      while ($rowSBA = $ep_4_fetch_assoc($resultSBA)) {
 //          print_r($rowSBA);
         //$rowSBA    = mysql_fetch_array($resultSBA);
         //  get the attribute and quantity data from the SBA table
@@ -747,7 +745,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
           $sqlSBAAttributes = $db->bindVars($sqlSBAAttributes, ':currentAttrib:', trim($currentAttrib), 'integer');
           $resultSBAAttributes = ep_4_query($sqlSBAAttributes);
           unset($sqlSBAAttributes);
-          $resultSBACountAttributes = ($ep_uses_mysqli ? mysqli_fetch_assoc($resultSBAAttributes) : mysql_fetch_assoc($resultSBAAttributes));
+          $resultSBACountAttributes = $ep_4_fetch_assoc($resultSBAAttributes);
           unset($resultSBAAttributes);
 
           $row['v_products_attributes'] .= (is_null($resultSBACountAttributes['v_SBA_value_name']) ? 'Option Does Not Exist' : $resultSBACountAttributes['v_SBA_option_name']) . ': ' . (is_null($resultSBACountAttributes['v_SBA_value_name']) ? 'Value Does Not Exist' : $resultSBACountAttributes['v_SBA_value_name']) . '; ';
@@ -818,13 +816,13 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     $sql_music_extra = 'SELECT * FROM ' . TABLE_PRODUCT_MUSIC_EXTRA . ' WHERE products_id = :products_id: LIMIT 1';
     $sql_music_extra = $db->bindVars($sql_music_extra, ':products_id:', $row['v_products_id'], 'integer');
     $result_music_extra = ep_4_query($sql_music_extra);
-    $row_music_extra = ($ep_uses_mysqli ? mysqli_fetch_array($result_music_extra) : mysql_fetch_array($result_music_extra));
+    $row_music_extra = $ep_4_fetch_array($result_music_extra);
     // artist
     if (!empty($row_music_extra['artists_id'])) { // '0' is correct, but '' NULL is possible
       $sql_record_artists = 'SELECT * FROM ' . TABLE_RECORD_ARTISTS . ' WHERE artists_id = :artists_id: LIMIT 1';
       $sql_record_artists = $db->bindVars($sql_record_artists, ':artists_id:', $row_music_extra['artists_id'], 'integer');
       $result_record_artists = ep_4_query($sql_record_artists);
-      $row_record_artists = ($ep_uses_mysqli ? mysqli_fetch_array($result_record_artists) : mysql_fetch_array($result_record_artists));
+      $row_record_artists = $ep_4_fetch_array($result_record_artists);
       $row['v_artists_name'] = $row_record_artists['artists_name'];
       $row['v_artists_image'] = $row_record_artists['artists_image'];
       foreach ($langcode as $key => $lang) {
@@ -834,7 +832,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $sql_record_artists_info = $db->bindVars($sql_record_artists_info, ':artists_id:', $row_music_extra['artists_id'], 'integer');
         $sql_record_artists_info = $db->bindVars($sql_record_artists_info, ':languages_id:', $lid, 'integer');
         $result_record_artists_info = ep_4_query($sql_record_artists_info);
-        $row_record_artists_info = ($ep_uses_mysqli ? mysqli_fetch_array($result_record_artists_info) : mysql_fetch_array($result_record_artists_info));
+        $row_record_artists_info = $ep_4_fetch_array($result_record_artists_info);
         $row['v_artists_url_' . $lid_code] = $row['v_artists_url_' . $lid] = $row_record_artists_info['artists_url'];
       }
       unset($key);
@@ -862,7 +860,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql_record_company = $db->bindVars($sql_record_company, ':record_company_id:', $row_music_extra['record_company_id'], 'integer');
       $result_record_company = ep_4_query($sql_record_company);
       unset($sql_record_company);
-      $row_record_company = ($ep_uses_mysqli ? mysqli_fetch_array($result_record_company) : mysql_fetch_array($result_record_company));
+      $row_record_company = $ep_4_fetch_array($result_record_company);
       unset($result_record_company);
       $row['v_record_company_name'] = $row_record_company['record_company_name'];
       $row['v_record_company_image'] = $row_record_company['record_company_image'];
@@ -874,7 +872,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
         $sql_record_company_info = $db->bindVars($sql_record_company_info, ':record_company_id:', $row_music_extra['record_company_id'], 'integer');
         $sql_record_company_info = $db->bindVars($sql_record_company_info, ':languages_id:', $lid, 'integer');
         $result_record_company_info = ep_4_query($sql_record_company_info);
-        $row_record_company_info = ($ep_uses_mysqli ? mysqli_fetch_array($result_record_company_info) : mysql_fetch_array($result_record_company_info));
+        $row_record_company_info = $ep_4_fetch_array($result_record_company_info);
         $row['v_record_company_url_' . $lid_code] = $row['v_record_company_url_' . $lid] = $row_record_company_info['record_company_url'];
       }
       unset($sql_record_company_info);
@@ -895,7 +893,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql_music_genre = $db->bindVars($sql_music_genre, ':music_genre_id:', $row_music_extra['music_genre_id'], 'integer');
       $result_music_genre = ep_4_query($sql_music_genre);
       unset($sql_music_genre);
-      $row_music_genre = ($ep_uses_mysqli ? mysqli_fetch_array($result_music_genre) : mysql_fetch_array($result_music_genre));
+      $row_music_genre = $ep_4_fetch_array($result_music_genre);
       unset($result_music_genre);
       $row['v_music_genre_name'] = $row_music_genre['music_genre_name'];
     } else {
@@ -913,7 +911,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql2 = $db->bindVars($sql2, ':manufacturers_id:', $row['v_manufacturers_id'], 'integer');
       $result2 = ep_4_query($sql2);
       unset($sql2);
-      $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+      $row2 = $ep_4_fetch_array($result2);
       unset($result2);
       $row['v_manufacturers_name'] = $row2['manufacturers_name'];
       unset($row2);
@@ -934,7 +932,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $sql2 = $db->bindVars($sql2, ':discount_id:', $discount_index, 'integer');
       $result2 = ep_4_query($sql2);
       unset($sql2);
-      $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+      $row2 = $ep_4_fetch_array($result2);
       $row['v_discount_price_' . $discount_index] = $row2['discount_price'];
       $row['v_discount_qty_' . $discount_index] = $row2['discount_qty'];
       unset($row2);

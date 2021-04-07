@@ -43,7 +43,7 @@ if ($music_genre_name_str_len > $max_len['music_genre_name']) {
 $sql = "SELECT music_genre_id AS music_genreID FROM " . TABLE_MUSIC_GENRE . " WHERE music_genre_name = :music_genre_name: LIMIT 1";
 $sql = $db->bindVars($sql, ':music_genre_name:', $v_music_genre_name, $zc_support_ignore_null);
 $result = ep_4_query($sql);
-if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) {
+if ($row = $ep_4_fetch_array($result)) {
   $v_music_genre_id = $row['music_genreID']; // this id goes into the product_music_extra table
 } else { // It is set to autoincrement, do not need to fetch max id
   $sql = "INSERT INTO " . TABLE_MUSIC_GENRE . " (music_genre_name, date_added)
@@ -51,7 +51,7 @@ if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($r
   $sql = $db->bindVars($sql, ':music_genre_name:', $v_music_genre_name, $zc_support_ignore_null);
   $result = ep_4_query($sql);
 
-  $v_music_genre_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment
+  $v_music_genre_id = $ep_4_insert_id(($ep_uses_mysqli ? $db->link : null)); // id is auto_increment
 
   if ($result) {
     zen_record_admin_activity('Inserted music genre ' . zen_db_input($v_music_genre_name) . ' via EP4.', 'info');

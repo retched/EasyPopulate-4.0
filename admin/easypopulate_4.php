@@ -59,6 +59,19 @@ $ep_metatags = defined('EASYPOPULATE_4_CONFIG_META_DATA') ? (int) EASYPOPULATE_4
 $ep_music = defined('EASYPOPULATE_4_CONFIG_MUSIC_DATA') ? (int) EASYPOPULATE_4_CONFIG_MUSIC_DATA : 0; // 0-Disable, 1-Enable
 $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3' ? true : false);
 
+$ep_4_fetch_array = $ep_fetch_array = 'mysqli_fetch_array';
+$ep_4_num_rows = 'mysqli_num_rows';
+$ep_4_fetch_assoc = 'mysqli_fetch_assoc';
+$ep_4_insert_id = 'mysqli_insert_id'; // @TODO: Verify this works as expected.
+$ep_4_error = 'mysqli_error'; // @TODO: verify this works as expected.
+if (!$ep_uses_mysqli) {
+  $ep_4_fetch_array = $ep_fetch_array = 'mysql_fetch_array';
+  $ep_4_num_rows = 'mysql_num_rows';
+  $ep_4_fetch_assoc = 'mysql_fetch_assoc';
+  $ep_4_insert_id = 'mysql_insert_id'; // @TODO: Verify this works as expected.
+  $ep_4_error = 'mysql_error';
+}
+
 @set_time_limit($ep_execution);  // executin limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
 
 if (!isset($error) || !$error) {
@@ -354,12 +367,12 @@ if (($collation == 'utf8') && ((substr($project, 0, 5) == "1.3.8") || (substr($p
 //$epdlanguage_query = $db->Execute("SELECT languages_id, name FROM ".TABLE_LANGUAGES." WHERE code = '".DEFAULT_LANGUAGE."'");
 if (!defined('DEFAULT_LANGUAGE')) {
   $epdlanguage_query = ep_4_query("SELECT languages_id, code, name FROM " . TABLE_LANGUAGES . " ORDER BY languages_id LIMIT 1");
-  $epdlanguage = ($ep_uses_mysqli ? mysqli_fetch_array($epdlanguage_query) : mysql_fetch_array($epdlanguage_query));
+  $epdlanguage = $ep_4_fetch_array($epdlanguage_query);
   define('DEFAULT_LANGUAGE', $epdlanguage['code']);
 }
 $epdlanguage_query = ep_4_query("SELECT languages_id, code, name FROM " . TABLE_LANGUAGES . " WHERE code = '" . DEFAULT_LANGUAGE . "'");
-if (($ep_uses_mysqli ? mysqli_num_rows($epdlanguage_query) : mysql_num_rows($epdlanguage_query))) {
-  $epdlanguage = ($ep_uses_mysqli ? mysqli_fetch_array($epdlanguage_query) : mysql_fetch_array($epdlanguage_query));
+if ($ep_4_num_rows($epdlanguage_query)) {
+  $epdlanguage = $ep_4_fetch_array($epdlanguage_query);
   $epdlanguage_id = $epdlanguage['languages_id'];
   $epdlanguage_name = $epdlanguage['name'];
   $epdlanguage_code = $epdlanguage['code'];
@@ -466,7 +479,9 @@ function getFileDelimiter($file, $checkLines = 2) {
     // found the one delimiter that works
     $results = array_keys($results, max($results));
     return $results[0]; // The one and only delimiter.
-  } else if ($size_results > 1) {
+  } 
+  
+  if ($size_results > 1) {
     // Options available, need to let know.
     // Have opportunity to evaluate the results of the row(s).
     // Ideally can evaluate each line for number of fields.
@@ -500,10 +515,10 @@ function getFileDelimiter($file, $checkLines = 2) {
     }
 
     return $returndelimiters; // Will return an array, but question is if it is empty or has 1 or more values.   
-  } else {
-    // None found and need user to do something else.
-    return NULL;
   }
+  
+  // None found and need user to do something else.
+  return NULL;
 }
 
 function ep_4_display_CSV_Delimiter($filename) {
@@ -512,32 +527,33 @@ function ep_4_display_CSV_Delimiter($filename) {
   if (!isset($file_delimiter)) {
     // File does not have a matching delimiter to what is in the database, bad filename, or delimiter is not set in database, need user to take some sort of action.
     return NULL;
-  } else if (is_array($file_delimiter)) {
+  }
+  if (is_array($file_delimiter)) {
     // Could have none (empty array), 1 delimiter, or multiple come back.
     // if empty array then the delimiter was inconsistently used in each row.
     // if 1 delimiter, then its the one to use. Return user friendly choice.
     // if 2 or more delimiters, need to offer choices/advise of potential issue.
     if (empty($file_delimiter)) {
       return NULL;
-    } else if (count($file_delimiter) == 1) {
+    }
+    if (count($file_delimiter) == 1) {
       if ($file_delimiter[0] == "\t") {
         $file_delimiter[0] = 'tab';
       } elseif ($file_delimiter[0] == " " || $file_delimiter[0] == "&nbsp;") {
         $file_delimiter[0] = 'space';
       }
       return $file_delimiter[0];
-    } else {
-      return array('delims'=>$file_delimiter);
     }
-  } else {
-    // Single delimiter used and was "immediately" found return user friendly choice.
-    if ($file_delimiter == "\t") {
-      $file_delimiter = 'tab';
-    } elseif ($file_delimiter == " " || $file_delimiter == "&nbsp;") {
-      $file_delimiter = 'space';
-    }
-    return $file_delimiter;
+    
+    return array('delims'=>$file_delimiter);
   }
+  // Single delimiter used and was "immediately" found return user friendly choice.
+  if ($file_delimiter == "\t") {
+    $file_delimiter = 'tab';
+  } elseif ($file_delimiter == " " || $file_delimiter == "&nbsp;") {
+    $file_delimiter = 'space';
+  }
+  return $file_delimiter;
 }
 
 if (isset($_POST['export']) || isset($_GET['export']) || isset($_POST['exportorder'])) {
@@ -577,8 +593,9 @@ if (isset($_FILES['uploadfile'])) {
     if (is_uploaded_file($file['tmp_name'])) {
       ep_4_copy_uploaded_file($file, (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . $tempdir);
     }
+    $file_delimiter = ep_4_display_CSV_Delimiter($upload_dir . $file['name']);
     $message_file_ext = explode('.', $file['name']);
-    $message_data =  (strtolower(end($message_file_ext)) == 'csv' ? zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), '', 'post', '', $request_type == 'SSL') . zen_draw_hidden_field('import', /*$message_data2*/ urlencode($file['name']), '') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT, '', false, 'submit') . EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_IMPORT . "</form>\n"  : EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_NO_CSV);
+    $message_data =  (strtolower(end($message_file_ext)) == 'csv' && isset($file_delimiter) && !is_array($file_delimiter) ? zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), '', 'post', '', $request_type == 'SSL') . zen_draw_hidden_field('import', /*$message_data2*/ urlencode($file['name']), '') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT, '', false, 'submit') . EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_IMPORT . "</form>\n"  : (isset($file_delimiter) && !is_array($file_delimiter) ? EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_NO_CSV : ((strtolower(end($message_file_ext)) == 'csv' ? EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES : EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES_NO_CSV))));
     $messageStack->add(sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_COMPLETE, $file['name'], $message_data), 'success');
   }
 }

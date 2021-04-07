@@ -1017,6 +1017,57 @@ function ep4_field_in_file($field_name) {
   return false;
 }
 
+/*
+
+      if (array_key_exists('lid', $val)) {
+        foreach ($val['lid'] as $lid => $data) {
+          foreach ($data as $file_field => $var_nm) {
+            $field_title = $file_field;
+            $var_name = key($var_nm);
+            if (ep4_field_in_file($field_title)) {
+              $_POST[$post_key][$lid] = ep_4_curly_quotes($val['lid'][$lid][$field_title][$var_name]);
+            }
+            if (ep4_field_in_file($field_title)) {
+              $_POST[$post_key][$lid] = ep_4_curly_quotes($items[$filelayout['v_categories_name_' . $lid]]);
+            }
+            if (ep4_field_in_file('v_categories_name_' . $lid_code) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_categories_name_' . $lid))) {
+              $_POST[$post_key][$lid] = ep_4_curly_quotes($items[$filelayout['v_categories_name_' . $lid_code]]);
+            }
+          }
+        }
+        continue;
+      }
+    
+      $post_array = array(
+        'categories_name' => array(
+          'v_record_company_url' => compact('v_record_company_url_store'),
+          'lid' = $lid,
+        ),
+      );
+      $post_array = array(
+        $post_key = array(
+          $field_title => compact($var_name)
+        ),
+      );
+
+      $post_array = array(
+        'categories_name' => array(
+          'lid' => array( 
+            '1' => array(
+              'v_record_company_url' => compact('v_record_company_url_store'),
+            )
+          ),
+        ),
+      );
+      $post_array = array(
+        $post_key = array(
+          $field_title => compact($var_name)
+        ),
+      );
+
+
+
+*/
 function ep4_post_sanitize($post_array) {
 
   $return_val = array();
@@ -1030,21 +1081,85 @@ function ep4_post_sanitize($post_array) {
     unset($_POST);
   }
 
+
+/*
+
+      $post_array = array(
+        'categories_name' => array(
+          'lang' => array(
+            'lid' => array($lid => array('v_categories_name_' . $lid => '$value1'),),
+            'code' => array($lid_code => array('v_categories_name_' . $lid_code => '$value2'),),
+            'var' => compact('v_categories_name'),
+          ),
+        ),
+      );
+      $data[$lang] = $val['lang'][$lang];
+      ${$lang} = key($data[$lang]);
+      $var[$lang] = key($data[$lang][${$lang}]);
+      $vals[$lang] = $data[$lang][${$lang}][$var[$lang]];
+
+      $post_array = array(
+        'categories_name' => array(
+          'v_record_company_url' => compact('v_record_company_url_store'),
+          'lid' = $lid,
+        ),
+      );
+      $post_array = array(
+        $post_key = array(
+          $field_title => compact($var_name)
+        ),
+      );
+
+*/
   $lang_vars = array('lid', 'code');
   foreach ($post_array as $post_key => $val) {
+/*    if (array_key_exists('lid', $val)) {
+      foreach ($val['lid'] as $lid => $data) {
+        foreach ($data as $file_field => $var_nm) {
+          $field_title = $file_field;
+          $var_name = key($var_nm);
+          if (ep4_field_in_file($field_title)) {
+            $_POST[$post_key][$lid] = ep_4_curly_quotes($val['lid'][$lid][$field_title][$var_name]);
+          }
+          if (ep4_field_in_file($field_title)) {
+            $_POST[$post_key][$lid] = ep_4_curly_quotes($items[$filelayout['v_categories_name_' . $lid]]);
+          }
+          if (ep4_field_in_file('v_categories_name_' . $lid_code) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_categories_name_' . $lid))) {
+            $_POST[$post_key][$lid] = ep_4_curly_quotes($items[$filelayout['v_categories_name_' . $lid_code]]);
+          }
+        }
+      }
+      continue;
+    }*/
+    
+    /*
+      $post_array = array(
+        'categories_name' => array(
+          'lang' => array(
+            'lid' => array($lid => array('v_categories_name_' . $lid => '$value1'),),
+            'code' => array($lid_code => array('v_categories_name_' . $lid_code => '$value2'),),
+            'var' => compact('v_categories_name'),
+          ),
+        ),
+      );
+    */
     if (array_key_exists('lang', $val)) {
       $vari = $val['lang']['var'];
       foreach ($lang_vars as $lang) {
+        $var[$lang] = null;
+        if (!array_key_exists($lang, $val['lang'])) {
+          continue;
+        }
         $data[$lang] = $val['lang'][$lang];
         ${$lang} = key($data[$lang]);
         $var[$lang] = key($data[$lang][${$lang}]);
         $vals[$lang] = $data[$lang][${$lang}][$var[$lang]];
       }
 
-      if (ep4_field_in_file($var['lid'])) {
+      if (array_key_exists('lid', $vals) && ep4_field_in_file($var['lid'])) {
         $_POST[$post_key][$lid] = ep_4_curly_quotes($vals['lid']);
       }
-      if (ep4_field_in_file($var['code']) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file($var['lid']))) {
+      if (array_key_exists('code', $vals) && ep4_field_in_file($var['code']) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file($var['lid']))) {
         $_POST[$post_key][$lid] = ep_4_curly_quotes($vals['code']);
       }
       
@@ -1052,6 +1167,8 @@ function ep4_post_sanitize($post_array) {
     }
     
     foreach ($val as $field_title => $var) {
+      //$field_title = key($val);
+//      $var_name = key($val[$field_title]);
       $var_name = key($var);
       if (ep4_field_in_file($field_title)) {
         $_POST[$post_key] = ep_4_curly_quotes($var[$var_name]);
@@ -1075,8 +1192,20 @@ function ep4_post_sanitize($post_array) {
         $var[$lang] = key($data[$lang][${$lang}]);
         $vals[$lang] = $data[$lang][${$lang}][$var[$lang]];
 
-        $return_val[key($vari)] = $_POST[$post_key];
+//        $_POST[$post_key][$lid] = ep_4_curly_quotes($vals['lid']);
+        $return_val[key($vari)] = array_key_exists($post_key, $_POST) ? $_POST[$post_key] : null;
       }
+
+/*      foreach ($val['lid'] as $lid => $data) {
+        foreach ($data as $file_field => $var_nm) {
+          $field_name = $file_field;
+          $var_name = key($var_nm);
+          if (ep4_field_in_file($field_name)) {
+            $_POST[$post_key][$lid] = ep_4_curly_quotes($val['lid'][$lid][$field_name][$var_name]);
+            $return_val[$var_name] = $_POST[$post_key];
+          }
+        }
+      }*/
       continue;
     }
   
@@ -1086,6 +1215,11 @@ function ep4_post_sanitize($post_array) {
         $return_val[$var_name] = $_POST[$post_key];
       }
     }
+/*    $field_name = key($val);
+    $var_name = key($val[$field_name]);
+    if (ep4_field_in_file($field_name)) {
+      $return_val[$var_name] = $_POST[$post_key];
+    }*/
   }
   
   unset($_POST);

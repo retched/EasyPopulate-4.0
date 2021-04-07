@@ -49,7 +49,7 @@ unset($record_company_name_str_len);
 $sql = "SELECT record_company_id AS record_companyID FROM " . TABLE_RECORD_COMPANY . " WHERE record_company_name = :record_company_name: LIMIT 1";
 $sql = $db->bindVars($sql, ':record_company_name:', ep_4_curly_quotes($v_record_company_name), $zc_support_ignore_null);
 $result = ep_4_query($sql);
-if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) {
+if ($row = $ep_4_fetch_array($result)) {
   $v_record_company_id = $row['record_companyID']; // this id goes into the product_music_extra table
   $sql = "UPDATE " . TABLE_RECORD_COMPANY . " SET
     record_company_image = :record_company_image:,
@@ -126,7 +126,7 @@ $sql = $db->bindVars($sql, ':record_company_name:', ep_4_curly_quotes($v_record_
 $sql = $db->bindVars($sql, ':record_company_image:', $v_record_company_image, $zc_support_ignore_null);
 $result = ep_4_query($sql);
 
-$v_record_company_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment, so can use this function
+$v_record_company_id = $ep_4_insert_id(($ep_uses_mysqli ? $db->link : null)); // id is auto_increment, so can use this function
 
 if ($result) {
   zen_record_admin_activity('Inserted record company ' . zen_db_input(ep_4_curly_quotes($v_record_company_name)) . ' via EP4.', 'info');

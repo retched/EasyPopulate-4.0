@@ -29,8 +29,11 @@ define('EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_IMPORT', ' file to database or see 
 define('EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_COMPLETE','<br /><b>File uploaded Successfully</b>: %1$s %2$s');
 define('EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_EMPTY','<br /><b>Upload button was pressed, but no file had been selected.  Click Browse... to select a file to upload.</b>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_NO_CSV', ' file is not a CSV file. See below for options.');
+define('EASYPOPULATE_4_DISPLAY_RESULT_ARTISTS_NAME_EMPTY', '<br /><font color="red"><b>SKIPPED! - Artist Name for:</b> %1$s - not provided when using primary Key: %2$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_ARTISTS_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Artist Name:</b> %1$s - exceeds max. length: %2$s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_RECORD_COMPANY_NAME_EMPTY', '<br /><font color="red"><b>SKIPPED! - Record Company Name for:</b> %1$s - not provided when using primary Key: %2$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_RECORD_COMPANY_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Record Company Name:</b> %1$s - exceeds max. length: %2$s</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_MUSIC_GENRE_NAME_EMPTY', '<br /><font color="red"><b>SKIPPED! - Music Genre Name for:</b> %1$s - not provided when using primary Key: %2$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_MUSIC_GENRE_NAME_LONG','<br /><font color="red"><b>SKIPPED! - Music Genre Name:</b> %1$s - exceeds max. length: %2$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_SBA_DETAIL_NOT_FOUND','<br /><font color="red"><b>SKIPPED! - Attribute Entry on %2$s: </b>%1$s - Not Found!</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_NEW','<br /><font color="green"><b>NEW ATTRIBUTE! - %1$s:</b> %2$s, <b>Option:</b> %3$s, <b>Values:</b> %4$s</font>');
@@ -144,6 +147,7 @@ define('EASYPOPULATE_4_ORDERS_DROPDOWN_EXPORT', 'Export');
 
 define('EASYPOPULATE_4_DELIMITER_UNKNOWN', 'Unknown Delimiter');
 define('EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES', 'Issues with the CSV file delimiter(s)');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES_NO_CSV', 'File is not a CSV file and there are issues with the delimiter(s)');
 
 define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_SPLIT', 'Split');
 define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT_SYNC', 'Import w/Sync');
