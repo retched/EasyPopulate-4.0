@@ -46,7 +46,8 @@ if (!defined('EP4_SHOW_ALL_FILETYPES')) {
 $tempdir = defined('EASYPOPULATE_4_CONFIG_TEMP_DIR') ? EASYPOPULATE_4_CONFIG_TEMP_DIR : 'EASYPOPULATE_4_CONFIG_TEMP_DIR'; // This ideally should not actually include the Admin Directory in the variable.
 $ep_date_format = defined('EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT') ? EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT : 'm-d-y';
 $ep_raw_time = defined('EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME') ? EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME : '09:00:00';
-$ep_debug_logging = ((!defined('EASYPOPULATE_4_CONFIG_DEBUG_LOGGING') || EASYPOPULATE_4_CONFIG_DEBUG_LOGGING === 'true') ? true : false);
+$ep_debug_logging = ((!defined('EASYPOPULATE_4_CONFIG_DEBUG_LOGGING') || EASYPOPULATE_4_CONFIG_DEBUG_LOGGING !== 'false') ? true : false);
+$ep_debug_logging_all = ((!defined('EASYPOPULATE_4_CONFIG_DEBUG_LOGGING') || EASYPOPULATE_4_CONFIG_DEBUG_LOGGING === 'all') ? true : false);
 $ep_split_records = defined('EASYPOPULATE_4_CONFIG_SPLIT_RECORDS') ? (int) EASYPOPULATE_4_CONFIG_SPLIT_RECORDS : 2000;
 $price_with_tax = ((defined('EASYPOPULATE_4_CONFIG_PRICE_INC_TAX') && EASYPOPULATE_4_CONFIG_PRICE_INC_TAX === 'true') ? 1 : 0);
 $strip_smart_tags = ((!defined('EASYPOPULATE_4_CONFIG_SMART_TAGS') || EASYPOPULATE_4_CONFIG_SMART_TAGS == 'true') ? true : false);
@@ -79,7 +80,7 @@ if (!isset($error) || !$error) {
 // register_globals_vars_check();
 // $maxrecs = 4;
 // usefull stuff: mysql_affected_rows(), mysql_num_rows().
-$ep_debug_logging_all = false; // do not comment out.. make false instead
+// $ep_debug_logging_all = false; // do not comment out.. make false instead This is now controlled from admin.
 //$sql_fail_test == true; // used to cause an sql error on new product upload - tests error handling & logs
 /* Test area end */
 
