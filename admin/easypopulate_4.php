@@ -578,8 +578,9 @@ if (isset($_FILES['uploadfile'])) {
     if (is_uploaded_file($file['tmp_name'])) {
       ep_4_copy_uploaded_file($file, (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . $tempdir);
     }
+    $file_delimiter = ep_4_display_CSV_Delimiter($upload_dir . $file['name']);
     $message_file_ext = explode('.', $file['name']);
-    $message_data =  (strtolower(end($message_file_ext)) == 'csv' ? zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), '', 'post', '', $request_type == 'SSL') . zen_draw_hidden_field('import', /*$message_data2*/ urlencode($file['name']), '') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT, '', false, 'submit') . EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_IMPORT . "</form>\n"  : EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_NO_CSV);
+    $message_data =  (strtolower(end($message_file_ext)) == 'csv' && isset($file_delimiter) && !is_array($file_delimiter) ? zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), '', 'post', '', $request_type == 'SSL') . zen_draw_hidden_field('import', /*$message_data2*/ urlencode($file['name']), '') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT, '', false, 'submit') . EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_IMPORT . "</form>\n"  : (isset($file_delimiter) && !is_array($file_delimiter) ? EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_NO_CSV : ((strtolower(end($message_file_ext)) == 'csv' ? EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES : EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES_NO_CSV))));
     $messageStack->add(sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_COMPLETE, $file['name'], $message_data), 'success');
   }
 }

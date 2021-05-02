@@ -147,6 +147,7 @@ define('EASYPOPULATE_4_ORDERS_DROPDOWN_EXPORT', 'Exportieren');
 
 define('EASYPOPULATE_4_DELIMITER_UNKNOWN', 'Unknown Delimiter');
 define('EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES', 'Issues with the CSV file delimiter(s)');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES_NO_CSV', 'File is not a CSV file and there are issues with the delimiter(s)');
 
 define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_SPLIT', 'Splitten');
 define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT_SYNC', 'Importieren m/Sync');
