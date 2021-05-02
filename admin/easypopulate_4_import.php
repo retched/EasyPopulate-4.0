@@ -286,7 +286,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
         // this gets default values for current v_products_model
         // inputs: $items array (file data by column #); $filelayout array (headings by column #);
         // $row (current TABLE_PRODUCTS data by heading name)
-        while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) { // chadd - this executes once?? why use while-loop?? //mc12345678 - This executes for each instance of the product in a category (ie. linked product are included)
+        while ($row = $ep_4_fetch_array($result)) { // chadd - this executes once?? why use while-loop?? //mc12345678 - This executes for each instance of the product in a category (ie. linked product are included)
           $product_is_new = false; // we found products_model in database
           // Get current products descriptions and categories for this model from database
           // $row at present consists of current product data for above fields only (in $sql)
@@ -317,7 +317,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             $sql2 = $db->bindVars($sql2, ':language_id:', $lang['id'], 'integer');
             $result2 = ep_4_query($sql2);
             unset($sql2);
-            $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+            $row2 = $ep_4_fetch_array($result2);
             unset($result2);
             // create variables (v_products_name_1, v_products_name_2, etc. which corresponds to our column headers) and assign data
             $row['v_products_name_' . $lang['code']] = $row['v_products_name_' . $lang['id']] = ep_4_curly_quotes($row2['products_name']);
@@ -349,7 +349,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             $sql2 = $db->bindVars($sql2, ':manufacturers_id:', $row['v_manufacturers_id'], 'integer');
             $result2 = ep_4_query($sql2);
             unset($sql2);
-            $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+            $row2 = $ep_4_fetch_array($result2);
             unset($result2);
             $row['v_manufacturers_name'] = $row2['manufacturers_name'];
           } else {
@@ -708,7 +708,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
 
           $result = ep_4_query($sql);
           unset ($sql);
-          if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) {
+          if ($row = $ep_4_fetch_array($result)) {
             $v_manufacturers_id = $row['manID']; // this id goes into the products table
           } else { // It is set to autoincrement, do not need to fetch max id
             $sql = "INSERT INTO " . TABLE_MANUFACTURERS . " (manufacturers_name, date_added, last_modified)
@@ -717,7 +717,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             $result = ep_4_query($sql);
             unset($sql);
 
-            $v_manufacturers_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment, so can use this function
+            $v_manufacturers_id = $ep_4_insert_id(($ep_uses_mysqli ? $db->link : null)); // id is auto_increment, so can use this function
 
             if ($result) {
               zen_record_admin_activity('Inserted manufacturer ' . zen_db_input($v_manufacturers_name) . ' via EP4.', 'info');
@@ -984,7 +984,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
 
             $result = ep_4_query($sql);
             unset($sql);
-            $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
+            $row = $ep_4_fetch_array($result);
             unset($result);
             // if $row is not null, we found entry, so retrive info
             if ($row != '') { // category exists
@@ -1045,7 +1045,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
               $sql = "SHOW TABLE STATUS LIKE '" . TABLE_CATEGORIES . "'";
               $result = ep_4_query($sql);
               unset($sql);
-              $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
+              $row = $ep_4_fetch_array($result);
               unset($result);
               $max_category_id = $row['Auto_increment'];
               // if database is empty, start at 1
@@ -1208,13 +1208,13 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
           }
           $result = ep_4_query($sql);
           unset($sql);
-          if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) { // new item, insert into products
+          if ($ep_4_num_rows($result) == 0) { // new item, insert into products
             unset($result);
             $v_date_added = ($v_date_added >= '0001-01-01') ? $v_date_added : 'CURRENT_TIMESTAMP';
             $sql = "SHOW TABLE STATUS LIKE '" . TABLE_PRODUCTS . "'";
             $result = ep_4_query($sql);
             unset($sql);
-            $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
+            $row = $ep_4_fetch_array($result);
             unset($result);
             $max_product_id = $row['Auto_increment'];
             if (!is_numeric($max_product_id)) {
@@ -1356,7 +1356,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 $sql_music_extra = "SELECT * FROM " . TABLE_PRODUCT_MUSIC_EXTRA . " WHERE (products_id = :products_id:) LIMIT 1";
                 $sql_music_extra = $db->bindVars($sql_music_extra, ':products_id:', $v_products_id, 'integer');
                 $sql_music_extra = ep_4_query($sql_music_extra);
-                if (($ep_uses_mysqli ? mysqli_num_rows($sql_music_extra) : mysql_num_rows($sql_music_extra)) == 0) { // new item, insert into products
+                if ($ep_4_num_rows($sql_music_extra) == 0) { // new item, insert into products
                   $query = "INSERT INTO " . TABLE_PRODUCT_MUSIC_EXTRA . " SET
                     products_id     = :products_id:,
                     artists_id        = :artists_id:,
@@ -1395,10 +1395,10 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             // if date added is null, let's keep the existing date in db..
             $v_date_added = (!zen_not_null($v_date_added) || $v_date_added < '0001-01-01' ? $row['v_date_added'] : $v_date_added); // if NULL, use date in db
             $v_date_added = (zen_not_null($v_date_added) && $v_date_added >= '0001-01-01') ? $v_date_added : 'CURRENT_TIMESTAMP'; // if updating, but date added is null, we use today's date
-            $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
+            $row = $ep_4_fetch_array($result);
             $v_products_id = $row['products_id'];
             unset($row);
-            $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
+            $row = $ep_4_fetch_array($result);
             // CHADD - why is master_categories_id not being set on update??? //mc12345678 Because on update, the category was already set, on the first upload it was set to be the master_category_id, but now the product is merely updated to add the category(ies) to it, not to update the master_category_id which should be done on a separate transaction.
             $query = "UPDATE " . TABLE_PRODUCTS . " SET
               products_price = :products_price:, ";
@@ -1523,7 +1523,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
               // PRODUCT_MUSIC_EXTRA
               if ($v_products_type == '2') {
                 $sql_music_extra = ep_4_query("SELECT * FROM " . TABLE_PRODUCT_MUSIC_EXTRA . " WHERE (products_id = " . (int)$v_products_id . ") LIMIT 1");
-                if (($ep_uses_mysqli ? mysqli_num_rows($sql_music_extra) : mysql_num_rows($sql_music_extra)) == 1) { // update
+                if ($ep_4_num_rows($sql_music_extra) == 1) { // update
                   $query = "UPDATE " . TABLE_PRODUCT_MUSIC_EXTRA . " SET
                   artists_id        = :artists_id:,
                     record_company_id = :record_company_id:,
@@ -1558,7 +1558,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
               $sql = $db->bindVars($sql, ':key:', $key, 'integer');
               $result = ep_4_query($sql);
               unset($sql);
-              if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
+              if ($row = $ep_4_fetch_array($result)) {
                 // UPDATE
                 $sql = "UPDATE " . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . " SET
                   metatags_title = :metatags_title:,
@@ -1626,8 +1626,8 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 }
                 $result = ep_4_query($sql);
                 unset($sql);
-                if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) != 0) { // found entry
-                  $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
+                if ($ep_4_num_rows($result) != 0) { // found entry
+                  $row3 = $ep_4_fetch_array($result);
                   $v_products_id = $row3['products_id'];
 
                   // remove all old associated quantity discounts
@@ -1678,8 +1678,8 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   $sql = $db->bindVars($sql, ':' . $chosen_key_sub . ':', (!empty(${$chosen_key}) ? ${$chosen_key} : ''), $zc_support_ignore_null);
                 }
                 $result = ep_4_query($sql);
-                if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) != 0) { // found entry
-                  $row3 = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
+                if ($ep_4_num_rows($result) != 0) { // found entry
+                  $row3 = $ep_4_fetch_array($result);
                   $v_products_id = $row3['products_id'];
                   // remove all associated quantity discounts
                   $db->Execute("DELETE FROM " . TABLE_PRODUCTS_DISCOUNT_QUANTITY . " WHERE products_id = " . (int) $v_products_id);
@@ -1713,7 +1713,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
               unset($sql);
 
               // Product not found, must add the product.
-              if (($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0) {
+              if ($ep_4_num_rows($result) == 0) {
                   unset($result);
                 $sql = "INSERT INTO " . TABLE_PRODUCTS_DESCRIPTION . " (
                             products_id,
@@ -2030,7 +2030,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
               '.TABLE_PRODUCTS_TO_CATEGORIES.' ptc ON (p.products_id = ptc.products_id AND ptc.categories_id='.(int)$v_categories_id.')
               WHERE
               p.products_id='.(int)$v_products_id);
-            $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) : mysql_fetch_array($result_incategory));
+            $result_incategory = $ep_4_fetch_array($result_incategory);
             if (!zen_not_null($result_incategory['products_id']) || count($result_incategory) <= 0 /* ($ep_uses_mysqli ? mysqli_num_rows($result_incategory) : mysql_num_rows($result_incategory)) == 0 */) { // nope, this is a new category for this product
               // Product is new to the category, category is not being changed for product, and product should be added to category
               // Don't move the product
@@ -2153,7 +2153,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             // Check if this product already has a special
             $special = ep_4_query("SELECT products_id FROM " . TABLE_SPECIALS . " WHERE products_id = " . (int)$v_products_id);
 
-            if (($ep_uses_mysqli ? mysqli_num_rows($special) : mysql_num_rows($special)) == 0) { // not in db
+            if ($ep_4_num_rows($special) == 0) { // not in db
               if ($v_specials_price == '0') { // delete requested, but is not a special
                 $specials_print .= sprintf(EASYPOPULATE_4_SPECIALS_DELETE_FAIL, ${$chosen_key}, substr(strip_tags($v_products_name[$epdlanguage_id]), 0, 10), $chosen_key);
                 continue;

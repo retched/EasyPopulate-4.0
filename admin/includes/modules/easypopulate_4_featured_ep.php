@@ -43,13 +43,13 @@
           $sql = $db->bindVars($sql, ':' . $chosen_key_sub . ':', $items[$filelayout[$chosen_key]], $zc_support_ignore_null);
         }
         $result = ep_4_query($sql);
-        if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
+        if ($row = $ep_4_fetch_array($result)) {
           $v_products_id = $row['products_id'];
           // Add or Update the table Featured
           $sql2 = "SELECT * FROM " . TABLE_FEATURED . " WHERE ( products_id = :products_id: ) LIMIT 1";
           $sql2 = $db->bindVars($sql2, ':products_id:', $v_products_id, 'integer');
           $result2 = ep_4_query($sql2);
-          if ($row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2))) { // update featured product
+          if ($row2 = $ep_4_fetch_array($result2)) { // update featured product
             $v_featured_id = $row2['featured_id'];
             $v_today = strtotime(date("Y-m-d"));
             if (isset($filelayout['v_expires_date']) && $items[$filelayout['v_expires_date']] > '0001-01-01') {
@@ -91,7 +91,7 @@
             // add featured product
             $sql_max = "SELECT MAX(featured_id) max FROM " . TABLE_FEATURED;
             $result_max = ep_4_query($sql_max);
-            $row_max = ($ep_uses_mysqli ? mysqli_fetch_array($result_max) : mysql_fetch_array($result_max));
+            $row_max = $ep_4_fetch_array($result_max);
             $max_featured_id = $row_max['max'] + 1;
             // if database is empty, start at 1
             if (!is_numeric($max_featured_id)) {

@@ -104,6 +104,19 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(
   $ep_music = defined('EASYPOPULATE_4_CONFIG_MUSIC_DATA') ? (int) EASYPOPULATE_4_CONFIG_MUSIC_DATA : 0; // 0-Disable, 1-Enable
   $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3' ? true : false);
 
+  $ep_4_fetch_array = $ep_fetch_array = 'mysqli_fetch_array';
+  $ep_4_num_rows = 'mysqli_num_rows';
+  $ep_4_fetch_assoc = 'mysqli_fetch_assoc';
+  $ep_4_insert_id = 'mysqli_insert_id'; // @TODO: Verify this works as expected.
+  $ep_4_error = 'mysqli_error'; // @TODO: verify this works as expected.
+  if (!$ep_uses_mysqli) {
+    $ep_4_fetch_array = $ep_fetch_array = 'mysql_fetch_array';
+    $ep_4_num_rows = 'mysql_num_rows';
+    $ep_4_fetch_assoc = 'mysql_fetch_assoc';
+    $ep_4_insert_id = 'mysql_insert_id'; // @TODO: Verify this works as expected.
+    $ep_4_error = 'mysql_error';
+  }
+
   if (!isset($error) || !$error) {
     $upload_max_filesize = ini_get("upload_max_filesize");
     if (preg_match("/([0-9]+)K/i", $upload_max_filesize, $tempregs)) {

@@ -46,7 +46,7 @@ $result = ep_4_query($sql);
 unset($sql);
 
 
-if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result) )) {
+if ($row = $ep_4_fetch_array($result)) {
   unset($result);
   $v_artists_id = $row['artistsID']; // this id goes into the product_music_extra table, the other information is collected from the assignment of ${$key} = $items[$value]
   $sql = "UPDATE " . TABLE_RECORD_ARTISTS . " SET
@@ -121,7 +121,7 @@ $sql = $db->bindVars($sql, ':artists_image:', $v_artists_image, $zc_support_igno
 $result = ep_4_query($sql);
 unset($sql);
 
-$v_artists_id = ($ep_uses_mysqli ? mysqli_insert_id($db->link) : mysql_insert_id()); // id is auto_increment, so can use this function
+$v_artists_id = $ep_4_insert_id(($ep_uses_mysqli ? $db->link : null)); // id is auto_increment, so can use this function
 
 if ($result) {
   zen_record_admin_activity('Inserted record artist ' . zen_db_input(ep_4_curly_quotes($v_artists_name)) . ' via EP4.', 'info');

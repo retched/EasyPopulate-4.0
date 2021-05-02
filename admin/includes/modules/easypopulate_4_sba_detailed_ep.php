@@ -27,7 +27,7 @@
         $sql = $db->bindVars($sql, ':products_attributes_id:', $items[$filelayout['v_products_attributes_id']], 'integer');
 
         $result = ep_4_query($sql);
-        if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
+        if ($row = $ep_4_fetch_array($result)) {
           // UPDATE
           $sql = "UPDATE " . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK . " SET
             products_id                 = :products_id:,
@@ -57,7 +57,7 @@
             $sql = $db->bindVars($sql, ':products_attributes_id:', $items[$filelayout['v_products_attributes_id']], 'integer');
 
             $result = ep_4_query($sql);
-            if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) { // update
+            if ($row = $ep_4_fetch_array($result)) { // update
               $sql = "UPDATE " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . " SET
                 products_attributes_filename = :products_attributes_filename:,
                 products_attributes_maxdays  = :products_attributes_maxdays:,

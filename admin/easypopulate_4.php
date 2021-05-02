@@ -60,6 +60,19 @@ $ep_metatags = defined('EASYPOPULATE_4_CONFIG_META_DATA') ? (int) EASYPOPULATE_4
 $ep_music = defined('EASYPOPULATE_4_CONFIG_MUSIC_DATA') ? (int) EASYPOPULATE_4_CONFIG_MUSIC_DATA : 0; // 0-Disable, 1-Enable
 $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3' ? true : false);
 
+$ep_4_fetch_array = $ep_fetch_array = 'mysqli_fetch_array';
+$ep_4_num_rows = 'mysqli_num_rows';
+$ep_4_fetch_assoc = 'mysqli_fetch_assoc';
+$ep_4_insert_id = 'mysqli_insert_id'; // @TODO: Verify this works as expected.
+$ep_4_error = 'mysqli_error'; // @TODO: verify this works as expected.
+if (!$ep_uses_mysqli) {
+  $ep_4_fetch_array = $ep_fetch_array = 'mysql_fetch_array';
+  $ep_4_num_rows = 'mysql_num_rows';
+  $ep_4_fetch_assoc = 'mysql_fetch_assoc';
+  $ep_4_insert_id = 'mysql_insert_id'; // @TODO: Verify this works as expected.
+  $ep_4_error = 'mysql_error';
+}
+
 @set_time_limit($ep_execution);  // executin limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
 
 if (!isset($error) || !$error) {
@@ -355,12 +368,12 @@ if (($collation == 'utf8') && ((substr($project, 0, 5) == "1.3.8") || (substr($p
 //$epdlanguage_query = $db->Execute("SELECT languages_id, name FROM ".TABLE_LANGUAGES." WHERE code = '".DEFAULT_LANGUAGE."'");
 if (!defined('DEFAULT_LANGUAGE')) {
   $epdlanguage_query = ep_4_query("SELECT languages_id, code, name FROM " . TABLE_LANGUAGES . " ORDER BY languages_id LIMIT 1");
-  $epdlanguage = ($ep_uses_mysqli ? mysqli_fetch_array($epdlanguage_query) : mysql_fetch_array($epdlanguage_query));
+  $epdlanguage = $ep_4_fetch_array($epdlanguage_query);
   define('DEFAULT_LANGUAGE', $epdlanguage['code']);
 }
 $epdlanguage_query = ep_4_query("SELECT languages_id, code, name FROM " . TABLE_LANGUAGES . " WHERE code = '" . DEFAULT_LANGUAGE . "'");
-if (($ep_uses_mysqli ? mysqli_num_rows($epdlanguage_query) : mysql_num_rows($epdlanguage_query))) {
-  $epdlanguage = ($ep_uses_mysqli ? mysqli_fetch_array($epdlanguage_query) : mysql_fetch_array($epdlanguage_query));
+if ($ep_4_num_rows($epdlanguage_query)) {
+  $epdlanguage = $ep_4_fetch_array($epdlanguage_query);
   $epdlanguage_id = $epdlanguage['languages_id'];
   $epdlanguage_name = $epdlanguage['name'];
   $epdlanguage_code = $epdlanguage['code'];

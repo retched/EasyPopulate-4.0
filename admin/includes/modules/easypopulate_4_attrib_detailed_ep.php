@@ -35,7 +35,7 @@
         $sql = $db->bindVars($sql, ':options_values_id:', $items[$filelayout['v_options_values_id']], 'integer');
         $result = ep_4_query($sql);
         
-        if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
+        if ($row = $ep_4_fetch_array($result)) {
           // UPDATE
           $sql = "UPDATE " . TABLE_PRODUCTS_ATTRIBUTES . " SET
           options_values_price              = :options_values_price:, ";
@@ -116,7 +116,7 @@
               WHERE (products_attributes_id = :products_attributes_id:) LIMIT 1';
             $sql = $db->bindVars($sql, ':products_attributes_id:', $items[$filelayout['v_products_attributes_id']], 'integer');
             $result = ep_4_query($sql);
-            if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) { // update
+            if ($row = $ep_4_fetch_array($result)) { // update
               $sql = "UPDATE " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . " SET
                 products_attributes_filename = :products_attributes_filename:,
                 products_attributes_maxdays  = :products_attributes_maxdays:,
