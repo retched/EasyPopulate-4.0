@@ -874,7 +874,7 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
           <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=SBA_detailed', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_DETAILED_SBA; ?></a><br />
           <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=SBAStock', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_SBA_STOCK; ?></a><br />
 
-          <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=SBAStockProdFilter, $request_type'); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_SBA_STOCK_ASC; ?></a><br />
+          <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=SBAStockProdFilter', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_SBA_STOCK_ASC; ?></a><br />
 
         <?php } /* End SBA1 Addition */
     $zco_notifier->notify('EP4_LINK_SELECTION_END');
