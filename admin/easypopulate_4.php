@@ -682,6 +682,8 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
            <?php
            echo '<br /><b><u>' . EASYPOPULATE_4_CONFIG_SETTINGS . '</u></b><br />';
            echo EASYPOPULATE_4_CONFIG_UPLOAD . '<b>' . (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ 'catalog/' : /* Admin side */ 'admin/') . $tempdir . '</b><br />';
+           echo EASYPOPULATE_4_CONFIG_PRIMARY . EP4_DB_FILTER_KEY . '<br>';
+           echo EASYPOPULATE_4_CONFIG_TEXT_IMPORT_OVERRIDE . EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE . '<br>';
            echo 'Verbose Feedback: ' . (($ep_feedback) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
            echo EASYPOPULATE_4_DISPLAY_SPLIT_SHORT . $ep_split_records . '<br />';
            echo EASYPOPULATE_4_DISPLAY_EXEC_TIME . $ep_execution . '<br />';

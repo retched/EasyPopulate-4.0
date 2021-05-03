@@ -106,6 +106,8 @@ define('EASYPOPULATE_4_ERRORLOG_SQL_ERROR', 'MySQL error %1$s: %2$s\nWhen execut
 define('EASYPOPULATE_4_REMOVE_SETTINGS', 'Easy Populate 4 deinstallieren' );
 define('EASYPOPULATE_4_CONFIG_SETTINGS', 'Konfigurationseinstellungen');
 define('EASYPOPULATE_4_CONFIG_UPLOAD', 'Upload Verzeichnis: ');
+define('EASYPOPULATE_4_CONFIG_PRIMARY', 'Primary Key: ');
+define('EASYPOPULATE_4_CONFIG_TEXT_IMPORT_OVERRIDE', 'Import Language Override: ');
 define('EASYPOPULATE_4_UPDATE_SETTINGS', 'Update EP4 Database');
 define('EASYPOPULATE_4_DISPLAY_SPLIT_SHORT', 'Einträge aufteilen: ');
 define('EASYPOPULATE_4_DISPLAY_EXEC_TIME', 'Ausführungszeit: ');
