@@ -86,8 +86,11 @@ if (isset($_POST['ep_category_filter'])) {
 }
 
 if (isset($_POST['ep_manufacturer_filter'])) {
-  if ($_POST['ep_manufacturer_filter'] != '') {
+  if ($_POST['ep_manufacturer_filter'] != '0') {
     $sql_filter .= ' AND p.manufacturers_id = :ep_manufacturer_filter:';
+    if ($_POST['ep_manufacturer_filter'] === -1) {
+      $_POST['ep_manufacturer_filter'] = 0;
+    }
     $sql_filter = $db->bindVars($sql_filter, ':ep_manufacturer_filter:', $_POST['ep_manufacturer_filter'], 'integer');
   }
 }

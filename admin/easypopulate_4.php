@@ -798,7 +798,8 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
              $category_filter_array = array_merge(array(0 => array("id" => '', 'text' => EASYPOPULATE_4_DD_FILTER_CATEGORIES)), zen_get_category_tree());
 
              $manufacturers_array = array();
-             $manufacturers_array[] = array("id" => '', 'text' => EASYPOPULATE_4_DISPLAY_MANUFACTURERS);
+             $manufacturers_array[] = array("id" => '0', 'text' => EASYPOPULATE_4_DISPLAY_MANUFACTURERS);
+             $manufacturers_array[] = array("id" => '-1', 'text' => EASYPOPULATE_4_DISPLAY_MANUFACTURERS_NONE);
              if ($ep_uses_mysqli) {
                $manufacturers_query = mysqli_query($db->link, "SELECT manufacturers_id, manufacturers_name FROM " . TABLE_MANUFACTURERS . " ORDER BY manufacturers_name");
                while ($manufacturers = mysqli_fetch_array($manufacturers_query)) {

@@ -5,6 +5,7 @@
 
 // file uploads display - output via $display_output
 define('EASYPOPULATE_4_DISPLAY_MANUFACTURERS', 'Hersteller');
+define('EASYPOPULATE_4_DISPLAY_MANUFACTURERS_NONE', 'Kein Hersteller');
 define('EASYPOPULATE_4_DISPLAY_FILTERABLE_EXPORTS', 'Filterbare Exporte:');
 define('EASYPOPULATE_4_DISPLAY_PRODUCTS_PRICE_EXPORT_OPTION', 'Artikel &amp; Preis Export/Import Optionen:');
 define('EASYPOPULATE_4_DISPLAY_COMPLETE_PRODUCTS', '<b>Alle Artikel</b> (mit Metatags falls in der Konfiguration aktiviert)');
