@@ -18,7 +18,9 @@ if (!defined('EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD')) {
 }
 
 // BEGIN: Data Import Module
-if (isset($_POST['import']) && $_POST['import'] != '') {
+if (!(isset($_POST['import']) && $_POST['import'] != '')) {
+  return;
+}
   $time_start = microtime(true); // benchmarking
   $display_output .= EASYPOPULATE_4_DISPLAY_HEADING;
 
@@ -874,10 +876,15 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 unset($cat_str_len);
               }
             }
-            if ($categories_count['code'][$lang['code']] > 0) { // only check $max_len['categories_name'] if $categories_count['code'][$lang['id']] > 0
+            if (empty($categories_count['code'][$lang['code']])) { // only check $max_len['categories_name'] if $categories_count['code'][$lang['id']] > 0
+              continue;
+            }
               for ($category_index = 0; $category_index < $categories_count['code'][$lang['code']]; $category_index++) {
                 $cat_str_len = (function_exists('mb_strlen')) ? mb_strlen($categories_names_array['code'][$lang['code']][$category_index]) : strlen($categories_names_array['code'][$lang['code']][$category_index]);
-                if ($cat_str_len > $max_len['categories_name']) {
+              if ($cat_str_len <= $max_len['categories_name']) {
+                unset($cat_str_len);
+                continue;
+              }
                   $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array['code'][$lang['code']][$category_index], $max_len['categories_name'], $chosen_key);
 
                   if (empty($max_len['categories_name_found']) || $max_len['categories_name_found'] < $cat_str_len) {
@@ -897,9 +904,7 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
 
                     $max_len['categories_name'] = $cat_str_len;
                   }
-                }
                 unset($cat_str_len);
-              }
             }
           } // foreach
           unset($lang);
@@ -909,16 +914,18 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             $categories_count_value['id'] = $categories_count['id'][$lid_first];
             foreach ($langcode as $lang) {
               $v_categories_name_check['id'] = 'v_categories_name_' . $lang['id'];
-              if (isset(${$v_categories_name_check['id']})) {
-                if (($categories_count_value['id'] != $categories_count['id'][$lang['id']]) && !empty($categories_count['id'][$lang['id']])) {
+              if (!isset(${$v_categories_name_check['id']})) {
+                continue;
+              }
+              if (!(($categories_count_value['id'] != $categories_count['id'][$lang['id']]) && !empty($categories_count['id'][$lang['id']]))) {
+                continue;
+              }
                   //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG,
                   //${$chosen_key}, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name'], $chosen_key);
                   $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['id']]];
                   $ep_error_count++;
                   unset($lang);
                   continue 2; // skip to next record
-                }
-              }
             } // foreach
             unset($lang);
           }
@@ -946,16 +953,18 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             foreach ($langcode as $lang) {
               $v_categories_name_check['code'] = 'v_categories_name_' . $lang['code'];
               $v_categories_name_check['id'] = 'v_categories_name_' . $lang['id'];
-              if (isset(${$v_categories_name_check['code']}) && isset(${$v_categories_name_check['id']})) {
-                if (($categories_count_value['code'] != $categories_count['id'][$lang['id']]) && !empty($categories_count['id'][$lang['id']]) || ($categories_count_value['id'] != $categories_count['code'][$lang['code']]) && !empty($categories_count['code'][$lang['code']])) {
+              if (!(isset(${$v_categories_name_check['code']}) && isset(${$v_categories_name_check['id']}))) {
+                continue;
+              }
+              if (!(($categories_count_value['code'] != $categories_count['id'][$lang['id']]) && !empty($categories_count['id'][$lang['id']]) || ($categories_count_value['id'] != $categories_count['code'][$lang['code']]) && !empty($categories_count['code'][$lang['code']]))) {
+                continue;
+              }
                   //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG,
                   //$v_products_model, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name']);
                   $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['code']]];
                   $ep_error_count++;
                   unset($lang);
                   continue 2; // skip to next record
-                }
-              }
             } // foreach
             unset($lang);
           }
@@ -1025,8 +1034,9 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                 $current_category_id = $thiscategoryid;
               foreach ($langcode as $lang2) {
                 $v_categories_name_check['id'] = 'v_categories_name_' . $lang2['id'];
-                if (isset(${$v_categories_name_check['id']})) { // update
-                
+                if (!isset(${$v_categories_name_check['id']})) { // update
+                  continue;
+                }
                   $cat_lang_id = $lang2['id'];
                   $sql = "UPDATE " . TABLE_CATEGORIES_DESCRIPTION . " SET
                       categories_name = :categories_name:
@@ -1060,7 +1070,6 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   }
                   unset($cat_lang_id);
                   unset($result);
-                }
               }
               unset($lang2);
             } else { // otherwise add new category
@@ -1282,14 +1291,16 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             }
             if (count($custom_fields) > 0) {
               foreach ($custom_fields as $field) {
-                if ($field != 'products_id' || ( $field == 'products_id' && defined('EP4_DB_FILTER_KEY') && EP4_DB_FILTER_KEY === 'blank_new' && zen_not_null(${$chosen_key}))) {
+                if (!($field != 'products_id' || ( $field == 'products_id' && defined('EP4_DB_FILTER_KEY') && EP4_DB_FILTER_KEY === 'blank_new' && zen_not_null(${$chosen_key})))) {
+                  continue;
+                }
                   $value = 'v_' . $field;
-                  if ($filelayout[$value]) {
+                if (!$filelayout[$value]) {
+                  continue;
+                }
                     $query .= ":field: = :value:, ";
                     $query = $db->bindVars($query, ':field:', $field, 'noquotestring');
                     $query = $db->bindVars($query, ':value:', ${$value}, ($zc_support_ignore_null));
-                  }
-                }
               }
               unset($field);
               unset($value);
@@ -1357,7 +1368,12 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
 
             $result = ep_4_query($query);
             unset($query);
-            if ($result == true) {
+            if ($result != true) {
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT_FAIL, ${$chosen_key}, $chosen_key);
+              $ep_error_count++;
+              continue; // new categories however have been created by now... Adding into product table needs to be 1st action?
+            }
+
               // need to change to an log file, this is gobbling up memory! chadd 11-14-2011
               zen_record_admin_activity('New product ' . (int) $v_products_id . ' added via EP4.', 'info');
 
@@ -1388,11 +1404,6 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
                   unset($result);
                 }
                 unset($sql_music_extra);
-              }
-            } else {
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT_FAIL, ${$chosen_key}, $chosen_key);
-              $ep_error_count++;
-              continue; // new categories however have been created by now... Adding into product table needs to be 1st action?
             }
             // needs to go into log file chadd 11-14-2011
             if ($ep_feedback == true) {
@@ -1448,11 +1459,12 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
             if (count($custom_fields) > 0) {
               foreach ($custom_fields as $field) {
                 $value = 'v_' . $field;
-                if (isset($filelayout[$value])) {
+                if (!isset($filelayout[$value])) {
+                  continue;
+                }
                   $query .= ":field: = :value:, ";
                   $query = $db->bindVars($query, ':field:', $field, 'noquotestring');
                   $query = $db->bindVars($query, ':value:', ${$value}, $zc_support_ignore_null);
-                }
               }
               unset($field);
               unset($value);
@@ -2180,4 +2192,5 @@ if (isset($_POST['import']) && $_POST['import'] != '') {
   if ($has_specials == true) { // specials were in upload so check for expired specials
     zen_expire_specials();
   }
-} // END FILE UPLOADS
+
+  // END FILE UPLOADS
