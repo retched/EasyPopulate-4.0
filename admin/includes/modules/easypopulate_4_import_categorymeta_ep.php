@@ -58,14 +58,25 @@
             $lid_code = $lang['code'];
             // $items[$filelayout['v_categories_name_'.$lid]];
             // $items[$filelayout['v_categories_description_'.$lid]];
-            if (isset($filelayout['v_categories_name_' . $lid]) || isset($filelayout['v_categories_description_' . $lid]) || isset($filelayout['v_categories_name_' . $lid_code]) || isset($filelayout['v_categories_description_' . $lid_code])) {
+            // @TODO: Simplify this evaluation.
+            if (!isset($filelayout['v_categories_name_' . $lid]) && !isset($filelayout['v_categories_description_' . $lid]) && !isset($filelayout['v_categories_name_' . $lid_code]) && !isset($filelayout['v_categories_description_' . $lid_code]) &&
+              !isset($filelayout['v_metatags_title_' . $lid]) && !isset($filelayout['v_metatags_keywords_' . $lid]) && !isset($filelayout['v_metatags_description_' . $lid]) && !isset($filelayout['v_metatags_title_' . $lid_code]) && !isset($filelayout['v_metatags_keywords_' . $lid_code]) && !isset($filelayout['v_metatags_description_' . $lid_code])) {
+
+              $ep_warning_count++;
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_NO_CATEGORY_UPDATE, $items[$filelayout['v_categories_id']]);
+              unset($lid);
+              unset($lid_code);
+              continue;
+            }
+
+            if ((isset($filelayout['v_categories_name_' . $lid]) || isset($filelayout['v_categories_description_' . $lid])) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' || (isset($filelayout['v_categories_name_' . $lid_code]) || isset($filelayout['v_categories_description_' . $lid_code])) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
               $sql = "UPDATE " . TABLE_CATEGORIES_DESCRIPTION . " SET ";
               $update_count = false;
-              if (isset($filelayout['v_categories_name_' . $lid]) || isset($filelayout['v_categories_name_' . $lid_code])) {
+              if (isset($filelayout['v_categories_name_' . $lid]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' || isset($filelayout['v_categories_name_' . $lid_code]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
                 $sql .= "categories_name        = :categories_name:";
                 $update_count = true;
               }
-              if (isset($filelayout['v_categories_description_' . $lid]) || isset($filelayout['v_categories_description_' . $lid_code])) {
+              if (isset($filelayout['v_categories_description_' . $lid]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' || isset($filelayout['v_categories_description_' . $lid_code]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
                 $sql .= ($update_count ? ", " : "") . "categories_description = :categories_description: ";
                 $update_count = true;
               }
@@ -74,6 +85,7 @@
                 (categories_id = :categories_id: AND language_id = :language_id:)";
 
               // Need to admin sanitize the categories_name and categories_description and handle both languages id and  code.
+
               $post_array = array(
                 'categories_name' => array(
                   'lang' => array(
@@ -115,18 +127,18 @@
             $result = ep_4_query($sql);
             if ($row = $ep_4_fetch_array($result)) {
               // UPDATE
-              if (isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid]) || isset($filelayout['v_metatags_title_' . $lid_code]) || isset($filelayout['v_metatags_keywords_' . $lid_code]) || isset($filelayout['v_metatags_description_' . $lid_code])) {
+              if ((isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid])) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' || (isset($filelayout['v_metatags_title_' . $lid_code]) || isset($filelayout['v_metatags_keywords_' . $lid_code]) || isset($filelayout['v_metatags_description_' . $lid_code])) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
                 $sql = "UPDATE " . TABLE_METATAGS_CATEGORIES_DESCRIPTION . " SET ";
                   $update_count = false;
-                  if (isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_title_' . $lid_code])) {
+                  if (isset($filelayout['v_metatags_title_' . $lid]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' || isset($filelayout['v_metatags_title_' . $lid_code]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
                     $sql .= "metatags_title    = :metatags_title: ";
                     $update_count = true;
                   }
-                  if (isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid_code])) {
+                  if (isset($filelayout['v_metatags_keywords_' . $lid]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' || isset($filelayout['v_metatags_keywords_' . $lid_code]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
                     $sql .= ($update_count ? ", " : "") . "metatags_keywords   = :metatags_keywords:";
                     $update_count = true;
                   }
-                  if (isset($filelayout['v_metatags_description_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid_code])) {
+                  if (isset($filelayout['v_metatags_description_' . $lid]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' || isset($filelayout['v_metatags_description_' . $lid_code]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
                     $sql .= ($update_count ? ", " : "") . "metatags_description = :metatags_description:";
                     $update_count = true;
                   }
@@ -138,15 +150,15 @@
               // NEW - this should not happen
               $sql = "INSERT INTO " . TABLE_METATAGS_CATEGORIES_DESCRIPTION . " SET ";
               $update_count = false;
-              if (isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_title_' . $lid_code])) {
+              if (isset($filelayout['v_metatags_title_' . $lid]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' || isset($filelayout['v_metatags_title_' . $lid_code]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
                 $sql .= "metatags_title    = :metatags_title:";
                 $update_count = true;
               }
-              if (isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid_code])) {
+              if (isset($filelayout['v_metatags_keywords_' . $lid]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' || isset($filelayout['v_metatags_keywords_' . $lid_code]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
                 $sql .= ($update_count ? ", " : "") . "metatags_keywords   = :metatags_keywords:";
                 $update_count = true;
               }
-              if (isset($filelayout['v_metatags_description_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid_code])) {
+              if (isset($filelayout['v_metatags_description_' . $lid]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' || isset($filelayout['v_metatags_description_' . $lid_code]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
                 $sql .= ($update_count ? ", " : "") . "metatags_description = :metatags_description:";
                 $update_count = true;
               }
@@ -157,6 +169,15 @@
                 language_id      = :language_id:";
             }
             
+            // Nothing to update, nothing to insert. If counting lines processed, need to increment. @TODO
+            if (stripos($sql, 'SELECT') === 0) {
+              $ep_warning_count++;
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_NO_CATEGORY_UPDATE, $items[$filelayout['v_categories_id']]);
+              unset($sql);
+              unset($lid);
+              unset($lid_code);
+              continue;
+            }
             // Need to admin sanitize the categories_name and categories_description and handle both languages id and  code.
               $post_array = array(
                 'metatags_title' => array(
@@ -191,12 +212,16 @@
             $sql = $db->bindVars($sql, ':metatags_description:', $thiscategorymetatagsdescription[$lid], 'string');
             $sql = $db->bindVars($sql, ':categories_id:', $items[$filelayout['v_categories_id']], 'integer');
             $sql = $db->bindVars($sql, ':language_id:', $lid, 'integer');
-            if (!$row || isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid]) || isset($filelayout['v_metatags_title_' . $lid_code]) || isset($filelayout['v_metatags_keywords_' . $lid_code]) || isset($filelayout['v_metatags_description_' . $lid_code])) {
-              $result = ep_4_query($sql);
+            if (!$row || (isset($filelayout['v_metatags_title_' . $lid]) || isset($filelayout['v_metatags_keywords_' . $lid]) || isset($filelayout['v_metatags_description_' . $lid])) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' || (isset($filelayout['v_metatags_title_' . $lid_code]) || isset($filelayout['v_metatags_keywords_' . $lid_code]) || isset($filelayout['v_metatags_description_' . $lid_code])) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
+              $resultcatmeta = ep_4_query($sql);
             }
-            if ($result) {
+            if (!empty($resultcatmeta)) {
               zen_record_admin_activity('Inserted/Updated category metatag information ' . (int) $items[(int) $filelayout['v_categories_id']] . ' via EP4.', 'info');
             }
+            unset($data_array);
+            unset($lid);
+            unset($lid_code);
+            unset($resultcatmeta);
             $ep_update_count++;
           }
 /*        } else { // error Category ID not Found

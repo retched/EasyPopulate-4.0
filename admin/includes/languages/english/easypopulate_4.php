@@ -24,6 +24,7 @@ define('EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG','<br /><font color="re
 define('EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT', '<br /><font color="green"><b>NEW PRODUCT! - %2$s:</b> %1$s</font> | ');
 define('EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT_FAIL', '<br /><font color="red"><b>ADD NEW PRODUCT FAILED! - %2$s:</b> %1$s - SQL error. Check Easy Populate error log in uploads directory</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT', '<br /><font color="mediumblue"><b>UPDATED! - %2$s:</b> %1$s</font> | ');
+define('EASYPOPULATE_4_DISPLAY_RESULT_NO_CATEGORY_UPDATE', '<br /><font color="blue"><b>Nothing to update! - %1$s:</b> Did not contain information to support an update. Moved to next record.</font> | ');
 define('EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT_FAIL', '<br /><font color="red"><b>UPDATE PRODUCT FAILED! - %2$s:</b> %1$s - SQL error. Check Easy Populate error log in uploads directory</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_NO_MODEL', '<br /><font color="red"><b>No %1$s field data in record. This line was not imported</b></font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_UPLOAD_IMPORT', ' file to database or see below for more.');

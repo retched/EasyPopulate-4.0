@@ -645,8 +645,10 @@ function install_easypopulate_4() {
         $db->Execute("INSERT IGNORE INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES('Uploads Directory Admin/Catalog',                  'EP4_ADMIN_TEMP_DIRECTORY', 'true', 'Should the admin directory be used to store the export and import files for EP4?<br /><br />This switch affects how Uploads Directory is used.<br /><br />true (default) or<br />false. ', ".$group_id.", '20', NULL, now(), 'ep4_directory_choice_check', 'zen_cfg_select_option(array(\"true\", \"false\"),')");
         $db->Execute("INSERT IGNORE INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES
 ('Import/Export Primary Key', 'EP4_DB_FILTER_KEY', 'products_model', 'Select the primary key that is to be used for import of the data.<br /><br />The default for Easy Populate v4 is products_model.<br /><br /> The field products_model is independent of the store, while products_id will require/generate the product information associated with that products_id and could lead to duplication of product. Choosing blank_new will import by products_id and create new products when the products_id is not entered/blank.<br /><br />products_model (default)<br />products_id<br />blank_new', ".$group_id.", '30', NULL, now(), NULL, 'zen_cfg_select_option(array(\'products_model\', \'products_id\', \'blank_new\'),')");
+        $db->Execute("UPDATE IGNORE " . TABLE_CONFIGURATION . " SET configuration_description = 'On import, if all possible language identifiers for a field are given, which should be used for the final data? (E.g. products_name_en (language_code), products_name_1 (language_id) are given in the file, which should be used?)<br />This is a \"preference\" unless the option with _only is selected.<br />Default: language_code_only', set_function = 'zen_cfg_select_option(array(\"language_id_only\", \"language_code_only\", \"language_id\", \"language_code\", ),' WHERE configuration_key = 'EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE' 
+    ");
         $db->Execute("INSERT IGNORE INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES
-        ('Import Language Override',       'EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_code', 'On import, if all possible language identifiers for a field are given, which should be used for the final data? (E.g. products_name_en (language_code), products_name_1 (language_id) are given in the file, which should be used?)<br />Default: language_code', ".$group_id.", '32', NULL, now(), NULL, 'zen_cfg_select_option(array(\"language_id\", \"language_code\"),')
+        ('Import Language Override',       'EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_code_only', 'On import, if all possible language identifiers for a field are given, which should be used for the final data? (E.g. products_name_en (language_code), products_name_1 (language_id) are given in the file, which should be used?)<br />This is a \"preference\" unless the option with _only is selected.<br />Default: language_code_only', ".$group_id.", '32', NULL, now(), NULL, 'zen_cfg_select_option(array(\"language_id_only\", \"language_code_only\", \"language_id\", \"language_code\", ),')
     ");
         $db->Execute("INSERT IGNORE INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES
         ('Import/Export CSV Delimiter', 'EASYPOPULATE_4_CONFIG_CSV_DELIMITER', '0', 'When exporting and importing files, each field of a record is separated by some \"unique\" character.  This character is called the CSV delimiter and allows the program reading the file to understand where one field ends and another begins.  CSV stands for Comma Separated Value and therefore a comma is the default; however, there are conditions and times when an alternate delimiter is needed or desired.  Choose the delimiter used for the file(s) to be imported/exported.  (default: \",\")<br/><br/>1. \",\" - comma,<br/>2. \";\" - semicolon,<br/>3. \"\t\" - tab,<br/>4. \" \" - space', ".$group_id.", '35', NULL, now(), 'ep4_delimiter_display', 'zen_cfg_select_drop_down(array(array(\'id\'=>\'0\', \'text\'=>\',\'), array(\'id\'=>\'1\', \'text\'=>\';\'), array(\'id\'=>\'2\', \'text\'=>\'\t\'), array(\'id\'=>\'3\', \'text\'=>\' \')),')
@@ -764,8 +766,10 @@ function install_easypopulate_4() {
     $db->Execute("INSERT IGNORE INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES
       ('Import/Export Primary Key', 'EP4_DB_FILTER_KEY', 'products_model', 'Select the primary key that is to be used for import of the data.<br /><br />The default for Easy Populate v4 is products_model.<br /><br /> The field products_model is independent of the store, while products_id will require/generate the product information associated with that products_id and could lead to duplication of product. Choosing blank_new will import by products_id and create new products when the products_id is not entered/blank.<br /><br />products_model (default)<br />products_id<br />blank_new', ".$group_id.", '30', NULL, now(), NULL, 'zen_cfg_select_option(array(\'products_model\', \'products_id\', \'blank_new\'),')
     ");
+    $db->Execute("UPDATE IGNORE " . TABLE_CONFIGURATION . " SET configuration_description = 'On import, if all possible language identifiers for a field are given, which should be used for the final data? (E.g. products_name_en (language_code), products_name_1 (language_id) are given in the file, which should be used?)<br />This is a \"preference\" unless the option with _only is selected.<br />Default: language_code_only', set_function = 'zen_cfg_select_option(array(\"language_id_only\", \"language_code_only\", \"language_id\", \"language_code\", ),' WHERE configuration_key = 'EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE' 
+    ");
     $db->Execute("INSERT IGNORE INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES
-        ('Import Language Override',       'EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_code', 'On import, if all possible language identifiers for a field are given, which should be used for the final data? (E.g. products_name_en (language_code), products_name_1 (language_id) are given in the file, which should be used?)<br />Default: language_code', ".$group_id.", '32', NULL, now(), NULL, 'zen_cfg_select_option(array(\"language_id\", \"language_code\"),')
+        ('Import Language Override',       'EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_code_only', 'On import, if all possible language identifiers for a field are given, which should be used for the final data? (E.g. products_name_en (language_code), products_name_1 (language_id) are given in the file, which should be used?)<br />This is a \"preference\" unless the option with _only is selected.<br />Default: language_code_only', ".$group_id.", '32', NULL, now(), NULL, 'zen_cfg_select_option(array(\"language_id_only\", \"language_code_only\", \"language_id\", \"language_code\", ),')
     ");
     $db->Execute("INSERT IGNORE INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES
         ('Import/Export CSV Delimiter', 'EASYPOPULATE_4_CONFIG_CSV_DELIMITER', '0', 'When exporting and importing files, each field of a record is separated by some \"unique\" character.  This character is called the CSV delimiter and allows the program reading the file to understand where one field ends and another begins.  CSV stands for Comma Separated Value and therefore a comma is the default; however, there are conditions and times when an alternate delimiter is needed or desired.  Choose the delimiter used for the file(s) to be imported/exported.  (default: \",\")<br/><br/>1. \",\" - comma,<br/>2. \";\" - semicolon,<br/>3. \"\t\" - tab,<br/>4. \" \" - space', ".$group_id.", '35', NULL, now(), 'ep4_delimiter_display', 'zen_cfg_select_drop_down(array(array(\'id\'=>\'0\', \'text\'=>\',\'), array(\'id\'=>\'1\', \'text\'=>\';\'), array(\'id\'=>\'2\', \'text\'=>\'\t\'), array(\'id\'=>\'3\', \'text\'=>\' \')),')
@@ -1039,16 +1043,20 @@ function ep4_post_sanitize($post_array) {
     if (array_key_exists('lang', $val)) {
       $vari = $val['lang']['var'];
       foreach ($lang_vars as $lang) {
+        $var[$lang] = null;
+        if (!array_key_exists($lang, $val['lang'])) {
+          continue;
+        }
         $data[$lang] = $val['lang'][$lang];
         ${$lang} = key($data[$lang]);
         $var[$lang] = key($data[$lang][${$lang}]);
         $vals[$lang] = $data[$lang][${$lang}][$var[$lang]];
       }
 
-      if (ep4_field_in_file($var['lid'])) {
+      if (array_key_exists('lid', $vals) && ep4_field_in_file($var['lid'])) {
         $_POST[$post_key][$lid] = ep_4_curly_quotes($vals['lid']);
       }
-      if (ep4_field_in_file($var['code']) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file($var['lid']))) {
+      if (array_key_exists('code', $vals) && ep4_field_in_file($var['code']) && (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code_only' || !ep4_field_in_file($var['lid']))) {
         $_POST[$post_key][$lid] = ep_4_curly_quotes($vals['code']);
       }
       
@@ -1079,7 +1087,7 @@ function ep4_post_sanitize($post_array) {
         $var[$lang] = key($data[$lang][${$lang}]);
         $vals[$lang] = $data[$lang][${$lang}][$var[$lang]];
 
-        $return_val[key($vari)] = $_POST[$post_key];
+        $return_val[key($vari)] = array_key_exists($post_key, $_POST) ? $_POST[$post_key] : null;
       }
       continue;
     }

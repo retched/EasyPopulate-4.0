@@ -70,15 +70,15 @@ if ($row = $ep_4_fetch_array($result)) {
       unset($l_id);
       unset($l_id_code);
       unset($lang);
-      return;
+      continue;
     }
     
-    if (ep4_field_in_file('v_record_company_url_' . $l_id)) {
+    if (ep4_field_in_file('v_record_company_url_' . $l_id) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only') {
       $v_record_company_url_store = $v_record_company_url[$l_id] = $items[$filelayout['v_record_company_url_' . $l_id]];
     }
-    if (ep4_field_in_file('v_record_company_url_' . $l_id_code)) {
+    if (ep4_field_in_file('v_record_company_url_' . $l_id_code) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
       $v_record_company_url[$l_id_code] = $items[$filelayout['v_record_company_url_' . $l_id_code]];
-      if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_record_company_url_' . $l_id)) {
+      if (!ep4_field_in_file('v_record_company_url_' . $l_id) || EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id') {
         $v_record_company_url_store = $v_record_company_url[$l_id_code];
       }
       // Prioritize that if the $lang_id is also present for this language that this content rules/overrides.
@@ -113,6 +113,12 @@ if ($row = $ep_4_fetch_array($result)) {
     if ($result) {
       zen_record_admin_activity('Updated record company info ' . (int) $v_record_company_id . ' via EP4.', 'info');
     }
+    unset($post_array);
+    unset($data_array);
+    unset($sql);
+    unset($result);
+    unset($l_id);
+    unset($l_id_code);
   }
   unset($lang);
   return;
@@ -138,14 +144,21 @@ foreach ($langcode as $lang) {
   $l_id = $lang['id'];
   $l_id_code = $lang['code'];
   
+  if (!isset($filelayout['v_record_company_url_' . $l_id]) && !isset($filelayout['v_record_company_url_' . $l_id_code])) {
+    unset($l_id);
+    unset($l_id_code);
+    unset($lang);
+    continue;
+  }
+  
   $v_record_company_url = array();
   
-  if (ep4_field_in_file('v_record_company_url_' . $l_id)) {
+  if (ep4_field_in_file('v_record_company_url_' . $l_id) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only') {
     $v_record_company_url_store = $v_record_company_url[$l_id] = $items[$filelayout['v_record_company_url_' . $l_id]];
   }
-  if (ep4_field_in_file('v_record_company_url_' . $l_id_code)) {
+  if (ep4_field_in_file('v_record_company_url_' . $l_id_code) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
     $v_record_company_url[$l_id_code] = $items[$filelayout['v_record_company_url_' . $l_id_code]];
-    if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE == 'language_code' || !ep4_field_in_file('v_record_company_url_' . $l_id)) {
+    if (!ep4_field_in_file('v_record_company_url_' . $l_id) || EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id') {
       $v_record_company_url_store = $v_record_company_url[$l_id_code];
     }
     // Prioritize that if the $lang_id is also present for this language that this content rules/overrides.
@@ -170,5 +183,10 @@ foreach ($langcode as $lang) {
   if ($result) {
     zen_record_admin_activity('Inserted record company info ' . (int) $v_record_company_id . ' via EP4.', 'info');
   }
+  unset($post_array);
+  unset($data_array);
+  unset($sql);
+  unset($result);
+  
 }
 unset($lang);

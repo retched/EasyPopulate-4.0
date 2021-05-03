@@ -162,6 +162,8 @@ foreach ($langcode as $lang) {
   $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
   $sql = $db->bindVars($sql, ':artists_url:', $thisartistsurl[$l_id], $zc_support_ignore_null);
   $result = ep_4_query($sql);
+  unset($post_array);
+  unset($data_array);
   unset($sql);
   if ($result) {
     zen_record_admin_activity('Inserted record artists info ' . (int) $v_artists_id . ' via EP4.', 'info');
