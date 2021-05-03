@@ -441,6 +441,9 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
         // chadd - 12-13-2010 - this should allow you to update descriptions only for any given language of the import file!
         // cycle through all defined language codes, but only update those languages defined in the import file
         // Note 11-08-2011: I may remove the "smart_tags_4" function for better performance.
+        $v_metatags_title = array();
+        $v_metatags_keywords = array();
+        $v_metatags_description = array();
         foreach ($langcode as $lang) {
           $l_id = $lang['id'];
           $l_id_code = $lang['code'];
