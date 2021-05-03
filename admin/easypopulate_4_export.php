@@ -396,9 +396,9 @@ while ($row = $ep_4_fetch_array($result)) {
       $resultMeta = ep_4_query($sqlMeta);
       $rowMeta = $ep_4_fetch_array($resultMeta);
       unset($resultMeta);
-      $row['v_metatags_title_' . $lid2] = $rowMeta['metatags_title'];
-      $row['v_metatags_keywords_' . $lid2] = $rowMeta['metatags_keywords'];
-      $row['v_metatags_description_' . $lid2] = $rowMeta['metatags_description'];
+      $row['v_metatags_title_' . $lid2] = !empty($rowMeta['metatags_title']) ? $rowMeta['metatags_title'] : '';
+      $row['v_metatags_keywords_' . $lid2] = !empty($rowMeta['metatags_keywords']) ? $rowMeta['metatags_keywords'] : '';
+      $row['v_metatags_description_' . $lid2] = !empty($rowMeta['metatags_description']) ? $rowMeta['metatags_description'] : '';
       // metaData end
       $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP');
     } // foreach
@@ -649,9 +649,10 @@ while ($row = $ep_4_fetch_array($result)) {
     unset($sqlAttrib);
     $resultAttribCount = $ep_4_num_rows($resultAttrib);
 
+    $row['v_products_attributes'] = '';
     if ($resultAttribCount !== false) {
       while ($rowAttrib = $ep_4_fetch_assoc($resultAttrib)) {
-        $row['v_products_attributes'] .= $rowAttrib['v_products_options_name'] . ': ' . $rowAttrib['v_products_options_values_name'] . '; ';
+        $row['v_products_attributes'] .= $rowAttrib['v_products_options_name'] . ': ' . (!empty($rowAttrib['v_products_options_values_name']) ? $rowAttrib['v_products_options_values_name'] : EASYPOPULATE_4_DISPLAY_RESULT_EXPORT_NO_OPTION_VALUE) . '; ';
       }
       unset($rowAttrib);
     }
@@ -686,6 +687,9 @@ while ($row = $ep_4_fetch_array($result)) {
       // Clean the data then write the row of the original data
       $dataRow = '';
       foreach ($filelayout as $key => $value) {
+        if (!array_key_exists($key, $row)) {
+          continue;
+        }
         if (strpos($key, "v_products_description") !== false) {
           $row[$key] = strip_tags($row[$key]);
         }
