@@ -48,6 +48,7 @@ $ep_date_format = defined('EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT') ? EASYPOPULA
 $ep_raw_time = defined('EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME') ? EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME : '09:00:00';
 $ep_debug_logging = ((!defined('EASYPOPULATE_4_CONFIG_DEBUG_LOGGING') || EASYPOPULATE_4_CONFIG_DEBUG_LOGGING !== 'false') ? true : false);
 $ep_debug_logging_all = ((!defined('EASYPOPULATE_4_CONFIG_DEBUG_LOGGING') || EASYPOPULATE_4_CONFIG_DEBUG_LOGGING === 'all') ? true : false);
+
 $ep_split_records = defined('EASYPOPULATE_4_CONFIG_SPLIT_RECORDS') ? (int) EASYPOPULATE_4_CONFIG_SPLIT_RECORDS : 2000;
 $price_with_tax = ((defined('EASYPOPULATE_4_CONFIG_PRICE_INC_TAX') && EASYPOPULATE_4_CONFIG_PRICE_INC_TAX === 'true') ? 1 : 0);
 $strip_smart_tags = ((!defined('EASYPOPULATE_4_CONFIG_SMART_TAGS') || EASYPOPULATE_4_CONFIG_SMART_TAGS == 'true') ? true : false);
@@ -480,7 +481,9 @@ function getFileDelimiter($file, $checkLines = 2) {
     // found the one delimiter that works
     $results = array_keys($results, max($results));
     return $results[0]; // The one and only delimiter.
-  } else if ($size_results > 1) {
+  }
+
+  if ($size_results > 1) {
     // Options available, need to let know.
     // Have opportunity to evaluate the results of the row(s).
     // Ideally can evaluate each line for number of fields.
@@ -514,10 +517,10 @@ function getFileDelimiter($file, $checkLines = 2) {
     }
 
     return $returndelimiters; // Will return an array, but question is if it is empty or has 1 or more values.   
-  } else {
-    // None found and need user to do something else.
-    return NULL;
   }
+
+  // None found and need user to do something else.
+  return NULL;
 }
 
 function ep_4_display_CSV_Delimiter($filename) {
@@ -526,32 +529,33 @@ function ep_4_display_CSV_Delimiter($filename) {
   if (!isset($file_delimiter)) {
     // File does not have a matching delimiter to what is in the database, bad filename, or delimiter is not set in database, need user to take some sort of action.
     return NULL;
-  } else if (is_array($file_delimiter)) {
+  }
+  if (is_array($file_delimiter)) {
     // Could have none (empty array), 1 delimiter, or multiple come back.
     // if empty array then the delimiter was inconsistently used in each row.
     // if 1 delimiter, then its the one to use. Return user friendly choice.
     // if 2 or more delimiters, need to offer choices/advise of potential issue.
     if (empty($file_delimiter)) {
       return NULL;
-    } else if (count($file_delimiter) == 1) {
+    }
+    if (count($file_delimiter) == 1) {
       if ($file_delimiter[0] == "\t") {
         $file_delimiter[0] = 'tab';
       } elseif ($file_delimiter[0] == " " || $file_delimiter[0] == "&nbsp;") {
         $file_delimiter[0] = 'space';
       }
       return $file_delimiter[0];
-    } else {
-      return array('delims'=>$file_delimiter);
     }
-  } else {
-    // Single delimiter used and was "immediately" found return user friendly choice.
-    if ($file_delimiter == "\t") {
-      $file_delimiter = 'tab';
-    } elseif ($file_delimiter == " " || $file_delimiter == "&nbsp;") {
-      $file_delimiter = 'space';
-    }
-    return $file_delimiter;
+
+    return array('delims'=>$file_delimiter);
   }
+  // Single delimiter used and was "immediately" found return user friendly choice.
+  if ($file_delimiter == "\t") {
+    $file_delimiter = 'tab';
+  } elseif ($file_delimiter == " " || $file_delimiter == "&nbsp;") {
+    $file_delimiter = 'space';
+  }
+  return $file_delimiter;
 }
 
 if (isset($_POST['export']) || isset($_GET['export']) || isset($_POST['exportorder'])) {
