@@ -445,16 +445,16 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
           $l_id = $lang['id'];
           $l_id_code = $lang['code'];
           if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only') {
-          // products meta tags
-          if (isset($filelayout['v_metatags_title_' . $l_id])) {
-            $v_metatags_title[$l_id] = ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $l_id]]);
-          }
-          if (isset($filelayout['v_metatags_keywords_' . $l_id])) {
-            $v_metatags_keywords[$l_id] = ep_4_curly_quotes($items[$filelayout['v_metatags_keywords_' . $l_id]]);
-          }
-          if (isset($filelayout['v_metatags_description_' . $l_id])) {
-            $v_metatags_description[$l_id] = ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $l_id]]);
-          }
+            // products meta tags
+            if (isset($filelayout['v_metatags_title_' . $l_id])) {
+              $v_metatags_title[$l_id] = ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $l_id]]);
+            }
+            if (isset($filelayout['v_metatags_keywords_' . $l_id])) {
+              $v_metatags_keywords[$l_id] = ep_4_curly_quotes($items[$filelayout['v_metatags_keywords_' . $l_id]]);
+            }
+            if (isset($filelayout['v_metatags_description_' . $l_id])) {
+              $v_metatags_description[$l_id] = ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $l_id]]);
+            }
           }
           if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
             if (isset($filelayout['v_metatags_title_' . $l_id_code])) {
@@ -879,32 +879,32 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
             if (empty($categories_count['code'][$lang['code']])) { // only check $max_len['categories_name'] if $categories_count['code'][$lang['id']] > 0
               continue;
             }
-              for ($category_index = 0; $category_index < $categories_count['code'][$lang['code']]; $category_index++) {
-                $cat_str_len = (function_exists('mb_strlen')) ? mb_strlen($categories_names_array['code'][$lang['code']][$category_index]) : strlen($categories_names_array['code'][$lang['code']][$category_index]);
+            for ($category_index = 0; $category_index < $categories_count['code'][$lang['code']]; $category_index++) {
+              $cat_str_len = (function_exists('mb_strlen')) ? mb_strlen($categories_names_array['code'][$lang['code']][$category_index]) : strlen($categories_names_array['code'][$lang['code']][$category_index]);
               if ($cat_str_len <= $max_len['categories_name']) {
                 unset($cat_str_len);
                 continue;
               }
-                  $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array['code'][$lang['code']][$category_index], $max_len['categories_name'], $chosen_key);
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG, ${$chosen_key}, $categories_names_array['code'][$lang['code']][$category_index], $max_len['categories_name'], $chosen_key);
 
-                  if (empty($max_len['categories_name_found']) || $max_len['categories_name_found'] < $cat_str_len) {
-                    $max_len['categories_name_found'] = $cat_str_len;
+              if (empty($max_len['categories_name_found']) || $max_len['categories_name_found'] < $cat_str_len) {
+                $max_len['categories_name_found'] = $cat_str_len;
 
-                    if (EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD === 'false' /* Prevent expansion of categories_name field to fit new name */ ) {
-                      $ep_error_count++;
-                      unset($lang);
-                      unset($cat_str_len);
-                      continue 3; // skip to next record don't attempt further processing of current record.
-                    }
+                if (EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD === 'false' /* Prevent expansion of categories_name field to fit new name */ ) {
+                  $ep_error_count++;
+                  unset($lang);
+                  unset($cat_str_len);
+                  continue 3; // skip to next record don't attempt further processing of current record.
+                }
 
-                    $update_categories_sql = "ALTER TABLE " . TABLE_CATEGORIES_DESCRIPTION . " CHANGE categories_name categories_name VARCHAR(" . $cat_str_len . ") NOT NULL DEFAULT '';";
-                    $update_categories = $db->Execute($update_categories_sql);
+                $update_categories_sql = "ALTER TABLE " . TABLE_CATEGORIES_DESCRIPTION . " CHANGE categories_name categories_name VARCHAR(" . $cat_str_len . ") NOT NULL DEFAULT '';";
+                $update_categories = $db->Execute($update_categories_sql);
 
-                    zen_record_admin_activity('Extended table ' . TABLE_CATEGORIES_DESCRIPTION . ' field categories_name via EP4 from ' . zen_db_input($max_len['categories_name']) . ' to ' . zen_db_input($cat_str_len) . '.', 'info');
+                zen_record_admin_activity('Extended table ' . TABLE_CATEGORIES_DESCRIPTION . ' field categories_name via EP4 from ' . zen_db_input($max_len['categories_name']) . ' to ' . zen_db_input($cat_str_len) . '.', 'info');
 
-                    $max_len['categories_name'] = $cat_str_len;
-                  }
-                unset($cat_str_len);
+                $max_len['categories_name'] = $cat_str_len;
+              }
+              unset($cat_str_len);
             }
           } // foreach
           unset($lang);
@@ -920,12 +920,12 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
               if (!(($categories_count_value['id'] != $categories_count['id'][$lang['id']]) && !empty($categories_count['id'][$lang['id']]))) {
                 continue;
               }
-                  //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG,
-                  //${$chosen_key}, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name'], $chosen_key);
-                  $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['id']]];
-                  $ep_error_count++;
-                  unset($lang);
-                  continue 2; // skip to next record
+              //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG,
+              //${$chosen_key}, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name'], $chosen_key);
+              $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['id']]];
+              $ep_error_count++;
+              unset($lang);
+              continue 2; // skip to next record
             } // foreach
             unset($lang);
           }
@@ -959,12 +959,12 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
               if (!(($categories_count_value['code'] != $categories_count['id'][$lang['id']]) && !empty($categories_count['id'][$lang['id']]) || ($categories_count_value['id'] != $categories_count['code'][$lang['code']]) && !empty($categories_count['code'][$lang['code']]))) {
                 continue;
               }
-                  //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG,
-                  //$v_products_model, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name']);
-                  $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['code']]];
-                  $ep_error_count++;
-                  unset($lang);
-                  continue 2; // skip to next record
+              //$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG,
+              //$v_products_model, $categories_names_array['id'][$lang['id']][$category_index], $max_len['categories_name']);
+              $display_output .= "<br>Error: Unbalanced Categories defined in: " . $items[$filelayout['v_categories_name_' . $lang['code']]];
+              $ep_error_count++;
+              unset($lang);
+              continue 2; // skip to next record
             } // foreach
             unset($lang);
           }
@@ -1030,46 +1030,46 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
             // if $row is not null, we found entry, so retrive info
             if ($row != '') { // category exists
               $parent_category_id = $theparent_id;
-                $thiscategoryid = end($row)/*$item*/; // array of data
-                $current_category_id = $thiscategoryid;
+              $thiscategoryid = end($row); // array of data
+              $current_category_id = $thiscategoryid;
               foreach ($langcode as $lang2) {
                 $v_categories_name_check['id'] = 'v_categories_name_' . $lang2['id'];
                 if (!isset(${$v_categories_name_check['id']})) { // update
                   continue;
                 }
-                  $cat_lang_id = $lang2['id'];
-                  $sql = "UPDATE " . TABLE_CATEGORIES_DESCRIPTION . " SET
-                      categories_name = :categories_name:
-                    WHERE
-                      categories_id   = :categories_id: AND
-                      language_id     = :language_id:";
+                $cat_lang_id = $lang2['id'];
+                $sql = "UPDATE " . TABLE_CATEGORIES_DESCRIPTION . " SET
+                    categories_name = :categories_name:
+                  WHERE
+                    categories_id   = :categories_id: AND
+                    language_id     = :language_id:";
 
-                  $post_array = array(
-                    'categories_name' => array(
-                      'lang' => array(
-                        'lid' => array($cat_lang_id => array('v_categories_name_' . $cat_lang_id => $categories_names_array['id'][$cat_lang_id][$category_index]),),
-                        'code' => array($lang2['code'] => array('v_categories_name_' . $lang2['code'] => $categories_names_array['id'][$cat_lang_id][$category_index]),),
-                        'var' => array('temp_categories_name' => $thiscategoryname), //compact('v_categories_name'),
-                      ),
+                $post_array = array(
+                  'categories_name' => array(
+                    'lang' => array(
+                      'lid' => array($cat_lang_id => array('v_categories_name_' . $cat_lang_id => $categories_names_array['id'][$cat_lang_id][$category_index]),),
+                      'code' => array($lang2['code'] => array('v_categories_name_' . $lang2['code'] => $categories_names_array['id'][$cat_lang_id][$category_index]),),
+                      'var' => array('temp_categories_name' => $thiscategoryname), //compact('v_categories_name'),
                     ),
-                  );
+                  ),
+                );
 
-                  $data_array = ep4_post_sanitize($post_array);
-                  extract($data_array, EXTR_OVERWRITE);
+                $data_array = ep4_post_sanitize($post_array);
+                extract($data_array, EXTR_OVERWRITE);
 
-                  $categories_names_array['id'][$cat_lang_id][$category_index] = $temp_categories_name[$cat_lang_id];
-                  unset($temp_categories_name);
+                $categories_names_array['id'][$cat_lang_id][$category_index] = $temp_categories_name[$cat_lang_id];
+                unset($temp_categories_name);
 
-                  $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($categories_names_array['id'][$cat_lang_id][$category_index]), $zc_support_ignore_null);
-                  $sql = $db->bindVars($sql, ':categories_id:', $thiscategoryid, 'integer');
-                  $sql = $db->bindVars($sql, ':language_id:', $cat_lang_id, 'integer');
-                  $result = ep_4_query($sql);
-                  unset($sql);
-                  if ($result) {
-                    zen_record_admin_activity('Updated category description ' . (int) $thiscategoryid . ' via EP4.', 'info');
-                  }
-                  unset($cat_lang_id);
-                  unset($result);
+                $sql = $db->bindVars($sql, ':categories_name:', ep_4_curly_quotes($categories_names_array['id'][$cat_lang_id][$category_index]), $zc_support_ignore_null);
+                $sql = $db->bindVars($sql, ':categories_id:', $thiscategoryid, 'integer');
+                $sql = $db->bindVars($sql, ':language_id:', $cat_lang_id, 'integer');
+                $result = ep_4_query($sql);
+                unset($sql);
+                if ($result) {
+                  zen_record_admin_activity('Updated category description ' . (int) $thiscategoryid . ' via EP4.', 'info');
+                }
+                unset($cat_lang_id);
+                unset($result);
               }
               unset($lang2);
             } else { // otherwise add new category
@@ -1230,6 +1230,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
             $sql = $db->bindVars($sql, ':' . $chosen_key_sub . ':', (!empty(${$chosen_key}) ? ${$chosen_key} : ''), $zc_support_ignore_null);
           }
           $result = ep_4_query($sql);
+
           unset($sql);
           if ($ep_4_num_rows($result) == 0) { // new item, insert into products
             unset($result);
@@ -1294,13 +1295,13 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
                 if (!($field != 'products_id' || ( $field == 'products_id' && defined('EP4_DB_FILTER_KEY') && EP4_DB_FILTER_KEY === 'blank_new' && zen_not_null(${$chosen_key})))) {
                   continue;
                 }
-                  $value = 'v_' . $field;
+                $value = 'v_' . $field;
                 if (!$filelayout[$value]) {
                   continue;
                 }
-                    $query .= ":field: = :value:, ";
-                    $query = $db->bindVars($query, ':field:', $field, 'noquotestring');
-                    $query = $db->bindVars($query, ':value:', ${$value}, ($zc_support_ignore_null));
+                $query .= ":field: = :value:, ";
+                $query = $db->bindVars($query, ':field:', $field, 'noquotestring');
+                $query = $db->bindVars($query, ':value:', ${$value}, ($zc_support_ignore_null));
               }
               unset($field);
               unset($value);
@@ -1374,36 +1375,36 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
               continue; // new categories however have been created by now... Adding into product table needs to be 1st action?
             }
 
-              // need to change to an log file, this is gobbling up memory! chadd 11-14-2011
-              zen_record_admin_activity('New product ' . (int) $v_products_id . ' added via EP4.', 'info');
+            // need to change to an log file, this is gobbling up memory! chadd 11-14-2011
+            zen_record_admin_activity('New product ' . (int) $v_products_id . ' added via EP4.', 'info');
 
-              if ($ep_feedback == true) {
-                $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT, ${$chosen_key}, $chosen_key);
-              }
-              $ep_import_count++;
-              // PRODUCT_MUSIC_EXTRA
-              if ($v_products_type == '2') {
-                $sql_music_extra = "SELECT * FROM " . TABLE_PRODUCT_MUSIC_EXTRA . " WHERE (products_id = :products_id:) LIMIT 1";
-                $sql_music_extra = $db->bindVars($sql_music_extra, ':products_id:', $v_products_id, 'integer');
-                $sql_music_extra = ep_4_query($sql_music_extra);
-                if ($ep_4_num_rows($sql_music_extra) == 0) { // new item, insert into products
-                  $query = "INSERT INTO " . TABLE_PRODUCT_MUSIC_EXTRA . " SET
-                    products_id     = :products_id:,
-                    artists_id        = :artists_id:,
-                    record_company_id = :record_company_id:,
-                    music_genre_id    = :music_genre_id:";
-                  $query = $db->bindVars($query, ':products_id:', $v_products_id, 'integer');
-                  $query = $db->bindVars($query, ':artists_id:', !empty($v_artists_id) ? $v_artists_id : 0, 'integer');
-                  $query = $db->bindVars($query, ':record_company_id:', !empty($v_record_company_id) ? $v_record_company_id : 0, 'integer');
-                  $query = $db->bindVars($query, ':music_genre_id:', !empty($v_music_genre_id) ? $v_music_genre_id : 0, 'integer');
-                  $result = ep_4_query($query);
-                  unset($query);
-                  if ($result) {
-                    zen_record_admin_activity('Inserted product music extra ' . (int) $v_products_id . ' via EP4.', 'info');
-                  }
-                  unset($result);
+            if ($ep_feedback == true) {
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_NEW_PRODUCT, ${$chosen_key}, $chosen_key);
+            }
+            $ep_import_count++;
+            // PRODUCT_MUSIC_EXTRA
+            if ($v_products_type == '2') {
+              $sql_music_extra = "SELECT * FROM " . TABLE_PRODUCT_MUSIC_EXTRA . " WHERE (products_id = :products_id:) LIMIT 1";
+              $sql_music_extra = $db->bindVars($sql_music_extra, ':products_id:', $v_products_id, 'integer');
+              $sql_music_extra = ep_4_query($sql_music_extra);
+              if ($ep_4_num_rows($sql_music_extra) == 0) { // new item, insert into products
+                $query = "INSERT INTO " . TABLE_PRODUCT_MUSIC_EXTRA . " SET
+                  products_id     = :products_id:,
+                  artists_id        = :artists_id:,
+                  record_company_id = :record_company_id:,
+                  music_genre_id    = :music_genre_id:";
+                $query = $db->bindVars($query, ':products_id:', $v_products_id, 'integer');
+                $query = $db->bindVars($query, ':artists_id:', !empty($v_artists_id) ? $v_artists_id : 0, 'integer');
+                $query = $db->bindVars($query, ':record_company_id:', !empty($v_record_company_id) ? $v_record_company_id : 0, 'integer');
+                $query = $db->bindVars($query, ':music_genre_id:', !empty($v_music_genre_id) ? $v_music_genre_id : 0, 'integer');
+                $result = ep_4_query($query);
+                unset($query);
+                if ($result) {
+                  zen_record_admin_activity('Inserted product music extra ' . (int) $v_products_id . ' via EP4.', 'info');
                 }
-                unset($sql_music_extra);
+                unset($result);
+              }
+              unset($sql_music_extra);
             }
             // needs to go into log file chadd 11-14-2011
             if ($ep_feedback == true) {
@@ -1462,9 +1463,9 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
                 if (!isset($filelayout[$value])) {
                   continue;
                 }
-                  $query .= ":field: = :value:, ";
-                  $query = $db->bindVars($query, ':field:', $field, 'noquotestring');
-                  $query = $db->bindVars($query, ':value:', ${$value}, $zc_support_ignore_null);
+                $query .= ":field: = :value:, ";
+                $query = $db->bindVars($query, ':field:', $field, 'noquotestring');
+                $query = $db->bindVars($query, ':value:', ${$value}, $zc_support_ignore_null);
               }
               unset($field);
               unset($value);
