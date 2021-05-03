@@ -247,18 +247,15 @@ while ($row = $ep_4_fetch_array($result)) {
     if ($row['v_products_id'] == (int)$active_products_id) {
       if ($row['v_options_id'] == (int)$active_options_id) {
         // collect the products_options_values_name
+        $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
+        $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
         if ($active_language_id <> (int)$row['v_language_id']) {
 
-          $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
-          $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
           $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
           $active_language_id = (int)$row['v_language_id'];
         } else {
-          $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
           $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] .= "," . $row['v_products_options_values_name'];
-          $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
         }
-        continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
       } else { // same product, new attribute - only executes once on new option
         // Clean the texts that could break CSV file formatting
         $dataRow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
@@ -272,35 +269,36 @@ while ($row = $ep_4_fetch_array($result)) {
         $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
         $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
         $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
-        continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
       } // end of options_id check
-    } else { // new combo or different product or first time through while-loop
-      if (isset($active_row['v_products_id']) && ($active_row['v_products_id'] <> $last_products_id)) {
-        // Clean the texts that could break CSV file formatting
+      continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
+    }
+    // new combo or different product or first time through while-loop
+    if (isset($active_row['v_products_id']) && ($active_row['v_products_id'] <> $last_products_id)) {
+      // Clean the texts that could break CSV file formatting
 
-        $dataRow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
+      $dataRow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
 
-        fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
-        unset($dataRow);
+      fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+      unset($dataRow);
 
-        $ep_export_count++;
-        $last_products_id = ((isset($active_row['v_products_id']) || array_key_exists('v_products_id', $active_row)) ? (int)$active_row['v_products_id'] : 0);
-      } // end if new model
+      $ep_export_count++;
+      $last_products_id = ((isset($active_row['v_products_id']) || array_key_exists('v_products_id', $active_row)) ? (int)$active_row['v_products_id'] : 0);
+    } // end if new model
 
-      // get current row of data
-      $active_products_id = (int)$row['v_products_id'];
-      $active_options_id = (int)$row['v_options_id'];
-      $active_language_id = (int)$row['v_language_id'];
+    // get current row of data
+    $active_products_id = (int)$row['v_products_id'];
+    $active_options_id = (int)$row['v_options_id'];
+    $active_language_id = (int)$row['v_language_id'];
 
-      $active_row['v_products_model'] = $row['v_products_model'];
-      if ($chosen_key != 'v_products_model' && zen_not_null($chosen_key)) {
-          $active_row[$chosen_key] = $row[$chosen_key];
-      }
-      $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
+    $active_row['v_products_model'] = $row['v_products_model'];
+    if ($chosen_key != 'v_products_model' && zen_not_null($chosen_key)) {
+        $active_row[$chosen_key] = $row[$chosen_key];
+    }
+    $active_row['v_products_options_type'] = (int)$row['v_products_options_type'];
 
-      $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
-      $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
-    } // end of special case 'attrib_basic'
+    $active_row['v_products_options_name_' . $l_id_code] = $active_row['v_products_options_name_' . $l_id] = $row['v_products_options_name'];
+    $active_row['v_products_options_values_name_' . $l_id_code] = $active_row['v_products_options_values_name_' . $l_id] = $row['v_products_options_values_name'];
+    // end of special case 'attrib_basic'
   } else { // standard export processing // end of special case 'attrib_basic'
     if ($ep_dltype == 'orders_1' || $ep_dltype == 'orders_2' || $ep_dltype == 'orders_3' || $ep_dltype == 'orders_4') {
       if ((!isset($tracker['v_orders_id']) && !zen_not_null($tracker['v_orders_id'])) || $row['v_orders_id'] != $tracker['v_orders_id']) {
