@@ -1,7 +1,7 @@
 #
 # @copyright Copyright 2003-2016 Zen Cart Development Team
 # @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
-# @version $Id: .htaccess 19328 Modified in v1.5.5 and for EP4 $
+# @version $Id: .htaccess 19328 Modified in v1.5.7a and for EP4 Note that the default admin does not specifically require this file $
 #
 # This is used with Apache WebServers
 #
@@ -69,7 +69,7 @@ IndexIgnore */*
   FileETag None
   Header unset ETag
   #Header set Cache-Control "no-transform"
-  <FilesMatch "(?i).*\.(ico|jpe?g|gif|webp|png|otf|swf|flv|ttf|woff|eot|svg|svgz)$">
+  <FilesMatch "(?i).*\.(ico|jpe?g|gif|otf|webp|png|svgz?)$">
     Header set Cache-control "max-age=864000, public, must-revalidate"
     Header unset Last-Modified
   </FilesMatch>
@@ -93,17 +93,17 @@ IndexIgnore */*
   ExpiresByType application/x-javascript A3600
   ExpiresByType text/css A3600
   ExpiresByType image/gif A604800
-  ExpiresByType video/x-flv A604800
   ExpiresByType application/pdf A604800
   ExpiresByType text/html A300
   ExpiresByType image/x-icon A86400
   ExpiresByType image/jpeg A2592000
   ExpiresByType image/png A2592000
   ExpiresByType text/cache-manifest "access plus 0 seconds"
-
+  ExpiresByType image/svg A2592000
 </ifmodule>
 
 
 #turn off X-PHP-Originating-Script header when sending emails from admin
 #uncomment to activate:
 # php_flag mail.add_x_header Off
+
