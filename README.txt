@@ -5,6 +5,14 @@ http://www.zen-cart.com/forum/showthread.php?t=190417
 
 I recommend that you first enter a couple Categories and Products through the normal Zencart Admin. This will help you understand the exported file formats and how to import.
 
+Summary of important things:
+1) CSV Files
+2) primary key to match to records
+3) Categories and multi-language support
+4) File size (splitting)
+5) Filenaming as a filter.
+6) Attributes (the type for products)
+
 Things of Importance:
 
 1) EP4 works only with CSV data files, and for best cross platform compatibility please use OpenOffice to Export your CSV file.
@@ -13,13 +21,14 @@ At least one specific known issue is that dates must be formatted to be like: YY
 
 2) There are now two ways to address product that is imported.  The default as installed remains the products_model.  
    When assigned as the primary key, the products_model must be used to distinguish your products for import. Any record with a 
-   blank v_products_model entry will be skipped. 
+   blank v_products_model entry will be skipped to be considered desired by design. 
    
    Also note that if you enter the same products_model twice, the latest (last) record
-   entry will over-write any previous entry. The exception here is if you enter a different category; this will result in a linked
-   product. This means that if two rows of data have the same v_products_model data with only a difference of the category name,
-   then the product will appear in both categories and a change to the data in one entry will appear in the other category. See the
-   previous sentence about effect of two products having the same products_model identifier.
+   entry will over-write any previous entry. If the category is different in any later record, then all other new data will be replaced with
+   what the current record has and the product will be linked to the category identified in this record. 
+   This means that if two rows of data have all the same v_products_model data with only a difference of the category name,
+   then the product will appear in both categories and a change to the data in one entry will appear in all categories where the product is linked. 
+   See the previous sentence about effect of two products having the same products_model identifier.
    "Duplicate" products with the same products_model number is not supported when using the v_products_model as the primary key, they will each end up with the same information.
    If you have these entries in your database, you may get unpredictable results when importing data.
    
@@ -36,9 +45,12 @@ At least one specific known issue is that dates must be formatted to be like: YY
    other, blank_new, will assign a new products_id (next "available") for records that have a blank for the products_id field in the
    applicable row.
 
-3) Categories are handled differently from other versions of EP. You can now import multilingual categories and related multilingual
+3) Categories are handled differently from other versions of EP. Also, you can now import multilingual categories and related multilingual
 data (like Products Names, descriptions, etc.).
-To achieve this, each v_categories_names_1, v_categories_names_2, etc. with the number corresponding to a language installed in your system. Individual category names for a product are separated by the Carat "^" symbol ($category_delimiter). 
+To achieve this, each v_categories_names_1, v_categories_names_2, etc. with the number corresponding to a language installed in your system or 
+it is also now possible to use the language code (e.g., en, de, es) to reference the language. For example if english represents language id of 1,
+then either v_categories_names_1 or v_categories_en could be used. However, the data to capture for that field is to have each 
+Individual category names for a product separated by the Carat "^" symbol ($category_delimiter). 
 
 For Example: Bar Supplies^Glass Washers^Brushes
 
