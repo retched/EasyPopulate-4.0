@@ -126,166 +126,166 @@
          04-24-2012 Completed import/export for products_type = 2, Music (Artist, Record Company, Genre)
          04-25-2012 Concept for alternate column header names added to the import code. Needs fleshing out and a way for user interaction.
          04-30-2012 Added products_priced_by_attribute and product_is_always_free_shipping to the main products export/import file layout
-		 05-01-2012 Added NEW file to support Featured Items export/import
+                 05-01-2012 Added NEW file to support Featured Items export/import
          05-03-2012 Added "curly quotes" check for categories names import
          05-08-2012 More "curly quotes" checks added
-4.0.21   06-01-2012	Fix to v_products_type on import.
+4.0.21   06-01-2012     Fix to v_products_type on import.
                     Added new solution for checking database collation... this makes a difference when using 1.38/139 as the functions do not return field lengths correctly.
                     Fixed "security" issue with zencart 1.5
-4.0.22 	 03-01-2014	SBA_Stock: Added functionality to manage total stock of items when Stock By Attributes (SBA) is installed and items are or are not tracked by SBA.
-						Files modified: admin/easypopulate_4.php, easypopulate_4_import.php, easypopulate_4_export.php and admin/includes/functions/extra_functions/easypopulate_4_functions.php.
-4.0.23 	 07-13-2014	Upgrade to ZC 1.5.3. Incorporated usage of mysqli_ related functions where mysql_ functions were used to continue functionality in older versions but allow
-					continued operation in newer ZC versions.  Also added 
-					additional SBA functionality for import and export.  SBA is 
-					still tied to an older version of SBA and 
-					needs to be updated to reflect Potterhouse's version.  Also
-					modified the basic attribute process of updating the sort order
-					to use a factor of 10 instead of a factor of 1 when importing
-					basic attributes.  Ideally, the sort order would remain as
-					previously assigned if the product existed and be adjusted as
-					necessary to remain in the desired sort order; however, at 
-					least this way room is provided between EP4 updates to add
-					additional options between existing options.  
-					In admin/easypopulate_4_attrib.php is a variable 
-					$products_sort_order_increment that is currently set to 10 
-					so that options will be added first at the value of 1 as 
-					assigned in the same file, then will increment to 
-					10, 20, 30, etc... for each subsequent option upon import 
-					of the basic file.
+4.0.22   03-01-2014     SBA_Stock: Added functionality to manage total stock of items when Stock By Attributes (SBA) is installed and items are or are not tracked by SBA.
+                                                Files modified: admin/easypopulate_4.php, easypopulate_4_import.php, easypopulate_4_export.php and admin/includes/functions/extra_functions/easypopulate_4_functions.php.
+4.0.23   07-13-2014     Upgrade to ZC 1.5.3. Incorporated usage of mysqli_ related functions where mysql_ functions were used to continue functionality in older versions but allow
+                                        continued operation in newer ZC versions.  Also added 
+                                        additional SBA functionality for import and export.  SBA is 
+                                        still tied to an older version of SBA and 
+                                        needs to be updated to reflect Potterhouse's version.  Also
+                                        modified the basic attribute process of updating the sort order
+                                        to use a factor of 10 instead of a factor of 1 when importing
+                                        basic attributes.  Ideally, the sort order would remain as
+                                        previously assigned if the product existed and be adjusted as
+                                        necessary to remain in the desired sort order; however, at 
+                                        least this way room is provided between EP4 updates to add
+                                        additional options between existing options.  
+                                        In admin/easypopulate_4_attrib.php is a variable 
+                                        $products_sort_order_increment that is currently set to 10 
+                                        so that options will be added first at the value of 1 as 
+                                        assigned in the same file, then will increment to 
+                                        10, 20, 30, etc... for each subsequent option upon import 
+                                        of the basic file.
 4.0.24   07-15-2014 Fixed typo in attribute import (missing $ on variable name), and also corrected the way index increment was
-					calculated.
-4.0.25   10-10-2014		Added capability of using EP4 with modifications shown 
-					in potteryhouse's version of SBA. (Recognizes customid column).
-					This may also open EP4 to other versions of SBA; however, 
-					this code has not been tested on other versions of SBA that 
-					use the customid field.  The detailed export was updated; 
-					however, removal of old SBA records still needs to be
-					addressed.  Updated the README text a little.
+                                        calculated.
+4.0.25   10-10-2014             Added capability of using EP4 with modifications shown 
+                                        in potteryhouse's version of SBA. (Recognizes customid column).
+                                        This may also open EP4 to other versions of SBA; however, 
+                                        this code has not been tested on other versions of SBA that 
+                                        use the customid field.  The detailed export was updated; 
+                                        however, removal of old SBA records still needs to be
+                                        addressed.  Updated the README text a little.
 4.0.26   10-19-2014      Added the sort_id associated with categories.  Import and Export are
                          through the Categories Only (with Metatags) file(s).  If column is present
                          then the sort_id will be modified accordingly.  If the column is absent
                          there will be no change of the category's sort_order.
 4.0.26a  10-25-2014      Corrected the display of the SBA options.  Previously SBA menu options
-					displayed for all users not just those that had SBA installed.  This was
-					the only modification made to this version.
-4.0.26b  10-26-2014		Added a menu display of the status of SBA being installed similar to other
-					options previously incorporated by chadderruski (such as products short
-					descriptions, product unit of measure, etc...) Also updated some of the
-					html formatting.
+                                        displayed for all users not just those that had SBA installed.  This was
+                                        the only modification made to this version.
+4.0.26b  10-26-2014             Added a menu display of the status of SBA being installed similar to other
+                                        options previously incorporated by chadderruski (such as products short
+                                        descriptions, product unit of measure, etc...) Also updated some of the
+                                        html formatting.
 4.0.27   10-27-2014      Provided export of product and category URIs as generated from the admin
-					function zen_catalog_href_link.  If CEON URI Mapping is installed, then
-					the active uri is provided by that code.  Other URI rewriters may provide
-					the same functionality when installed and active; however, that has not
-					been tested.
+                                        function zen_catalog_href_link.  If CEON URI Mapping is installed, then
+                                        the active uri is provided by that code.  Other URI rewriters may provide
+                                        the same functionality when installed and active; however, that has not
+                                        been tested.
 4.0.28   01-03-2015      Added bypass to mb_internal_string and notification.
-					Also modified version check to support ZC 1.5.4 and above.
-					Future versions of ZC may still require this to be revised, but at least
-					this program will not need to be updated merely to support a version check.
-					Incorporated admin logging of database inserts and updates similar (and beyond)
-					those contained in ZC 1.5.4.  Deletions were not incorporated.
-4.0.29   04-03-2015		Added support for products_map modification (Manufacturer's Advertised Price)
-					Added MSRP export to areas where previously begun but not fully incorporated.
-					Modified import of customid for SBA-detailed-attributes to treat as a string.
-					Began incorporating language overrides, specifically with German as the first alternate language.
-					Added support for the plugin dual pricing.
-4.0.30   06-27-2015		Added a new way of displaying files on the EP4 screen to show
-					more information such as the prefix to the file types that are
-					processed.  This is to reduce the questions related to not
-					reading the instructions and understanding that certain files
-					are processed only by their name prefix.  Everything else is 
-					processed as if it was a full update file.  Also addressed a
-					warning received in PHP 5.4+ related to testing a variable not
-					initialized.  Previously 'if (!$error)' was sufficient, which
-					it is if $error has been assigned; however, if not assigned,
-					this results in a warning message in the logs folder.  So,
-					instead to maintain consistent usage/functionality will check
-					if it is set and if it is set to verify that it is not an
-					error, and if it never was set then that would need to be 
-					known as well.  end result: if (!$error) { has been changed to
-					if ((isset($error) && !$error) || !isset($error)) {.
-4.0.31   08-01-2015		Corrected how dates are imported for specials in PHP 5.5 - 5.6 to match
-					how ZC has to prevent dates converting from 0001-01-01 to 1970-01-01.
-					Added ability to import using products_id.
-					Modified method of handling the storage directory.  Previous versions
-					if the admin directory was desired had to be entered and
-					would be stored in the database.  There is no other default
-					ZC function that stores the admin directory in the database.
-					This could become a security issue if access to the database
-					is somehow inappropriately obtained.
-					Modified how some of the queries are handled to ensure
-					continued compatibility with ZC.
-					Modified the output links to account for files being
-					stored in different locations on the server based on
-					catalog/admin selections.
-4.0.32	02-08-2016		Updated for PHP 7.0 compatibility.
-				Corrected use of verifying that constant is in use and needs to be defined.
-				Completed incorporation of the German Language version of EP4 which allows for
-					EP4 to now be translated to other languages.  Assistance always welcome!
-				Converted from storing web page data via $_GET to $_POST operations.  Retrieval of files
-					is still by $_GET when selecting the download link(s) as well as links to generate
-					new files to modify unless the dropdowns at the top of the screen are used. This
-					also was a change away from using $_REQUEST to $_POST offering stricter
-					control of data transport.
-				Added checks in files that are "required" to validate that the file is being run from within
-					ZC by verification of a constant being defined.
-				Incorporated numerous notifiers to support expandability. (A BookX addon is in development by a 
-					third party and	will be looked at for easy incorporation to minimize the effort of it 
-					and other plugins being incorporated.)
-				Transitioned import queries to using bindVars to minimize errors that introduced by adding to the
-					code and to better handle the data being imported.  This is also in support of packaging
-					EP4 as a downloadable plugin on the zen cart site.
-				Revised the Product Description table modification process for updates allowing any of the fields
-					or a combination of any of the fields to not be included in the update file, though the
-					base fields necessary would be the products_id (internally identified if not directly
-					provided), and the language_id which is identified off of the languages installed to ZC.
-					This also made improvements to the use of the short product description that was added
-					by chadd.
-				Added ep4_curly_quotes operations to several of the import fields.
-				Updated the sql install to clarify the areas affected by some of the settings.
-				Modified how categories were updated somewhat similar to how products/products Description 
-					were affected; however, it does appear that additional work is necessary with that section
-					unfortunately as absence of the categories_description with the categories_name in place
-					will cause a SQL error because of an extra comma before the WHERE statement. :/
-				Similar process for category metatags was incorporated and has the same issue as categories and needs
-					to incorporate the processing added to product description updating to prevent a SQL error
-					if metatags_description is not included in the import.
-				Corrected an existing issue with short description for products that did not properly account for 
-					a language identifier.
-				Moved additional file for ZC 1.5.x into the main file path instead of being an additional file/folder
-					with which to contend.  Software remains functional on pre-1.5.x with appropriate action taken
-					to install that version's needed file(s).
-				Generated a module file to support the filelayout instead of having it within an additional function
-					file as a function.  This was to support adequate incorporation of notifiers without making
-					the functions file a class of its own and other work arounds.
-4.0.33	02-29-2016		Added a filter to prevent custom field entries from being overwritten on import if
-					the import file doesn't include the field.  If the field is in the import file,
-					but the data for the row is blank, then the data for that field will be cleared.  If
-					the field is not present, then any data that exists for that field will remain 
-					intact whether the admin->configuration->Easy Populate 4->User Defined Fields is
-					populated or blank.
-				Added some "folder" functionality to force the selection of the import file being in the
-					admin directory if catalog was selected and the entered path really points to
-					the admin directory.  This functionality occurs in the configuration window as 
-					well as when accessing EP4 for any operation.
-				Removed the bypassed code in admin/includes/functions/extra_functions that previously
-					was used for export formatting.  This code was incorporated into a module file
-					in 4.0.32.
-				Added notifiers throughout to support extending the code to support other bulk related
-					data.  Specifically targeted bookx.
-				Corrected the use of importing date_available and date_added as this had been affected
-					by use of bindVars without consideration of potential values.
-				Added a .htaccess file that only includes permission for .csv and .txt files based off
-					of the admin/.htaccess file available from ZC 1.5.4.
-				Updated instructions to add some additional considerations.
-				EP4 had been submitted for download, download from ZC is available from:
-					https://www.zen-cart.com/downloads.php?do=file&id=2068
+                                        Also modified version check to support ZC 1.5.4 and above.
+                                        Future versions of ZC may still require this to be revised, but at least
+                                        this program will not need to be updated merely to support a version check.
+                                        Incorporated admin logging of database inserts and updates similar (and beyond)
+                                        those contained in ZC 1.5.4.  Deletions were not incorporated.
+4.0.29   04-03-2015             Added support for products_map modification (Manufacturer's Advertised Price)
+                                        Added MSRP export to areas where previously begun but not fully incorporated.
+                                        Modified import of customid for SBA-detailed-attributes to treat as a string.
+                                        Began incorporating language overrides, specifically with German as the first alternate language.
+                                        Added support for the plugin dual pricing.
+4.0.30   06-27-2015             Added a new way of displaying files on the EP4 screen to show
+                                        more information such as the prefix to the file types that are
+                                        processed.  This is to reduce the questions related to not
+                                        reading the instructions and understanding that certain files
+                                        are processed only by their name prefix.  Everything else is 
+                                        processed as if it was a full update file.  Also addressed a
+                                        warning received in PHP 5.4+ related to testing a variable not
+                                        initialized.  Previously 'if (!$error)' was sufficient, which
+                                        it is if $error has been assigned; however, if not assigned,
+                                        this results in a warning message in the logs folder.  So,
+                                        instead to maintain consistent usage/functionality will check
+                                        if it is set and if it is set to verify that it is not an
+                                        error, and if it never was set then that would need to be 
+                                        known as well.  end result: if (!$error) { has been changed to
+                                        if ((isset($error) && !$error) || !isset($error)) {.
+4.0.31   08-01-2015             Corrected how dates are imported for specials in PHP 5.5 - 5.6 to match
+                                        how ZC has to prevent dates converting from 0001-01-01 to 1970-01-01.
+                                        Added ability to import using products_id.
+                                        Modified method of handling the storage directory.  Previous versions
+                                        if the admin directory was desired had to be entered and
+                                        would be stored in the database.  There is no other default
+                                        ZC function that stores the admin directory in the database.
+                                        This could become a security issue if access to the database
+                                        is somehow inappropriately obtained.
+                                        Modified how some of the queries are handled to ensure
+                                        continued compatibility with ZC.
+                                        Modified the output links to account for files being
+                                        stored in different locations on the server based on
+                                        catalog/admin selections.
+4.0.32  02-08-2016              Updated for PHP 7.0 compatibility.
+                                Corrected use of verifying that constant is in use and needs to be defined.
+                                Completed incorporation of the German Language version of EP4 which allows for
+                                        EP4 to now be translated to other languages.  Assistance always welcome!
+                                Converted from storing web page data via $_GET to $_POST operations.  Retrieval of files
+                                        is still by $_GET when selecting the download link(s) as well as links to generate
+                                        new files to modify unless the dropdowns at the top of the screen are used. This
+                                        also was a change away from using $_REQUEST to $_POST offering stricter
+                                        control of data transport.
+                                Added checks in files that are "required" to validate that the file is being run from within
+                                        ZC by verification of a constant being defined.
+                                Incorporated numerous notifiers to support expandability. (A BookX addon is in development by a 
+                                        third party and will be looked at for easy incorporation to minimize the effort of it 
+                                        and other plugins being incorporated.)
+                                Transitioned import queries to using bindVars to minimize errors that introduced by adding to the
+                                        code and to better handle the data being imported.  This is also in support of packaging
+                                        EP4 as a downloadable plugin on the zen cart site.
+                                Revised the Product Description table modification process for updates allowing any of the fields
+                                        or a combination of any of the fields to not be included in the update file, though the
+                                        base fields necessary would be the products_id (internally identified if not directly
+                                        provided), and the language_id which is identified off of the languages installed to ZC.
+                                        This also made improvements to the use of the short product description that was added
+                                        by chadd.
+                                Added ep4_curly_quotes operations to several of the import fields.
+                                Updated the sql install to clarify the areas affected by some of the settings.
+                                Modified how categories were updated somewhat similar to how products/products Description 
+                                        were affected; however, it does appear that additional work is necessary with that section
+                                        unfortunately as absence of the categories_description with the categories_name in place
+                                        will cause a SQL error because of an extra comma before the WHERE statement. :/
+                                Similar process for category metatags was incorporated and has the same issue as categories and needs
+                                        to incorporate the processing added to product description updating to prevent a SQL error
+                                        if metatags_description is not included in the import.
+                                Corrected an existing issue with short description for products that did not properly account for 
+                                        a language identifier.
+                                Moved additional file for ZC 1.5.x into the main file path instead of being an additional file/folder
+                                        with which to contend.  Software remains functional on pre-1.5.x with appropriate action taken
+                                        to install that version's needed file(s).
+                                Generated a module file to support the filelayout instead of having it within an additional function
+                                        file as a function.  This was to support adequate incorporation of notifiers without making
+                                        the functions file a class of its own and other work arounds.
+4.0.33  02-29-2016              Added a filter to prevent custom field entries from being overwritten on import if
+                                        the import file doesn't include the field.  If the field is in the import file,
+                                        but the data for the row is blank, then the data for that field will be cleared.  If
+                                        the field is not present, then any data that exists for that field will remain 
+                                        intact whether the admin->configuration->Easy Populate 4->User Defined Fields is
+                                        populated or blank.
+                                Added some "folder" functionality to force the selection of the import file being in the
+                                        admin directory if catalog was selected and the entered path really points to
+                                        the admin directory.  This functionality occurs in the configuration window as 
+                                        well as when accessing EP4 for any operation.
+                                Removed the bypassed code in admin/includes/functions/extra_functions that previously
+                                        was used for export formatting.  This code was incorporated into a module file
+                                        in 4.0.32.
+                                Added notifiers throughout to support extending the code to support other bulk related
+                                        data.  Specifically targeted bookx.
+                                Corrected the use of importing date_available and date_added as this had been affected
+                                        by use of bindVars without consideration of potential values.
+                                Added a .htaccess file that only includes permission for .csv and .txt files based off
+                                        of the admin/.htaccess file available from ZC 1.5.4.
+                                Updated instructions to add some additional considerations.
+                                EP4 had been submitted for download, download from ZC is available from:
+                                        https://www.zen-cart.com/downloads.php?do=file&id=2068
 4.0.33a  03/17/2016             Updated version check location to reflect the final submission/accepted download location of:
                                         https://www.zen-cart.com/downloads.php?do=file&id=2069
 4.0.34   03/19/2016             After report of an issue with EP4.0.33 being used on ZC 1.5.5, a change was made to how paths are
                                         generated for admin side related code.
                                 On import of priceqty files, the absence of language designated fields
-                                	now that the products description section has been rewritten
-                                	would cause a sql error on update.  This has been resolved.
+                                        now that the products description section has been rewritten
+                                        would cause a sql error on update.  This has been resolved.
 4.0.34.a 04/02/2016             Apply correction to importing on category information.  An attempt was previously made to centralize
                                         the use of the delimiter between categories.  The technical reason for this not working as
                                         expected was that the multi-byte function that acts on the data required the delimiter to
@@ -471,3 +471,56 @@
                                 - Improved the import of the category meta data to allow the omission of some of the columns.
                                 - Added import recognition of language related fields to use the language code (e.g., en, de, es, etc..) instead of the language id and provide override capability if both are included in the import file.
                                 - Further incorporated data sanitization in the category meta data import file to work like when using manual operation in the admin.
+4.0.37.12                         Add default settings for variables (constants) that may not be defined.
+                                  Reduce code necessary for logic.
+                                  Move the install error notification (need to run install) up in front of the notification that
+                                    the directory needs to be assigned based on user feedback during initial installation.
+                                  Address notifications that occur with increased PHP versions and/or stricter notification.
+                                  Prevent attempt providing a list of files if the directory folder hasn't been defined.
+                                  Update ep4_cron to include the changes above.
+                                  Provide support for utf8mb4 database collation.
+                                  Add notification that an uploaded file was too large.
+                                  Correct issues with category meta imports of data using the language code.
+4.0.37.13                         Move logging of all actions to an admin controlled option by expanding the options of debug logging.
+                                  Simplified the use of mysql_ and mysqli_ commands to up front single use instead of throughout the
+                                    core code.  The functions file was not at this time modified to support this.
+                                  Refactored deep if statements to provide early escape or improved/simplified logic.
+                                  Provide user file evaluation information of newly uploaded file to prevent attempting to import 
+                                    a problematic file.  This was added based on user feedback of attempting to import a file
+                                    that would be prohibited if attempted from the selection list.
+                                  Added additional setting information to the main EP4 screen such as the primary key filter and
+                                    the import filter for language dependent fields.
+                                  Added a dropdown option for exporting product that do not have a manufacturer assigned. This
+                                    is expected to reduce the effort needed to obtain the same information by exporting all
+                                    product and then removing those from the exported list that do not have a manufacturer assigned.
+                                  Corrected a typo associated with exporting Stock By Attributes (SBA) records sorted in ascending
+                                    order.
+                                  Refactored code to reduce code duplication.
+                                  Flushed out the remainder of importing by language code (e.g. en, de, es)
+                                  Expanded the options of selecting the language dependent field to consider only fields of
+                                    the selected type instead of the preference of the selected type.  Enforcement occurs only
+                                    when the selected import language identifier ends with the word 'only', otherwise if a
+                                    field with both the language id and language code is present in the file, the code will
+                                    choose from the one that is present. If the selected language identifier is not present
+                                    but the other one is present, then it will select from what is available. E.g. if set
+                                    to language_code, then a file that has a single version of the field and it has the
+                                    language identifier ending _1, then that field will be used. If both _en and _1 are present
+                                    then _en will be used. If only _en is present, then that will be used.
+                                  Replaced previous sanitization code segments with a single function to handle the processing
+                                    instead of the repeated code necessary to sanitize each item.
+                                  Modified product type designation to assign a value of 1 only if the product type doesn't have
+                                    a product type assigned and it is a new product.  This is expected to support product
+                                    retaining the product type originally assigned and/or assigning a new product type if
+                                    so desired.
+                                  Added display output information for when artist name, category meta, music genre
+                                    or record company name is empty/not being processed.
+                                  Resequenced code for artist name, music genre and record company name to support resizing
+                                    the database field to support import of longer data than what was originally supported.
+                                    Previously this would skip the imported item, make the size change and then require
+                                    the data to be imported again.
+                                  Corrected the use of exiting externally addressed file processing such as record company
+                                    name information by use of return instead of the previous use of continue.  This will
+                                    allow processing to continue beyond the call to such external file where previously
+                                    processing would stop and the next record would be attempted.
+
+                                  
