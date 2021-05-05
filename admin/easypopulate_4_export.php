@@ -770,7 +770,7 @@ while ($row = $ep_4_fetch_array($result)) {
         // loop through the SBA data until one before the end
         // While not at the one before end
         //  get the attribute and quantity data from the SBA table
-        if ($resultSBACounter < $resultSBACount) {
+        if (($resultSBACounter < $resultSBACount) || $resultSBACount == 1 && $resultSBACounter == 1) {
           //  clean the data then
           //  write the row (keep the same base data as previous)
           // Clean the data then write the row of the original data
