@@ -376,14 +376,15 @@ if (!defined('DEFAULT_LANGUAGE')) {
   define('DEFAULT_LANGUAGE', $epdlanguage['code']);
 }
 $epdlanguage_query = ep_4_query("SELECT languages_id, code, name FROM " . TABLE_LANGUAGES . " WHERE code = '" . DEFAULT_LANGUAGE . "'");
-if ($ep_4_num_rows($epdlanguage_query)) {
-  $epdlanguage = $ep_4_fetch_array($epdlanguage_query);
-  $epdlanguage_id = $epdlanguage['languages_id'];
-  $epdlanguage_name = $epdlanguage['name'];
-  $epdlanguage_code = $epdlanguage['code'];
-} else {
-  exit("EP4 FATAL ERROR: No default language set."); // this should never happen
+
+if ($ep_4_num_rows($epdlanguage_query) == 0) {
+  exit("EP4 FATAL ERROR: No default languages set."); // this should never happen
 }
+
+$epdlanguage = $ep_4_fetch_array($epdlanguage_query);
+$epdlanguage_id = $epdlanguage['languages_id'];
+$epdlanguage_name = $epdlanguage['name'];
+$epdlanguage_code = $epdlanguage['code'];
 
 $langcode = ep_4_get_languages(); // array of currently used language codes ( 1, 2, 3, ...)
 
