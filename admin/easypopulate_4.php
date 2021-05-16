@@ -42,6 +42,9 @@ if (!defined('EP4_SHOW_ALL_FILETYPES')) {
   //  assist with installation/operation.  mc12345678 12/30/15
   define('EP4_SHOW_ALL_FILETYPES', 'true');
 }
+if (!defined('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE')) {
+  define('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_id');
+}
 /* Configuration Variables from Admin Interface  */
 $tempdir = defined('EASYPOPULATE_4_CONFIG_TEMP_DIR') ? EASYPOPULATE_4_CONFIG_TEMP_DIR : 'EASYPOPULATE_4_CONFIG_TEMP_DIR'; // This ideally should not actually include the Admin Directory in the variable.
 $ep_date_format = defined('EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT') ? EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT : 'm-d-y';
