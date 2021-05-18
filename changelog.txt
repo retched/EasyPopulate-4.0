@@ -522,5 +522,28 @@
                                     name information by use of return instead of the previous use of continue.  This will
                                     allow processing to continue beyond the call to such external file where previously
                                     processing would stop and the next record would be attempted.
-
-                                  
+4.0.38.ZC                       - Add define to main file to support upgrade without notifications/warnings.
+                                - Disable EP4 debug logging if temporary folder is not defined.
+                                - Minor refactor of main file to remove else portion of if/else statement(s).
+                                - Incorporate new function to support display flush
+                                - Correct SBA export to ensure proper import alignment.
+                                - Refactor Export file to remove duplication.
+                                - Modify process of incorporating/loading a file filter.
+                                - Update ep4_cron to incorporate equivalent core file changes.
+                                - Refactored functions file to address readability and improved logic sequencing.
+                                - Reset default import/export conditions to default to EP4s use of the language_id_only, where
+                                    import files will be expected to have the language_id designator (_1, _2, _3, etc.) unless the setting
+                                    is changed to an option that is not language_id_only.  This is to ensure that along the
+                                    upgrade path that import and export will continue to work as it had in the past. The option
+                                    to do more is present, but depends on the store owner to establish matching settings between import and export.
+                                - Refactored the sba_detailed import filter for readibility and logic.
+                                - Refactored the sba_stock import filter for code alignment and readibility.
+                                - Revised fileset to support ZC 1.5.7+ zc_plugins style install.
+                                - Added variable style functions for mb_ related functions (mb_strlen and mb_split) and to simplify code.
+                                - Added import (and export) of the language dependent manufacturers_url.
+                                - Added a standard function to increase database field length and reduce code duplication.
+                                - Added a standard function for substituting $chosen_key in sql statements.
+                                - Increased information provided in newer messages to assist in debugging by reducing answers needed from users.
+                                - Changed version update processing to load once per session when successfully connected
+                                    and the ability to disable version checking/reporting.
+                                
