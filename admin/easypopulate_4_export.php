@@ -649,6 +649,9 @@ while ($row = $ep_4_fetch_array($result)) {
     unset($sqlAttrib);
     $resultAttribCount = $ep_4_num_rows($resultAttrib);
 
+    if ($ep_4_SBAEnabled == '2') {
+      $row['v_customid'] = '';
+    }
     $row['v_products_attributes'] = '';
     if ($resultAttribCount !== false) {
       while ($rowAttrib = $ep_4_fetch_assoc($resultAttrib)) {
@@ -683,6 +686,7 @@ while ($row = $ep_4_fetch_array($result)) {
 
     if ($resultSBACount !== false && $resultSBACount > 0) {
       //If product is tracked by SBA
+      $row['v_SBA_tracked'] = '';
 
       // Clean the data then write the row of the original data
       $dataRow = '';
@@ -770,7 +774,7 @@ while ($row = $ep_4_fetch_array($result)) {
         // loop through the SBA data until one before the end
         // While not at the one before end
         //  get the attribute and quantity data from the SBA table
-        if (($resultSBACounter < $resultSBACount) || $resultSBACount == 1 && $resultSBACounter == 1) {
+        if (($resultSBACounter < $resultSBACount)) {
           //  clean the data then
           //  write the row (keep the same base data as previous)
           // Clean the data then write the row of the original data
