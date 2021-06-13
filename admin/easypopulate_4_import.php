@@ -10,7 +10,7 @@ if (!defined('EP4_REPLACE_BLANK_IMAGE')) {
 }
 
 if (!defined('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE')) {
-  define('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_code');
+  define('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_id');
 }
 
 if (!defined('EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD')) {
