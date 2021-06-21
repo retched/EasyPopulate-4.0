@@ -28,24 +28,10 @@ if ($record_company_name_str_len === false) {
   return;
 }
 
-if ($record_company_name_str_len > $max_len['record_company_name']) {
-  $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_RECORD_COMPANY_NAME_LONG, $v_record_company_name, $max_len['record_company_name']);
-  if (empty($max_len['record_company_name_found']) || $max_len['record_company_name_found'] < $record_company_name_str_len) {
-    $max_len['record_company_name_found'] = $record_company_name_str_len;
-    if (EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD === 'false') {
+if (ep_4_extend_field($v_record_company_name, $max_len, 'record_company_name', null, array(TABLE_RECORD_COMPANY)) == 'continue') {
       $ep_error_count++;
-      unset($record_company_name_str_len);
       return;
-    }
-    $update_record_company_name_sql = "ALTER TABLE " . TABLE_RECORD_COMPANY . " CHANGE record_company_name record_company_name VARCHAR(" . (int)$record_company_name_str_len . ") NOT NULL DEFAULT '';";
-    $update_record_company_name = $db->Execute($update_record_company_name_sql);
-
-    zen_record_admin_activity('Extended table ' . TABLE_RECORD_COMPANY . ' field record_company_name via EP4 from ' . zen_db_input($max_len['record_company_name']) . ' to ' . zen_db_input($record_company_name_str_len) . '.', 'info');
-
-    $max_len['record_company_name'] = $record_company_name_str_len;
-  }
 }
-unset($record_company_name_str_len);
 $sql = "SELECT record_company_id AS record_companyID FROM " . TABLE_RECORD_COMPANY . " WHERE record_company_name = :record_company_name: LIMIT 1";
 $sql = $db->bindVars($sql, ':record_company_name:', ep_4_curly_quotes($v_record_company_name), $zc_support_ignore_null);
 $result = ep_4_query($sql);

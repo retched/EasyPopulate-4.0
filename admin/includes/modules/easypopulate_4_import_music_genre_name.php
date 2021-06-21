@@ -22,22 +22,11 @@ if ($music_genre_name_str_len === false) {
 }
 
 $v_music_genre_id = 0; // chadd - zencart uses genre_id = '0' for no assisgned artists
-if ($music_genre_name_str_len > $max_len['music_genre_name']) {
-  $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_MUSIC_GENRE_NAME_LONG, $v_music_genre_name, $max_len['music_genre_name']);
-  if (empty($max_len['music_genre_name_found']) || $max_len['music_genre_name_found'] < $music_genre_name_str_len) {
-    $max_len['music_genre_name_found'] = $music_genre_name_str_len;
-    if (EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD === 'false') {
-      $ep_error_count++;
-      unset($music_genre_name_str_len);
-      return;
-    }
-    $update_music_genre_name_sql = "ALTER TABLE " . TABLE_MUSIC_GENRE . " CHANGE music_genre_name music_genre_name VARCHAR(" . (int)$music_genre_name_str_len . ") NOT NULL DEFAULT '';";
-    $update_music_genre_name = $db->Execute($update_music_genre_name_sql);
+unset($music_genre_name_str_len);
 
-    zen_record_admin_activity('Extended table ' . TABLE_MUSIC_GENRE . ' field music_genre_name via EP4 from ' . zen_db_input($max_len['music_genre_name']) . ' to ' . zen_db_input($music_genre_name_str_len) . '.', 'info');
-
-    $max_len['music_genre_name'] = $music_genre_name_str_len;
-  }
+if (ep_4_extend_field($v_music_genre_name, $max_len, 'music_genre_name', null, array(TABLE_MUSIC_GENRE)) == 'continue') {
+  $ep_error_count++;
+  return;
 }
 
 $sql = "SELECT music_genre_id AS music_genreID FROM " . TABLE_MUSIC_GENRE . " WHERE music_genre_name = :music_genre_name: LIMIT 1";

@@ -20,25 +20,10 @@ if ($art_name_str_len === false) {
   return;
 }
 
-if ($art_name_str_len > $max_len['artists_name']) {
-  $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_ARTISTS_NAME_LONG, $v_artists_name, $max_len['artists_name']);
-  if (empty($max_len['artists_name_found']) || $max_len['artists_name_found'] < $art_name_str_len) {
-    $max_len['artists_name_found'] = $art_name_str_len;
-
-    if(EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD === 'false') {
-      $ep_error_count++;
-      unset($art_name_str_len);
-      return;
-    }
-    $update_artists_name_sql = "ALTER TABLE " . TABLE_RECORD_ARTISTS . " CHANGE record_artists_name record_artists_name VARCHAR(" . (int)$art_name_str_len . ") NOT NULL DEFAULT '';";
-    $update_artists_name = $db->Execute($update_artists_name_sql);
-
-    zen_record_admin_activity('Extended table ' . TABLE_RECORD_COMPANY . ' field record_artists_name via EP4 from ' . zen_db_input($max_len['record_artists_name']) . ' to ' . zen_db_input($art_name_str_len) . '.', 'info');
-
-    $max_len['artists_name'] = $art_name_str_len;
-  }
+if (ep_4_extend_field($v_artists_name, $max_len, 'artists_name', null, array(TABLE_RECORD_ARTISTS)) == 'continue') {
+  $ep_error_count++;
+  return;
 }
-unset($art_name_str_len);
 
 $sql = "SELECT artists_id AS artistsID FROM " . TABLE_RECORD_ARTISTS . " WHERE artists_name = :artists_name: LIMIT 1";
 $sql = $db->bindVars($sql, ':artists_name:', $v_artists_name, $zc_support_ignore_null);

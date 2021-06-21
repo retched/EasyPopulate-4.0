@@ -1103,6 +1103,61 @@ function ep4_post_sanitize($post_array) {
   return $return_val;
 }
 
+/**
+ *
+ * Expects $max_len[$field_name . '_found'] to exist as well as $max_len[$field_name]
+ * Expects this language constant to exist: 'EASYPOPULATE_4_DISPLAY_RESULT_' . strtoupper($field_name) . '_LONG'
+ **/
+function ep_4_extend_field($field_data, &$max_len, $field_name, $default_val, $tables = TABLE_PRODUCTS) {
+  global $ep_4_strlen, $chosen_key;
+
+  // check size of field, loop on error
+  $field_len = $ep_4_strlen($field_data);
+  if ($field_len <= $max_len[$field_name]) {
+    // Have previously found the longest allowable length for field.
+    unset($field_len);
+    return false;
+  }
+
+  $display_output .= sprintf(constant('EASYPOPULATE_4_DISPLAY_RESULT_' . strtoupper($field_name) . '_LONG'), ${$chosen_key}, $max_len[$field_name], $chosen_key);
+  
+  if (!empty($max_len[$field_name . '_found']) && $max_len[$field_name . '_found'] >= $field_len) {
+    // Longest length for this field has already been recorded and the longest found is still longer than current.
+    unset($field_len);
+    return false;
+  }
+
+  $max_len[$field_name . '_found'] = $field_len;
+  if (EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD === 'false') {
+    // Fields are not permitted to be extended and provided data won't fit, need to skip trying to enter/alter this data.
+    return 'continue'; // short-circuit on error
+  }
+
+  $prevent_null = ' NOT NULL';
+  if (is_null($default_val)) {
+    $prevent_null = ' ';
+    $default_val = 'null';
+  }
+  
+  if ($default_val === '') {
+    $default_val = "\'\'";
+  }
+  
+  foreach ($tables as $table) {
+    $update_field_name_sql = "ALTER TABLE " . $table . " CHANGE " . $field_name . " " . $field_name . " VARCHAR(" . (int)$field_len . ")" . $prevent_null . " DEFAULT " . $default_val . ";";
+    $update_field_name = $db->Execute($update_field_name_sql);
+    unset($update_field_name_sql);
+
+    zen_record_admin_activity('Extended table ' . $table . ' field ' . zen_db_input($field_name) . ' via EP4 from ' . zen_db_input($max_len[$field_name]) . ' to ' . zen_db_input((int)$field_len) . '.', 'info');
+  }
+
+  $max_len[$field_name] = $field_len;
+
+  unset($update_field_name);
+  unset($field_len);
+
+  return true;
+}
 function ep4_flush()
 {
   print(str_repeat(" ", 300));
