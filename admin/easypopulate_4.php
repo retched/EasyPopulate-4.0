@@ -77,6 +77,10 @@ if (!$ep_uses_mysqli) {
   $ep_4_error = 'mysql_error';
 }
 
+$ep_4_strlen = function_exists('mb_strlen') ? 'mb_strlen' : 'strlen';
+$ep_4_split = function_exists('mb_split') ? 'mb_split' : 'explode';
+$ep_4_split_conv = function_exists('mb_split') ? 'preg_quote' : '';
+
 @set_time_limit($ep_execution);  // executin limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
 
 if (!isset($error) || !$error) {

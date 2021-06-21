@@ -20,7 +20,7 @@ if (isset($v_record_company_name) && ($v_record_company_name != '')) {
 
 
 }
-$record_company_name_str_len = isset($v_record_company_name) && ($v_record_company_name != '') ? (function_exists('mb_strlen') ? mb_strlen($v_record_company_name) : strlen($v_record_company_name)) : false;
+$record_company_name_str_len = isset($v_record_company_name) && ($v_record_company_name != '') ? $ep_4_strlen($v_record_company_name) : false;
 $v_record_company_id = 0; // chadd - zencart uses artists_id = '0' for no assisgned artists
 
 if ($record_company_name_str_len === false) {

@@ -12,7 +12,7 @@ if (isset($v_music_genre_name) && ($v_music_genre_name != '')) {
 
 }
 
-$music_genre_name_str_len = isset($v_music_genre_name) && ($v_music_genre_name != '') ? (function_exists('mb_strlen') ? mb_strlen($v_music_genre_name) : strlen($v_music_genre_name)) : false;
+$music_genre_name_str_len = isset($v_music_genre_name) && ($v_music_genre_name != '') ? $ep_4_strlen($v_music_genre_name) : false;
 
 if ($music_genre_name_str_len === false) {
   $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_MUSIC_GENRE_NAME_EMPTY, $items[$filelayout[$chosen_key]], $chosen_key);

@@ -119,6 +119,10 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(
     $ep_4_error = 'mysql_error';
   }
 
+  $ep_4_strlen = function_exists('mb_strlen') ? 'mb_strlen' : 'strlen';
+  $ep_4_split = function_exists('mb_split') ? 'mb_split' : 'explode';
+  $ep_4_split_conv = function_exists('mb_split') ? 'preg_quote' : '';
+
   if (!isset($error) || !$error) {
     $upload_max_filesize = ini_get("upload_max_filesize");
     if (preg_match("/([0-9]+)K/i", $upload_max_filesize, $tempregs)) {

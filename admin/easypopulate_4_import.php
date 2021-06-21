@@ -768,7 +768,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
 
         // BEGIN: Manufacturer's Name
         // convert the manufacturer's name into id's for the database
-        $manf_str_len = (isset($v_manufacturers_name) && ($v_manufacturers_name != '')) ? ((function_exists('mb_strlen')) ? mb_strlen($v_manufacturers_name) : strlen($v_manufacturers_name)) : false;
+        $manf_str_len = (isset($v_manufacturers_name) && ($v_manufacturers_name != '')) ? ($ep_4_strlen($v_manufacturers_name)) : false;
         if ($manf_str_len !== false && ($manf_str_len <= $max_len['manufacturers_name'])) {
           $sql = "SELECT man.manufacturers_id AS manID FROM " . TABLE_MANUFACTURERS . " AS man WHERE man.manufacturers_name = :manufacturers_name: LIMIT 1";
           $sql = $db->bindVars($sql, ':manufacturers_name:', $v_manufacturers_name, $zc_support_ignore_null);
@@ -864,15 +864,12 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
           $v_categories_name_check = array();
 
           foreach ($langcode as $lang) {
-            if (!function_exists('mb_split')) {
-            // iso-8859-1
-              $categories_names_array['id'][$lang['id']] = isset($filelayout['v_categories_name_' . $lang['id']]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' ? explode($categories_delimiter,$items[$filelayout['v_categories_name_'.$lang['id']]]) : array();
-              $categories_names_array['code'][$lang['code']] = isset($filelayout['v_categories_name_' . $lang['code']]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only' ? explode($categories_delimiter,$items[$filelayout['v_categories_name_'.$lang['code']]]) : array();
-            } else {
-            // utf-8
-              $categories_names_array['id'][$lang['id']] = isset($filelayout['v_categories_name_' . $lang['id']]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' ? mb_split(preg_quote($categories_delimiter), $items[$filelayout['v_categories_name_' . $lang['id']]]) : array();
-              $categories_names_array['code'][$lang['code']] = isset($filelayout['v_categories_name_' . $lang['code']]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only' ? mb_split(preg_quote($categories_delimiter), $items[$filelayout['v_categories_name_' . $lang['code']]]) : array();
+            if (!empty($ep_4_split_conv)) {
+              $categories_delimiter = $ep_4_split_conv($categories_delimiter);
             }
+
+            $categories_names_array['id'][$lang['id']] = isset($filelayout['v_categories_name_' . $lang['id']]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' ? $ep_4_split($categories_delimiter,$items[$filelayout['v_categories_name_'.$lang['id']]]) : array();
+            $categories_names_array['code'][$lang['code']] = isset($filelayout['v_categories_name_' . $lang['code']]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only' ? $ep_4_split($categories_delimiter,$items[$filelayout['v_categories_name_'.$lang['code']]]) : array();
 
             if (isset($filelayout['v_categories_name_' . $lang['id']]) && !isset($filelayout['v_categories_name_' . $lang['code']]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only') {
               $categories_names_array['code'][$lang['code']] = $categories_names_array['id'][$lang['id']];

@@ -14,7 +14,7 @@ if (isset($v_artists_name) && ($v_artists_name != '')) {
   extract($data_array, EXTR_OVERWRITE);
 }
 $v_artists_id = 0; // chadd - zencart uses artists_id = '0' for no assisgned artists
-$art_name_str_len = isset($v_artists_name) && ($v_artists_name != '') ? (function_exists('mb_strlen') ? mb_strlen($v_artists_name) : strlen($v_artists_name)) : false;
+$art_name_str_len = isset($v_artists_name) && ($v_artists_name != '') ? $ep_4_strlen($v_artists_name) : false;
 if ($art_name_str_len === false) {
   $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_ARTISTS_NAME_EMPTY, $items[$filelayout[$chosen_key]], $chosen_key);
   return;
