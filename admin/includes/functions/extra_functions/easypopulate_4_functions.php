@@ -1158,6 +1158,23 @@ function ep_4_extend_field($field_data, &$max_len, $field_name, $default_val, $t
 
   return true;
 }
+
+function ep_4_chosen_key_sub($sql, $value) {
+  global $db, $chosen_key, $zc_support_ignore_null;
+
+  if (in_array($chosen_key, array('v_products_id', 'v_products_model'))) {
+    return $sql;
+  }
+  
+  $chosen_key_sub = $chosen_key;
+  if (strpos($chosen_key_sub, 'v_') === 0) {
+    $chosen_key_sub = substr($chosen_key_sub, 2);
+  }
+  $sql = $db->bindVars($sql, ':' . $chosen_key_sub . ':', $value, $zc_support_ignore_null);
+
+  return $sql;
+}
+
 function ep4_flush()
 {
   print(str_repeat(" ", 300));

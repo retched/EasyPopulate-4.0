@@ -315,14 +315,8 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
         if (ep4_field_in_file('v_products_id')) {
           $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_products_id']], 'integer');
         }
-        if (ep4_field_in_file($chosen_key) && !in_array($chosen_key, array('v_products_id', 'v_products_model'))){
-          if (!in_array($chosen_key, array('v_products_id', 'v_products_model'))) {
-            $chosen_key_sub = $chosen_key;
-            if (strpos($chosen_key_sub, 'v_') === 0) {
-              $chosen_key_sub = substr($chosen_key_sub, 2);
-            }
-            $sql = $db->bindVars($sql, ':' . $chosen_key_sub . ':', $items[$filelayout[$chosen_key]], $zc_support_ignore_null);
-          }
+        if (ep4_field_in_file($chosen_key)){
+          $sql = ep_4_chosen_key_sub($sql, $items[$filelayout[$chosen_key]]);
         }
         $result = ep_4_query($sql);
         unset($sql);
@@ -1138,13 +1132,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
 
           $sql = $db->bindVars($sql, ':products_model:', (!empty($v_products_model) ? $v_products_model : ''), $zc_support_ignore_null);
           $sql = $db->bindVars($sql, ':products_id:', (!empty($v_products_id) ? $v_products_id : 0), 'integer');
-          if (!in_array($chosen_key, array('v_products_id', 'v_products_model'))) {
-            $chosen_key_sub = $chosen_key;
-            if (strpos($chosen_key_sub, 'v_') === 0) {
-              $chosen_key_sub = substr($chosen_key_sub, 2);
-            }
-            $sql = $db->bindVars($sql, ':' . $chosen_key_sub . ':', (!empty(${$chosen_key}) ? ${$chosen_key} : ''), $zc_support_ignore_null);
-          }
+          $sql = ep_4_chosen_key_sub($sql, (!empty(${$chosen_key}) ? ${$chosen_key} : ''));
           $result = ep_4_query($sql);
 
           unset($sql);
@@ -1555,13 +1543,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
 
                 $sql = $db->bindVars($sql, ':products_model:', $v_products_model, $zc_support_ignore_null);
                 $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
-                if (!in_array($chosen_key, array('v_products_id', 'v_products_model'))) {
-                  $chosen_key_sub = $chosen_key;
-                  if (strpos($chosen_key_sub, 'v_') === 0) {
-                    $chosen_key_sub = substr($chosen_key_sub, 2);
-                  }
-                  $sql = $db->bindVars($sql, ':' . $chosen_key_sub . ':', (!empty(${$chosen_key}) ? ${$chosen_key} : ''), $zc_support_ignore_null);
-                }
+                $sql = ep_4_chosen_key_sub($sql, (!empty(${$chosen_key}) ? ${$chosen_key} : ''));
                 $result = ep_4_query($sql);
                 unset($sql);
                 if ($ep_4_num_rows($result) != 0) { // found entry
@@ -1608,14 +1590,9 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
 
                 $sql = $db->bindVars($sql, ':products_model:', $v_products_model, $zc_support_ignore_null);
                 $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
-                if (!in_array($chosen_key, array('v_products_id', 'v_products_model'))) {
-                  $chosen_key_sub = $chosen_key;
-                  if (strpos($chosen_key_sub, 'v_') === 0) {
-                    $chosen_key_sub = substr($chosen_key_sub, 2);
-                  }
-                  $sql = $db->bindVars($sql, ':' . $chosen_key_sub . ':', (!empty(${$chosen_key}) ? ${$chosen_key} : ''), $zc_support_ignore_null);
-                }
+                $sql = ep_4_chosen_key_sub($sql, (!empty(${$chosen_key}) ? ${$chosen_key} : ''));
                 $result = ep_4_query($sql);
+                unset($sql);
                 if ($ep_4_num_rows($result) != 0) { // found entry
                   $row3 = $ep_4_fetch_array($result);
                   $v_products_id = $row3['products_id'];
