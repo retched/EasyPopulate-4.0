@@ -47,7 +47,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
 
   $zco_notifier->notify('EP4_IMPORT_START');
 
-  require(DIR_FS_ADMIN . DIR_WS_MODULES . 'easypopulate_4_default_these.php');
+  require(DIR_WS_MODULES . 'easypopulate_4_default_these.php');
 
   /*if (count($custom_fields) > 0) {
     foreach ($custom_fields as $field) {

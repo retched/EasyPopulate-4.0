@@ -109,7 +109,7 @@ if ($ep_dltype == 'SBAStockProdFilter') {
 
 $filelayout = array();
 $filelayout_sql = '';
-require(DIR_FS_ADMIN . DIR_WS_MODULES . 'easypopulate_4_filelayout.php');
+require(DIR_WS_MODULES . 'easypopulate_4_filelayout.php');
 //$filelayout = ep_4_set_filelayout($ep_dltype, $filelayout_sql, $sql_filter, $langcode, $ep_supported_mods, $custom_fields);
 
 if (($ep_dltype == 'full' || $ep_dltype == 'categorymeta') && EASYPOPULATE_4_CONFIG_EXPORT_URI != '0') {

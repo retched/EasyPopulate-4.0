@@ -63,7 +63,7 @@ $_SERVER['HTTP_USER_AGENT'] = 'Zen Cart update';
 // echo 'PHP_SAPI = ' . PHP_SAPI . "\n";
 
 // Report inability to execute and exit operation with appropriate response.
-if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(FILENAME_EASYPOPULATE_4, '.php') ? FILENAME_EASYPOPULATE_4 . '.php' : FILENAME_EASYPOPULATE_4)))) {
+if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists((!strstr(FILENAME_EASYPOPULATE_4, '.php') ? FILENAME_EASYPOPULATE_4 . '.php' : FILENAME_EASYPOPULATE_4)))) {
   echo "Error: File not found: " . (!strstr(FILENAME_EASYPOPULATE_4, '.php') ? FILENAME_EASYPOPULATE_4 . '.php' : FILENAME_EASYPOPULATE_4) . ".\nMake sure you have placed the ep4_cron.php file in your (renamed) Admin folder and that Easy Populate V4 is properly installed.\n\n";
   exit(1);
 }
@@ -140,11 +140,11 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(
   //$ep_debug_logging_all = false;
 
   // Try to load early enough to not cause notices about missing values.
-  if(isset($_SESSION['language']) && file_exists(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4.php'))
+  if(isset($_SESSION['language']) && file_exists(DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4.php'))
   {
-      require DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4.php';
+      require DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4.php';
   } else {
-      require DIR_FS_ADMIN . DIR_WS_LANGUAGES . 'english' . '/easypopulate_4.php';
+      require DIR_WS_LANGUAGES . 'english' . '/easypopulate_4.php';
   }
 
   $curver_detail = '4.0.38.ZC';
@@ -362,7 +362,7 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(
   }
   $langcode = ep_4_get_languages(); // array of currently used language codes ( 1, 2, 3, ...)
 
-  require DIR_FS_ADMIN . 'easypopulate_4_import.php';
+  require 'easypopulate_4_import.php';
  // zen_update_currencies(IS_CLI == 'VERBOSE');
   if (IS_CLI == 'VERBOSE') echo 'Done.' . "\n\n";
   exit(0); // returns 0 status code, which means successful

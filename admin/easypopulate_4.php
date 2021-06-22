@@ -3,6 +3,10 @@
 
 // START INITIALIZATION
 require_once ('includes/application_top.php');
+if (!function_exists('ep_4_curly_quotes')) {
+  require_once DIR_WS_FUNCTIONS . 'extra_functions/easypopulate_4_functions.php';
+}
+
 // CSV VARIABLES - need to make this configurable in the ADMIN
 // $csv_delimiter = "\t"; // "\t" = tab AND "," = COMMA
 $csv_delimiter = ","; // "\t" = tab AND "," = COMMA
@@ -125,11 +129,11 @@ $has_specials = false;
 $zco_notifier->notify('EP4_START');
 
 // Load language file(s) for main screen menu(s).
-if(file_exists(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_menus.php'))
+if(file_exists(DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_menus.php'))
 {
-  require(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_menus.php');
+  require(DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_menus.php');
 } else {
-  require(DIR_FS_ADMIN . DIR_WS_LANGUAGES . 'english' . '/easypopulate_4_menus.php');
+  require(DIR_WS_LANGUAGES . 'english' . '/easypopulate_4_menus.php');
 }
 
 // all mods go in this array as 'name' => 'true' if exist. eg $ep_supported_mods['psd'] => true means it exists.
