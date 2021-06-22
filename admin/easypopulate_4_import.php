@@ -713,11 +713,28 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
             // This is not a complete fix, since we are not importing manufacturers_url
             foreach ($langcode as $lang) {
               $l_id = $lang['id'];
+              $l_id_code = $lang['code'];
+
+              $post_array = array(
+                'manufacturers_url' => array(
+                  'lang' => array(
+                    'lid' => array($l_id => array('v_manufacturers_url_' . $l_id => ep4_field_in_file('v_manufacturers_url_' . $l_id) ? $items[$filelayout['v_manufacturers_url_' . $l_id]] : ''),),
+                    'code' => array($l_id_code => array('v_manufacturers_url_' . $l_id_code => ep4_field_in_file('v_manufacturers_url_' . $l_id_code) ? $items[$filelayout['v_manufacturers_url_' . $l_id_code]] : ''),),
+                    'var' => array('v_manufacturers_url' => $v_manufacturers_url), //compact('v_manufacturers_url'),
+                  ),
+                ),
+              );
+
+              $data_array = ep4_post_sanitize($post_array);
+
+              extract($data_array, EXTR_OVERWRITE);
+              $v_manufacturers_url_store = isset($v_manufacturers_url[$l_id]) ? $v_manufacturers_url[$l_id] : '';
+
               $sql = "INSERT INTO " . TABLE_MANUFACTURERS_INFO . " (manufacturers_id, languages_id, manufacturers_url)
                 VALUES (:manufacturers_id:, :languages_id:, :manufacturers_url:)"; // seems we are skipping manufacturers url
               $sql = $db->bindVars($sql, ':manufacturers_id:', $v_manufacturers_id, 'integer');
               $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
-              $sql = $db->bindVars($sql, ':manufacturers_url:', '', $zc_support_ignore_null);
+              $sql = $db->bindVars($sql, ':manufacturers_url:', $v_manufacturers_url_store, $zc_support_ignore_null);
               $result = ep_4_query($sql);
               unset($sql);
               if ($result) {

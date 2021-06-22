@@ -191,6 +191,16 @@ if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CO
     $filelayout[] = 'v_date_added'; // should be changed to v_products_date_added for clarity
     $filelayout[] = 'v_products_quantity';
     $filelayout[] = 'v_manufacturers_name';
+    foreach ($langcode as $key => $lang) { // create categories variables for each language id
+      $l_id = $lang['id'];
+      $l_id_code = $lang['code'];
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT !== 'code') {
+        $filelayout[] = 'v_manufacturers_url_'.$l_id;
+      }
+      if (EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'code' || EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT === 'all') {
+        $filelayout[] = 'v_manufacturers_url_'.$l_id_code;
+      }
+    }
     // NEW code for 'unlimited' category depth - 1 Category Column for each installed Language
     foreach ($langcode as $key => $lang) { // create categories variables for each language id
       $l_id = $lang['id'];
@@ -340,7 +350,10 @@ if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CO
       FROM '
       .TABLE_CATEGORIES.' as subc, '
       .TABLE_PRODUCTS_TO_CATEGORIES.' as ptoc, '
-      .TABLE_PRODUCTS.' as p ';
+      .TABLE_PRODUCTS.' as p '
+      .' LEFT JOIN '
+      .TABLE_MANUFACTURERS_INFO.' as mi ON (mi.manufacturers_id = p.manufacturers_id) ';
+      
       $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE');
 
       $filelayout_sql .= ' WHERE

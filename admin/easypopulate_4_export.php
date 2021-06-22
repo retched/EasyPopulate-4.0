@@ -915,6 +915,23 @@ while ($row = $ep_4_fetch_array($result)) {
       unset($result2);
       $row['v_manufacturers_name'] = $row2['manufacturers_name'];
       unset($row2);
+      foreach ($langcode as $key => $lang) {
+        $lid = $lang['id'];
+        $lid_code = $lang['code'];
+        $sql_manufacturers_info = 'SELECT * FROM ' . TABLE_MANUFACTURERS_INFO . ' WHERE manufacturers_id = :manufacturers_id: AND languages_id = :languages_id: LIMIT 1';
+        $sql_manufacturers_info = $db->bindVars($sql_manufacturers_info, ':manufacturers_id:', $row['v_manufacturers_id'], 'integer');
+        $sql_manufacturers_info = $db->bindVars($sql_manufacturers_info, ':languages_id:', $lid, 'integer');
+        $result_manufacturers_info = ep_4_query($sql_manufacturers_info);
+        unset($sql_manufacturers_info);
+        $row_manufacturers_info = $ep_4_fetch_array($result_manufacturers_info);
+        unset($result_manufacturers_info);
+        $row['v_manufacturers_url_' . $lid_code] = $row['v_manufacturers_url_' . $lid] = $row_manufacturers_info['manufacturers_url'];
+        unset($row_manufacturers_info);
+      }
+      unset($key);
+      unset($lang);
+      unset($lid);
+      unset($lid_code);
     }
   } //End if isset v_manufacturers_name
 
