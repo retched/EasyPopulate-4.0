@@ -71,7 +71,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
       if (count($csv_delimiter) == 1) {
         $csv_delimiter = $csv_delimiter[0];
       } else {
-        $messageStack->add(EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES, 'warning');
+        $messageStack->add(sprintf(EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES, $file_location), 'warning');
         $ep_error_count++;
         $no_bypass = true;
       }
@@ -216,7 +216,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
       $missing_key = false;
       if (!isset($filelayout[$chosen_key])) {
         $missing_key = true;
-        $messageStack->add('Missing primary key from file', 'warning');
+        $messageStack->add(sprintf(EASYPOPULATE_4_DISPLAY_IMPORT_CSV_MISSING_PRIMARY_KEY, $chosen_key, $file_location), 'warning');
         $ep_error_count++;
       }
 
@@ -234,6 +234,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
         unset($thisvar);
 
         if (!(defined('EP4_DB_FILTER_KEY') && EP4_DB_FILTER_KEY === 'blank_new') && !zen_not_null($items[$filelayout[$chosen_key]])) { // products_model exists!
+          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_IMPORT_CSV_ROW_MISSING_PRIMARY_KEY, $chosen_key, $file_location);
           continue;
         }
 
@@ -441,7 +442,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
             unset($lang);
             if (!$categories_name_exists) {
               // let's skip this new product without a master category..
-              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NOT_FOUND, $items[$filelayout[$chosen_key]], ' new', $chosen_key);
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NOT_FOUND, $items[$filelayout[$chosen_key]], ' new', $chosen_key, EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE);
               $ep_error_count++;
               continue; // error, loop to next record
             }

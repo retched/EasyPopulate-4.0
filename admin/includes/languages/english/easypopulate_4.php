@@ -13,7 +13,7 @@ define('EASYPOPULATE_4_DISPLAY_LOCAL_FILE_SPEC','<p class=smallText><b>Filename:
 // upload results display - output via $display_output
 define('EASYPOPULATE_4_DISPLAY_RESULT_DELETED','<br /><font color="fuchsia"><b>DELETED! - %2$s:</b> %1$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_DELETE_NOT_FOUND','<br /><font color="darkviolet"><b>NOT FOUND! - %2$s:</b> %1$s - cant delete...</font>');
-define('EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NOT_FOUND', '<br /><font color="red"><b>SKIPPED! - %3$s:</b> %1$s - No category provided for this%2$s product</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NOT_FOUND', '<br /><font color="red"><b>SKIPPED! - %3$s:</b> %1$s - No category provided for this%2$s product importing with: %4$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_ID_NOT_FOUND', '<br /><font color="red"><b>SKIPPED! - Category ID: </b>%1$s - Not Found!</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_CATEGORIES_NAME_LONG','<br /><font color="red"><b>SKIPPED! - %4$s:</b> %1$s - Category name: "%2$s" exceeds max. length: %3$s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NAME_LONG','<br /><font color="red"><b>SKIPPED! - %4$s:</b> %1$s - Category name: "%2$s" exceeds max. length: %3$s</font>');
@@ -152,8 +152,10 @@ define('EASYPOPULATE_4_DD_FILTER_EXPORT', 'Export');
 define('EASYPOPULATE_4_ORDERS_DROPDOWN_EXPORT', 'Export');
 
 define('EASYPOPULATE_4_DELIMITER_UNKNOWN', 'Unknown Delimiter');
-define('EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES', 'Issues with the CSV file delimiter(s)');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES', 'Issues with the CSV file delimiter(s): %1$s');
 define('EASYPOPULATE_4_DISPLAY_IMPORT_CSV_DELIMITER_ISSUES_NO_CSV', 'File is not a CSV file and there are issues with the delimiter(s)');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_CSV_MISSING_PRIMARY_KEY', 'Missing primary key (%1$s) from file: %2$s');
+define('EASYPOPULATE_4_DISPLAY_IMPORT_CSV_ROW_MISSING_PRIMARY_KEY', 'Missing primary key (%1$s) from row of file: %2$s<br>');
 
 define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_SPLIT', 'Split');
 define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT_SYNC', 'Import w/Sync');
