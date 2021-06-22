@@ -732,6 +732,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
               $sql = $db->bindVars($sql, ':manufacturers_url:', $v_manufacturers_url_store, $zc_support_ignore_null);
               $result = ep_4_query($sql);
               unset($sql);
+              unset($v_manufacturers_url_store);
               if ($result) {
                 zen_record_admin_activity('Inserted manufacturers info ' . (int) $v_manufacturers_id . ' via EP4.', 'info');
               }
