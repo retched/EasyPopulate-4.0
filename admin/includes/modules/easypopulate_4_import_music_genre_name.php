@@ -34,17 +34,18 @@ $sql = $db->bindVars($sql, ':music_genre_name:', $v_music_genre_name, $zc_suppor
 $result = ep_4_query($sql);
 if ($row = $ep_4_fetch_array($result)) {
   $v_music_genre_id = $row['music_genreID']; // this id goes into the product_music_extra table
-} else { // It is set to autoincrement, do not need to fetch max id
-  $sql = "INSERT INTO " . TABLE_MUSIC_GENRE . " (music_genre_name, date_added)
-    VALUES (:music_genre_name:, CURRENT_TIMESTAMP)";
-  $sql = $db->bindVars($sql, ':music_genre_name:', $v_music_genre_name, $zc_support_ignore_null);
-  $result = ep_4_query($sql);
+  return;
+}
+// It is set to autoincrement, do not need to fetch max id
+$sql = "INSERT INTO " . TABLE_MUSIC_GENRE . " (music_genre_name, date_added)
+  VALUES (:music_genre_name:, CURRENT_TIMESTAMP)";
+$sql = $db->bindVars($sql, ':music_genre_name:', $v_music_genre_name, $zc_support_ignore_null);
+$result = ep_4_query($sql);
+unset($sql);
 
-  $v_music_genre_id = $ep_4_insert_id(($ep_uses_mysqli ? $db->link : null)); // id is auto_increment
+$v_music_genre_id = $ep_4_insert_id(($ep_uses_mysqli ? $db->link : null)); // id is auto_increment
 
-  if ($result) {
-    zen_record_admin_activity('Inserted music genre ' . zen_db_input($v_music_genre_name) . ' via EP4.', 'info');
-  }
+if ($result) {
+  zen_record_admin_activity('Inserted music genre ' . zen_db_input($v_music_genre_name) . ' via EP4.', 'info');
 }
 
-unset($music_genre_name_str_len);
