@@ -94,6 +94,7 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(
   $ep_raw_time = defined('EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME') ? EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME : '09:00:00';
   $ep_debug_logging = ($tempdir !== 'EASYPOPULATE_4_CONFIG_TEMP_DIR' && (!defined('EASYPOPULATE_4_CONFIG_DEBUG_LOGGING') || EASYPOPULATE_4_CONFIG_DEBUG_LOGGING !== 'false') ? true : false);
   $ep_debug_logging_all = ($tempdir !== 'EASYPOPULATE_4_CONFIG_TEMP_DIR' && (!defined('EASYPOPULATE_4_CONFIG_DEBUG_LOGGING') || EASYPOPULATE_4_CONFIG_DEBUG_LOGGING === 'all') ? true : false);
+
   $ep_split_records = defined('EASYPOPULATE_4_CONFIG_SPLIT_RECORDS') ? (int) EASYPOPULATE_4_CONFIG_SPLIT_RECORDS : 2000;
   $price_with_tax = ((defined('EASYPOPULATE_4_CONFIG_PRICE_INC_TAX') && EASYPOPULATE_4_CONFIG_PRICE_INC_TAX === 'true') ? 1 : 0);
   $strip_smart_tags = ((!defined('EASYPOPULATE_4_CONFIG_SMART_TAGS') || EASYPOPULATE_4_CONFIG_SMART_TAGS == 'true') ? true : false);
@@ -146,7 +147,7 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists(DIR_FS_ADMIN . (!strstr(
       require DIR_FS_ADMIN . DIR_WS_LANGUAGES . 'english' . '/easypopulate_4.php';
   }
 
-  $curver_detail = '4.0.37.6';
+  $curver_detail = '4.0.38.ZC';
   if (file_exists(DIR_WS_MODULES . 'easypopulate_4_version.php')) {
     require DIR_WS_MODULES . 'easypopulate_4_version.php';
   }
