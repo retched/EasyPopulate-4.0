@@ -99,7 +99,8 @@ if (class_exists('AdminRequestSanitizer')) {
   $sanitizer->addComplexSanitization($group);
 } else {
 
-  if ($_SERVER['SCRIPT_NAME'] != DIR_WS_ADMIN . (!strstr(FILENAME_LOGIN, '.php') ? FILENAME_LOGIN . '.php' : FILENAME_LOGIN)) {
+  if (((isset($_SERVER['HTTP_HOST']) || PHP_SAPI != 'cli') && isset($_SERVER["REMOTE_ADDR"]) && ($_SERVER["REMOTE_ADDR"] != $_SERVER["SERVER_ADDR"]))
+      && isset($_SERVER['SCRIPT_NAME']) && ($_SERVER['SCRIPT_NAME'] != DIR_WS_ADMIN . (!strstr(FILENAME_LOGIN, '.php') ? FILENAME_LOGIN . '.php' : FILENAME_LOGIN))) {
     $message = 'WARNING: This site is not fully protected from the items identified in the Trustwave Report discussed at <a href="https://www.zen-cart.com/showthread.php?219732-Trustwave-Security-report-Patch-Included-TWSL2016-006" target="_blank">this Zen-Cart site forum thread</a> ';
     $errors = array('params' => 'class="messageStackAlert alert alert-warning noprint" role="alert"', 'text' => '<i class="fa fa-2x fa-hand-stop-o"></i> ' . $message);
 
