@@ -330,14 +330,13 @@ while ($row = $ep_4_fetch_array($result)) {
         $result2 = ep_4_query($sql2);
         unset($sql2);
         $row2 = $ep_4_fetch_array($result2);
+        $row['v_products_attributes_filename'] = '';
+        $row['v_products_attributes_maxdays'] = '';
+        $row['v_products_attributes_maxcount'] = '';
         if ($ep_4_num_rows($result2)) {
           $row['v_products_attributes_filename'] = $row2['products_attributes_filename'];
           $row['v_products_attributes_maxdays'] = $row2['products_attributes_maxdays'];
           $row['v_products_attributes_maxcount'] = $row2['products_attributes_maxcount'];
-        } else {
-          $row['v_products_attributes_filename'] = '';
-          $row['v_products_attributes_maxdays'] = '';
-          $row['v_products_attributes_maxcount'] = '';
         }
         unset($row2);
       } // end isset($filelayout['v_products_attributes_filename'])
@@ -347,15 +346,14 @@ while ($row = $ep_4_fetch_array($result)) {
         $sql2 = $db->bindVars($sql2, ':products_attributes_id:', $row['v_products_attributes_id'], 'integer');
         $result2 = ep_4_query($sql2);
         unset($sql2);
+        $row['v_products_attributes_filename'] = '';
+        $row['v_products_attributes_maxdays'] = '';
+        $row['v_products_attributes_maxcount'] = '';
         $row2 = $ep_4_fetch_array($result2);
         if ($ep_4_num_rows($result2)) {
           $row['v_products_attributes_filename'] = $row2['products_attributes_filename'];
           $row['v_products_attributes_maxdays'] = $row2['products_attributes_maxdays'];
           $row['v_products_attributes_maxcount'] = $row2['products_attributes_maxcount'];
-        } else {
-          $row['v_products_attributes_filename'] = '';
-          $row['v_products_attributes_maxdays'] = '';
-          $row['v_products_attributes_maxcount'] = '';
         }
         unset($row2);
       } // end isset($filelayout['v_products_attributes_filename'])
@@ -417,15 +415,14 @@ while ($row = $ep_4_fetch_array($result)) {
             TABLE_SPECIALS . ' WHERE products_id = :products_id:';
     $specials_query = $db->bindVars($specials_query, ':products_id:', $row['v_products_id'], 'integer');
     $specials_query = ep_4_query($specials_query);
+    $row['v_specials_price'] = '';
+    $row['v_specials_date_avail'] = '';
+    $row['v_specials_expires_date'] = '';
     if ($ep_4_num_rows($specials_query)) {  // special
       $ep_specials = $ep_4_fetch_array($specials_query);
       $row['v_specials_price'] = $ep_specials['specials_new_products_price'];
       $row['v_specials_date_avail'] = $ep_specials['specials_date_available'];
       $row['v_specials_expires_date'] = $ep_specials['expires_date'];
-    } else { // no special
-      $row['v_specials_price'] = '';
-      $row['v_specials_date_avail'] = '';
-      $row['v_specials_expires_date'] = '';
     }
   } // END: Specials
 
@@ -829,6 +826,13 @@ while ($row = $ep_4_fetch_array($result)) {
     $result_music_extra = ep_4_query($sql_music_extra);
     $row_music_extra = $ep_4_fetch_array($result_music_extra);
     // artist
+    $row['v_artists_name'] = ''; // no artists name
+    $row['v_artists_image'] = '';
+    foreach ($langcode as $key => $lang) {
+      $lid = $lang['id'];
+      $lid_code = $lang['code'];
+      $row['v_artists_url_' . $lid_code] = $row['v_artists_url_' . $lid] = '';
+    }
     if (!empty($row_music_extra['artists_id'])) { // '0' is correct, but '' NULL is possible
       $sql_record_artists = 'SELECT * FROM ' . TABLE_RECORD_ARTISTS . ' WHERE artists_id = :artists_id: LIMIT 1';
       $sql_record_artists = $db->bindVars($sql_record_artists, ':artists_id:', $row_music_extra['artists_id'], 'integer');
@@ -846,22 +850,14 @@ while ($row = $ep_4_fetch_array($result)) {
         $row_record_artists_info = $ep_4_fetch_array($result_record_artists_info);
         $row['v_artists_url_' . $lid_code] = $row['v_artists_url_' . $lid] = $row_record_artists_info['artists_url'];
       }
-
-    } else {
-      $row['v_artists_name'] = ''; // no artists name
-      $row['v_artists_image'] = '';
-      foreach ($langcode as $key => $lang) {
-        $lid = $lang['id'];
-        $lid_code = $lang['code'];
-        $row['v_artists_url_' . $lid_code] = $row['v_artists_url_' . $lid] = '';
-      }
-
     }
     unset($key);
     unset($lang);
     unset($lid);
     unset($lid_code);
     // record company
+    $row['v_record_company_name'] = '';
+    $row['v_record_company_image'] = '';
     if (!empty($row_music_extra['record_company_id'])) { // '0' is correct, but '' NULL is possible
       $sql_record_company = 'SELECT * FROM ' . TABLE_RECORD_COMPANY . ' WHERE record_company_id = :record_company_id: LIMIT 1';
       $sql_record_company = $db->bindVars($sql_record_company, ':record_company_id:', $row_music_extra['record_company_id'], 'integer');
@@ -889,12 +885,9 @@ while ($row = $ep_4_fetch_array($result)) {
       unset($lang);
       unset($lid);
       unset($lid_code);
-
-    } else {
-      $row['v_record_company_name'] = '';
-      $row['v_record_company_image'] = '';
     }
     // genre
+    $row['v_music_genre_name'] = '';
     if (!empty($row_music_extra['music_genre_id'])) { // '0' is correct, but '' NULL is possible
       $sql_music_genre = 'SELECT * FROM ' . TABLE_MUSIC_GENRE . ' WHERE music_genre_id = :music_genre_id: LIMIT 1';
       $sql_music_genre = $db->bindVars($sql_music_genre, ':music_genre_id:', $row_music_extra['music_genre_id'], 'integer');
@@ -903,8 +896,6 @@ while ($row = $ep_4_fetch_array($result)) {
       $row_music_genre = $ep_4_fetch_array($result_music_genre);
       unset($result_music_genre);
       $row['v_music_genre_name'] = $row_music_genre['music_genre_name'];
-    } else {
-      $row['v_music_genre_name'] = '';
     }
     unset($row_music_genre);
   } // if (v_artists_name && v_products_type)
@@ -913,6 +904,8 @@ while ($row = $ep_4_fetch_array($result)) {
   // MANUFACTURERS EXPORT - THIS NEEDS MULTI-LINGUAL SUPPORT LIKE EVERYTHING ELSE!
   // if the filelayout says we need a manfacturers name, get it for download file
   if (isset($filelayout['v_manufacturers_name'])) {
+    // $row['v_manufacturers_id'] = '0';  blank name mean 0 id - right? chadd 4-7-09
+    $row['v_manufacturers_name'] = ''; // no manufacturer name
     if (!empty($row['v_manufacturers_id'])) { // '0' is correct, but '' NULL is possible
       $sql2 = 'SELECT manufacturers_name FROM ' . TABLE_MANUFACTURERS . ' WHERE manufacturers_id = :manufacturers_id:';
       $sql2 = $db->bindVars($sql2, ':manufacturers_id:', $row['v_manufacturers_id'], 'integer');
@@ -922,9 +915,6 @@ while ($row = $ep_4_fetch_array($result)) {
       unset($result2);
       $row['v_manufacturers_name'] = $row2['manufacturers_name'];
       unset($row2);
-    } else {  // this is to fix the error on manufacturers name
-      // $row['v_manufacturers_id'] = '0';  blank name mean 0 id - right? chadd 4-7-09
-      $row['v_manufacturers_name'] = ''; // no manufacturer name
     }
   } //End if isset v_manufacturers_name
 

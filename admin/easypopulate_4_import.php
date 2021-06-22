@@ -384,6 +384,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
           // Default values for manufacturers name if exist
           // Note: need to test for '0' and NULL for best compatibility with older version of EP that set blank manufacturers to NULL
           // I find it very strange that the Manufacturer's Name is NOT multi-lingual, but he URL IS!
+          $row['v_manufacturers_name'] = '';  // added by chadd 4-7-09 - default name to blank
           if (($row['v_manufacturers_id'] != '0') && ($row['v_manufacturers_id'] != '')) { // if 0, no manufacturer set
             $sql2 = 'SELECT manufacturers_name FROM ' . TABLE_MANUFACTURERS . ' WHERE manufacturers_id = :manufacturers_id:';
             $sql2 = $db->bindVars($sql2, ':manufacturers_id:', $row['v_manufacturers_id'], 'integer');
@@ -392,8 +393,6 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
             $row2 = $ep_4_fetch_array($result2);
             unset($result2);
             $row['v_manufacturers_name'] = $row2['manufacturers_name'];
-          } else {
-            $row['v_manufacturers_name'] = '';  // added by chadd 4-7-09 - default name to blank
           }
 
           // Get tax info for this product

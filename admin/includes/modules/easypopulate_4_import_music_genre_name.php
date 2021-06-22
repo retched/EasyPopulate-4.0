@@ -12,16 +12,16 @@ if (isset($v_music_genre_name) && ($v_music_genre_name != '')) {
 
 }
 
+$v_music_genre_id = 0; // chadd - zencart uses artists_id = '0' for no assisgned artists
+
 $music_genre_name_str_len = isset($v_music_genre_name) && ($v_music_genre_name != '') ? $ep_4_strlen($v_music_genre_name) : false;
 
 if ($music_genre_name_str_len === false) {
   $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_MUSIC_GENRE_NAME_EMPTY, $items[$filelayout[$chosen_key]], $chosen_key);
-  $v_music_genre_id = 0; // chadd - zencart uses artists_id = '0' for no assisgned artists
   unset($music_genre_name_str_len);
   return;
 }
 
-$v_music_genre_id = 0; // chadd - zencart uses genre_id = '0' for no assisgned artists
 unset($music_genre_name_str_len);
 
 if (ep_4_extend_field($v_music_genre_name, $max_len, 'music_genre_name', null, array(TABLE_MUSIC_GENRE)) == 'continue') {
