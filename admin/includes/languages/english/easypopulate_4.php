@@ -162,7 +162,7 @@ define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT_SYNC', 'Import w/Sync');
 define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT', 'Import');
 define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DELETE', 'Delete file');
 define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DOWNLOAD', 'Download');
-define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED', '<b>No Supported Data Files</b>');
+define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED', '<b>No Supported Data Files in Folder</b>');
 define('EASYPOPULATE_4_DISPLAY_EXPORT_FILE_ERROR_FOLDER_OPEN', '<b>Error Opening Upload Directory:</b>');
 
 define('EASYPOPULATE_4_DISPLAY_EXPORT_TYPE_ERROR','error: no export type set - press backspace to return.');
