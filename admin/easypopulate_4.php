@@ -112,10 +112,12 @@ if (!isset($error) || !$error) {
 /* populate the variable $curver_detail using independent file to identify the version of this plugin. */
 require DIR_WS_MODULES . 'easypopulate_4_version.php'; //$curver_detail = '4.0.37.6';
 $message = '';
-if (IS_ADMIN_FLAG) {
-  $new_version_details = plugin_version_check_for_updates(2069, $curver_detail);
-  if ($new_version_details !== FALSE) {
-    $message = '<span class="alert">' . ' - NOTE: A NEW VERSION OF THIS PLUGIN IS AVAILABLE. <a href="' . $new_version_details['link'] . '" target="_blank">[Details]</a>' . '</span>';
+if (IS_ADMIN_FLAG && function_exists('plugin_version_check_for_updates') && (!defined('SHOW_VERSION_UPDATE_IN_HEADER') || SHOW_VERSION_UPDATE_IN_HEADER) && (!defined('EASYPOPULATE_4_PLUGIN_CHECK') || EASYPOPULATE_4_PLUGIN_CHECK)) {
+  if (empty($_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV'])) {
+    $_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV'] = plugin_version_check_for_updates(2069, $curver_detail);
+  }
+  if ($_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV'] !== FALSE) {
+    $message = '<span class="alert">' . ' - NOTE: A NEW VERSION OF THIS PLUGIN IS AVAILABLE. <a href="' . $_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV']['link'] . '" target="_blank">[Details]</a>' . '</span>';
   }
 }
 
@@ -676,14 +678,21 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
         }
         unset($group_check);
       } else {
-        $check_database_installed = plugin_version_check_for_updates(2069, TOOLS_EASYPOPULATE_4_VERSION);
-        // If EP4 is installed (because of above), database version installed is greater than or equal to the version available on ZC, current database version is not the same as the software version (allows an upgrade or a downgrade, but downgrade won't remove admin settings).
-        if ($check_database_installed === FALSE && $curver_detail !== TOOLS_EASYPOPULATE_4_VERSION) {
-          $update = true;
-        }
-        // If EP4 is installed (because of above), files installed are greater than or equal to the version available on ZC, installed version is behind the version available on ZC.
-        if (!$update && plugin_version_check_for_updates(2069, $curver_detail) === FALSE && $check_database_installed !== FALSE) {
-          $update = true;
+        if (function_exists('plugin_version_check_for_updates') && (!defined('SHOW_VERSION_UPDATE_IN_HEADER') || SHOW_VERSION_UPDATE_IN_HEADER) && (!defined('EASYPOPULATE_4_PLUGIN_CHECK') || EASYPOPULATE_4_PLUGIN_CHECK)) {
+          if (empty($_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_EP4V'])) {
+            $_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_EP4V'] = plugin_version_check_for_updates(2069, TOOLS_EASYPOPULATE_4_VERSION);
+          }
+          // If EP4 is installed (because of above), database version installed is greater than or equal to the version available on ZC, current database version is not the same as the software version (allows an upgrade or a downgrade, but downgrade won't remove admin settings).
+          if ($_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_EP4V'] === FALSE && $curver_detail !== TOOLS_EASYPOPULATE_4_VERSION) {
+            $update = true;
+          }
+          // If EP4 is installed (because of above), files installed are greater than or equal to the version available on ZC, installed version is behind the version available on ZC.
+          if (empty($_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV'])) {
+            $_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV'] = plugin_version_check_for_updates(2069, $curver_detail);
+          }
+          if (!$update && $_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV'] === FALSE && $_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_EP4V'] !== FALSE) {
+            $update = true;
+          }
         }
       }
       if ($update) { ?>
