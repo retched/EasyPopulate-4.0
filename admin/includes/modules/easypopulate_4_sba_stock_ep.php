@@ -81,20 +81,24 @@ if (empty($sync)) {
     return;
 }
 
+$sql1 = "UPDATE " . TABLE_PRODUCTS . " SET
+    products_quantity             = :products_quantity:
+WHERE (
+    products_id = :products_id: )";
+
 foreach ($query as $items) {
-    $sql = "UPDATE " . TABLE_PRODUCTS . " SET
-        products_quantity             = :products_quantity:
-    WHERE (
-        products_id = :products_id: )";
-    $sql = $db->bindVars($sql, ':products_quantity:', $items[$filelayout['v_products_quantity']], 'float');
+    $sql = $db->bindVars($sql1, ':products_quantity:', $items[$filelayout['v_products_quantity']], 'float');
     $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_table_tracker']], 'integer');
     if ($result = ep_4_query($sql)) {
         zen_record_admin_activity('Updated product ' . (int) $items[(int) $filelayout['v_table_tracker']] . ' via EP4.', 'info');
         $ep_update_count++;
         $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_UPDATE_PRODUCT, $items[(int) $filelayout['v_products_model']]) . $items[(int) $filelayout['v_products_quantity']];
-    } else { // error Attribute entry not found - needs work!
-        $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Product Quantity on Model: </b>%s - Not Found!</font>', $items[(int) $filelayout['v_products_model']]);
-        $ep_error_count++;
-    } //end if Standard
+        continue;
+    }
+
+    // error Attribute entry not found - needs work!
+    $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Product Quantity on Model: </b>%s - Not Found!</font>', $items[(int) $filelayout['v_products_model']]);
+    $ep_error_count++;
+    //end if Standard
 } //end foreach
 //    $display_output .= '<br/> This: ' . print_r($query) . 'test<br/>';
