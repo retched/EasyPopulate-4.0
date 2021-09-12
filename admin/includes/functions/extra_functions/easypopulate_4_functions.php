@@ -180,10 +180,9 @@ function ep_4_SBA1Exists () {
       if ($desired >= 6) {
         unset($desired);
         return '2';
-      } else {
-        unset($desired);
-        return false;
       }
+      unset($desired);
+      return false;
     }
 }
 
@@ -446,28 +445,23 @@ function ep_4_check_table_column($table_name,$column_name) {
   $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
   $sql = "SHOW COLUMNS FROM ".$table_name;
   $result = ep_4_query($sql);
+  $answer = false;
   while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
-    $column = $row['Field'];
-    if ($column == $column_name) {
-      unset($project);
-      unset($ep_uses_mysqli);
-      unset($sql);
-      unset($result);
-      unset($column);
-      unset($row);
-
-      return true;
+//    $column = $row['Field'];
+    if ($row['Field'] != $column_name) {
+      continue;
     }
+    $answer = true;
   }
 
   unset($project);
   unset($ep_uses_mysqli);
   unset($sql);
   unset($result);
-  unset($column);
+//  unset($column);
   unset($row);
 
-  return false;
+  return $answer;
 }
 
 function ep_4_remove_product($product_model) {
@@ -910,35 +904,35 @@ function remove_easypopulate_4() {
 
 function ep_4_chmod_check($tempdir) {
   global $messageStack;
-  $chmod_check = true;
   if (!@file_exists((EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . $tempdir . ".")) { // directory does not exist
     $messageStack->add(sprintf(EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_MISSING, $tempdir, (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN)), 'warning');
-    $chmod_check = false;
-  } else { // directory exists, test is writeable
-    if (!@is_writable((EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . $tempdir . ".")) { // directory does not exist
-      $messageStack->add(sprintf(EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_NOT_WRITABLE, $tempdir, (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN)), 'warning');
-      $chmod_check = false;
-    }
+    return false;
   }
-  return $chmod_check;
+  // directory exists, test is writeable
+  if (!@is_writable((EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . $tempdir . ".")) { // directory does not exist
+    $messageStack->add(sprintf(EASYPOPULATE_4_MSGSTACK_TEMP_FOLDER_NOT_WRITABLE, $tempdir, (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN)), 'warning');
+    return false;
+  }
+  return true;
 }
 
 function ep4_non_admin_temp($ep_debug_log_path) {
   if (EP4_ADMIN_TEMP_DIRECTORY === 'true') {
     return;
   }
-  if (strpos(DIR_FS_CATALOG . $ep_debug_log_path, DIR_FS_ADMIN) === 0) {
-    global $db;
-    
-    $temp_rem = substr(DIR_FS_CATALOG . $ep_debug_log_path, strlen(DIR_FS_ADMIN));
-    $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'true\' where configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', "1", false, 0, true);
+  if (strpos(DIR_FS_CATALOG . $ep_debug_log_path, DIR_FS_ADMIN) !== 0) {
+    return;
+  }
+  global $db;
+  
+  $temp_rem = substr(DIR_FS_CATALOG . $ep_debug_log_path, strlen(DIR_FS_ADMIN));
+  $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'true\' where configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', "1", false, 0, true);
 
-    $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'' . $temp_rem . '\' WHERE configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', "1", false, 0, true);
-    unset($temp_rem);
+  $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'' . $temp_rem . '\' WHERE configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', "1", false, 0, true);
+  unset($temp_rem);
     // need a message to  be displayed...
 //    zen_redirect(zen_href_link(FILENAME_CONFIGURATION /*, $parameters*/));
     // zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
-  }
 
 }
 
