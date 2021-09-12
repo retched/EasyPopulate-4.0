@@ -451,6 +451,9 @@ function getFileDelimiter($file, $checkLines = 2) {
 
   $basepath = "";
   $realBase = realpath($basepath);
+  if (defined('EP4_ADMIN_TEMP_DIRECTORY') && EP4_ADMIN_TEMP_DIRECTORY === 'false') {
+    $realBase = realpath($realBase . DIRECTORY_SEPARATOR . "..");
+  }
   $userpath = $basepath . $file;
   $realUserPath = realpath($userpath);
   if ($realUserPath === false || strpos($realUserPath, $realBase) !== 0) {
