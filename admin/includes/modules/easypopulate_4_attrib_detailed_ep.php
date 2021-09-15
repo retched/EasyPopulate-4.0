@@ -72,6 +72,7 @@
           options_id = :options_id: AND
           options_values_id = :options_values_id:)";
                                                    
+          // @todo: rework the below to simplify the replacement.
           $sql = $db->bindVars($sql, ':options_values_price:', (isset($filelayout['v_options_values_price'])) ? $items[$filelayout['v_options_values_price']] : $row['options_values_price'], 'currency');
           $sql = $db->bindVars($sql, ':price_prefix:', (isset($filelayout['v_price_prefix'])) ? $items[$filelayout['v_price_prefix']] : $row['price_prefix'], 'string');
           $sql = $db->bindVars($sql, ':products_options_sort_order:', (isset($filelayout['v_products_options_sort_order'])) ? $items[$filelayout['v_products_options_sort_order']] : $row['products_options_sort_order'], 'integer');
