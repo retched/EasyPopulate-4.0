@@ -100,6 +100,12 @@ if (!isset($error) || !$error) {
   }
 }
 
+// Retain values if they were POSTed on last page load.
+$last['downloadType'] = !empty($_POST['ep_export_type']) ? $_POST['ep_export_type'] : "0";
+$last['categorySel'] = !empty($_POST['ep_category_filter']) ? $_POST['ep_category_filter'] : "0";
+$last['manufacturerSel'] = !empty($_POST['ep_manufacturer_filter']) ? $_POST['ep_manufacturer_filter'] : "0";
+$last['statusSel'] = !empty($_POST['ep_status_filter']) ? $_POST['ep_status_filter'] : "1";
+
 /* Test area start */
 // error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);//test purposes only
 // register_globals_vars_check();
@@ -822,10 +828,15 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
                array("id" => '0', 'text' => EASYPOPULATE_4_DD_DOWNLOAD_COMPLETE),
                array("id" => '1', 'text' => EASYPOPULATE_4_DD_DOWNLOAD_QUANTITY),
                array("id" => '2', 'text' => EASYPOPULATE_4_DD_DOWNLOAD_BREAKS),
-               array("id" => '3', 'text' => EASYPOPULATE_4_DD_DOWNLOAD_COMPLETE_SINGLE));
+               array("id" => '3', 'text' => EASYPOPULATE_4_DD_DOWNLOAD_COMPLETE_SINGLE),
+               array("id" => '4', 'text' => EASYPOPULATE_4_DD_DOWNLOAD_BASIC_ATTRIBUTES),
+               array("id" => '5', 'text' => EASYPOPULATE_4_DD_DOWNLOAD_DETAILED_ATTRIBUTES),
+               );
 
              $category_filter_array = array();
-             $category_filter_array = array_merge(array(0 => array("id" => '', 'text' => EASYPOPULATE_4_DD_FILTER_CATEGORIES)), zen_get_category_tree());
+             $ep_cat_tree = ep4_get_category_tree('', '', '0', '', '', true, false, true, false, '1');
+
+             $category_filter_array = array_merge(array(0 => array("id" => '', 'text' => EASYPOPULATE_4_DD_FILTER_CATEGORIES)), $ep_cat_tree);
 
              $manufacturers_array = array();
              $manufacturers_array[] = array("id" => '0', 'text' => EASYPOPULATE_4_DISPLAY_MANUFACTURERS);
@@ -846,10 +857,10 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
 
              echo "<b>" . EASYPOPULATE_4_DISPLAY_FILTERABLE_EXPORTS . "</b><br />";
 
-             echo zen_draw_pull_down_menu('ep_export_type', $export_type_array) . ' ';
-             echo ' ' . zen_draw_pull_down_menu('ep_category_filter', $category_filter_array) . ' ';
-             echo ' ' . zen_draw_pull_down_menu('ep_manufacturer_filter', $manufacturers_array) . ' ';
-             echo ' ' . zen_draw_pull_down_menu('ep_status_filter', $status_array) . ' ';
+             echo zen_draw_pull_down_menu('ep_export_type', $export_type_array, $last['downloadType']) . ' ';
+             echo ' ' . zen_draw_pull_down_menu('ep_category_filter', $category_filter_array, $last['categorySel']) . ' ';
+             echo ' ' . zen_draw_pull_down_menu('ep_manufacturer_filter', $manufacturers_array, $last['manufacturerSel']) . ' ';
+             echo ' ' . zen_draw_pull_down_menu('ep_status_filter', $status_array, $last['statusSel']) . ' ';
              echo zen_draw_input_field('export', EASYPOPULATE_4_DD_FILTER_EXPORT, ' style="padding: 0px"', false, 'submit');
              ?>
           <br /><br />

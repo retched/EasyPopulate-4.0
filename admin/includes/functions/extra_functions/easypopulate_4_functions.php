@@ -1180,3 +1180,130 @@ function ep4_flush()
   print(str_repeat(" ", 300));
   flush();
 }
+
+if (!defined('TOPMOST_CATEGORY_PARENT_ID')) {
+  define('TOPMOST_CATEGORY_PARENT_ID', '0');
+}
+
+/**
+ * Get all products_id in a Category and its SubCategories
+ * use as:
+ * $my_products_id_list = array();
+ * $my_products_id_list = ep4_get_categories_products_list($categories_id)
+ * @param int $categories_id
+ * @param bool $include_deactivated
+ * @param bool $include_child
+ * @param string $parent_category
+ * @param string $display_limit
+ * @return array|null
+ */
+function ep4_get_categories_products_list($categories_id, $include_deactivated = false, $include_child = true, $parent_category = TOPMOST_CATEGORY_PARENT_ID, $display_limit = '')
+{
+    global $db, $categories_products_id_list;
+
+    if (!empty($display_limit)) {
+        $display_limit = $db->prepare_input($display_limit);
+    }
+
+    if (!isset($categories_products_id_list) || !is_array($categories_products_id_list)) {
+        $categories_products_id_list = array();
+    }
+
+    $childCatID = str_replace('_', '', substr($categories_id, strrpos($categories_id, '_')));
+
+    $current_cPath = ($parent_category != TOPMOST_CATEGORY_PARENT_ID ? $parent_category . '_' : '') . $categories_id;
+
+    $sql = "SELECT p.products_id
+            FROM " . TABLE_PRODUCTS . " p
+            INNER JOIN " . TABLE_PRODUCTS_TO_CATEGORIES . " p2c USING (products_id)
+            WHERE p2c.categories_id = " . (int)$childCatID .
+        (!$include_deactivated ? " AND p.products_status = 1" : '') .
+        $display_limit;
+
+    $results = $db->Execute($sql);
+    while (!$results->EOF) {
+        $categories_products_id_list[$results->fields['products_id']] = $current_cPath;
+        $results->MoveNext();
+    }
+
+    if ($include_child) {
+        $sql = "SELECT categories_id
+                FROM " . TABLE_CATEGORIES . "
+                WHERE parent_id = " . (int)$childCatID;
+
+        $results = $db->Execute($sql);
+        while (!$results->EOF) {
+            ep4_get_categories_products_list($results->fields['categories_id'], $include_deactivated, $include_child, $current_cPath, $display_limit);
+            $results->MoveNext();
+        }
+    }
+    return $categories_products_id_list;
+}
+
+function ep4_get_category_tree($parent_id = '0', $spacing = '', $exclude = '', $category_tree_array = array(), $include_itself = false, $category_has_products = false, $limit = false, $withProd = true, $withAttribs = false, $showOnly = false) {
+    global $db, $categories_products_id_list;;
+
+    $limit_count = '';
+    if ($limit) {
+      $limit_count = " limit 1";
+    }
+
+    if (!is_array($category_tree_array)) $category_tree_array = array();
+    if ( (sizeof($category_tree_array) < 1) && ($exclude != '0') ) $category_tree_array[] = array('id' => '0', 'text' => TEXT_TOP);
+
+    if ($include_itself) {
+      $category = $db->Execute("SELECT cd.categories_name
+                                FROM " . TABLE_CATEGORIES_DESCRIPTION . " cd
+                                WHERE cd.language_id = " . (int)$_SESSION['languages_id'] . "
+                                AND cd.categories_id = " . (int)$parent_id);
+
+      if (!$category->EOF) {
+        $category_tree_array[] = array('id' => $parent_id, 'text' => $category->fields['categories_name']);
+      }
+    }
+
+    $categories = $db->Execute("SELECT c.categories_id, cd.categories_name, c.parent_id
+                                FROM " . TABLE_CATEGORIES . " c, " . TABLE_CATEGORIES_DESCRIPTION . " cd
+                                WHERE c.categories_id = cd.categories_id
+                                AND cd.language_id = " . (int)$_SESSION['languages_id'] . "
+                                AND c.parent_id = " . (int)$parent_id . "
+                                ORDER BY c.sort_order, cd.categories_name");
+
+    $temp = $categories_products_id_list;
+    while (!$categories->EOF) {
+      if ($category_has_products == true and zen_products_in_category_count($categories->fields['categories_id'], '', false, true) >= 1) {
+        $mark = '*';
+        if ($withAttribs) {
+          $categories_products_id_list = array();
+          $products = ep4_get_categories_products_list($categories->fields['categories_id'], true);
+          foreach ($products as $products_id => $cat) {
+            if (zen_has_product_attributes($products_id)) {
+              if (!$withProd) {
+                $mark ='';
+              }
+              $mark .= '-a';
+              break;
+            }
+          }
+        }
+      } else {
+        $mark = '&nbsp;&nbsp;' . ($withProd ? '&nbsp;' : '');
+      }
+      if ($exclude != $categories->fields['categories_id']) {
+        $category_tree_array[] = array('id' => $categories->fields['categories_id'], 'text' => $spacing . $categories->fields['categories_name'] . $mark);
+      }
+      $category_tree_array = ep4_get_category_tree($categories->fields['categories_id'], $spacing . '&nbsp;&nbsp;&nbsp;', $exclude, $category_tree_array, '', $category_has_products, false, $withProd, $withAttribs, $showOnly);
+      $categories->MoveNext();
+    }
+
+    $categories_products_id_list = $temp;
+    unset($temp);
+    return $category_tree_array;
+  }
+
+
+function ep4_draw_cat_list($current_cat_id, $withAttribs = true, $withProd = true, $showOnly = false) {
+    if (!$withAttribs && $withProd && !$showOnly) {
+        return zen_get_category_tree('', '', '0', '', '', true);
+    }
+}

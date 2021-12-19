@@ -728,7 +728,9 @@ $filelayout_sql .= '
       a.options_id        = o.products_options_id AND
       a.options_values_id = v.products_options_values_id AND
       o.language_id       = v.language_id AND
-      o.language_id       = 1 ORDER BY a.products_id, a.options_id, v.products_options_values_id';
+      o.language_id       = 1
+      :where:
+      ORDER BY a.products_id, a.options_id, v.products_options_values_id';
     break;
 
 
@@ -795,7 +797,9 @@ $filelayout_sql .= '
       a.products_id       = p.products_id AND
       a.options_id        = o.products_options_id AND
       a.options_values_id = v.products_options_values_id AND
-      o.language_id       = v.language_id ORDER BY a.products_id, a.options_id, v.language_id, v.products_options_values_id';
+      o.language_id       = v.language_id 
+      :where:
+      ORDER BY a.products_id, a.options_id, v.language_id, v.products_options_values_id';
     break;
 
   case 'SBA_detailed':

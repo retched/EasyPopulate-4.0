@@ -146,6 +146,8 @@ define('EASYPOPULATE_4_DD_DOWNLOAD_COMPLETE', 'Alle Artikel');
 define('EASYPOPULATE_4_DD_DOWNLOAD_QUANTITY', 'Artikelnummer/Preis/Anzahl');
 define('EASYPOPULATE_4_DD_DOWNLOAD_BREAKS', 'Artikelnummer/Preis/Staffelpreise');
 define('EASYPOPULATE_4_DD_DOWNLOAD_COMPLETE_SINGLE', 'Alle Artikel Ohne Linked');
+define('EASYPOPULATE_4_DD_DOWNLOAD_BASIC_ATTRIBUTES', 'Basic Attributes');
+define('EASYPOPULATE_4_DD_DOWNLOAD_DETAILED_ATTRIBUTES', 'Detailed Attributes');
 define('EASYPOPULATE_4_DD_FILTER_CATEGORIES', 'Kategorien');
 define('EASYPOPULATE_4_DD_FILTER_EXPORT', 'Exportieren');
 

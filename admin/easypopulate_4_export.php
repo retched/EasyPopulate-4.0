@@ -21,6 +21,45 @@ if ($ep_dltype == '') {
   die(EASYPOPULATE_4_DISPLAY_EXPORT_TYPE_ERROR); // need better handler
 }
 
+function ep4_attributes_where($filelayout_sql, $filter) {
+    global $db;
+
+    $myProd = array();
+    $use_string = '';
+
+    if (!empty($_POST['ep_category_filter']) /*zen_not_null($_POST['ep_category_filter']) && $_POST['ep_category_filter'] !== '0'*/) {
+        // Have reason to identify product in sub-categories.
+        $includeDisabled = isset($_POST['ep_status_filter']) && in_array($_POST['ep_status_filter'], array('0', '3'));
+
+        $myProd = ep4_get_categories_products_list($_POST['ep_category_filter'], $includeDisabled);
+        if (empty($myProd)) {
+            $myProd = array();
+        }
+        $useArray = array_keys($myProd);
+      
+        if (!empty($useArray)) {
+            $useArray = array_map('intval', $useArray);
+            $use_text = implode(',', $useArray);
+            $use_string = ' AND a.products_id IN (' . $use_text . ') ';
+        }
+      
+    }
+      
+    if (!empty($filter['manufacturer'])) {
+        $use_string .= $filter['manufacturer'];
+    }
+      
+    if (!empty($filter['status'])) {
+        $use_string .= $filter['status'];
+    }
+
+    if (!empty($use_string)) {
+        $filelayout_sql = $db->bindVars($filelayout_sql, ':where:', $use_string, 'noquotestring');
+    }
+    
+    return $filelayout_sql;
+}
+
 $ep_export_count = 0;
 // BEGIN: File Download Layouts
 // if dltype is set, then create the filelayout.  Otherwise filelayout is read from the uploaded file.
@@ -41,17 +80,23 @@ if (isset($_POST['ep_export_type'])) {
   } elseif ($_POST['ep_export_type'] == '3') {
     $sql_filter .= ' AND p.master_categories_id = ptoc.categories_id'; // Complete Products by master_categories_id only (no linked product)
     $ep_dltype = 'full';
+  } elseif ($_POST['ep_export_type'] == '4') {
+    $ep_dltype = 'attrib_basic';
+  } elseif ($_POST['ep_export_type'] == '5') {
+    $ep_dltype = 'attrib_detailed';
   }
 }
 
 if ($ep_dltype == 'fullsingle') {
-    $sql_filter .= ' AND p.master_categories_id = ptoc.categories_id'; // Complete Products by master_categories_id only (no linked product)
+    $filter['fullsingle'] = ' AND p.master_categories_id = ptoc.categories_id'; // Complete Products by master_categories_id only (no linked product)
+    $sql_filter .= $filter['fullsingle'];
     $ep_dltype = 'full';
 }
 
 // Cause only 1 instance of product to be exported.
 if ($ep_dltype == 'priceqty') {
-    $sql_filter .= ' AND p.master_categories_id = ptoc.categories_id'; // Complete Products by master_categories_id only (no linked product)
+    $filter['priceqty'] = ' AND p.master_categories_id = ptoc.categories_id'; // Complete Products by master_categories_id only (no linked product)
+    $sql_filter .= $filter['priceqty'];
 }
 
 // override for $ep_dltype
@@ -80,25 +125,28 @@ if (isset($_POST['ep_category_filter'])) {
     unset($category);
     unset($sub_categories);
     $categories_query_addition = $db->bindVars($categories_query_addition, ':ep_category_filter:', $_POST['ep_category_filter'], 'integer');
-    $sql_filter .= ' AND (' . $categories_query_addition . ')';
+    $filter['categories_query'] = ' AND (' . $categories_query_addition . ')';
+    $sql_filter .= $filter['categories_query'];
     unset($categories_query_addition);
   }
 }
 
 if (isset($_POST['ep_manufacturer_filter'])) {
   if ($_POST['ep_manufacturer_filter'] != '0') {
-    $sql_filter .= ' AND p.manufacturers_id = :ep_manufacturer_filter:';
+    $filter['manufacturer'] = ' AND p.manufacturers_id = :ep_manufacturer_filter:';
     if ($_POST['ep_manufacturer_filter'] === -1) {
       $_POST['ep_manufacturer_filter'] = 0;
     }
-    $sql_filter = $db->bindVars($sql_filter, ':ep_manufacturer_filter:', $_POST['ep_manufacturer_filter'], 'integer');
+    $filter['manufacturer'] = $db->bindVars($filter['manufacturer'], ':ep_manufacturer_filter:', $_POST['ep_manufacturer_filter'], 'integer');
+    $sql_filter .= $filter['manufacturer'];
   }
 }
 
 if (isset($_POST['ep_status_filter'])) {
   if ($_POST['ep_status_filter'] != '3') {
-    $sql_filter .= ' AND p.products_status = :ep_status_filter:';
-    $sql_filter = $db->bindVars($sql_filter, ':ep_status_filter:', $_POST['ep_status_filter'], 'integer');
+    $filter['status'] = ' AND p.products_status = :ep_status_filter:';
+    $filter['status'] = $db->bindVars($filter['status'], ':ep_status_filter:', $_POST['ep_status_filter'], 'integer');
+    $sql_filter .= $filter['status'];
   }
 }
 
@@ -144,6 +192,10 @@ switch ($ep_dltype) { // chadd - changed to use $EXPORT_FILE
     break;
   case 'attrib_detailed':
     $EXPORT_FILE = 'Attrib-Detailed-EP';
+    if (zen_not_null($sql_filter)) {
+      $filelayout_sql = ep4_attributes_where($filelayout_sql, $filter);
+    }
+    $filelayout_sql = $db->bindVars($filelayout_sql, ':where:', '', 'noquotestring');
     break;
   case 'SBA_detailed'; // mc12345678 - added 07-18-2013 to support Stock By Attributes
     $EXPORT_FILE = 'SBA-Detailed-EP';
@@ -156,6 +208,10 @@ switch ($ep_dltype) { // chadd - changed to use $EXPORT_FILE
 //  break;
   case 'attrib_basic':
     $EXPORT_FILE = 'Attrib-Basic-EP';
+    if (zen_not_null($sql_filter)) {
+      $filelayout_sql = ep4_attributes_where($filelayout_sql, $filter);
+    }
+    $filelayout_sql = $db->bindVars($filelayout_sql, ':where:', '', 'noquotestring');
     break;
   case 'options':
     $EXPORT_FILE = 'Options-EP';
