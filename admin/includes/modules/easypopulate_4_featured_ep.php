@@ -61,8 +61,12 @@
             $result = ep_4_query($sql);
             if ($result) {
               zen_record_admin_activity('Updated featured product with featured_id ' . (int) $v_featured_id . ' via EP4.', 'info');
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_FEATURED_UPDATE, $items[$filelayout[$chosen_key]], substr($chosen_key, 2), $items[$filelayout['v_products_id']], (int) $v_featured_id);
+              $ep_update_count++;
+            } else {
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_FEATURED_UPDATE_SKIPPED, $items[$filelayout[$chosen_key]], substr($chosen_key, 2), (int)$v_featured_id);
+              $ep_error_count++;
             }
-            $ep_update_count++;
           } else {
             // add featured product
             $sql_max = "SELECT MAX(featured_id) max FROM " . TABLE_FEATURED;
@@ -108,11 +112,15 @@
             $result = ep_4_query($sql);
             if ($result) {
               zen_record_admin_activity('Inserted product ' . (int) $v_products_id . ' via EP4 into featured table.', 'info');
-            $ep_import_count++;
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_FEATURED_INSERT, $items[$filelayout[$chosen_key]], substr($chosen_key, 2), (int)$v_featured_id);
+              $ep_import_count++;
+            } else {
+              $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_FEATURED_INSERT_SKIPPED, $items[$filelayout[$chosen_key]], substr($chosen_key, 2), (int)$v_featured_id);
+              $ep_error_count++;
             }
           }
         } else { // ERROR: This products_model doesn't exist!
-          $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - ' . $chosen_key . ': </b>%s - Not Found!</font>', $items[$filelayout[$chosen_key]]);
+          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_FEATURED_RECORD_MISSING, $items[$filelayout[$chosen_key]], substr($chosen_key, 2));
           $ep_error_count++;
         }
         ep4_flush();

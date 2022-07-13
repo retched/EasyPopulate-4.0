@@ -53,6 +53,11 @@ define('EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_DOWNLOADS_INSERT', '<br />
 define('EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_DOWNLOADS_SKIPPED', '<br /><font color="red"><b>SKIPPED! - Attribute Entry on %2$s: </b>%1$s - Not Found!</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_DOWNLOADS_INSERT_SKIPPED', '<br /><font color="red"><b>SKIPPED! - Attribute Entry on %2$s: </b>%1$s - Not Found!</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_RECORD_MISSING', '<br /><font color="red"><b>SKIPPED! - Attribute Entry on %2$s: </b>%1$s - Not Found!</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_FEATURED_UPDATE', '<br /><font color="green"><b>Updated! - %1$s Featured Product using %2$s of product %3$d having featured id %4$d.</b></font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_FEATURED_UPDATE_SKIPPED', '<br /><font color="red"><b>SKIPPED! - Featured product on %2$s: </b>%1$s with feature id %3$d - Not Found Nor Updated!</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_FEATURED_INSERT', '<br /><font color="green"><b>Inserted! - %1$s Featured Product using %2$s of product %3$d having featured id %4$d.</b></font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_FEATURED_INSERT_SKIPPED', '<br /><font color="red"><b>SKIPPED! - Featured product on %2$s: </b>%1$s with feature id %3$d - Not Found Nor Updated!</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_FEATURED_RECORD_MISSING', '<br /><font color="red"><b>SKIPPED! - Featured Product on %2$s: </b>%1$s - Not Found!</font>');
 
 // $messageStack defines
 // checks - msg stack alerts - output via $messageStack
