@@ -45,6 +45,14 @@ define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_UPDATE','<br /><font color="b
 define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_SKIPPED', '<br /><font color="red"><b>SKIPPED! - Primary key: %1$s:</b>%2$s - Not Found! Unable to apply attributes.</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_NO_PRIMARY_KEY', '<br /><font color="red"><b>SKIPPED! - Primary key: %1$s:</b> - Not Found in the file! Unable to import attributes.</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_BASIC_ATTRIB_NEW_PRODUCT_OPTION_NO_PRODUCTS_OPTIONS_TYPE', '<br /><font color="blue"><b>WARNING! - Primary key: %1$s:</b>%2$S - File did not have a v_products_attributes_type field. Using default of %3$d.</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_NO_PRIMARY_KEY', '<br /><font color="red"><b>SKIPPED! - Attribute Entry on %1$S: </b>%2$s - Not Found!</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_UPDATE', '<br /><font color="green"><b>Updated! - %1$s Attribute Entry %2$s of product %3$s having option %4$s and option value %5$s.</b></font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_SKIPPED', '<br /><font color="red"><b>SKIPPED! - Attribute Entry on %2$s: </b>%1$s - Not Found!</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_DOWNLOADS_UPDATE', '<br /><font color="green"><b>Updated downloads manager attribute details of %1$s by %2$s for %3$s</b></font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_DOWNLOADS_INSERT', '<br /><font color="green"><b>Inserted downloads manager details of %1$s by %2$s for %3$s</b></font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_DOWNLOADS_SKIPPED', '<br /><font color="red"><b>SKIPPED! - Attribute Entry on %2$s: </b>%1$s - Not Found!</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_DOWNLOADS_INSERT_SKIPPED', '<br /><font color="red"><b>SKIPPED! - Attribute Entry on %2$s: </b>%1$s - Not Found!</font>');
+define('EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_RECORD_MISSING', '<br /><font color="red"><b>SKIPPED! - Attribute Entry on %2$s: </b>%1$s - Not Found!</font>');
 
 // $messageStack defines
 // checks - msg stack alerts - output via $messageStack

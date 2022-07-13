@@ -15,7 +15,7 @@
 //Need to validate that the four file records are present or else can do nothing.
         if (!(isset($filelayout['v_products_attributes_id']) && isset($filelayout['v_products_id']) && isset($filelayout['v_options_id']) && isset($filelayout['v_options_values_id']))) {
           // error Attribute entry not found or the file does not contain necessary records - needs work!
-          $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Attribute Entry on ' . substr($chosen_key, 2) . ': </b>%s - Not Found!</font>', $items[$filelayout[$chosen_key]]);
+          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_NO_PRIMARY_KEY, substr($chosen_key, 2), $items[$filelayout[$chosen_key]]);
           $ep_error_count++;
           ep4_flush();
           continue;
@@ -103,9 +103,9 @@
           $result = ep_4_query($sql);
           if ($result) {
             zen_record_admin_activity('Updated products attributes ' . (int) $items[$filelayout['v_products_attributes_id']] . ' of product ' . $items[$filelayout['v_products_id']] . ' having option ' . $items[$filelayout['v_options_id']] . ' and option value ' . $items[$filelayout['v_options_values_id']] . ' via EP4.', 'info');
-            $display_output .= sprintf('<br /><font color="green"><b>Updated! - Attribute Entry ' . $items[$filelayout['v_products_attributes_id']] . ' of product ' . $items[$filelayout['v_products_id']] . ' having option ' . $items[$filelayout['v_options_id']] . ' and option value ' . $items[$filelayout['v_options_values_id']] . '.</b></font>', $items[$filelayout[$chosen_key]]);
+            $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_UPDATE, $items[$filelayout[$chosen_key]], $items[$filelayout['v_products_attributes_id']], $items[$filelayout['v_products_id']], $items[$filelayout['v_options_id']], $items[$filelayout['v_options_values_id']]);
           } else {
-            $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Attribute Entry on ' . substr($chosen_key, 2) . ': </b>%s - Not Found!</font>', $items[$filelayout[$chosen_key]]);
+            $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_SKIPPED, $items[$filelayout[$chosen_key]], substr($chosen_key, 2));
             $ep_error_count++;
           }
 // Need to validate that products_attributes_id is in the file, otherwise can do nothing, also checking that the record is
@@ -131,9 +131,9 @@
               $result = ep_4_query($sql);
               if ($result) {
                 zen_record_admin_activity('Downloads-manager details updated by EP4 for ' . $items[$filelayout['v_products_attributes_id']], 'info');
-                $display_output .= sprintf('<br /><font color="green"><b>Updated downloads manager attribute details for ' . $items[$filelayout['v_products_attributes_id']] . '</b></font>', $items[$filelayout[$chosen_key]]);
+                $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_DOWNLOADS_UPDATE, $items[$filelayout[$chosen_key]], substr($chosen_key, 2), $items[$filelayout['v_products_attributes_id']]);
               } else {
-                $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Attribute Entry on ' . substr($chosen_key, 2) . ': </b>%s - Not Found!</font>', $items[$filelayout[$chosen_key]]);
+                $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_DOWNLOADS_SKIPPED, $items[$filelayout[$chosen_key]], substr($chosen_key, 2));
                 $ep_error_count++;
               }
             } else { // insert
@@ -151,16 +151,16 @@
               $result = ep_4_query($sql);
               if ($result) {
                 zen_record_admin_activity('Downloads-manager details inserted by EP4 for ' . $items[$filelayout['v_products_attributes_id']], 'info');
-                $display_output .= sprintf('<br /><font color="green"><b>Inserted downloads manager details for ' . $items[$filelayout['v_products_attributes_id']] . '</b></font>', $items[$filelayout[$chosen_key]]);
+                $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_DOWNLOADS_INSERT, $items[$filelayout[$chosen_key]], substr($chosen_key, 2), $items[$filelayout['v_products_attributes_id']]);
               } else {
-                $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Attribute Entry on ' . substr($chosen_key, 2) . ': </b>%s - Not Found!</font>', $items[$filelayout[$chosen_key]]);
+                $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_DOWNLOADS_INSERT_SKIPPED, $items[$filelayout[$chosen_key]], substr($chosen_key, 2));
                 $ep_error_count++;
               }
             }
           }
           $ep_update_count++;
         } else { // error Attribute entry not found or the file does not contain necessary records - needs work!
-          $display_output .= sprintf('<br /><font color="red"><b>SKIPPED! - Attribute Entry on ' . substr($chosen_key, 2) . ': </b>%s - Not Found!</font>', $items[$filelayout[$chosen_key]]);
+          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DETAILED_ATTRIB_RECORD_MISSING, $items[$filelayout[$chosen_key]], substr($chosen_key, 2));
           $ep_error_count++;
         } // if
         ep4_flush();
