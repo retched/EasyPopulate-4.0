@@ -10,6 +10,14 @@
 
         @set_time_limit($ep_execution);
 
+        if (!isset($filelayout[$chosen_key])) {
+          // error Attribute entry not found or the file does not contain necessary records - needs work!
+          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_FEATURED_NO_PRIMARY_KEY, substr($chosen_key, 2), $items[$filelayout[$chosen_key]]);
+          $ep_error_count++;
+          ep4_flush();
+          continue;
+        }
+
         $sql = "SELECT * FROM " . TABLE_PRODUCTS;
 
         $sql .= $chosen_key_sql_limit;
