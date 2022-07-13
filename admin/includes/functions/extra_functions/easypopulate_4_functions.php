@@ -187,12 +187,12 @@ function ep_4_SBA1Exists () {
 }
 
 function ep_4_CEONURIExists () {
-  $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
+  //$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
   $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
   // The current thought is to have one of these Exists files for each version of SBA to consider; however, they also all could fall under one SBA_Exists check provided some return is made and a comparison done on the other end about what was returned.
   //Check to see if any version of Stock with attributes is installed (If so, and properly programmed, there should be a define for the table associated with the stock.  There may be more than one, and if so, they should all be verified for the particular SBA.
   if (!defined('TABLE_CEON_URI_MAPPINGS')) {
-    unset($project);
+    //unset($project);
     unset($ep_uses_mysqli);
     return false;
   }
@@ -202,7 +202,7 @@ function ep_4_CEONURIExists () {
 //    echo 'After execute<br />';
   $numCols = ($ep_uses_mysqli ? ($colsarray === false ? 0 : mysqli_num_rows($colsarray)) : mysql_num_rows($colsarray));
   if ($numCols != 9) {
-    unset($project);
+    //unset($project);
     unset($ep_uses_mysqli);
     unset($colsarray);
     unset($numCols);
@@ -221,7 +221,7 @@ function ep_4_CEONURIExists () {
       case 'date_added':
         break;
       default:
-        unset($project);
+        //unset($project);
         unset($ep_uses_mysqli);
         unset($colsarray);
         unset($numCols);
@@ -232,7 +232,7 @@ function ep_4_CEONURIExists () {
     }
   }
 
-  unset($project);
+  //unset($project);
   unset($ep_uses_mysqli);
   unset($colsarray);
   unset($numCols);
