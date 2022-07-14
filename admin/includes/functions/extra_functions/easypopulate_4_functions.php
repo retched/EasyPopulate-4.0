@@ -922,7 +922,7 @@ function ep_4_chmod_check($tempdir) {
   return $chmod_check;
 }
 
-function ep4_non_admin_temp() {
+function ep4_non_admin_temp($ep_debug_log_path) {
   if (EP4_ADMIN_TEMP_DIRECTORY === 'true') {
     return;
   }
@@ -944,7 +944,7 @@ function ep4_non_admin_temp() {
 function ep4_directory_check($ep_debug_log_path) {
   global $db;
 
-  ep4_non_admin_temp();
+  ep4_non_admin_temp($ep_debug_log_path);
   $ep_debug_log_path = $db->Execute('SELECT configuration_value FROM ' . TABLE_CONFIGURATION . ' WHERE configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', '1', false, 0, true);
 
   return $ep_debug_log_path->fields['configuration_value'];
@@ -982,7 +982,7 @@ function ep4_directory_choice_check($ep_debug_log_path) {
 
   //$temp_dir = $db->Execute('SELECT configuration_value FROM ' . TABLE_CONFIGURATION . ' where configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', false, false, 0, true);
 
-  ep4_non_admin_temp();
+  ep4_non_admin_temp($ep_debug_log_path);
   $ep_debug_log_path = $db->Execute('SELECT configuration_value FROM ' . TABLE_CONFIGURATION . ' WHERE configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', '1', false, 0, true);
 
   // Intended to be a string value that returns for database value storage
