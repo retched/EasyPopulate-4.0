@@ -589,6 +589,9 @@ function write_debug_log_4($string) {
   global $ep_debug_log_path;
   $logFile = $ep_debug_log_path.'ep_debug_log.txt';
   $fp = fopen($logFile,'ab');
+  if (function_exists('debug_backtrace')) {
+    $string .= print_r(debug_backtrace(), true);
+  }
   fwrite($fp, $string);
   fclose($fp);
   unset($logFile);
@@ -610,6 +613,9 @@ function ep_4_query($query) {
     }
   } elseif ($ep_debug_logging_all == true) {
     $string = ($ep_uses_mysqli ? "MySQLi" : "MySQL") . " PASSED\nWhen executing:\n$query\n";
+    if (function_exists('debug_backtrace')) {
+      $string .= print_r(debug_backtrace(), true);
+    }
     write_debug_log_4($string);
   }
 //  unset($project);
