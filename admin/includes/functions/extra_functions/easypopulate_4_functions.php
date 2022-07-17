@@ -404,7 +404,7 @@ function ep_4_get_tax_title_class_id($tax_class_title) {
     " WHERE tax_class_title = '".zen_db_input($tax_class_title)."'") : mysql_query("SELECT tax_class_id FROM ".TABLE_TAX_CLASS.
     " WHERE tax_class_title = '".zen_db_input($tax_class_title)."'"));
   $tax_class_array = ($ep_uses_mysqli ? mysqli_fetch_array($classes_query) : mysql_fetch_array($classes_query));
-  $tax_class_id = $tax_class_array['tax_class_id'];
+  $tax_class_id = !empty($tax_class_array['tax_class_id']) ? $tax_class_array['tax_class_id'] : 0;
 
   unset($project);
   unset($ep_uses_mysqli);
