@@ -102,7 +102,8 @@ function ep_4_SBA1Exists () {
           LIMIT 1;');
     // Check if database table is present in the database before attempting to access it.  If not present, then no need to
     //  continue processing.
-    if ($tablePresent == false) {
+
+    if (($ep_uses_mysqli ? ($tablePresent === false ? 0 : mysqli_num_rows($tablePresent)) : mysql_num_rows($tablePresent)) == 0)/*$tablePresent == false || (is_object($tablePresent) && $tablePresent->num_rows == 0))*/ {
       unset($project);
       unset($ep_uses_mysqli);
       unset($tablePresent);
@@ -112,7 +113,7 @@ function ep_4_SBA1Exists () {
     //Columns in table: stock_id, products_id, stock_attributes, quantity, and sort.
     $colsarray = ep_4_query('SHOW COLUMNS FROM ' . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK);
 //    echo 'After execute<br />';
-    $numCols = ($ep_uses_mysqli ? mysqli_num_rows($colsarray) : mysql_num_rows($colsarray));
+    $numCols = ($ep_uses_mysqli ? ($colsarray === false ? 0 : mysqli_num_rows($colsarray)) : mysql_num_rows($colsarray));
 
     if ($numCols < 5) {
       unset($project);
