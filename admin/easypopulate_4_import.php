@@ -327,7 +327,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
         // this gets default values for current v_products_model
         // inputs: $items array (file data by column #); $filelayout array (headings by column #);
         // $row (current TABLE_PRODUCTS data by heading name)
-        while ($row = $ep_4_fetch_array($result)) { // chadd - this executes once?? why use while-loop?? //mc12345678 - This executes for each instance of the product in a category (ie. linked product are included)
+        while (!empty($result) && $row = $ep_4_fetch_array($result)) { // chadd - this executes once?? why use while-loop?? //mc12345678 - This executes for each instance of the product in a category (ie. linked product are included)
           $product_is_new = false; // we found products_model in database
           // Get current products descriptions and categories for this model from database
           // $row at present consists of current product data for above fields only (in $sql)
@@ -1190,7 +1190,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
                   continue;
                 }
                 $value = 'v_' . $field;
-                if (!$filelayout[$value]) {
+                if (empty($filelayout[$value])) {
                   continue;
                 }
                 $query .= ":field: = :value:, ";
