@@ -227,7 +227,7 @@ function ep_4_CEONURIExists () {
         unset($numCols);
         unset($row);
         return false;
-        break;
+//        break;
 
     }
   }
@@ -452,6 +452,7 @@ function ep_4_check_table_column($table_name,$column_name) {
       continue;
     }
     $answer = true;
+    break;
   }
 
   unset($project);
