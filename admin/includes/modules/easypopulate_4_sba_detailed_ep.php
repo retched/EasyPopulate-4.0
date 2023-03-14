@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /*
  * This is the file processed if the import file is a attrib-detailed-ep file.

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /*
  * When updating products info, these values are used for existing data 
  *   This allows a reduced number of columns to be used on updates  
