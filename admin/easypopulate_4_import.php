@@ -298,17 +298,18 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
           p.metatags_model_status     as v_metatags_model_status,
           p.metatags_price_status     as v_metatags_price_status,
           p.metatags_title_tagline_status as v_metatags_title_tagline_status,
-          subc.categories_id        as v_categories_id
+          c.categories_id        as v_categories_id
           FROM ' .
-                TABLE_PRODUCTS . ' as p, ' .
-                TABLE_PRODUCTS_TO_CATEGORIES . ' as ptoc,' .
-                TABLE_CATEGORIES . ' as subc ';
+                TABLE_PRODUCTS . ' as p
+                INNER JOIN ' . TABLE_PRODUCTS_TO_CATEGORIES . ' ptc USING (products_id)
+                INNER JOIN ' . TABLE_CATEGORIES . ' c USING (categories_id) ';
         $zco_notifier->notify('EP4_IMPORT_PRODUCT_DEFAULT_SELECT_TABLES');
-        $sql .= "WHERE
-          p.products_id      = ptoc.products_id AND
-          ptoc.categories_id = subc.categories_id AND ";
-
+        if (zen_not_null($chosen_key_sql)) {
+        $sql .= "
+          WHERE
+          ";
         $sql .= $chosen_key_sql;
+        }
 
         if (ep4_field_in_file('v_products_model')) {
           $sql = $db->bindVars($sql, ':products_model:', $items[$filelayout['v_products_model']], $zc_support_ignore_null);
@@ -912,14 +913,13 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
           }
           for ($category_index = 0; $category_index < $categories_count['id'][$lid]; $category_index++) {
             $thiscategoryname = ep_4_curly_quotes($categories_names_array['id'][$lid][$category_index]); // category name - 5-3-2012 added curly quote fix
-            $sql = "SELECT cat.categories_id
-              FROM " . TABLE_CATEGORIES . " AS cat,
-                 " . TABLE_CATEGORIES_DESCRIPTION . " AS des
+            $sql = "SELECT c.categories_id
+              FROM " . TABLE_CATEGORIES . " AS c
+                 INNER JOIN " . TABLE_CATEGORIES_DESCRIPTION . " AS cd ON (cd.categories_id = c.categories_id)
               WHERE
-                cat.parent_id = :parent_id: AND
-                cat.categories_id = des.categories_id AND
-                des.language_id = :language_id: AND
-                des.categories_name = :categories_name: LIMIT 1";
+                c.parent_id = :parent_id: AND
+                cd.language_id = :language_id: AND
+                cd.categories_name = :categories_name: LIMIT 1";
 
             $post_array = array(
               'categories_name' => array(
@@ -1804,7 +1804,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
               p.master_categories_id
               FROM
               '.TABLE_PRODUCTS.' p
-              LEFT JOIN
+              INNER JOIN
               '.TABLE_PRODUCTS_TO_CATEGORIES.' ptc ON (p.products_id = ptc.products_id AND ptc.categories_id='.(int)$v_categories_id.')
               WHERE
               p.products_id='.(int)$v_products_id);

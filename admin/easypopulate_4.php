@@ -1,6 +1,22 @@
 <?php
 // $Id: easypopulate_4.php, v4.0.37 02-08-2017 mc12345678 $
 
+/**
+ * Table prefixes, as needed in queries are as follows:
+ *   TABLE_CATEGORIES                                     c
+ *   TABLE_FEATURED                                       f
+ *   TABLE_MANUFACTURERS_INFO                             mi
+ *   TABLE_PRODUCTS                                       p
+ *   TABLE_PRODUCTS_ATTRIBUTES                            pa
+ *   TABLE_PRODUCTS_DESCRIPTION                           pd
+ *   TABLE_PRODUCTS_OPTIONS                               po
+ *   TABLE_PRODUCTS_OPTIONS_VALUES                        pov
+ *   TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS    povtpo
+ *   TABLE_PRODUCTS_TO_CATEGORIES                         ptc
+ *   TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK                 pwas
+ *
+ **/
+
 // START INITIALIZATION
 require_once ('includes/application_top.php');
 if (!function_exists('ep_4_curly_quotes')) {

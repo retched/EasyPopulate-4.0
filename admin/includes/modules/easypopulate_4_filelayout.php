@@ -87,12 +87,19 @@ if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CO
       p.products_quantity       as v_products_quantity,
       p.products_status       as v_status
       FROM '
-      .TABLE_PRODUCTS.' as p '
-      //.TABLE_CATEGORIES.' as subc,'
-      //.TABLE_PRODUCTS_TO_CATEGORIES.' as ptoc
-      . ($sql_filter <> '' ? 'WHERE '. $sql_filter : '');
-      //p.products_id = ptoc.products_id AND
-      /*ptoc.categories_id = subc.categories_id '.$sql_filter;*/
+      .TABLE_PRODUCTS.' as p ';
+      //.TABLE_CATEGORIES.' as c,'
+      //.TABLE_PRODUCTS_TO_CATEGORIES.' as ptc
+      if (zen_not_null($sql_filter)) {
+        $filelayout_sql .= 'WHERE ';
+        if (stripos(trim($sql_filter), 'AND ') === 0) {
+          $filelayout_sql .= ' TRUE ';
+        }
+        $filelayout_sql .= $sql_filter;
+      }
+/*      . ($sql_filter <> '' ? 'WHERE '. $sql_filter : '');*/
+      //p.products_id = ptc.products_id AND
+      /*ptc.categories_id = c.categories_id '.$sql_filter;*/
     break;
 
   case 'full': // FULL products download
@@ -340,7 +347,7 @@ if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CO
       p.products_quantity       as v_products_quantity,
       p.master_categories_id        as v_master_categories_id,
       p.manufacturers_id        as v_manufacturers_id,
-      subc.categories_id        as v_categories_id,
+      c.categories_id        as v_categories_id,
       p.products_status       as v_status,
       p.metatags_title_status         as v_metatags_title_status,
       p.metatags_products_name_status as v_metatags_products_name_status,
@@ -348,20 +355,32 @@ if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CO
       p.metatags_price_status         as v_metatags_price_status,
       p.metatags_title_tagline_status as v_metatags_title_tagline_status
       FROM '
-      .TABLE_CATEGORIES.' as subc, '
-      .TABLE_PRODUCTS_TO_CATEGORIES.' as ptoc, '
-      .TABLE_PRODUCTS.' as p '
-      .' LEFT JOIN '
-      .TABLE_MANUFACTURERS_INFO.' as mi ON (mi.manufacturers_id = p.manufacturers_id) ';
+      . TABLE_CATEGORIES . ' as c
+      INNER JOIN ' . TABLE_PRODUCTS_TO_CATEGORIES .' AS ptc
+        ON (
+          c.categories_id = ptc.categories_id
+        )
+      INNER JOIN ' . TABLE_PRODUCTS .' AS p
+        ON (
+          ptc.products_id = p.products_id
+        )
+      LEFT JOIN ' . TABLE_MANUFACTURERS_INFO .' AS mi
+        ON (
+          p.manufacturers_id = mi.manufacturers_id
+        )
+      ';
       
       $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE');
 
-      $filelayout_sql .= ' WHERE
-      p.products_id = ptoc.products_id AND ';
       $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_WHERE_FILELAYOUT_FULL_SQL_TABLE');
 
-      $filelayout_sql .= '
-      ptoc.categories_id = subc.categories_id '.$sql_filter;
+      if (zen_not_null($sql_filter)) {
+        $filelayout_sql .= ' WHERE ';
+        if (stripos(trim($sql_filter), 'AND ') === 0) {
+          $filelayout_sql .= ' TRUE ';
+        }
+        $filelayout_sql .= $sql_filter;
+      }
     break;
 
   case 'featured': // added 5-2-2012
@@ -387,10 +406,12 @@ if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CO
       f.status                  as v_status,
       f.featured_date_available as v_featured_date_available
       FROM '
-      .TABLE_PRODUCTS.' as p,'
-      .TABLE_FEATURED.' as f
-      WHERE
-      p.products_id = f.products_id';
+      . TABLE_PRODUCTS . ' AS p
+      INNER JOIN ' . TABLE_FEATURED . ' AS f
+        ON (
+          p.products_id = f.products_id
+        )
+      ';
     break;
 
   case 'priceqty':
@@ -417,12 +438,12 @@ if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CO
     $filelayout[] = 'v_products_quantity';
     $filelayout_sql = 'SELECT
       p.products_id     as v_products_id,
-      d.products_name   as v_products_name,
+      pd.products_name   as v_products_name,
       p.products_status as v_status,
       p.products_model  as v_products_model,
       p.products_price  as v_products_price,
       p.manufacturers_id  as v_manufacturers_id,
-      subc.categories_id  as v_categories_id,';
+      c.categories_id  as v_categories_id,';
     if ($ep_supported_mods['uom'] == true) { // price UOM mod
       $filelayout_sql .= 'p.products_price_uom as v_products_price_uom,';
     }
@@ -436,14 +457,27 @@ if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CO
     $filelayout_sql .= 'p.products_tax_class_id as v_tax_class_id,
       p.products_quantity as v_products_quantity
       FROM '
-      .TABLE_PRODUCTS.' as p,'
-      .TABLE_PRODUCTS_DESCRIPTION.' as d,'
-      .TABLE_CATEGORIES.' as subc,'
-      .TABLE_PRODUCTS_TO_CATEGORIES.' as ptoc
-      WHERE
-      p.products_id = ptoc.products_id AND
-      d.products_id = p.products_id AND
-      ptoc.categories_id = subc.categories_id '.$sql_filter; // added filter 4-13-2012
+      .TABLE_PRODUCTS.' as p
+      INNER JOIN ' . TABLE_PRODUCTS_DESCRIPTION . ' AS pd
+        ON (
+          p.products_id = pd.products_id
+        )
+      INNER JOIN ' . TABLE_PRODUCTS_TO_CATEGORIES . ' AS ptc
+        ON (
+          p.products_id = ptc.products_id
+        )
+      INNER JOIN ' . TABLE_CATEGORIES . ' AS c
+        ON (
+          ptc.categories_id = c.categories_id
+        )
+      ';
+    if (zen_not_null($sql_filter)) {
+      $filelayout_sql .= ' WHERE '; // added filter 4-13-2012, edited 7/16/2022
+      if (stripos(trim($sql_filter), 'AND ') === 0) {
+        $filelayout_sql .= ' TRUE ';
+      }
+      $filelayout_sql .= $sql_filter; // added filter 4-13-2012, edited 7/16/2022
+    }
     break;
 
   // Quantity price breaks file layout
@@ -493,7 +527,7 @@ if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CO
       p.products_model  as v_products_model,
       p.products_price  as v_products_price,
       p.manufacturers_id  as v_manufacturers_id,
-      subc.categories_id  as v_categories_id,';
+      c.categories_id  as v_categories_id,';
     if ($chosen_key != 'v_products_model' && zen_not_null($chosen_key)) {
 
     }
@@ -510,12 +544,23 @@ if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CO
     $filelayout_sql .= 'p.products_discount_type as v_products_discount_type,
       p.products_discount_type_from as v_products_discount_type_from
       FROM '
-      .TABLE_PRODUCTS.' as p,'
-      .TABLE_CATEGORIES.' as subc,'
-      .TABLE_PRODUCTS_TO_CATEGORIES.' as ptoc
-      WHERE
-      p.products_id = ptoc.products_id AND
-      ptoc.categories_id = subc.categories_id '.$sql_filter; // added filter 4-13-2012
+      . TABLE_PRODUCTS . ' AS p
+      INNER JOIN ' . TABLE_PRODUCTS_TO_CATEGORIES . ' AS ptc
+        ON (
+          p.products_id = ptc.products_id
+        )
+      INNER JOIN ' . TABLE_CATEGORIES . ' AS c
+        ON (
+          ptc.categories_id = c.categories_id
+        )
+      ';
+    if (zen_not_null($sql_filter)) {
+      $filelayout_sql .= ' WHERE '; // added filter 4-13-2012, edited 7/16/2022
+      if (stripos(trim($sql_filter), 'AND ') === 0) {
+        $filelayout_sql .= ' TRUE ';
+      }
+      $filelayout_sql .= $sql_filter; // added filter 4-13-2012, edited 7/16/2022
+    }
   break;
 
   case 'category':
@@ -547,14 +592,18 @@ if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CO
     $filelayout_sql = 'SELECT
       p.products_id      as v_products_id,
       p.products_model   as v_products_model,
-      subc.categories_id as v_categories_id
+      c.categories_id as v_categories_id
       FROM '
-      .TABLE_PRODUCTS.'   as p,'
-      .TABLE_CATEGORIES.' as subc,'
-      .TABLE_PRODUCTS_TO_CATEGORIES.' as ptoc
-      WHERE
-      p.products_id = ptoc.products_id AND
-      ptoc.categories_id = subc.categories_id';
+      . TABLE_PRODUCTS . '   AS p
+      INNER JOIN ' . TABLE_PRODUCTS_TO_CATEGORIES . ' AS ptc
+        ON (
+          p.products_id = ptc.products_id
+        )
+      INNER JOIN ' . TABLE_CATEGORIES . ' AS c
+        ON (
+          ptc.categories_id = c.categories_id
+        )
+      ';
     break;
 
     // Categories Meta Data - added 12-02-2010
@@ -679,58 +728,66 @@ if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CO
     // v = table PRODUCTS_OPTIONS_VALUES
     // d = table PRODUCTS_ATTRIBUTES_DOWNLOAD
     $filelayout_sql = 'SELECT
-      a.products_attributes_id            as v_products_attributes_id,
-      a.products_id                       as v_products_id,
+      pa.products_attributes_id             as v_products_attributes_id,
+      pa.products_id                        as v_products_id,
       p.products_model            as v_products_model,
-      a.options_id                        as v_options_id,
-      o.products_options_id               as v_products_options_id,
-      o.products_options_name             as v_products_options_name,
-      o.products_options_type             as v_products_options_type,
-      a.options_values_id                 as v_options_values_id,
-      v.products_options_values_id        as v_products_options_values_id,
-      v.products_options_values_name      as v_products_options_values_name,
-      a.options_values_price              as v_options_values_price, ';
+      pa.options_id                         as v_options_id,
+      po.products_options_id                as v_products_options_id,
+      po.products_options_name              as v_products_options_name,
+      po.products_options_type              as v_products_options_type,
+      pa.options_values_id                  as v_options_values_id,
+      pov.products_options_values_id        as v_products_options_values_id,
+      pov.products_options_values_name      as v_products_options_values_name,
+      pa.options_values_price               as v_options_values_price, ';
     if ($ep_supported_mods['dual']) {
 $filelayout_sql .= '
-      a.options_values_price_w            as v_options_values_price_w,
+      pa.options_values_price_w             as v_options_values_price_w,
       ';
     }
 $filelayout_sql .= '
-      a.price_prefix                      as v_price_prefix,
-      a.products_options_sort_order       as v_products_options_sort_order,
-      a.product_attribute_is_free         as v_product_attribute_is_free,
-      a.products_attributes_weight        as v_products_attributes_weight,
-      a.products_attributes_weight_prefix as v_products_attributes_weight_prefix,
-      a.attributes_display_only           as v_attributes_display_only,
-      a.attributes_default                as v_attributes_default,
-      a.attributes_discounted             as v_attributes_discounted,
-      a.attributes_image                  as v_attributes_image,
-      a.attributes_price_base_included    as v_attributes_price_base_included,
-      a.attributes_price_onetime          as v_attributes_price_onetime,
-      a.attributes_price_factor           as v_attributes_price_factor,
-      a.attributes_price_factor_offset    as v_attributes_price_factor_offset,
-      a.attributes_price_factor_onetime   as v_attributes_price_factor_onetime,
-      a.attributes_price_factor_onetime_offset      as v_attributes_price_factor_onetime_offset,
-      a.attributes_qty_prices             as v_attributes_qty_prices,
-      a.attributes_qty_prices_onetime     as v_attributes_qty_prices_onetime,
-      a.attributes_price_words            as v_attributes_price_words,
-      a.attributes_price_words_free       as v_attributes_price_words_free,
-      a.attributes_price_letters          as v_attributes_price_letters,
-      a.attributes_price_letters_free     as v_attributes_price_letters_free,
-      a.attributes_required               as v_attributes_required
+      pa.price_prefix                       as v_price_prefix,
+      pa.products_options_sort_order        as v_products_options_sort_order,
+      pa.product_attribute_is_free          as v_product_attribute_is_free,
+      pa.products_attributes_weight         as v_products_attributes_weight,
+      pa.products_attributes_weight_prefix  as v_products_attributes_weight_prefix,
+      pa.attributes_display_only            as v_attributes_display_only,
+      pa.attributes_default                 as v_attributes_default,
+      pa.attributes_discounted              as v_attributes_discounted,
+      pa.attributes_image                   as v_attributes_image,
+      pa.attributes_price_base_included     as v_attributes_price_base_included,
+      pa.attributes_price_onetime           as v_attributes_price_onetime,
+      pa.attributes_price_factor            as v_attributes_price_factor,
+      pa.attributes_price_factor_offset     as v_attributes_price_factor_offset,
+      pa.attributes_price_factor_onetime    as v_attributes_price_factor_onetime,
+      pa.attributes_price_factor_onetime_offset      as v_attributes_price_factor_onetime_offset,
+      pa.attributes_qty_prices              as v_attributes_qty_prices,
+      pa.attributes_qty_prices_onetime      as v_attributes_qty_prices_onetime,
+      pa.attributes_price_words             as v_attributes_price_words,
+      pa.attributes_price_words_free        as v_attributes_price_words_free,
+      pa.attributes_price_letters           as v_attributes_price_letters,
+      pa.attributes_price_letters_free      as v_attributes_price_letters_free,
+      pa.attributes_required                as v_attributes_required
       FROM '
-      .TABLE_PRODUCTS_ATTRIBUTES.     ' as a,'
-      .TABLE_PRODUCTS.                ' as p,'
-      .TABLE_PRODUCTS_OPTIONS.        ' as o,'
-      .TABLE_PRODUCTS_OPTIONS_VALUES. ' as v
+      . TABLE_PRODUCTS_ATTRIBUTES .                   ' AS pa
+      INNER JOIN ' . TABLE_PRODUCTS .                 ' AS p
+        ON (
+          pa.products_id         = p.products_id
+        )
+      INNER JOIN ' . TABLE_PRODUCTS_OPTIONS .         ' AS po
+        ON (
+          pa.options_id         = po.products_options_id
+        )
+      INNER JOIN ' . TABLE_PRODUCTS_OPTIONS_VALUES .  ' AS pov
+        ON (
+          pa.options_values_id = pov.products_options_values_id
+          AND
+          po.language_id      = pov.language_id
+        )
       WHERE
-      a.products_id       = p.products_id AND
-      a.options_id        = o.products_options_id AND
-      a.options_values_id = v.products_options_values_id AND
-      o.language_id       = v.language_id AND
-      o.language_id       = 1
+      po.language_id       = 1
       :where:
-      ORDER BY a.products_id, a.options_id, v.products_options_values_id';
+      ORDER BY pa.products_id, pa.options_id, pov.products_options_values_id';
+  // @TODO, evaluate/address the above language_id assignment where this filter is used. E.g. what about another language?
     break;
 
 
@@ -777,29 +834,37 @@ $filelayout_sql .= '
     // o = table PRODUCTS_OPTIONS
     // v = table PRODUCTS_OPTIONS_VALUES
     $filelayout_sql = 'SELECT
-      a.products_attributes_id            as v_products_attributes_id,
-      a.products_id                       as v_products_id,
-      a.options_id                        as v_options_id,
-      a.options_values_id                 as v_options_values_id,
+      pa.products_attributes_id            as v_products_attributes_id,
+      pa.products_id                       as v_products_id,
+      pa.options_id                        as v_options_id,
+      pa.options_values_id                 as v_options_values_id,
       p.products_model            as v_products_model,
-      o.products_options_id               as v_products_options_id,
-      o.products_options_name             as v_products_options_name,
-      o.products_options_type             as v_products_options_type,
-      v.products_options_values_id        as v_products_options_values_id,
-      v.products_options_values_name      as v_products_options_values_name,
-      v.language_id                       as v_language_id
+      po.products_options_id               as v_products_options_id,
+      po.products_options_name             as v_products_options_name,
+      po.products_options_type             as v_products_options_type,
+      pov.products_options_values_id        as v_products_options_values_id,
+      pov.products_options_values_name      as v_products_options_values_name,
+      pov.language_id                       as v_language_id
       FROM '
-      .TABLE_PRODUCTS_ATTRIBUTES.     ' as a,'
-      .TABLE_PRODUCTS.                ' as p,'
-      .TABLE_PRODUCTS_OPTIONS.        ' as o,'
-      .TABLE_PRODUCTS_OPTIONS_VALUES. ' as v
+      . TABLE_PRODUCTS_ATTRIBUTES .     ' AS pa
+      INNER JOIN ' . TABLE_PRODUCTS .                ' AS p
+        ON (
+          pa.products_id       = p.products_id
+        )
+      INNER JOIN ' . TABLE_PRODUCTS_OPTIONS .        ' AS po
+        ON (
+          pa.options_id        = po.products_options_id
+        )
+      INNER JOIN ' . TABLE_PRODUCTS_OPTIONS_VALUES . ' AS pov
+        ON (
+          pa.options_values_id = pov.products_options_values_id
+          AND
+          po.language_id       = pov.language_id
+        )
       WHERE
-      a.products_id       = p.products_id AND
-      a.options_id        = o.products_options_id AND
-      a.options_values_id = v.products_options_values_id AND
-      o.language_id       = v.language_id 
+        TRUE
       :where:
-      ORDER BY a.products_id, a.options_id, v.language_id, v.products_options_values_id';
+      ORDER BY pa.products_id, pa.options_id, pov.language_id, pov.products_options_values_id';
     break;
 
   case 'SBA_detailed':
@@ -857,62 +922,73 @@ $filelayout_sql .= '
     // s = table PRODUCTS_WITH_ATTRIBUTES_STOCK
     // pd = table PRODUCTS_DESCRIPTIONS
     $filelayout_sql = 'SELECT DISTINCT
-      a.products_attributes_id            as v_products_attributes_id,
-      a.products_id                       as v_products_id,
+      pa.products_attributes_id            as v_products_attributes_id,
+      pa.products_id                       as v_products_id,
       p.products_model            as v_products_model,
-      a.options_id                        as v_options_id,
-      o.products_options_id               as v_products_options_id,
-      o.products_options_name             as v_products_options_name,
-      o.products_options_type             as v_products_options_type,
-      a.options_values_id                 as v_options_values_id,
-      v.products_options_values_id        as v_products_options_values_id,
-      v.products_options_values_name      as v_products_options_values_name,'./*
-      a.options_values_price              as v_options_values_price,
-      a.price_prefix                      as v_price_prefix,
-      a.products_options_sort_order       as v_products_options_sort_order,
-      a.product_attribute_is_free         as v_product_attribute_is_free,
-      a.products_attributes_weight        as v_products_attributes_weight,
-      a.products_attributes_weight_prefix as v_products_attributes_weight_prefix,
-      a.attributes_display_only           as v_attributes_display_only,
-      a.attributes_default                as v_attributes_default,
-      a.attributes_discounted             as v_attributes_discounted,
-      a.attributes_image                  as v_attributes_image,
-      a.attributes_price_base_included    as v_attributes_price_base_included,
-      a.attributes_price_onetime          as v_attributes_price_onetime,
-      a.attributes_price_factor           as v_attributes_price_factor,
-      a.attributes_price_factor_offset    as v_attributes_price_factor_offset,
-      a.attributes_price_factor_onetime   as v_attributes_price_factor_onetime,
-      a.attributes_price_factor_onetime_offset      as v_attributes_price_factor_onetime_offset,
-      a.attributes_qty_prices             as v_attributes_qty_prices,
-      a.attributes_qty_prices_onetime     as v_attributes_qty_prices_onetime,
-      a.attributes_price_words            as v_attributes_price_words,
-      a.attributes_price_words_free       as v_attributes_price_words_free,
-      a.attributes_price_letters          as v_attributes_price_letters,
-      a.attributes_price_letters_free     as v_attributes_price_letters_free,
-      a.attributes_required               as v_attributes_required, */
-      's.stock_id          as v_stock_id,
-      s.stock_attributes         as v_stock_attributes,
-      s.quantity           as v_quantity,
-      s.sort             as v_sort,
+      pa.options_id                        as v_options_id,
+      po.products_options_id               as v_products_options_id,
+      po.products_options_name             as v_products_options_name,
+      po.products_options_type             as v_products_options_type,
+      pa.options_values_id                 as v_options_values_id,
+      pov.products_options_values_id        as v_products_options_values_id,
+      pov.products_options_values_name      as v_products_options_values_name,'./*
+      pa.options_values_price              as v_options_values_price,
+      pa.price_prefix                      as v_price_prefix,
+      pa.products_options_sort_order       as v_products_options_sort_order,
+      pa.product_attribute_is_free         as v_product_attribute_is_free,
+      pa.products_attributes_weight        as v_products_attributes_weight,
+      pa.products_attributes_weight_prefix as v_products_attributes_weight_prefix,
+      pa.attributes_display_only           as v_attributes_display_only,
+      pa.attributes_default                as v_attributes_default,
+      pa.attributes_discounted             as v_attributes_discounted,
+      pa.attributes_image                  as v_attributes_image,
+      pa.attributes_price_base_included    as v_attributes_price_base_included,
+      pa.attributes_price_onetime          as v_attributes_price_onetime,
+      pa.attributes_price_factor           as v_attributes_price_factor,
+      pa.attributes_price_factor_offset    as v_attributes_price_factor_offset,
+      pa.attributes_price_factor_onetime   as v_attributes_price_factor_onetime,
+      pa.attributes_price_factor_onetime_offset      as v_attributes_price_factor_onetime_offset,
+      pa.attributes_qty_prices             as v_attributes_qty_prices,
+      pa.attributes_qty_prices_onetime     as v_attributes_qty_prices_onetime,
+      pa.attributes_price_words            as v_attributes_price_words,
+      pa.attributes_price_words_free       as v_attributes_price_words_free,
+      pa.attributes_price_letters          as v_attributes_price_letters,
+      pa.attributes_price_letters_free     as v_attributes_price_letters_free,
+      pa.attributes_required               as v_attributes_required, */
+      'pwas.stock_id          as v_stock_id,
+      pwas.stock_attributes         as v_stock_attributes,
+      pwas.quantity           as v_quantity,
+      pwas.sort             as v_sort,
       pd.products_name         as v_products_name' . ( $ep_4_SBAEnabled == '2' ? ',
-        s.customid            as v_customid ' : ' ') .
+        pwas.customid            as v_customid ' : ' ') .
         'FROM '
-      .TABLE_PRODUCTS_ATTRIBUTES.     ' as a,'
-      .TABLE_PRODUCTS.                ' as p,'
-      .TABLE_PRODUCTS_OPTIONS.        ' as o,'
-      .TABLE_PRODUCTS_OPTIONS_VALUES. ' as v,'
-      .TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK. ' as s,'
-      .TABLE_PRODUCTS_DESCRIPTION.    ' as pd
+      . TABLE_PRODUCTS_ATTRIBUTES .     ' AS pa
+      INNER JOIN ' . TABLE_PRODUCTS .                ' AS p
+        ON (
+          pa.products_id       = p.products_id
+        )
+      INNER JOIN ' . TABLE_PRODUCTS_OPTIONS .        ' AS po
+        ON (
+          pa.options_id        = po.products_options_id
+        )
+      INNER JOIN ' . TABLE_PRODUCTS_OPTIONS_VALUES . ' AS pov
+        ON (
+          pa.options_values_id = pov.products_options_values_id
+          AND
+          po.language_id       = pov.language_id
+        )
+      INNER JOIN ' . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK . ' AS pwas
+        ON (
+          p.products_id   = pwas.products_id
+          pa.products_attributes_id = pwas.stock_attributes
+        )
+      INNER JOIN ' . TABLE_PRODUCTS_DESCRIPTION .    ' AS pd
+        ON (
+          p.products_id    = pd.products_id
+        )
       WHERE
-      a.products_id       = p.products_id AND
-      pd.products_id    = p.products_id AND
-      a.options_id        = o.products_options_id AND
-      a.options_values_id = v.products_options_values_id AND
-      o.language_id       = v.language_id AND
-      o.language_id       = 1 AND
-      s.products_id   = p.products_id AND
-      s.stock_attributes  = a.products_attributes_id
-      ORDER BY a.products_id, a.options_id, v.products_options_values_id';
+      po.language_id       = 1 AND
+      ORDER BY pa.products_id, pa.options_id, pov.products_options_values_id';
     break;
 
   case 'options':
@@ -929,19 +1005,19 @@ $filelayout_sql .= '
     $filelayout[] = 'v_products_options_rows';
     // o = table PRODUCTS_OPTIONS
     $filelayout_sql = 'SELECT
-      o.products_options_id             AS v_products_options_id,
-      o.language_id                     AS v_language_id,
-      o.products_options_name           AS v_products_options_name,
-      o.products_options_sort_order     AS v_products_options_sort_order,
-      o.products_options_type           AS v_products_options_type,
-      o.products_options_length         AS v_products_options_length,
-      o.products_options_comment        AS v_products_options_comment,
-      o.products_options_size           AS v_products_options_size,
-      o.products_options_images_per_row AS v_products_options_images_per_row,
-      o.products_options_images_style   AS v_products_options_images_style,
-      o.products_options_rows           AS v_products_options_rows '
+      po.products_options_id             AS v_products_options_id,
+      po.language_id                     AS v_language_id,
+      po.products_options_name           AS v_products_options_name,
+      po.products_options_sort_order     AS v_products_options_sort_order,
+      po.products_options_type           AS v_products_options_type,
+      po.products_options_length         AS v_products_options_length,
+      po.products_options_comment        AS v_products_options_comment,
+      po.products_options_size           AS v_products_options_size,
+      po.products_options_images_per_row AS v_products_options_images_per_row,
+      po.products_options_images_style   AS v_products_options_images_style,
+      po.products_options_rows           AS v_products_options_rows '
       .' FROM '
-      .TABLE_PRODUCTS_OPTIONS. ' AS o';
+      .TABLE_PRODUCTS_OPTIONS. ' AS po';
     break;
 
   case 'values':
@@ -951,12 +1027,12 @@ $filelayout_sql .= '
     $filelayout[] = 'v_products_options_values_sort_order';
     // v = table PRODUCTS_OPTIONS_VALUES
     $filelayout_sql = 'SELECT
-      v.products_options_values_id         AS v_products_options_values_id,
-      v.language_id                        AS v_language_id,
-      v.products_options_values_name       AS v_products_options_values_name,
-      v.products_options_values_sort_order AS v_products_options_values_sort_order '
+      pov.products_options_values_id         AS v_products_options_values_id,
+      pov.language_id                        AS v_language_id,
+      pov.products_options_values_name       AS v_products_options_values_name,
+      pov.products_options_values_sort_order AS v_products_options_values_sort_order '
       .' FROM '
-      .TABLE_PRODUCTS_OPTIONS_VALUES. ' AS v';
+      .TABLE_PRODUCTS_OPTIONS_VALUES. ' AS pov';
     break;
 
   case 'optionvalues':
@@ -969,18 +1045,22 @@ $filelayout_sql .= '
     // v = table PRODUCTS_OPTIONS_VALUES
     // otv = table PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS
     $filelayout_sql = 'SELECT
-      otv.products_options_values_to_products_options_id AS v_products_options_values_to_products_options_id,
-      otv.products_options_id           AS v_products_options_id,
-      o.products_options_name           AS v_products_options_name,
-      otv.products_options_values_id    AS v_products_options_values_id,
-      v.products_options_values_name    AS v_products_options_values_name '
+      povtpo.products_options_values_to_products_options_id AS v_products_options_values_to_products_options_id,
+      povtpo.products_options_id           AS v_products_options_id,
+      po.products_options_name           AS v_products_options_name,
+      povtpo.products_options_values_id    AS v_products_options_values_id,
+      pov.products_options_values_name    AS v_products_options_values_name '
       .' FROM '
-      .TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS. ' AS otv, '
-      .TABLE_PRODUCTS_OPTIONS.        ' AS o, '
-      .TABLE_PRODUCTS_OPTIONS_VALUES. ' AS v
-      WHERE
-      otv.products_options_id        = o.products_options_id AND
-      otv.products_options_values_id = v.products_options_values_id';
+      . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . ' AS povtpo
+      INNER JOIN ' . TABLE_PRODUCTS_OPTIONS .        ' AS po
+        ON (
+          po.products_options_id         = povtpo.products_options_id
+        )
+      INNER JOIN ' . TABLE_PRODUCTS_OPTIONS_VALUES . ' AS pov
+        ON (
+          pov.products_options_values_id = povtpo.products_options_values_id
+        )
+      ';
     break;
 
   case 'orders_3': // No attributes

@@ -78,7 +78,7 @@ if (isset($_POST['ep_export_type'])) {
   } elseif ($_POST['ep_export_type'] == '2') {
     $ep_dltype = 'pricebreaks'; // Model/Price/Breaks
   } elseif ($_POST['ep_export_type'] == '3') {
-    $sql_filter .= ' AND p.master_categories_id = ptoc.categories_id'; // Complete Products by master_categories_id only (no linked product)
+    $sql_filter .= ' AND p.master_categories_id = ptc.categories_id'; // Complete Products by master_categories_id only (no linked product)
     $ep_dltype = 'full';
   } elseif ($_POST['ep_export_type'] == '4') {
     $ep_dltype = 'attrib_basic';
@@ -88,14 +88,14 @@ if (isset($_POST['ep_export_type'])) {
 }
 
 if ($ep_dltype == 'fullsingle') {
-    $filter['fullsingle'] = ' AND p.master_categories_id = ptoc.categories_id'; // Complete Products by master_categories_id only (no linked product)
+    $filter['fullsingle'] = ' AND p.master_categories_id = ptc.categories_id'; // Complete Products by master_categories_id only (no linked product)
     $sql_filter .= $filter['fullsingle'];
     $ep_dltype = 'full';
 }
 
 // Cause only 1 instance of product to be exported.
 if ($ep_dltype == 'priceqty') {
-    $filter['priceqty'] = ' AND p.master_categories_id = ptoc.categories_id'; // Complete Products by master_categories_id only (no linked product)
+    $filter['priceqty'] = ' AND p.master_categories_id = ptc.categories_id'; // Complete Products by master_categories_id only (no linked product)
     $sql_filter .= $filter['priceqty'];
 }
 
@@ -115,10 +115,10 @@ if ( isset($_POST['ep_order_export_type']) ) {
 if (isset($_POST['ep_category_filter'])) {
   if (!empty($_POST['ep_category_filter'])) {
     $sub_categories = array();
-    $categories_query_addition = 'ptoc.categories_id = :ep_category_filter:';
+    $categories_query_addition = 'ptc.categories_id = :ep_category_filter:';
     zen_get_sub_categories($sub_categories, $_POST['ep_category_filter']);
     foreach ($sub_categories AS $key => $category) {
-      $categories_query_addition .= ' OR ptoc.categories_id = :category:';
+      $categories_query_addition .= ' OR ptc.categories_id = :category:';
       $categories_query_addition = $db->bindVars($categories_query_addition, ':category:', $category, 'integer');
     }
     unset($key);
@@ -644,61 +644,59 @@ while ($row = $ep_4_fetch_array($result)) {
   if (($ep_dltype == 'SBAStock')) {
 
     //Get the option names and option values for the current product
-    // a = table PRODUCTS_ATTRIBUTES
+    // pa = table PRODUCTS_ATTRIBUTES
     // p = table PRODUCTS
-    // o = table PRODUCTS_OPTIONS
-    // v = table PRODUCTS_OPTIONS_VALUES
+    // po = table PRODUCTS_OPTIONS
+    // pov = table PRODUCTS_OPTIONS_VALUES
     // d = table PRODUCTS_ATTRIBUTES_DOWNLOAD
     $sqlAttrib = 'SELECT DISTINCT
-        ' . /* a.products_attributes_id            as v_products_attributes_id, */'
+        ' . /* pa.products_attributes_id            as v_products_attributes_id, */'
               p.products_id                       as v_products_id,
         ' . /* p.products_model            as v_products_model,
-              a.options_id                        as v_options_id,
-              o.products_options_id               as v_products_options_id, */'
-              o.products_options_name             as v_products_options_name,
-        ' . /* o.products_options_type             as v_products_options_type,
-              a.options_values_id                 as v_options_values_id,
-              v.products_options_values_id        as v_products_options_values_id, */'
-              v.products_options_values_name      as v_products_options_values_name ' . /*
-              a.options_values_price              as v_options_values_price,
-              a.price_prefix                      as v_price_prefix,
-              a.products_options_sort_order       as v_products_options_sort_order,
-              a.product_attribute_is_free         as v_product_attribute_is_free,
-              a.products_attributes_weight        as v_products_attributes_weight,
-              a.products_attributes_weight_prefix as v_products_attributes_weight_prefix,
-              a.attributes_display_only           as v_attributes_display_only,
-              a.attributes_default                as v_attributes_default,
-              a.attributes_discounted             as v_attributes_discounted,
-              a.attributes_image                  as v_attributes_image,
-              a.attributes_price_base_included    as v_attributes_price_base_included,
-              a.attributes_price_onetime          as v_attributes_price_onetime,
-              a.attributes_price_factor           as v_attributes_price_factor,
-              a.attributes_price_factor_offset    as v_attributes_price_factor_offset,
-              a.attributes_price_factor_onetime   as v_attributes_price_factor_onetime,
-              a.attributes_price_factor_onetime_offset      as v_attributes_price_factor_onetime_offset,
-              a.attributes_qty_prices             as v_attributes_qty_prices,
-              a.attributes_qty_prices_onetime     as v_attributes_qty_prices_onetime,
-              a.attributes_price_words            as v_attributes_price_words,
-              a.attributes_price_words_free       as v_attributes_price_words_free,
-              a.attributes_price_letters          as v_attributes_price_letters,
-              a.attributes_price_letters_free     as v_attributes_price_letters_free,
-              a.attributes_required               as v_attributes_required */'
+              pa.options_id                        as v_options_id,
+              po.products_options_id               as v_products_options_id, */'
+              po.products_options_name             as v_products_options_name,
+        ' . /* po.products_options_type             as v_products_options_type,
+              pa.options_values_id                 as v_options_values_id,
+              pov.products_options_values_id        as v_products_options_values_id, */'
+              pov.products_options_values_name      as v_products_options_values_name ' . /*
+              pa.options_values_price              as v_options_values_price,
+              pa.price_prefix                      as v_price_prefix,
+              pa.products_options_sort_order       as v_products_options_sort_order,
+              pa.product_attribute_is_free         as v_product_attribute_is_free,
+              pa.products_attributes_weight        as v_products_attributes_weight,
+              pa.products_attributes_weight_prefix as v_products_attributes_weight_prefix,
+              pa.attributes_display_only           as v_attributes_display_only,
+              pa.attributes_default                as v_attributes_default,
+              pa.attributes_discounted             as v_attributes_discounted,
+              pa.attributes_image                  as v_attributes_image,
+              pa.attributes_price_base_included    as v_attributes_price_base_included,
+              pa.attributes_price_onetime          as v_attributes_price_onetime,
+              pa.attributes_price_factor           as v_attributes_price_factor,
+              pa.attributes_price_factor_offset    as v_attributes_price_factor_offset,
+              pa.attributes_price_factor_onetime   as v_attributes_price_factor_onetime,
+              pa.attributes_price_factor_onetime_offset      as v_attributes_price_factor_onetime_offset,
+              pa.attributes_qty_prices             as v_attributes_qty_prices,
+              pa.attributes_qty_prices_onetime     as v_attributes_qty_prices_onetime,
+              pa.attributes_price_words            as v_attributes_price_words,
+              pa.attributes_price_words_free       as v_attributes_price_words_free,
+              pa.attributes_price_letters          as v_attributes_price_letters,
+              pa.attributes_price_letters_free     as v_attributes_price_letters_free,
+              pa.attributes_required               as v_attributes_required */'
         FROM '
-            . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . ' as ovpo,'
-            . TABLE_PRODUCTS_OPTIONS_VALUES . ' as v,'
-            . TABLE_PRODUCTS . ' as p,'
-            . TABLE_PRODUCTS_OPTIONS . ' as o,'
-            . TABLE_PRODUCTS_ATTRIBUTES . ' a LEFT JOIN '
-            . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK . ' pwas ON pwas.stock_attributes = a.products_attributes_id
+            . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . ' AS povtpo
+            INNER JOIN ' . TABLE_PRODUCTS_OPTIONS_VALUES . ' AS pov ON (pov.products_options_values_id  = povtpo.products_options_values_id)
+            INNER JOIN ' . TABLE_PRODUCTS . ' AS p USING (products_id)
+            INNER JOIN ' . TABLE_PRODUCTS_OPTIONS . ' AS po ON (po.language_id       = pov.language_id
+                                                                AND po.products_options_id  = povtpo.products_options_id)
+            INNER JOIN ' . TABLE_PRODUCTS_ATTRIBUTES . ' AS pa ON (pa.products_id       = p.products_id
+                                                                  AND pa.options_id        = po.products_options_id
+                                                                  AND pa.options_values_id = pov.products_options_values_id)
+            INNER JOIN ' . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK . ' pwas ON (pwas.stock_attributes = pa.products_attributes_id)
         WHERE
-        a.products_id       = p.products_id AND
-        a.options_id        = o.products_options_id AND
-        a.options_values_id = v.products_options_values_id AND
-        o.language_id       = v.language_id AND
         p.products_id    = :products_id: AND
-        o.products_options_id  = ovpo.products_options_id AND
-        v.products_options_values_id  = ovpo.products_options_values_id AND
-        o.language_id       = 1 ORDER BY p.products_id ASC'; /* , a.options_id, v.products_options_values_id'; */
+        o.language_id       = 1
+        ORDER BY p.products_id ASC'; /* , a.options_id, v.products_options_values_id'; */
     $sqlAttrib = $db->bindVars($sqlAttrib, ':products_id:', $row['v_products_id'], 'integer');
     $resultAttrib = ep_4_query($sqlAttrib);
     unset($sqlAttrib);
@@ -723,16 +721,15 @@ while ($row = $ep_4_fetch_array($result)) {
 
     //Check if product is tracked via SBA
     $sqlSBA = 'SELECT
-        s.products_id        as v_products_id,
-        s.stock_id           as v_stock_id,
-        s.stock_attributes         as v_stock_attributes,
-        s.quantity           as v_quantity' . ( $ep_4_SBAEnabled == '2' ? ',
-        s.customid            as v_customid ' : ' ') .
+        pwas.products_id        as v_products_id,
+        pwas.stock_id           as v_stock_id,
+        pwas.stock_attributes         as v_stock_attributes,
+        pwas.quantity           as v_quantity' . ( $ep_4_SBAEnabled == '2' ? ',
+        pwas.customid            as v_customid ' : ' ') .
             'FROM '
-            . TABLE_PRODUCTS . ' as p,'
-            . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK . ' as s
+            . TABLE_PRODUCTS . ' AS p
+            INNER JOIN ' . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK . ' AS pwas ON (pwas.products_id = p.products_id)
         WHERE
-        s.products_id    = p.products_id AND
         p.products_id = :products_id:';
     $sqlSBA = $db->bindVars($sqlSBA, ':products_id:', $row['v_products_id'], 'integer');
     $resultSBA = ep_4_query($sqlSBA);
@@ -800,16 +797,14 @@ while ($row = $ep_4_fetch_array($result)) {
         $row['v_products_attributes'] = '';
         foreach ($trackAttribute as $currentAttrib) {
           $sqlSBAAttributes = 'SELECT
-              o.products_options_name    as v_SBA_option_name,
-              v.products_options_values_name  as v_SBA_value_name
+              po.products_options_name    as v_SBA_option_name,
+              pov.products_options_values_name  as v_SBA_value_name
               FROM '
-                  . TABLE_PRODUCTS_OPTIONS . ' as o, '
-                  . TABLE_PRODUCTS_OPTIONS_VALUES . ' as v, '
-                  . TABLE_PRODUCTS_ATTRIBUTES . ' as a
+                  . TABLE_PRODUCTS_OPTIONS . ' AS po
+                  INNER JOIN ' . TABLE_PRODUCTS_ATTRIBUTES . ' as pa ON (pa.options_id = po.products_options_id)
+                  INNER JOIN ' . TABLE_PRODUCTS_OPTIONS_VALUES . ' AS pov ON (pov.products_options_values_id = pa.options_values_id)
               WHERE
-              o.products_options_id = a.options_id AND
-              v.products_options_values_id = a.options_values_id AND
-              a.products_attributes_id = :currentAttrib:';
+              pa.products_attributes_id = :currentAttrib:';
           $sqlSBAAttributes = $db->bindVars($sqlSBAAttributes, ':currentAttrib:', trim($currentAttrib), 'integer');
           $resultSBAAttributes = ep_4_query($sqlSBAAttributes);
           unset($sqlSBAAttributes);

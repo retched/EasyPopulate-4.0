@@ -202,11 +202,10 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
             pov.products_options_values_id,
             pov.products_options_values_name
             FROM "
-            . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " as povtpo, "
-            . TABLE_PRODUCTS_OPTIONS_VALUES . " as pov
+            . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " AS povtpo
+            INNER JOIN " . TABLE_PRODUCTS_OPTIONS_VALUES . " AS pov ON (pov.products_options_values_id = povtpo.products_options_values_id)
             WHERE
             povtpo.products_options_id = :v_products_options_id: AND
-            povtpo.products_options_values_id = pov.products_options_values_id AND
             pov.products_options_values_name = :values_name:";
           $sql = $db->bindVars($sql, ':v_products_options_id:', $v_products_options_id, 'integer');
           $sql = $db->bindVars($sql, ':values_name:', $values_names_array[$l_id][$values_names_index], 'string');
@@ -269,11 +268,10 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
             pov.products_options_values_id,
             pov.products_options_values_name
             FROM "
-            . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " as povtpo, "
-            . TABLE_PRODUCTS_OPTIONS_VALUES . " as pov
+            . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " AS povtpo
+            INNER JOIN " . TABLE_PRODUCTS_OPTIONS_VALUES . " AS pov ON (pov.products_options_values_id = povtpo.products_options_values_id)
             WHERE
             povtpo.products_options_id = :v_products_options_id: AND
-            povtpo.products_options_values_id = pov.products_options_values_id AND
             pov.products_options_values_name = :values_name:";
           $sql5 = $db->bindVars($sql5, ':v_products_options_id:', $v_products_options_id, 'integer');
           $sql5 = $db->bindVars($sql5, ':values_name:', $values_names_array[$l_id][$values_names_index], 'string');
@@ -302,11 +300,10 @@ while (($contents = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) !== fal
             pov.products_options_values_id,
             pov.products_options_values_name
             FROM "
-            . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " as povtpo, "
-            . TABLE_PRODUCTS_OPTIONS_VALUES . " as pov
+            . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . " AS povtpo
+            INNER JOIN " . TABLE_PRODUCTS_OPTIONS_VALUES . " AS pov ON (pov.products_options_values_id = povtpo.products_options_values_id)
             WHERE
             povtpo.products_options_id = :v_products_options_id: AND
-            povtpo.products_options_values_id = pov.products_options_values_id AND
             pov.products_options_values_name = :values_name:";
           $sql5 = $db->bindVars($sql5, ':v_products_options_id:', $v_products_options_id, 'integer');
           $sql5 = $db->bindVars($sql5, ':values_name:', $values_names_array[$l_id][$values_names_index], 'string');

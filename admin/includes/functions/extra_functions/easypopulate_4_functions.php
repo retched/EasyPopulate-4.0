@@ -1270,9 +1270,9 @@ function ep4_get_category_tree($parent_id = '0', $spacing = '', $exclude = '', $
     }
 
     $categories = $db->Execute("SELECT c.categories_id, cd.categories_name, c.parent_id
-                                FROM " . TABLE_CATEGORIES . " c, " . TABLE_CATEGORIES_DESCRIPTION . " cd
-                                WHERE c.categories_id = cd.categories_id
-                                AND cd.language_id = " . (int)$_SESSION['languages_id'] . "
+                                FROM " . TABLE_CATEGORIES . " c
+                                INNER JOIN " . TABLE_CATEGORIES_DESCRIPTION . " cd ON (c.categories_id = cd.categories_id)
+                                WHERE cd.language_id = " . (int)$_SESSION['languages_id'] . "
                                 AND c.parent_id = " . (int)$parent_id . "
                                 ORDER BY c.sort_order, cd.categories_name");
 
