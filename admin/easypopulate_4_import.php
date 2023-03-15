@@ -474,50 +474,53 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
         // chadd - 12-13-2010 - this should allow you to update descriptions only for any given language of the import file!
         // cycle through all defined language codes, but only update those languages defined in the import file
         // Note 11-08-2011: I may remove the "smart_tags_4" function for better performance.
-        $v_metatags_title = array();
-        $v_metatags_keywords = array();
-        $v_metatags_description = array();
+        $v_metatags /*= $v_metatags_title */= array();
+//        $v_metatags_keywords = array();
+//        $v_metatags_description = array();
         foreach ($langcode as $lang) {
           $l_id = $lang['id'];
           $l_id_code = $lang['code'];
           if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only') {
             // products meta tags
             if (isset($filelayout['v_metatags_title_' . $l_id])) {
-              $v_metatags_title[$l_id] = ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $l_id]]);
+              $v_metatags[$l_id]['title'] = /*$v_metatags_title[$l_id] = */ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $l_id]]);
             }
             if (isset($filelayout['v_metatags_keywords_' . $l_id])) {
-              $v_metatags_keywords[$l_id] = ep_4_curly_quotes($items[$filelayout['v_metatags_keywords_' . $l_id]]);
+              $v_metatags[$l_id]['keywords'] = /*$v_metatags_keywords[$l_id] = */ep_4_curly_quotes($items[$filelayout['v_metatags_keywords_' . $l_id]]);
             }
             if (isset($filelayout['v_metatags_description_' . $l_id])) {
-              $v_metatags_description[$l_id] = ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $l_id]]);
+              $v_metatags[$l_id]['description'] = /*$v_metatags_description[$l_id] = */ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $l_id]]);
             }
           }
           if (EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') {
             if (isset($filelayout['v_metatags_title_' . $l_id_code])) {
-              $v_metatags_title[$l_id_code] = ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $l_id_code]]);
+              $v_metatags[$l_id_code]['title'] = /*$v_metatags_title[$l_id_code] = */ep_4_curly_quotes($items[$filelayout['v_metatags_title_' . $l_id_code]]);
             }
             if (isset($filelayout['v_metatags_keywords_' . $l_id_code])) {
-              $v_metatags_keywords[$l_id_code] = ep_4_curly_quotes($items[$filelayout['v_metatags_keywords_' . $l_id_code]]);
+              $v_metatags[$l_id_code]['keywords'] = /*$v_metatags_keywords[$l_id_code] = */ep_4_curly_quotes($items[$filelayout['v_metatags_keywords_' . $l_id_code]]);
             }
             if (isset($filelayout['v_metatags_description_' . $l_id_code])) {
-              $v_metatags_description[$l_id_code] = ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $l_id_code]]);
+              $v_metatags[$l_id_code]['description'] = /*$v_metatags_description[$l_id_code] = */ep_4_curly_quotes($items[$filelayout['v_metatags_description_' . $l_id_code]]);
             }
           }
 
-          if (isset($v_metatags_title[$l_id_code]) && (!isset($v_metatags_title[$l_id]) || in_array(EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE, array('language_code', 'language_code_only')))) {
-            $v_metatags_title[$l_id] = $v_metatags_title[$l_id_code];
+          if (isset($v_metatags[$l_id_code]['title']) && (!isset($v_metatags[$l_id]['title']) || in_array(EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE, array('language_code', 'language_code_only')))) {
+            $v_metatags[$l_id]['title'] = /*$v_metatags_title[$l_id] = */$v_metatags[$l_id_code]['title']/* = $v_metatags_title[$l_id_code]*/;
           }
-          unset($v_metatags_title[$l_id_code]);
+          unset($v_metatags[$l_id_code]['title']/*, $v_metatags_title[$l_id_code]*/);
           
-          if (isset($v_metatags_keywords[$l_id_code]) && (!isset($v_metatags_keywords[$l_id]) || in_array(EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE, array('language_code', 'language_code_only')))) {
-            $v_metatags_keywords[$l_id] = $v_metatags_keywords[$l_id_code];
+          if (isset($v_metatags[$l_id_code]['keywords'] /*$v_metatags_keywords[$l_id_code]*/) && (!isset($v_metatags[$l_id]['keywords'] /*$v_metatags_keywords[$l_id]*/) || in_array(EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE, array('language_code', 'language_code_only')))) {
+            $v_metatags[$l_id]['keywords'] = /*$v_metatags_keywords[$l_id] = */$v_metatags[$l_id_code]['keywords']/* = $v_metatags_keywords[$l_id_code]*/;
           }
-          unset($v_metatags_keywords[$l_id_code]);
+          unset($v_metatags[$l_id_code]['keywords']/*, $v_metatags_keywords[$l_id_code]*/);
           
-          if (isset($v_metatags_description[$l_id_code]) && (!isset($v_metatags_description[$l_id]) || in_array(EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE, array('language_code', 'language_code_only')))) {
-            $v_metatags_description[$l_id] = $v_metatags_description[$l_id_code];
+          if (isset($v_metatags[$l_id_code]['description'] /*$v_metatags_description[$l_id_code]*/) && (!isset($v_metatags[$l_id]['description'] /*$v_metatags_description[$l_id]*/) || in_array(EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE, array('language_code', 'language_code_only')))) {
+            $v_metatags[$l_id]['description'] =/* $v_metatags_description[$l_id] = */ $v_metatags[$l_id_code]['description']/* = $v_metatags_description[$l_id_code]*/;
           }
-          unset($v_metatags_description[$l_id_code]);
+          unset($v_metatags[$l_id_code]['description']/*, $v_metatags_description[$l_id_code]*/);
+          if (empty($v_metatags[$l_id_code])) {
+            unset($v_metatags[$l_id_code]);
+          }
           // products name, description, url, and optional short description
           // smart_tags_4 ... removed - chadd 11-18-2011 - will look into this feature at a future date
           // chadd 12-09-2011 - added some error checking on field lengths
@@ -1471,33 +1474,47 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
           } // EOF Update product
 
           // START: Product MetaTags
-          if (!empty($v_metatags_title)) {
-            foreach ($v_metatags_title as $key => $metaData) {
+          if (!empty($v_metatags)) {
+            foreach ($v_metatags as $key => $metaData) {
               $sql = "SELECT products_id FROM " . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . " WHERE
                 (products_id = :products_id: AND language_id = :key:) LIMIT 1 ";
               $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
               $sql = $db->bindVars($sql, ':key:', $key, 'integer');
               $result = ep_4_query($sql);
               unset($sql);
+              $v_metatags[$key]['array'] = array();
+              if (array_key_exists('title', $v_metatags[$key])) {
+                $v_metatags[$key]['array'][] = "
+                  metatags_title = :metatags_title:
+                  ";
+              }
+              if (array_key_exists('keywords', $v_metatags[$key])) {
+               $v_metatags[$key]['array'][] = "
+                  metatags_keywords = :metatags_keywords:
+                  ";
+              }
+              if (array_key_exists('descriptions', $v_metatags[$key])) {
+                $v_metatags[$key]['array'][] = "
+                  metatags_description = :metatags_description:
+                  ";
+              }
+              $v_metatags[$key]['arraystring'] = implode(", ", $v_metatags[$key]['array']);
               if ($row = $ep_4_fetch_array($result)) {
                 // UPDATE
                 $sql = "UPDATE " . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . " SET
-                  metatags_title = :metatags_title:,
-                  metatags_keywords = :metatags_keywords:,
-                  metatags_description = :metatags_description:
+                " . $v_metatags[$key]['arraystring'] . "
                   WHERE (products_id = :products_id: AND language_id = :key:)";
               } else {
                 // NEW
                 $sql = "INSERT INTO " . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . " SET
-                  metatags_title = :metatags_title:,
-                  metatags_keywords = :metatags_keywords:,
-                  metatags_description = :metatags_description:,
+                  " . $v_metatags[$key]['arraystring'] .
+                  (!empty($v_metatags[$key]['arraystring']) ? ", " : "") . "
                   products_id = :products_id:,
                   language_id = :key:";
               }
-              $sql = $db->bindVars($sql, ':metatags_title:', ep_4_curly_quotes($v_metatags_title[$key]), $zc_support_ignore_null);
-              $sql = $db->bindVars($sql, ':metatags_keywords:', ep_4_curly_quotes($v_metatags_keywords[$key]), $zc_support_ignore_null);
-              $sql = $db->bindVars($sql, ':metatags_description:', ep_4_curly_quotes($v_metatags_description[$key]), $zc_support_ignore_null);
+              $sql = $db->bindVars($sql, ':metatags_title:', ep_4_curly_quotes($v_metatags[$key]['title']), $zc_support_ignore_null);
+              $sql = $db->bindVars($sql, ':metatags_keywords:', ep_4_curly_quotes($v_metatags[$key]['keywords']), $zc_support_ignore_null);
+              $sql = $db->bindVars($sql, ':metatags_description:', ep_4_curly_quotes($v_metatags[$key]['description']), $zc_support_ignore_null);
               $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
               $sql = $db->bindVars($sql, ':key:', $key, 'integer');
               unset($row);
