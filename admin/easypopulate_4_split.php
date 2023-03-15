@@ -5,11 +5,11 @@ if (!defined('IS_ADMIN_FLAG')) {
   die('Illegal Access');
 }
 
-if ( isset($_POST['split']) ) {
-  $file_name = $_POST['split'];
-} else {
+if (!isset($_POST['split']) ) {
   die("invalid program entry");
 }
+
+$file_name = $_POST['split'];
 $file_location = (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . $tempdir . $file_name;
 // if no error, retreive header row
 if (!file_exists($file_location)) {
