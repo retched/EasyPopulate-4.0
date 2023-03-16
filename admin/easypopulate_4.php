@@ -503,18 +503,22 @@ function getFileDelimiter($file, $checkLines = 2) {
 
     while($file->valid() && $i < $checkLines) {
       $line[$delimiter][$i] = $file->fgetcsv($delimiter); // obtain fields based on attempted delimiter.
-      if (count($line[$delimiter][$i]) > 1) { // There are at least two fields which would be needed to perform any work.
-        if (!empty($results[$delimiter])) {
-          if (!empty($results[$delimiter][$i])) {
-            $results[$delimiter][$i]++;
-          } else {
-            $results[$delimiter][$i] = 1;
-          }
-        } else {
-          $results[$delimiter] = array();
-          $results[$delimiter][$i] = 1;
-        }
+      if (count($line[$delimiter][$i]) <= 1) { // There are at least two fields which would be needed to perform any work.
+        $i++;
+        continue;
       }
+      if (empty($results[$delimiter])) {
+        $results[$delimiter] = array();
+        $results[$delimiter][$i] = 1;
+        $i++;
+        continue;
+      }
+      if (empty($results[$delimiter][$i])) {
+        $results[$delimiter][$i] = 1;
+        $i++;
+        continue;
+      }
+      $results[$delimiter][$i]++;
       $i++;
     }
   }
