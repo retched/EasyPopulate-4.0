@@ -48,7 +48,9 @@ if (isset($_SERVER["argc"]) && $_SERVER["argc"] > 1) {
     }
   }
 }
-if (empty($ep4_import_file)) die("Error: an import file was not identified.\nTo see the list of options execute this file with a parameter of -help.\n\n");
+if (empty($ep4_import_file)) {
+  die("Error: an import file was not identified.\nTo see the list of options execute this file with a parameter of -help.\n\n");
+}
 
 // setup
 chdir( dirname(__FILE__) );
@@ -57,7 +59,9 @@ $_SERVER['REMOTE_ADDR'] = 'cron';
 $_SERVER['REQUEST_URI'] = 'cron';
 // Define any necessary overriding defines here before loading the system.
 $result = require('includes/application_top.php');
-if ($result == FALSE)  die("Error: application_top not found.\nMake sure you have placed the ep4_cron.php file in your (renamed) Admin folder.\n\n");
+if ($result == FALSE) {
+  die("Error: application_top not found.\nMake sure you have placed the ep4_cron.php file in your (renamed) Admin folder.\n\n");
+}
 $_SERVER['HTTP_USER_AGENT'] = 'Zen Cart update';
 // $_SERVER['REMOTE_ADDR'] = DB_SERVER;
 // echo 'PHP_SAPI = ' . PHP_SAPI . "\n";
@@ -69,8 +73,12 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists((!strstr(FILENAME_EASYPO
 }
 
 // main execution area identifying if EP4 is installed
-  if (IS_CLI == 'VERBOSE' && $is_browser) echo '<br><pre>' . "\n";
-  if (IS_CLI == 'VERBOSE') echo 'Importing file: ' . $ep4_import_file . '... ' . "\n";
+  if (IS_CLI == 'VERBOSE' && $is_browser) {
+    echo '<br><pre>' . "\n";
+  }
+  if (IS_CLI == 'VERBOSE') {
+    echo 'Importing file: ' . $ep4_import_file . '... ' . "\n";
+  }
 
   // assign cleansed $_POST values here instead of before loading the application_top.  If the security token is not set when application_top is executed, then $_POST values will be removed/fully cleansed.
   // $_POST['key'] = cleaning operation.
@@ -85,9 +93,15 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists((!strstr(FILENAME_EASYPO
   $csv_delimiter = ","; // "\t" = tab AND "," = COMMA
   $csv_enclosure = '"';
   $category_delimiter = "\x5e";
-  if (!defined('EP4_DB_FILTER_KEY')) define('EP4_DB_FILTER_KEY', 'products_model');
-  if (!defined('EP4_ADMIN_TEMP_DIRECTORY')) define('EP4_ADMIN_TEMP_DIRECTORY', 'true');
-  if (!defined('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE')) define('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_id');
+  if (!defined('EP4_DB_FILTER_KEY')) {
+    define('EP4_DB_FILTER_KEY', 'products_model');
+  }
+  if (!defined('EP4_ADMIN_TEMP_DIRECTORY')) {
+    define('EP4_ADMIN_TEMP_DIRECTORY', 'true');
+  }
+  if (!defined('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE')) {
+    define('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_id');
+  }
 
   $tempdir = defined('EASYPOPULATE_4_CONFIG_TEMP_DIR') ? EASYPOPULATE_4_CONFIG_TEMP_DIR : 'EASYPOPULATE_4_CONFIG_TEMP_DIR'; // This ideally should not actually include the Admin Directory in the variable.
   $ep_date_format = defined('EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT') ? EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT : 'm-d-y';
@@ -364,5 +378,7 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists((!strstr(FILENAME_EASYPO
 
   require 'easypopulate_4_import.php';
  // zen_update_currencies(IS_CLI == 'VERBOSE');
-  if (IS_CLI == 'VERBOSE') echo 'Done.' . "\n\n";
+  if (IS_CLI == 'VERBOSE') {
+    echo 'Done.' . "\n\n";
+  }
   exit(0); // returns 0 status code, which means successful

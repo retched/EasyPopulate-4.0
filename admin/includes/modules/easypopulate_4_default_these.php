@@ -7,7 +7,9 @@
  * includes/modules/easypopulate_4_default_these.php, v4.0.35.ZC.2 10-03-2016 mc12345678 $
  */
 
-  if (!isset($default_these) || !is_array($default_these)) $default_these = array();
+  if (!isset($default_these) || !is_array($default_these)) {
+    $default_these = array();
+  }
   $default_these[] = 'v_products_image'; 
   $default_these[] = 'v_products_type'; 
   $default_these[] = 'v_categories_id'; 

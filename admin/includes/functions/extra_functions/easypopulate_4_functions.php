@@ -250,7 +250,9 @@ if (!function_exists('zen_get_sub_categories')) {
       " WHERE parent_id = ".(int)$categories_id) : mysql_query("SELECT categories_id FROM ".TABLE_CATEGORIES.
       " WHERE parent_id = ".(int)$categories_id));
     while ($sub_categories = ($ep_uses_mysqli ? mysqli_fetch_array($sub_categories_query) : mysql_fetch_array($sub_categories_query))) {
-      if ($sub_categories['categories_id'] == 0) return true;
+      if ($sub_categories['categories_id'] == 0) {
+        return true;
+      }
       $categories[count($categories)] = $sub_categories['categories_id'];
       if ($sub_categories['categories_id'] != $categories_id) {
         zen_get_sub_categories($categories, $sub_categories['categories_id']);
@@ -1255,7 +1257,9 @@ function ep4_get_category_tree($parent_id = '0', $spacing = '', $exclude = '', $
       $limit_count = " limit 1";
     }
 
-    if (!is_array($category_tree_array)) $category_tree_array = array();
+    if (!is_array($category_tree_array)) {
+      $category_tree_array = array();
+    }
     if ( (sizeof($category_tree_array) < 1) && ($exclude != '0') ) $category_tree_array[] = array('id' => '0', 'text' => TEXT_TOP);
 
     if ($include_itself) {

@@ -8,7 +8,9 @@ if (!defined('IS_ADMIN_FLAG')) {
   die('Illegal Access');
 }
 
-if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) define('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT', 'id');
+if (!defined('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT')) {
+  define('EASYPOPULATE_4_CONFIG_LANGUAGE_EXPORT', 'id');
+}
 
   if (!isset($chosen_key)){
     switch (EP4_DB_FILTER_KEY) {
