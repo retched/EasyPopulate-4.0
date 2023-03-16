@@ -447,17 +447,19 @@ function getDBDelimiterList() {
 
   preg_match_all("/\(([^\)(]+)\)/", $set_function_val, $output_array); // Pull the inner part of the set_function to determine what delimiter(s) are available
 
-  if (!empty($output_array) && !empty($output_array[0])) {
-    $delimiters = array();
-    foreach ($output_array[1] as $out_array) {
-      $output_delimiters = preg_replace('/&quot;/','"', $out_array);
-      preg_match_all('/\'([^\']+)\'/', $output_delimiters, $output_array2); // Pull just the array of values within the function
+  if (empty($output_array) || empty($output_array[0])) {
+    return $delimiters;
+  }
 
-      if (!empty($output_array2) && !empty($output_array2[1])) {
-        $delimiters[] = $output_array2[1][3];
-      }
+  $delimiters = array();
+  foreach ($output_array[1] as $out_array) {
+    $output_delimiters = preg_replace('/&quot;/','"', $out_array);
+    preg_match_all('/\'([^\']+)\'/', $output_delimiters, $output_array2); // Pull just the array of values within the function
+
+    if (empty($output_array2) || empty($output_array2[1])) {
+      continue;
     }
-    
+    $delimiters[] = $output_array2[1][3];
   }
 
   return $delimiters;
