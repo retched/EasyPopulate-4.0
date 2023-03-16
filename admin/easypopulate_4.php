@@ -915,7 +915,7 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
         echo '<br /><br />';
 //  echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
 // $upload_dir = DIR_FS_CATALOG.$tempdir; // defined above
-        if (defined('EASYPOPULATE_4_CONFIG_TEMP_DIR') && EASYPOPULATE_4_CONFIG_TEMP_DIR !== 'EASYPOPULATE_4_CONFIG_TEMP_DIR' && $dirhandle = opendir($upload_dir)) {
+        if (defined('EASYPOPULATE_4_CONFIG_TEMP_DIR') && EASYPOPULATE_4_CONFIG_TEMP_DIR !== 'EASYPOPULATE_4_CONFIG_TEMP_DIR' && is_dir($upload_dir) && $dirhandle = opendir($upload_dir)) {
           $files = array();
           while (false !== ($files[] = readdir($dirhandle))); // get directory contents
           closedir($dirhandle);
