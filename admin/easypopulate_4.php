@@ -531,44 +531,45 @@ function getFileDelimiter($file, $checkLines = 2) {
     return $results[0]; // The one and only delimiter.
   }
 
-  if ($size_results > 1) {
-    // Options available, need to let know.
-    // Have opportunity to evaluate the results of the row(s).
-    // Ideally can evaluate each line for number of fields.
-    // The number of fields should align between each line, otherwise there could be a problem with the file.
-
-    foreach ($delimiters as $delimiter) {
-      if (empty($line[$delimiter])) {
-        continue;
-      }
-
-      $i = 0;
-      $base = count($line[$delimiter][$i]); // Establish the number of fields in the first line.
-      $i++;
-      // Check each line to see how the number of fields compares to the first.
-      while ($i <= $checkLines) {
-        if (!empty($line[$delimiter][$i]) && count($line[$delimiter][$i]) <> $base) { // If any line has a different number of fields from the first, then columns do not match and/or delimiter is not properly used.
-          unset($results[$delimiter]); // Remove the data associated with a delimiter that doesn't match.
-          break; // stop processing any remaining rows.
-        }
-        $i++;
-      }
-    }
-    $returndelimiters = array();
-    if (!empty($results)) {
-      foreach ($delimiters as $delimiter) {
-        if ((isset($results[$delimiter]) || array_key_exists($delimiter, $results)) && is_array($results[$delimiter]) && count($results[$delimiter]) == $checkLines) {
-          // Delimiter is used in every line and resulted in a satisfactory split of the data.
-          $returndelimiters[] = $delimiter;
-        }
-      }
-    }
-
-    return $returndelimiters; // Will return an array, but question is if it is empty or has 1 or more values.   
+  if (empty($size_results)) {
+    // None found and need user to do something else.
+    return NULL;
   }
 
-  // None found and need user to do something else.
-  return NULL;
+  // Options available, need to let know.
+  // Have opportunity to evaluate the results of the row(s).
+  // Ideally can evaluate each line for number of fields.
+  // The number of fields should align between each line, otherwise there could be a problem with the file.
+
+  foreach ($delimiters as $delimiter) {
+    if (empty($line[$delimiter])) {
+      continue;
+    }
+
+    $i = 0;
+    $base = count($line[$delimiter][$i]); // Establish the number of fields in the first line.
+    $i++;
+    // Check each line to see how the number of fields compares to the first.
+    while ($i <= $checkLines) {
+      if (!empty($line[$delimiter][$i]) && count($line[$delimiter][$i]) <> $base) { // If any line has a different number of fields from the first, then columns do not match and/or delimiter is not properly used.
+        unset($results[$delimiter]); // Remove the data associated with a delimiter that doesn't match.
+        break; // stop processing any remaining rows.
+      }
+      $i++;
+    }
+  }
+  if (empty($results)) {
+    return array();
+  }
+  $returndelimiters = array();
+  foreach ($delimiters as $delimiter) {
+    if ((isset($results[$delimiter]) || array_key_exists($delimiter, $results)) && is_array($results[$delimiter]) && count($results[$delimiter]) == $checkLines) {
+      // Delimiter is used in every line and resulted in a satisfactory split of the data.
+      $returndelimiters[] = $delimiter;
+    }
+  }
+
+  return $returndelimiters; // Will return an array, but question is if it is empty or has 1 or more values.   
 }
 
 function ep_4_display_CSV_Delimiter($filename) {
