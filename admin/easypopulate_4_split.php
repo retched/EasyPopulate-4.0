@@ -48,6 +48,8 @@ while ( ($file_data = fgets($handle)) !== false ) { // read 1 line of data and e
     $data_lines_written = 0; // reset counter
   }
 }
-fclose($split_handle); // close final split file
+if (isset($split_handle)) {
+  fclose($split_handle); // close final split file
+}
 fclose($handle);
 $messageStack->add("File Splitting Completed.", 'success');
