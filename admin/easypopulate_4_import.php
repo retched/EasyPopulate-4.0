@@ -640,10 +640,10 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
         // default the stock if they spec'd it or if it's blank
         // $v_db_status = '1'; // default to active
         $v_db_status = $v_products_status; // changed by chadd to database default value 3-30-09
-        if ($v_status == '0') { // request deactivate this item
+        if (empty($v_status)) { // request deactivate this item
           $v_db_status = '0';
         }
-        if ($v_status == '1') { // request activate this item
+        if (!empty($v_status) && $v_status == '1') { // request activate this item
           $v_db_status = '1';
         }
 
