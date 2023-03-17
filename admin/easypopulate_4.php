@@ -173,6 +173,9 @@ if (substr($tempdir, 0, 1) == '/') {
   $tempdir = substr($tempdir, 1);
 }
 
+// @TODO: Looks like here is the best place to test for the existence of this path and prepare to alert.
+//   Existence is in relation to the file server path, not the assignment to variable/constant path.
+//   If doesn't exist, then should prevent future file write attempts so that do not create unneeded logs.
 //$ep_debug_log_path = DIR_FS_CATALOG . $tempdir;
 $ep_debug_log_path = (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . $tempdir;
 
