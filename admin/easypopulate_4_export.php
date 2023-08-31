@@ -112,7 +112,7 @@ if ( isset($_POST['ep_order_export_type']) ) {
   }
 }
 
-if (isset($_POST['ep_category_filter'])) {
+//if (isset($_POST['ep_category_filter'])) { // Duplicates next test.
   if (!empty($_POST['ep_category_filter'])) {
     $sub_categories = array();
     $categories_query_addition = 'ptc.categories_id = :ep_category_filter:';
@@ -129,7 +129,7 @@ if (isset($_POST['ep_category_filter'])) {
     $sql_filter .= $filter['categories_query'];
     unset($categories_query_addition);
   }
-}
+//}
 
 if (isset($_POST['ep_manufacturer_filter'])) {
   if ($_POST['ep_manufacturer_filter'] != '0') {

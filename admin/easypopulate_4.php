@@ -19,9 +19,9 @@
 
 // START INITIALIZATION
 require_once ('includes/application_top.php');
-if (!function_exists('ep_4_curly_quotes')) {
-  require_once DIR_WS_FUNCTIONS . 'extra_functions/easypopulate_4_functions.php';
-}
+//if (!function_exists('ep_4_curly_quotes')) {
+//  require_once DIR_WS_FUNCTIONS . 'extra_functions/easypopulate_4_functions.php';
+//}
 
 if (class_exists('queryFactoryEP4')) {
   $ep4['db'] = new queryFactoryEP4();
