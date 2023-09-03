@@ -5,18 +5,23 @@ if (!defined('IS_ADMIN_FLAG')) {
   die('Illegal Access');
 }
 
-if (!defined('EP4_REPLACE_BLANK_IMAGE')) {
-  define('EP4_REPLACE_BLANK_IMAGE', 'false'); // Values to be 'true' and 'false' true, if on import the image path evaluates to '' then if true, stores the value of PRODUCTS_IMAGE_NO_IMAGE as the image, otherwise will leave it as blank.;
-}
+if (function_exists('zen_define_default')) {
+  zen_define_default('EP4_REPLACE_BLANK_IMAGE', 'false'); // Values to be 'true' and 'false' true, if on import the image path evaluates to '' then if true, stores the value of PRODUCTS_IMAGE_NO_IMAGE as the image, otherwise will leave it as blank.;
+  zen_define_default('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_id');
+  zen_define_default('EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD', 'false');
+} else {
+  if (!defined('EP4_REPLACE_BLANK_IMAGE')) {
+    define('EP4_REPLACE_BLANK_IMAGE', 'false'); // Values to be 'true' and 'false' true, if on import the image path evaluates to '' then if true, stores the value of PRODUCTS_IMAGE_NO_IMAGE as the image, otherwise will leave it as blank.;
+  }
 
-if (!defined('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE')) {
-  define('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_id');
-}
+  if (!defined('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE')) {
+    define('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_id');
+  }
 
-if (!defined('EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD')) {
-  define('EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD', 'false');
+  if (!defined('EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD')) {
+    define('EASYPOPULATE_4_CONFIG_AUTO_EXTEND_FIELD', 'false');
+  }
 }
-
 // BEGIN: Data Import Module
 if (!(isset($_POST['import']) && $_POST['import'] != '')) {
   return;

@@ -39,31 +39,59 @@ $category_delimiter = "\x5e"; //Need to move this to the admin panel
 
 $excel_safe_output = true; // this forces enclosure in quotes
 
-if (!defined('EP4_DB_FILTER_KEY')) {
+// This function was created in ZC 1.5.8, such that this section could be
+//   removed for 1.5.8 and beyond.
+if (!function_exists('zen_define_default')) {
+  if (!defined('EP4_DB_FILTER_KEY')) {
+    // Need to define this to support use of primary key for import/export
+    //   Instead of adding an additional switch, have incorporated the conversion
+    //   of a blank product_id field to a new product in here.  Currently
+    //   expecting three choices: products_model, products_id, and blank_new
+    //   with model as default
+    define('EP4_DB_FILTER_KEY', 'products_model'); // This could/should apply to both
+    //  import and export files, so here is a good location for it.
+  }
+  if (!defined('EP4_ADMIN_TEMP_DIRECTORY')) {
+    // Intention is to identify which file path to reference throughout instead of
+    //  storing the path in the database. If the individual wishes to use the
+    //  admin path, then this switch will direct the files to use the admin path
+    //  instead of storing the path in the database.
+    define('EP4_ADMIN_TEMP_DIRECTORY', 'true'); // Valid Values considered (false, true)
+  }
+  if (!defined('EP4_SHOW_ALL_FILETYPES')) {
+    // Intention is to force display of all file types and files for someone
+    //  that hasn't done an update on the database as part of installing this
+    //  software.  Perhaps could/need to create a default(s) file to
+    //  assist with installation/operation.  mc12345678 12/30/15
+    define('EP4_SHOW_ALL_FILETYPES', 'true');
+  }
+  if (!defined('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE')) {
+    define('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_id');
+  }
+} else {
+  
   // Need to define this to support use of primary key for import/export
   //   Instead of adding an additional switch, have incorporated the conversion
   //   of a blank product_id field to a new product in here.  Currently
   //   expecting three choices: products_model, products_id, and blank_new
   //   with model as default
-  define('EP4_DB_FILTER_KEY', 'products_model'); // This could/should apply to both
+  zen_define_default('EP4_DB_FILTER_KEY', 'products_model'); // This could/should apply to both
   //  import and export files, so here is a good location for it.
-}
-if (!defined('EP4_ADMIN_TEMP_DIRECTORY')) {
+
   // Intention is to identify which file path to reference throughout instead of
   //  storing the path in the database. If the individual wishes to use the
   //  admin path, then this switch will direct the files to use the admin path
   //  instead of storing the path in the database.
-  define('EP4_ADMIN_TEMP_DIRECTORY', 'true'); // Valid Values considered (false, true)
-}
-if (!defined('EP4_SHOW_ALL_FILETYPES')) {
+  zen_define_default('EP4_ADMIN_TEMP_DIRECTORY', 'true'); // Valid Values considered (false, true)
+
   // Intention is to force display of all file types and files for someone
   //  that hasn't done an update on the database as part of installing this
   //  software.  Perhaps could/need to create a default(s) file to
   //  assist with installation/operation.  mc12345678 12/30/15
-  define('EP4_SHOW_ALL_FILETYPES', 'true');
-}
-if (!defined('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE')) {
-  define('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_id');
+  zen_define_default('EP4_SHOW_ALL_FILETYPES', 'true');
+
+  zen_define_default('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_id');
+
 }
 /* Configuration Variables from Admin Interface  */
 $tempdir = defined('EASYPOPULATE_4_CONFIG_TEMP_DIR') ? EASYPOPULATE_4_CONFIG_TEMP_DIR : 'EASYPOPULATE_4_CONFIG_TEMP_DIR'; // This ideally should not actually include the Admin Directory in the variable.
