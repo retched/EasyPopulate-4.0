@@ -235,17 +235,28 @@ switch ($ep_dltype) { // chadd - changed to use $EXPORT_FILE
     $EXPORT_FILE = 'orders_4-EP';
     break;
   default:
+    $EXPORT_FILE = 'Full-EP';
     $zco_notifier->notify('EP4_EXPORT_CASE_EXPORT_FILE_END');
     break;
 }
 if (defined('EASYPOPULATE_4_CONFIG_DATE_SORT') && EASYPOPULATE_4_CONFIG_DATE_SORT == 'Ymd') {
-  $EXPORT_FILE .= strftime('%Y%m%d-%H%M%S'); // mc12345678 - added to support improved sort order by YearMonthDay in 4,2,2 digit representations without the comma.
+  $strftimeFmt = '%Y%m%d-%H%M%S'; // mc12345678 - added to support improved sort order by YearMonthDay in 4,2,2 digit representations without the comma.
   //Consider expanding options to a "pick list" such that the options chosen will be applied here
 } else if (defined('EASYPOPULATE_4_CONFIG_DATE_SORT') && EASYPOPULATE_4_CONFIG_DATE_SORT == 'Y-m-d') {
-  $EXPORT_FILE .= strftime('%Y-%m-%d-%H%M%S'); // mc12345678 - added to support improved sort order by YearMonthDay in 4,2,2 digit representations without the comma.
+  $strftimeFmt = '%Y-%m-%d-%H%M%S'; // mc12345678 - added to support improved sort order by YearMonthDay in 4,2,2 digit representations without the comma.
 } else {
-  $EXPORT_FILE .= strftime('%Y%b%d-%H%M%S'); // chadd - changed for hour.minute.second
+  $strftimeFmt = '%Y%b%d-%H%M%S'; // chadd - changed for hour.minute.second
 }
+
+if (class_exists('zcDate')) {
+  if (empty($zcDate)) {
+    $zcDate = new zcDate();
+  }
+  $EXPORT_FILE .= $zcDate->output($strftimeFmt);
+} else {
+  $EXPORT_FILE .= strftime($strftimeFmt);
+}
+
 
 // create file name and path and prepare for writing
 $tmpfpath = (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . '' . $tempdir . "$EXPORT_FILE" . (($csv_delimiter == "," || $csv_delimiter == ";" || $csv_delimiter == "\t" || $csv_delimiter == " ") ? ".csv" : ".txt");
