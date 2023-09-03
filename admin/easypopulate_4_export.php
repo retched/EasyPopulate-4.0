@@ -212,7 +212,9 @@ unset($filelayout_header);
 $column_headers = rtrim($column_headers, $csv_delimiter) . "\n";
 //Need to make sure that headers are ready if SBA_basic
 if ($ep_dltype <> 'SBA_basic') { // mc12345678 - SBA Basic add on.
-  fwrite($fp, $column_headers); // write column headers
+  if ($fp !== false) {
+    fwrite($fp, $column_headers); // write column headers
+  }
 } else {
   $dataRow[] = $column_headers; // Hold off on writing column headers
 }
@@ -719,7 +721,9 @@ while ($row = $ep_4_fetch_array($result)) {
       // Remove trailing tab, then append the end-of-line
       $dataRow = rtrim($dataRow, $csv_delimiter) . "\n";
 
-      fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+      if ($fp !== false) {
+        fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+      }
       unset($dataRow);
 
       // loop through the SBA data until one before the end
@@ -805,7 +809,9 @@ while ($row = $ep_4_fetch_array($result)) {
           // Remove trailing tab, then append the end-of-line
           $dataRow = rtrim($dataRow, $csv_delimiter) . "\n";
 
-          fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+          if ($fp !== false) {
+            fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+          }
           unset($dataRow);
 
         }
@@ -965,7 +971,9 @@ while ($row = $ep_4_fetch_array($result)) {
   // Clean the texts that could break CSV file formatting
   $dataRow = ep_4_rmv_chars($filelayout, $row, $csv_delimiter);
 
-  fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+  if ($fp !== false) {
+    fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+  }
   unset($dataRow);
   unset($row);
   $ep_export_count++;
@@ -979,14 +987,18 @@ if ($ep_dltype == 'attrib_basic') { // must write last record
   // Clean the texts that could break CSV file formatting
   $dataRow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
 
-  fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+  if ($fp !== false) {
+    fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
+  }
   $ep_export_count++;
 } // EOF ep_dltype attrib_basic
 unset($active_row);
 unset($dataRow);
 
 
-fclose($fp); // close output file
+if ($fp !== false) {
+  fclose($fp); // close output file
+}
 unset($fp);
 
 //$display_output .= '<br><u><h3>Export Results</h3></u><br>';
