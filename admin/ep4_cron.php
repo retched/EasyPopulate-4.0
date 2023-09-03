@@ -90,6 +90,19 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists((!strstr(FILENAME_EASYPO
     unset($sanitizer);
   }
 
+  if (class_exists('queryFactoryEP4')) {
+    $ep4['db'] = new queryFactoryEP4($db);
+    $ep4['link'] = $ep4['db']->getLink();
+  } else {
+    $ep4['db'] = $db;
+    $ep4['link'] = $ep4['db']->link;
+  }
+  $ep4['path'] = realpath(dirname(__FILE__));
+  // Ensure ends with a directory divider to simplify further handling
+  if ($ep4['path'] !== '/') {
+    $ep4['path'] .= '/';
+  }
+
   $csv_delimiter = ","; // "\t" = tab AND "," = COMMA
   $csv_enclosure = '"';
   $category_delimiter = "\x5e";
@@ -154,11 +167,39 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists((!strstr(FILENAME_EASYPO
   //$ep_debug_logging_all = false;
 
   // Try to load early enough to not cause notices about missing values.
-  if(isset($_SESSION['language']) && file_exists(DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4.php'))
-  {
-      require DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4.php';
-  } else {
-      require DIR_WS_LANGUAGES . 'english' . '/easypopulate_4.php';
+
+  $filename = 'easypopulate_4.php';
+  $folder = '/';  // end with slash
+  $langs = array();
+  $langs[] = isset($_SESSION['language']) ? $_SESSION['language'] : 'english';
+  $langs[] = 'english';
+
+  $old_langfile = '';
+  foreach ($langs as $lang) {
+    $old_langfile = $ep4['path'] . DIR_WS_LANGUAGES . $lang . $folder . $filename;
+    if (file_exists($old_langfile)) {
+      break;
+    }
+  }
+
+  if (class_exists('LanguageLoader')) {
+    foreach ($langs as $lang) {
+      $new_langfile = $ep4['path'] . DIR_WS_LANGUAGES . $lang . $folder . 'lang.' . $filename;
+      if (file_exists($new_langfile)) {
+        break;
+      }
+    }
+  }
+
+  if (class_exists('languageLoader') && file_exists($new_langfile)) {
+    global $languageLoader;
+    $languageLoader->loadExtraLanguageFiles($ep4['path'] .  DIR_WS_LANGUAGES,  $_SESSION['language'], $filename, $folder);
+  } elseif (file_exists($old_langfile)) {
+    $tpl_old_langfile = $ep4['path'] . DIR_WS_LANGUAGES . $_SESSION['language'] . $folder .  $template_dir . '/' . $filename;
+    if (file_exists($tpl_old_langfile)) {
+      $old_langfile = $tpl_old_langfile;
+    }
+    require $old_langfile;
   }
 
   $curver_detail = '4.0.38.ZC';
@@ -321,7 +362,7 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists((!strstr(FILENAME_EASYPO
            );
   $project = PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR;
   if ($ep_uses_mysqli) {
-    $collation = mysqli_character_set_name($db->link); // should be either latin1 or utf8
+    $collation = mysqli_character_set_name($ep4['link']); // should be either latin1 or utf8
   } else {
     $collation = mysql_client_encoding(); // should be either latin1 or utf8
   }

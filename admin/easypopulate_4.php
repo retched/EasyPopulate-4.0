@@ -23,6 +23,19 @@ if (!function_exists('ep_4_curly_quotes')) {
   require_once DIR_WS_FUNCTIONS . 'extra_functions/easypopulate_4_functions.php';
 }
 
+if (class_exists('queryFactoryEP4')) {
+  $ep4['db'] = new queryFactoryEP4();
+  $ep4['link'] = $ep4['db']->getLink();
+} else {
+  $ep4['db'] = $db;
+  $ep4['link'] = $ep4['db']->link;
+}
+$ep4['path'] = realpath(dirname(__FILE__));
+// Ensure ends with a directory divider to simplify further handling
+if ($ep4['path'] !== '/') {
+  $ep4['path'] .= '/';
+}
+
 // CSV VARIABLES - need to make this configurable in the ADMIN
 // $csv_delimiter = "\t"; // "\t" = tab AND "," = COMMA
 $csv_delimiter = ","; // "\t" = tab AND "," = COMMA
@@ -178,14 +191,42 @@ $ep_dltype = NULL;
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
 $specials_print = EASYPOPULATE_4_SPECIALS_HEADING;
 $has_specials = false;
+
+$filename = 'easypopulate_4_menus.php';
+$folder = '/';  // end with slash
+$langs = array();
+$langs[] = isset($_SESSION['language']) ? $_SESSION['language'] : 'english';
+$langs[] = 'english';
+
+foreach ($langs as $lang) {
+  $old_langfile = $ep4['path'] . DIR_WS_LANGUAGES . $lang . $folder . $filename;
+  if (file_exists($old_langfile)) {
+    break;
+  }
+}
+
+if (class_exists('LanguageLoader')) {
+  foreach ($langs as $lang) {
+    $new_langfile = $ep4['path'] . DIR_WS_LANGUAGES . $lang . $folder . 'lang.' . $filename;
+    if (file_exists($new_langfile)) {
+      break;
+    }
+  }
+}
+
 $zco_notifier->notify('EP4_START');
 
 // Load language file(s) for main screen menu(s).
-if(file_exists(DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_menus.php'))
-{
-  require(DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_menus.php');
-} else {
-  require(DIR_WS_LANGUAGES . 'english' . '/easypopulate_4_menus.php');
+
+if (class_exists('LanguageLoader') && file_exists($new_langfile)) {
+  global $languageLoader;
+  $languageLoader->loadExtraLanguageFiles($ep4['path'] . DIR_WS_LANGUAGES, $_SESSION['language'], $filename, $folder);
+} elseif (file_exists($old_langfile)) {
+  $tpl_old_langfile = $ep4['path'] . DIR_WS_LANGUAGES . $_SESSION['language'] . $folder .  $template_dir . '/' . $filename;
+  if (file_exists($tpl_old_langfile)) {
+    $old_langfile = $tpl_old_langfile;
+  }
+  require $old_langfile;
 }
 
 // all mods go in this array as 'name' => 'true' if exist. eg $ep_supported_mods['psd'] => true means it exists.
@@ -388,7 +429,7 @@ $max_len = array(
 $project = PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR;
 
 if ($ep_uses_mysqli) {
-  $collation = mysqli_character_set_name($db->link); // should be either latin1, utf8 or utf8mb4
+  $collation = mysqli_character_set_name($ep4['link']); // should be either latin1, utf8 or utf8mb4
 } else {
   $collation = mysql_client_encoding(); // should be either latin1, utf8, or utf8mb4
 }
@@ -494,7 +535,7 @@ function getDBDelimiterList() {
 }
 
 function getFileDelimiter($file, $checkLines = 2) {
-  //global $db;
+  //global $ep4;
 
   $tempdir = EASYPOPULATE_4_CONFIG_TEMP_DIR;
   if (substr($tempdir, -1) != '/') {
@@ -896,7 +937,7 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
              $manufacturers_array[] = array("id" => '0', 'text' => EASYPOPULATE_4_DISPLAY_MANUFACTURERS);
              $manufacturers_array[] = array("id" => '-1', 'text' => EASYPOPULATE_4_DISPLAY_MANUFACTURERS_NONE);
              if ($ep_uses_mysqli) {
-               $manufacturers_query = mysqli_query($db->link, "SELECT manufacturers_id, manufacturers_name FROM " . TABLE_MANUFACTURERS . " ORDER BY manufacturers_name");
+               $manufacturers_query = mysqli_query($ep4['link'], "SELECT manufacturers_id, manufacturers_name FROM " . TABLE_MANUFACTURERS . " ORDER BY manufacturers_name");
                while ($manufacturers = mysqli_fetch_array($manufacturers_query)) {
                  $manufacturers_array[] = array("id" => $manufacturers['manufacturers_id'], 'text' => $manufacturers['manufacturers_name']);
                }

@@ -706,7 +706,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
             $result = ep_4_query($sql);
             unset($sql);
 
-            $v_manufacturers_id = $ep_4_insert_id(($ep_uses_mysqli ? $db->link : null)); // id is auto_increment, so can use this function
+            $v_manufacturers_id = $ep_4_insert_id(($ep_uses_mysqli ? $ep4['link'] : null)); // id is auto_increment, so can use this function
 
             if ($result) {
               zen_record_admin_activity('Inserted manufacturer ' . zen_db_input($v_manufacturers_name) . ' via EP4.', 'info');

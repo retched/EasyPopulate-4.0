@@ -34,14 +34,17 @@ function ep_4_curly_quotes($curly_text) {
 // function to return field length
 // uses $tbl = table name, $fld = field name
 function ep4_zen_field_length($tbl, $fld) {
-    global $db;
+  global $db;
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
   $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
 
   $meta = array();
-  $result = ($ep_uses_mysqli ? mysqli_query($db->link, "SELECT $fld FROM $tbl") : mysql_query("SELECT $fld FROM $tbl"));
+  if ($ep_uses_mysqli) {
+    global $ep4;
+  }
+  $result = ($ep_uses_mysqli ? mysqli_query($ep4['link'], "SELECT $fld FROM $tbl") : mysql_query("SELECT $fld FROM $tbl"));
   if (!$result) {
-      echo 'Could not run query: ' . ($ep_uses_mysqli ? mysqli_error($db->link) : mysql_error());
+      echo 'Could not run query: ' . ($ep_uses_mysqli ? mysqli_error($ep4['link']) : mysql_error());
       unset($project);
       unset($ep_uses_mysqli);
       unset($meta);
@@ -243,12 +246,17 @@ function ep_4_CEONURIExists () {
 
 if (!function_exists('zen_get_sub_categories')) {
   function zen_get_sub_categories(&$categories, $categories_id) {
-    global $db;
+    //global $db;
     $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
     $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
-    $sub_categories_query = ($ep_uses_mysqli ? mysqli_query($db->link, "SELECT categories_id FROM ".TABLE_CATEGORIES.
-      " WHERE parent_id = ".(int)$categories_id) : mysql_query("SELECT categories_id FROM ".TABLE_CATEGORIES.
-      " WHERE parent_id = ".(int)$categories_id));
+    if ($ep_uses_mysqli) {
+      global $ep4;
+    }
+    $cat_query = "SELECT categories_id FROM " . TABLE_CATEGORIES .
+      " WHERE parent_id = ".(int)$categories_id;
+
+    $sub_categories_query = ($ep_uses_mysqli ? mysqli_query($ep4['link'], $cat_query) 
+      : mysql_query($cat_query));
     while ($sub_categories = ($ep_uses_mysqli ? mysqli_fetch_array($sub_categories_query) : mysql_fetch_array($sub_categories_query))) {
       if ($sub_categories['categories_id'] == 0) {
         return true;
@@ -377,14 +385,21 @@ function ep_4_copy_uploaded_file($filename, $target) {
 }
 
 function ep_4_get_tax_class_rate($tax_class_id) {
-  global $db;
+  //global $db;
   $tax_multiplier = 0;
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
   $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
 
-  $tax_query = ($ep_uses_mysqli ? mysqli_query($db->link, "SELECT SUM(tax_rate) AS tax_rate FROM ".TABLE_TAX_RATES.
-    " WHERE tax_class_id = '".zen_db_input($tax_class_id)."' GROUP BY tax_priority") : mysql_query("SELECT SUM(tax_rate) AS tax_rate FROM ".TABLE_TAX_RATES.
-    " WHERE tax_class_id = '".zen_db_input($tax_class_id)."' GROUP BY tax_priority"));
+  if ($ep_uses_mysqli) {
+    global $ep4;
+  }
+  
+  $tax_rate_query = "SELECT SUM(tax_rate) AS tax_rate FROM ".TABLE_TAX_RATES.
+    " WHERE tax_class_id = " . (int)$tax_class_id . " GROUP BY tax_priority";
+  $tax_query = ($ep_uses_mysqli 
+    ? mysqli_query($ep4['link'], $tax_rate_query)
+    : mysql_query($tax_rate_query)
+  );
   if (($ep_uses_mysqli ? mysqli_num_rows($tax_query): mysql_num_rows($tax_query))) {
     while ($tax = ($ep_uses_mysqli ? mysqli_fetch_array($tax_query) : mysql_fetch_array($tax_query))) {
       $tax_multiplier += $tax['tax_rate'];
@@ -399,12 +414,15 @@ function ep_4_get_tax_class_rate($tax_class_id) {
 }
 
 function ep_4_get_tax_title_class_id($tax_class_title) {
-  global $db;
+  global $ep4;
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
   $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
-  $classes_query = ($ep_uses_mysqli ? mysqli_query($db->link, "SELECT tax_class_id FROM ".TABLE_TAX_CLASS.
-    " WHERE tax_class_title = '".zen_db_input($tax_class_title)."'") : mysql_query("SELECT tax_class_id FROM ".TABLE_TAX_CLASS.
-    " WHERE tax_class_title = '".zen_db_input($tax_class_title)."'"));
+  $tax_class_id_query = "SELECT tax_class_id FROM " . TABLE_TAX_CLASS .
+    " WHERE tax_class_title = '" . zen_db_input($tax_class_title) . "'";
+  $classes_query = ($ep_uses_mysqli 
+    ? mysqli_query($ep4['link'], $tax_class_id_query) 
+    : mysql_query($tax_class_id_query)
+  );
   $tax_class_array = ($ep_uses_mysqli ? mysqli_fetch_array($classes_query) : mysql_fetch_array($classes_query));
   $tax_class_id = !empty($tax_class_array['tax_class_id']) ? $tax_class_array['tax_class_id'] : 0;
 
@@ -468,7 +486,7 @@ function ep_4_check_table_column($table_name,$column_name) {
 }
 
 function ep_4_remove_product($product_model) {
-  global $db, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error, $zco_notifier, $zc_support_ignore_null;
+  global $db, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error, $zco_notifier, $zc_support_ignore_null, $ep4;
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
   $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
   $sql = "SELECT p.products_id FROM ".TABLE_PRODUCTS . " p";
@@ -491,10 +509,10 @@ function ep_4_remove_product($product_model) {
       break;
   }
   $products = $db->Execute($sql);
-  if (($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno())) {
+  if (($ep_uses_mysqli ? mysqli_errno($ep4['link']) : mysql_errno())) {
     $ep_stack_sql_error = true;
     if ($ep_debug_logging == true) {
-      $string = "MySQL error ".($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno()).": ".($ep_uses_mysqli ? mysqli_error($db->link) : mysql_error())."\nWhen executing:\n$sql\n";
+      $string = "MySQL error ".($ep_uses_mysqli ? mysqli_errno($ep4['link']) : mysql_errno()).": ".($ep_uses_mysqli ? mysqli_error($ep4['link']) : mysql_error())."\nWhen executing:\n$sql\n";
       write_debug_log_4($string);
     }
   } elseif ($ep_debug_logging_all == true) {
@@ -604,14 +622,17 @@ function write_debug_log_4($string) {
 }
 
 function ep_4_query($query) {
-  global $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error, $db;
+  global $ep4, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error/*, $db*/;
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
   $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
-  $result = ($ep_uses_mysqli ? mysqli_query($db->link, $query) : mysql_query($query));
-  if (($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno())) {
+  $result = ($ep_uses_mysqli ? (empty($query) ? false : mysqli_query($ep4['link'], $query)) : mysql_query($query));
+  if (($ep_uses_mysqli ? ($result === false ? true : mysqli_errno($ep4['link'])) : mysql_errno())) {
     $ep_stack_sql_error = true;
     if ($ep_debug_logging == true) {
-      $string = ($ep_uses_mysqli ? "MySQLi" : "MySQL") . " error ".($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno() ) . ": ".($ep_uses_mysqli ? mysqli_error($db->link) : mysql_error())."\nWhen executing:\n$query\n";
+      $string = ($ep_uses_mysqli ? "MySQLi" : "MySQL") . " error ".($ep_uses_mysqli ? ($result === false ? 'Empty query' : mysqli_errno($ep4['link'])) : mysql_errno() ) . ": ".($ep_uses_mysqli ? ($result === false ? 'Empty query' : mysqli_error($ep4['link'])) : mysql_error())."\nWhen executing:\n$query\n";
+      if (function_exists('debug_backtrace')) {
+        $string .= print_r(debug_backtrace(), true);
+      }
       write_debug_log_4($string);
     }
   } elseif ($ep_debug_logging_all == true) {
@@ -731,7 +752,8 @@ function install_easypopulate_4() {
         } else {
             $db->Execute("INSERT INTO " . TABLE_CONFIGURATION_GROUP . " (configuration_group_title, configuration_group_description, sort_order, visible) VALUES ('Easy Populate 4', 'Configuration Options for Easy Populate 4', '1', '1')");
             if (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') {
-                $group_id = mysqli_insert_id($db->link);
+                global $ep4;
+                $group_id = mysqli_insert_id($ep4['link']);
             } else {
                 $group_id = mysql_insert_id();
             }
