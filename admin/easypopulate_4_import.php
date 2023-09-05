@@ -431,7 +431,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
         if ($product_is_new == true) {
           if (zen_not_null($items[$filelayout[$chosen_key]])) { // must have products_model
             // new products must have a categories_name to be added to the store.
-            $categories_name_exists = false; // assume no column defined
+            $categories_name_exists = array(); // assume no column defined
             foreach ($langcode as $lang) {
               // test column headers for each language
               if (ep4_field_in_file('v_categories_name_' . $lang['id']) && zen_not_null($items[$filelayout['v_categories_name_' . $lang['id']]]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only' || ep4_field_in_file('v_categories_name_' . $lang['code']) && zen_not_null($items[$filelayout['v_categories_name_' . $lang['code']]]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_id_only') { // import column found
@@ -755,7 +755,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
         unset($manf_str_len);
 
         // BEGIN: CATEGORIES2 ===============================================================================================
-        $categories_name_exists = false; // assume no column defined
+        $categories_name_exists = array(); // assume no column defined
         foreach ($langcode as $lang) {
           // test column headers for each language
           if (ep4_field_in_file('v_categories_name_' . $lang['id']) && zen_not_null($items[$filelayout['v_categories_name_' . $lang['id']]]) && EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE != 'language_code_only') { // import column found
