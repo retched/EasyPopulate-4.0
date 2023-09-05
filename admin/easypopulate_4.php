@@ -482,7 +482,7 @@ if (!defined('DEFAULT_LANGUAGE')) {
 $epdlanguage_query = ep_4_query("SELECT languages_id, code, name FROM " . TABLE_LANGUAGES . " WHERE code = '" . DEFAULT_LANGUAGE . "'");
 
 if ($ep_4_num_rows($epdlanguage_query) == 0) {
-  exit("EP4 FATAL ERROR: No default languages set."); // this should never happen
+  exit("EP4 FATAL ERROR: No default language set."); // this should never happen
 }
 
 $epdlanguage = $ep_4_fetch_array($epdlanguage_query);
@@ -726,7 +726,7 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
     // $messageStack->add(sprintf($_POST["delete"]." was deleted successfully"), 'success');
     zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
   } else {
-    $messageStack->add(sprintf("Cannot delete file: " . $_POST["delete"]), 'caution');
+    $messageStack->add(sprintf("Cannot delete file: %s" , $_POST["delete"]), 'caution');
     // zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
   }
 }
