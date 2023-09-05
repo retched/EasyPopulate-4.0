@@ -225,8 +225,8 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists((!strstr(FILENAME_EASYPO
   if (EP4_ADMIN_TEMP_DIRECTORY !== 'true') {
     if (strpos($ep_debug_log_path, DIR_FS_ADMIN) !== false) {
       $temp_rem = substr($ep_debug_log_path, strlen(DIR_FS_ADMIN));
-      $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'true\' where configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', false, false, 0, true);
-      $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'' . $temp_rem . '\' WHERE configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', false, false, 0, true);
+      $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'true\' where configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', 1, false, 0, true);
+      $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'' . $temp_rem . '\' WHERE configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', 1, false, 0, true);
       // @TODO need a message to  be displayed...
       // Reload the page with the path now reset. No parameters are passed.
 //      zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));

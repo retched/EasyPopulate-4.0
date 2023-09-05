@@ -258,9 +258,9 @@ $ep_debug_log_path = (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_
 if (EP4_ADMIN_TEMP_DIRECTORY !== 'true') {
   if (strpos($ep_debug_log_path, DIR_FS_ADMIN) !== false) {
     $temp_rem = substr($ep_debug_log_path, strlen(DIR_FS_ADMIN));
-    $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'true\' where configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', false, false, 0, true);
+    $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'true\' where configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', 1, false, 0, true);
 
-    $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'' . $temp_rem . '\' WHERE configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', false, false, 0, true);
+    $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'' . $temp_rem . '\' WHERE configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', 1, false, 0, true);
 
     // @TODO need a message to  be displayed...
 
@@ -501,7 +501,7 @@ function getDBDelimiterList() {
   global $db;
   
   $sql = "SELECT set_function FROM " . TABLE_CONFIGURATION . " where configuration_key = 'EASYPOPULATE_4_CONFIG_CSV_DELIMITER'";
-  $set_function = $db->Execute($sql);
+  $set_function = $db->Execute($sql, 1);
 
   if ($set_function->EOF) {
     return NULL;
