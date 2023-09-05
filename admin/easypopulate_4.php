@@ -966,11 +966,13 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
 
     <div align = "left">
     <?php
-    $order_export_type_array  = array(array( "id" => '0', 'text' => EASYPOPULATE_4_ORDERS_DROPDOWN_FIRST ),
-      array( "id" => '1', 'text' => EASYPOPULATE_4_ORDERS_FULL ),
-      array( "id" => '2', 'text' => EASYPOPULATE_4_ORDERS_NEWFULL ),
-      array( "id" => '3', 'text' => EASYPOPULATE_4_ORDERS_NO_ATTRIBS ),
-      array( "id" => '4', 'text' => EASYPOPULATE_4_ORDERS_ATTRIBS ));
+    $order_export_type_array  = array(
+      array("id" => '0', 'text' => EASYPOPULATE_4_ORDERS_DROPDOWN_FIRST),
+      array("id" => '1', 'text' => EASYPOPULATE_4_ORDERS_FULL),
+      array("id" => '2', 'text' => EASYPOPULATE_4_ORDERS_NEWFULL),
+      array("id" => '3', 'text' => EASYPOPULATE_4_ORDERS_NO_ATTRIBS),
+      array("id" => '4', 'text' => EASYPOPULATE_4_ORDERS_ATTRIBS),
+      );
     $order_status_export_array = array ();
     echo EASYPOPULATE_4_ORDERS_DROPDOWN_TITLE;
 
