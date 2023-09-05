@@ -342,7 +342,7 @@ while ($row = $ep_4_fetch_array($result)) {
       continue; // loop - for more products_options_values_name on same v_products_id/v_options_id combo
     }
     // new combo or different product or first time through while-loop
-    if (isset($active_row['v_products_id']) && ($active_row['v_products_id'] <> $last_products_id)) {
+    if (isset($active_row['v_products_id']) && ($active_row['v_products_id'] <> $last_products_id)) { // Consider if isset should be used here instead of array_key_exists
       // Clean the texts that could break CSV file formatting
 
       $dataRow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
@@ -351,7 +351,7 @@ while ($row = $ep_4_fetch_array($result)) {
       unset($dataRow);
 
       $ep_export_count++;
-      $last_products_id = ((isset($active_row['v_products_id']) || array_key_exists('v_products_id', $active_row)) ? (int)$active_row['v_products_id'] : 0);
+      $last_products_id = ((isset($active_row['v_products_id']) || array_key_exists('v_products_id', $active_row)) ? (int)$active_row['v_products_id'] : 0); // Verify that need if statement considering how we arrived here.
     } // end if new model
 
     // get current row of data
