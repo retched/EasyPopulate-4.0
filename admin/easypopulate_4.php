@@ -909,7 +909,7 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
             <?php echo zen_draw_input_field("buttoninsert", EASYPOPULATE_4_DISPLAY_UPLOAD_BUTTON_TEXT, '', false, 'submit', true); ?>
             <br /><br /><br />
           </div>
-        </form>
+        <?php echo '</form>'; ?>
 
         <?php
 // echo zen_draw_form('custom', 'easypopulate_4.php', 'id="custom"', 'get');
@@ -959,7 +959,7 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
              echo zen_draw_input_field('export', EASYPOPULATE_4_DD_FILTER_EXPORT, ' style="padding: 0px"', false, 'submit');
              ?>
           <br /><br />
-        </div></form>
+        </div><?php echo '</form>'; ?>
   <?php
   echo zen_draw_form('custom2', FILENAME_EASYPOPULATE_4, '', 'post', 'id="custom2"');
   ?>
@@ -981,7 +981,7 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
     echo zen_draw_input_field('exportorder', EASYPOPULATE_4_ORDERS_DROPDOWN_EXPORT, ' style="padding: 0px"', false, 'submit');
     ?>
     <br /><br />
-    </div></form>
+    </div><?php echo '</form>'; ?>
 
 
         <b><?php echo EASYPOPULATE_4_DISPLAY_PRODUCTS_PRICE_EXPORT_OPTION; ?></b><br />
