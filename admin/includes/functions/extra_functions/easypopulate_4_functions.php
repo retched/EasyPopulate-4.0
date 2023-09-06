@@ -36,7 +36,7 @@ function ep_4_curly_quotes($curly_text) {
 function ep4_zen_field_length($tbl, $fld) {
   global $db;
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-  $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
+  $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3');
 
   $meta = array();
   if ($ep_uses_mysqli) {
@@ -64,7 +64,7 @@ function ep4_zen_field_length($tbl, $fld) {
 function ep_4_get_languages() {
     $ep_languages_array = array();
     $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-  $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
+  $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3');
   $langcode = array();
   $languages_query = ep_4_query("SELECT languages_id, name, code FROM ".TABLE_LANGUAGES." ORDER BY sort_order");
   $i = 1;
@@ -88,7 +88,7 @@ function ep_4_get_languages() {
 
 function ep_4_SBA1Exists () {
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-  $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
+  $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3');
   // The current thought is to have one of these Exists files for each version of SBA to consider; however, they also all could fall under one SBA_Exists check provided some return is made and a comparison done on the other end about what was returned.
   //Check to see if any version of Stock with attributes is installed (If so, and properly programmed, there should be a define for the table associated with the stock.  There may be more than one, and if so, they should all be verified for the particular SBA.
   if (!defined('TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK')) {
@@ -191,7 +191,7 @@ function ep_4_SBA1Exists () {
 
 function ep_4_CEONURIExists () {
   //$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-  $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
+  $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3');
   // The current thought is to have one of these Exists files for each version of SBA to consider; however, they also all could fall under one SBA_Exists check provided some return is made and a comparison done on the other end about what was returned.
   //Check to see if any version of Stock with attributes is installed (If so, and properly programmed, there should be a define for the table associated with the stock.  There may be more than one, and if so, they should all be verified for the particular SBA.
   if (!defined('TABLE_CEON_URI_MAPPINGS')) {
@@ -248,7 +248,7 @@ if (!function_exists('zen_get_sub_categories')) {
   function zen_get_sub_categories(&$categories, $categories_id) {
     //global $db;
     $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-    $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
+    $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3');
     if ($ep_uses_mysqli) {
       global $ep4;
     }
@@ -388,8 +388,7 @@ function ep_4_get_tax_class_rate($tax_class_id) {
   //global $db;
   $tax_multiplier = 0;
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-  $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
-
+  $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3');
   if ($ep_uses_mysqli) {
     global $ep4;
   }
@@ -416,7 +415,7 @@ function ep_4_get_tax_class_rate($tax_class_id) {
 function ep_4_get_tax_title_class_id($tax_class_title) {
   global $ep4;
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-  $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
+  $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3');
   $tax_class_id_query = "SELECT tax_class_id FROM " . TABLE_TAX_CLASS .
     " WHERE tax_class_title = '" . zen_db_input($tax_class_title) . "'";
   $classes_query = ($ep_uses_mysqli 
@@ -462,7 +461,7 @@ function smart_tags_4($string,$tags,$crsub,$doit) {
 
 function ep_4_check_table_column($table_name,$column_name) {
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-  $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
+  $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3');
   $sql = "SHOW COLUMNS FROM ".$table_name;
   $result = ep_4_query($sql);
   $answer = false;
@@ -488,7 +487,7 @@ function ep_4_check_table_column($table_name,$column_name) {
 function ep_4_remove_product($product_model) {
   global $db, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error, $zco_notifier, $zc_support_ignore_null, $ep4;
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-  $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
+  $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3');
   $sql = "SELECT p.products_id FROM ".TABLE_PRODUCTS . " p";
   switch (EP4_DB_FILTER_KEY) {
     case 'products_model':
@@ -624,7 +623,7 @@ function write_debug_log_4($string) {
 function ep_4_query($query) {
   global $ep4, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error/*, $db*/;
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-  $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
+  $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3');
   $result = ($ep_uses_mysqli ? (empty($query) ? false : mysqli_query($ep4['link'], $query)) : mysql_query($query));
   if (($ep_uses_mysqli ? ($result === false ? true : mysqli_errno($ep4['link'])) : mysql_errno())) {
     $ep_stack_sql_error = true;
@@ -905,7 +904,7 @@ function install_easypopulate_4() {
 function remove_easypopulate_4() {
   global $db;
   $project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-  $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
+  $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3');
   if ( (substr($project,0,5) == "1.3.8") || (substr($project,0,5) == "1.3.9") ) {
     $sql = "SELECT configuration_group_id FROM ".TABLE_CONFIGURATION_GROUP." WHERE configuration_group_title = 'Easy Populate 4' LIMIT 1";
     $result = ep_4_query($sql);

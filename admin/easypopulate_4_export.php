@@ -387,7 +387,7 @@ while ($row = $ep_4_fetch_array($result)) {
         $row['v_customers_telephone'] = NULL;
         $row['v_customers_email_address'] = NULL;
       }
-      if (isset($row['v_orders_id']) || !isset($tracker['v_products_id']) || (isset($tracker['v_products_id']) && $tracker['v_products_id'] != $row['v_products_id'])) {
+      if (isset($row['v_orders_id']) || !isset($tracker['v_products_id']) || ($tracker['v_products_id'] != $row['v_products_id'])) {
         $tracker['v_products_id'] = $row['v_products_id'];
       } else {
         $row['v_products_id'] = NULL;
