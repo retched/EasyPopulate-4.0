@@ -98,95 +98,95 @@ function ep_4_SBA1Exists () {
     return false;
   }
 
-    $tablePresent = ep_4_query('SELECT *
-          FROM information_schema.tables
-          WHERE table_schema = \'' . DB_DATABASE . '\'
-          AND table_name = \'' . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK . '\'
-          LIMIT 1;');
-    // Check if database table is present in the database before attempting to access it.  If not present, then no need to
-    //  continue processing.
+  $tablePresent = ep_4_query('SELECT *
+        FROM information_schema.tables
+        WHERE table_schema = \'' . DB_DATABASE . '\'
+        AND table_name = \'' . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK . '\'
+        LIMIT 1;');
+  // Check if database table is present in the database before attempting to access it.  If not present, then no need to
+  //  continue processing.
 
-    if (($ep_uses_mysqli ? ($tablePresent === false ? 0 : mysqli_num_rows($tablePresent)) : mysql_num_rows($tablePresent)) == 0)/*$tablePresent == false || (is_object($tablePresent) && $tablePresent->num_rows == 0))*/ {
-      unset($project);
-      unset($ep_uses_mysqli);
-      unset($tablePresent);
-      return false;
-    }
-    //Now that have identified that the table (applicable to mc12345678's store, has been identified as in existence, now need to look at the setup of the table (Number of columns and if each column identified below is in the table, or conversely if the table's column matches the list below.
-    //Columns in table: stock_id, products_id, stock_attributes, quantity, and sort.
-    $colsarray = ep_4_query('SHOW COLUMNS FROM ' . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK);
-//    echo 'After execute<br />';
-    $numCols = ($ep_uses_mysqli ? ($colsarray === false ? 0 : mysqli_num_rows($colsarray)) : mysql_num_rows($colsarray));
+  if (($ep_uses_mysqli ? ($tablePresent === false ? 0 : mysqli_num_rows($tablePresent)) : mysql_num_rows($tablePresent)) == 0)/*$tablePresent == false || (is_object($tablePresent) && $tablePresent->num_rows == 0))*/ {
+    unset($project);
+    unset($ep_uses_mysqli);
+    unset($tablePresent);
+    return false;
+  }
+  //Now that have identified that the table (applicable to mc12345678's store, has been identified as in existence, now need to look at the setup of the table (Number of columns and if each column identified below is in the table, or conversely if the table's column matches the list below.
+  //Columns in table: stock_id, products_id, stock_attributes, quantity, and sort.
+  $colsarray = ep_4_query('SHOW COLUMNS FROM ' . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK);
+//  echo 'After execute<br />';
+  $numCols = ($ep_uses_mysqli ? ($colsarray === false ? 0 : mysqli_num_rows($colsarray)) : mysql_num_rows($colsarray));
 
-    if ($numCols < 5) {
-      unset($project);
-      unset($ep_uses_mysqli);
-      unset($tablePresent);
-      unset($colsarray);
-      unset($numCols);
-      unset($row);
-      return false;
-    }
+  if ($numCols < 5) {
+    unset($project);
+    unset($ep_uses_mysqli);
+    unset($tablePresent);
+    unset($colsarray);
+    unset($numCols);
+    unset($row);
+    return false;
+  }
 
-    if ($numCols == 5) {
-      while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($colsarray) : mysql_fetch_array($colsarray))){
-        switch ($row['Field']) {
-          case 'stock_id':
-          case 'products_id':
-          case 'stock_attributes':
-          case 'quantity':
-          case 'sort':
-            break;
-          default:
-            unset($project);
-            unset($ep_uses_mysqli);
-            unset($tablePresent);
-            unset($colsarray);
-            unset($numCols);
-            unset($row);
-            return false;
-            break;
+  if ($numCols == 5) {
+    while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($colsarray) : mysql_fetch_array($colsarray))){
+      switch ($row['Field']) {
+        case 'stock_id':
+        case 'products_id':
+        case 'stock_attributes':
+        case 'quantity':
+        case 'sort':
+          break;
+        default:
+          unset($project);
+          unset($ep_uses_mysqli);
+          unset($tablePresent);
+          unset($colsarray);
+          unset($numCols);
+          unset($row);
+          return false;
+          break;
 
-        }
       }
-      unset($project);
-      unset($ep_uses_mysqli);
-      unset($tablePresent);
-      unset($colsarray);
-      unset($numCols);
-      unset($row);
-      return '1';
-    } elseif ($numCols >= 6) {
-      $desired = 0;
-//      $addToList = array();
-      while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($colsarray) : mysql_fetch_array($colsarray))){
-        switch ($row['Field']) {
-          case 'stock_id':
-          case 'products_id':
-          case 'stock_attributes':
-          case 'quantity':
-          case 'sort':
-          case 'customid';
-            $desired++;
-            break;
-          default:
-//            $addToList = $row['Field'];
-            break;
-        }
-      }
-      unset($project);
-      unset($ep_uses_mysqli);
-      unset($tablePresent);
-      unset($colsarray);
-      unset($numCols);
-      unset($row);
-      if ($desired >= 6) {
-        unset($desired);
-        return '2';
-      }
-      unset($desired);
-      return false;
     }
+    unset($project);
+    unset($ep_uses_mysqli);
+    unset($tablePresent);
+    unset($colsarray);
+    unset($numCols);
+    unset($row);
+    return '1';
+  }
+
+  $desired = 0;
+//  $addToList = array();
+  while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($colsarray) : mysql_fetch_array($colsarray))){
+    switch ($row['Field']) {
+      case 'stock_id':
+      case 'products_id':
+      case 'stock_attributes':
+      case 'quantity':
+      case 'sort':
+      case 'customid';
+        $desired++;
+        break;
+      default:
+//        $addToList = $row['Field'];
+        break;
+    }
+  }
+  unset($project);
+  unset($ep_uses_mysqli);
+  unset($tablePresent);
+  unset($colsarray);
+  unset($numCols);
+  unset($row);
+  if ($desired >= 6) {
+    unset($desired);
+    return '2';
+  }
+  unset($desired);
+  return false;
 }
 
 function ep_4_CEONURIExists () {

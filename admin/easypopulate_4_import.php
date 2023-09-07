@@ -310,10 +310,10 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
                 INNER JOIN ' . TABLE_CATEGORIES . ' c USING (categories_id) ';
         $zco_notifier->notify('EP4_IMPORT_PRODUCT_DEFAULT_SELECT_TABLES');
         if (zen_not_null($chosen_key_sql)) {
-        $sql .= "
+          $sql .= "
           WHERE
           ";
-        $sql .= $chosen_key_sql;
+          $sql .= $chosen_key_sql;
         }
 
         if (ep4_field_in_file('v_products_model')) {
@@ -1526,7 +1526,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
               $result = ep_4_query($sql);
               unset($sql);
               if ($result) {
-                zen_record_admin_activity('Updated/inserted meta tags products description ' . (int) $v_products_id . ' via EP4.', 'info');
+                zen_record_admin_activity('Updated/inserted meta tags products description ' . (int)$v_products_id . ' via EP4.', 'info');
               }
               unset($result);
             }
