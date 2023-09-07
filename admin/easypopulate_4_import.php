@@ -52,7 +52,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
 
   $zco_notifier->notify('EP4_IMPORT_START');
 
-  require(DIR_WS_MODULES . 'easypopulate_4_default_these.php');
+  require DIR_WS_MODULES . 'easypopulate_4_default_these.php';
 
   /*if (count($custom_fields) > 0) {
     foreach ($custom_fields as $field) {
@@ -1094,21 +1094,21 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
         // HERE ==========================>
         // BEGIN: record_artists
         if (isset($filelayout['v_artists_name'])) {
-          require(DIR_WS_MODULES . 'easypopulate_4_import_artists_name.php');
+          require DIR_WS_MODULES . 'easypopulate_4_import_artists_name.php';
         }
         // END: record_artists
 
         // HERE ==========================>
         // BEGIN: record_company
         if (isset($filelayout['v_record_company_name'])) {
-          require(DIR_WS_MODULES . 'easypopulate_4_import_record_company_name.php');
+          require DIR_WS_MODULES . 'easypopulate_4_import_record_company_name.php';
         }
         // END: record_company
 
         // HERE ==========================>
         // BEGIN: music_genre
         if (isset($filelayout['v_music_genre_name'])) {
-          require(DIR_WS_MODULES . 'easypopulate_4_import_music_genre_name.php');
+          require DIR_WS_MODULES . 'easypopulate_4_import_music_genre_name.php';
         }
         // END: music_genre
 
