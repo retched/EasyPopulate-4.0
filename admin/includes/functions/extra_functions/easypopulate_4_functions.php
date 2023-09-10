@@ -1345,4 +1345,5 @@ function ep4_draw_cat_list($current_cat_id, $withAttribs = true, $withProd = tru
     if (!$withAttribs && $withProd && !$showOnly) {
         return zen_get_category_tree('', '', '0', '', '', true);
     }
+    return '';
 }
