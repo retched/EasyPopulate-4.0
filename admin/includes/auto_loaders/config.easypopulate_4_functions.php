@@ -20,6 +20,13 @@ if (!defined('IS_ADMIN_FLAG')) {
 //added to support processing when working with configurations as navigation occurs.
 
 $autoLoadConfig[199][] = array(
+    'autoType'=>'require',
+    'forceLoad'=>false,
+    'loadFile'=>realpath(__DIR__ . "/../../") . '/'
+     . DIR_WS_FUNCTIONS . 'extra_functions/reg_easypopulate_4.php',
+  );
+
+$autoLoadConfig[199][] = array(
     'autoType'=>'init_script',
     'loadFile'=>'init_easypopulate_4_functions.php'
   );
