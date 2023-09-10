@@ -1315,13 +1315,14 @@ function ep4_get_category_tree($parent_id = '0', $spacing = '', $exclude = '', $
           $categories_products_id_list = array();
           $products = ep4_get_categories_products_list($categories->fields['categories_id'], true);
           foreach ($products as $products_id => $cat) {
-            if (zen_has_product_attributes($products_id)) {
-              if (!$withProd) {
-                $mark ='';
-              }
-              $mark .= '-a';
-              break;
+            if (!zen_has_product_attributes($products_id)) {
+              continue;
             }
+            if (!$withProd) {
+              $mark = '';
+            }
+            $mark .= '-a';
+            break;
           }
         }
       } else {
