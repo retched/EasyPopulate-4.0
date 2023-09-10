@@ -6,6 +6,10 @@
   }
 
 function ep_4_curly_quotes($curly_text) {
+  // Address PHP 8.x deprecation of str_replace on a null value.
+  if (is_null($curly_text)) {
+    return null;
+  }
   $ep_curly_quotes = (int)EASYPOPULATE_4_CONFIG_CURLY_QUOTES;
   $ep_char_92 = (int)EASYPOPULATE_4_CONFIG_CHAR_92;
   if ($ep_curly_quotes == 1) { // standard characters
@@ -539,7 +543,7 @@ function ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter = "^") {
 //    $thetext = $active_row[$key];
     // remove carriage returns, newlines, and tabs - needs review
     $thetext = '';
-    if (isset($active_row[$key]) || array_key_exists($key, $active_row)) {
+    if (isset($active_row[$key]) /*|| array_key_exists($key, $active_row)*/) {
       $thetext = str_replace($problem_chars, ' ', $active_row[$key]);
     }
     // encapsulate data in quotes, and escape embedded quotes in data
