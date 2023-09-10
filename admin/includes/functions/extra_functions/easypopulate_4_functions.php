@@ -1275,7 +1275,7 @@ function ep4_get_categories_products_list($categories_id, $include_deactivated =
 }
 
 function ep4_get_category_tree($parent_id = '0', $spacing = '', $exclude = '', $category_tree_array = array(), $include_itself = false, $category_has_products = false, $limit = false, $withProd = true, $withAttribs = false, $showOnly = false) {
-    global $db, $categories_products_id_list;;
+    global $db, $categories_products_id_list;
 
     $limit_count = '';
     if ($limit) {
