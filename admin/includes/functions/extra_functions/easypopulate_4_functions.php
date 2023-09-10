@@ -1285,7 +1285,9 @@ function ep4_get_category_tree($parent_id = '0', $spacing = '', $exclude = '', $
     if (!is_array($category_tree_array)) {
       $category_tree_array = array();
     }
-    if ( (sizeof($category_tree_array) < 1) && ($exclude != '0') ) $category_tree_array[] = array('id' => '0', 'text' => TEXT_TOP);
+    if (empty($category_tree_array) && ($exclude != '0') ) {
+      $category_tree_array[] = array('id' => '0', 'text' => TEXT_TOP);
+    }
 
     if ($include_itself) {
       $category = $db->Execute("SELECT cd.categories_name
