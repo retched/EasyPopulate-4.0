@@ -407,14 +407,13 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists((!strstr(FILENAME_EASYPO
     define('DEFAULT_LANGUAGE', $epdlanguage['code']);
   }
   $epdlanguage_query = ep_4_query("SELECT languages_id, code, name FROM " . TABLE_LANGUAGES . " WHERE code = '" . DEFAULT_LANGUAGE . "'");
-  if (($ep_uses_mysqli ? mysqli_num_rows($epdlanguage_query) : mysql_num_rows($epdlanguage_query))) {
-    $epdlanguage = ($ep_uses_mysqli ? mysqli_fetch_array($epdlanguage_query) : mysql_fetch_array($epdlanguage_query));
-    $epdlanguage_id = $epdlanguage['languages_id'];
-    $epdlanguage_name = $epdlanguage['name'];
-    $epdlanguage_code = $epdlanguage['code'];
-  } else {
+  if ($ep_4_num_rows($epdlanguage_query) == 0) {
     exit("EP4 FATAL ERROR: No default language set."); // this should never happen
   }
+  $epdlanguage = $ep_4_fetch_array($epdlanguage_query);
+  $epdlanguage_id = $epdlanguage['languages_id'];
+  $epdlanguage_name = $epdlanguage['name'];
+  $epdlanguage_code = $epdlanguage['code'];
   $langcode = ep_4_get_languages(); // array of currently used language codes ( 1, 2, 3, ...)
 
   require 'easypopulate_4_import.php';
