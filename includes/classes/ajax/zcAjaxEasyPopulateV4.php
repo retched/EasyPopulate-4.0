@@ -2,11 +2,10 @@
 /**
  * zcAjaxEasyPopulateV4
  *
- * @package templateSystem
- * @copyright Copyright 2021 mc12345678 of McNumbers Ware
+ * @copyright Copyright 2023 mc12345678 of McNumbers Ware
  * @copyright Copyright 2003-2018 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: Thu Dec 16 2021 +0000 New in v1.5.7 $
+ * @version $Id: Thu Sep 10 2023 +0000 New in v1.5.7 $
  */
 
 $ep4_extra_funcs_path = DIR_WS_FUNCTIONS . 'extra_functions/easypopulate_4_functions.php';

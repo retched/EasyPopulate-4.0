@@ -11,12 +11,16 @@
 $ep4_extra_funcs_path = DIR_WS_FUNCTIONS . 'extra_functions/easypopulate_4_functions.php';
 $ep4_lang_path = DIR_WS_LANGUAGES . $_SESSION['language'] . '/' . 'easypopulate_4.php';
 if (!is_file($ep4_lang_path)) {
-  $ep4_lang_path = DIR_WS_LANGUAGES . 'english' . '/' . 'easypopulate_4.php';
+    $ep4_lang_path = DIR_WS_LANGUAGES . 'english' . '/' . 'easypopulate_4.php';
+}
+
+if (!defined('DIR_FS_ADMIN')) {
+    return false;
 }
 
 if (!isset($installedPlugins['EasyPopulateV4'])){
     // Software not installed as a plugin.
-    if (!defined('DIR_FS_ADMIN') || !is_file(DIR_FS_ADMIN . $ep4_extra_funcs_path)) {
+    if (!is_file(DIR_FS_ADMIN . $ep4_extra_funcs_path)) {
       // Software not installed in the expected location, presume that not installed at all.
         return false;
     }
@@ -25,6 +29,11 @@ if (!isset($installedPlugins['EasyPopulateV4'])){
 } else {
     // Supports Zen Cart 1.5.7+ and/or with software installed via Zen Cart Plugin Manager.
     $ep4_prefix = $pluginManager->getPluginVersionDirectory('EasyPopulateV4', $installedPlugins) . 'admin/';
+    if (!is_file($ep4_prefix . $ep4_lang_path)) {
+        // Plugin was installed; however, files are missing, assume that have downgraded
+        //   back to standard admin.
+        $ep4_prefix = DIR_FS_ADMIN;
+    }
 }
 
 require $ep4_prefix . $ep4_lang_path;
