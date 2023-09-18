@@ -7,5 +7,5 @@
  * @ New file added 2019-01-10 by mc12345678: https://mc12345678.com
  */
  
- $curver_detail = '4.0.38.ZC';
+ $curver_detail = '4.0.39.ZC';
  
