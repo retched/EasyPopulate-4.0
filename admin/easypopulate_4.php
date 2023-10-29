@@ -318,6 +318,8 @@ $ep_supported_mods['map'] = ($ep_supported_mods['map'] && ep_4_check_table_colum
 $ep_supported_mods['gppi'] = ep_4_check_table_column(TABLE_PRODUCTS, 'products_group_a_price'); // gppi = group pricing per item, added by Chadd 4-24-2012
 $ep_supported_mods['excl'] = ep_4_check_table_column(TABLE_PRODUCTS, 'products_exclusive'); // exclu = Custom Mod for Exclusive Products: 04-24-2012
 $ep_supported_mods['dual'] = ep_4_check_table_column(TABLE_PRODUCTS_ATTRIBUTES, 'options_values_price_w');
+$ep_supported_mods['instock'] = ep_4_check_table_column(TABLE_PRODUCTS, 'instock');
+
 // END: check for existance of various mods
 $ep_mods_supported = array(
                         'psd'=>array(
