@@ -1083,7 +1083,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
               $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
               unset($result);
               $max_category_id = $row['max'];*/
-              
+/*              
               $sql = "SHOW TABLE STATUS LIKE '" . TABLE_CATEGORIES . "'";
               $result = ep_4_query($sql);
               unset($sql);
@@ -1098,13 +1098,18 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
               $sql = "INSERT INTO " . TABLE_CATEGORIES . "(categories_id, categories_image, parent_id, sort_order, date_added, last_modified
                 ) VALUES (
                 :categories_id:, '', :parent_id:, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+                )";*/
+              $sql = "INSERT INTO " . TABLE_CATEGORIES . " (
+                  categories_image, parent_id, sort_order, date_added, last_modified
+                ) VALUES (
+                  '', :parent_id:, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
                 )";
-              $sql = $db->bindVars($sql, ':categories_id:', $max_category_id, 'integer');
               $sql = $db->bindVars($sql, ':parent_id:', $theparent_id, 'integer');
-              $current_category_id = $max_category_id;
-              $parent_category_id = $theparent_id;
               $result = ep_4_query($sql);
               unset($sql);
+              $max_category_id = $ep_4_insert_id(($ep_uses_mysqli ? $ep4['link'] : null));
+              $current_category_id = $max_category_id;
+              $parent_category_id = $theparent_id;
               if ($result) {
                 zen_record_admin_activity('Inserted category ' . (int) $max_category_id . ' via EP4.', 'info');
               }
