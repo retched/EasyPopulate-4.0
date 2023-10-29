@@ -364,12 +364,6 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
             $row['v_products_name_' . $lang['code']] = $row['v_products_name_' . $lang['id']] = ep_4_curly_quotes($row2['products_name']);
 
             // utf-8 conversion of smart-quotes, em-dash, and ellipsis
-            /*        $text = $row2['products_description'];
-              $text = str_replace(
-              array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6"),
-              array("'", "'", '"', '"', '-', '--', '...'),  $text);
-              $row['v_products_description_'.$lang['id']] = $text; // description assigned
-             */
             $row['v_products_description_' . $lang['code']] = $row['v_products_description_' . $lang['id']] = ep_4_curly_quotes($row2['products_description']); // description assigned
 
             //$row['v_products_description_'.$lang['id']] = $row2['products_description']; // description assigned
@@ -997,28 +991,6 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
               unset($lang2);
             } else { // otherwise add new category
               // get next available categoies_id (though could replace the last deleted category id..
-              /*$sql = "SELECT MAX(categories_id) + 1 max FROM " . TABLE_CATEGORIES;
-              $result = ep_4_query($sql);
-              unset($sql);
-              $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
-              unset($result);
-              $max_category_id = $row['max'];*/
-/*              
-              $sql = "SHOW TABLE STATUS LIKE '" . TABLE_CATEGORIES . "'";
-              $result = ep_4_query($sql);
-              unset($sql);
-              $row = $ep_4_fetch_array($result);
-              unset($result);
-              $max_category_id = $row['Auto_increment'];
-              // if database is empty, start at 1
-              if (!isset($max_category_id) || !is_numeric($max_category_id) || $max_category_id == 0) {
-                $max_category_id = 1;
-              }
-              // TABLE_CATEGORIES has 1 entry per categories_id
-              $sql = "INSERT INTO " . TABLE_CATEGORIES . "(categories_id, categories_image, parent_id, sort_order, date_added, last_modified
-                ) VALUES (
-                :categories_id:, '', :parent_id:, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-                )";*/
               $sql = "INSERT INTO " . TABLE_CATEGORIES . " (
                   categories_image, parent_id, sort_order, date_added, last_modified
                 ) VALUES (
@@ -1620,7 +1592,6 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
             } // if ($v_products_discount_type != '0')
           }
 
-
           // BEGIN: Products Descriptions
           // the following is common in both the updating an existing product and creating a new product // mc12345678 updated to allow omission of v_products_description in the import file.
           $add_products_description_data = false;
@@ -1632,7 +1603,6 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
              || $add_products_description_data) { //
             // Effectively need a way to step through all language options, this section to be "accepted" if there is something to be updated.  Prefer the ability to verify update need without having to loop on anything, but just by "presence" of information.
             foreach ($langcode as $lang) {
-              // foreach ($v_products_name as $key => $name) {  // Decouple the dependency on the products_name being imported to update the products_name, description, short description and/or URL. //mc12345678 2015-Dec-12
               $lang_id = $lang['id'];
               $lang_id_code = $lang['code'];
               $sql = "SELECT * FROM " . TABLE_PRODUCTS_DESCRIPTION . " WHERE

@@ -31,7 +31,6 @@
           continue;
         }
         
-//        if ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
           // UPDATE
           $sql = "UPDATE " . TABLE_CATEGORIES . " SET
             categories_image = :categories_image:,
@@ -222,9 +221,5 @@
             unset($resultcatmeta);
             $ep_update_count++;
           }
-/*        } else { // error Category ID not Found
-          $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_ID_NOT_FOUND, $items[$filelayout['v_categories_id']]);
-          $ep_error_count++;
-        } // if category found*/
         ep4_flush();
       } // while

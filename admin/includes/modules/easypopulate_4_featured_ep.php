@@ -14,24 +14,7 @@
 
         $sql .= $chosen_key_sql_limit;
 
-        /*switch (EP4_DB_FILTER_KEY) {
-          case 'products_model':
-            $sql .= " WHERE (products_model = :products_model:)";
-            $chosen_key = 'v_products_model';
-            break;
-          case 'blank_new':
-          case 'products_id':
-            $sql .= " WHERE (products_id = :products_id:)";
-            $chosen_key = 'v_products_id';
-            break;
-          default:
-            $sql .= " WHERE (products_model = :products_model:)";
-            $chosen_key = 'v_products_model';
-            break;
-        }*/
         ${$chosen_key} = NULL;
-
-        //$sql .= " LIMIT 1";
 
         $sql = $db->bindVars($sql, ':products_model:', $items[$filelayout['v_products_model']], $zc_support_ignore_null);
         $sql = $db->bindVars($sql, ':products_id:', $items[$filelayout['v_products_id']], $zc_support_ignore_null);
