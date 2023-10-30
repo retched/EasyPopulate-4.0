@@ -590,7 +590,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
             $v_products_url[$l_id] = $items[$filelayout['v_products_url_' . $l_id]];
             // check products url length and display warning on error, but still process record
             if (ep_4_extend_field($v_products_url[$l_id], $max_len, 'products_url', null, array(TABLE_PRODUCTS_DESCRIPTION)) == 'continue') {
-                  $ep_warning_count++;
+              $ep_warning_count++;
             }
           } else { // column doesn't exist in the IMPORT file
             // and product is new
@@ -673,16 +673,15 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
 
         // check size of v_products_model, loop on error
         if (ep_4_extend_field($v_products_model, $max_len, 'products_model', null, array(TABLE_PRODUCTS)) == 'continue') {
-              $ep_error_count++;
-              unset($lang);
-              unset($model_str_len);
-              continue; // short-circuit on error
+          $ep_error_count++;
+          unset($lang);
+          unset($model_str_len);
+          continue;
         }
 
         // BEGIN: Manufacturer's Name
         // convert the manufacturer's name into id's for the database
         $manf_str_len = (isset($v_manufacturers_name) && ($v_manufacturers_name != '')) ? ($ep_4_strlen($v_manufacturers_name)) : false;
-        
         $v_manufacturers_id = 0; // chadd - zencart uses manufacturer's id = '0' for no assisgned manufacturer
 
         if ($manf_str_len !== false) {
@@ -750,7 +749,6 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
             }
             unset($lang);
           }
-
         } // END: Manufacturer's Name
         unset($manf_str_len);
 
@@ -814,10 +812,10 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
             if ($categories_count['id'][$lang['id']] > 0) { // only check $max_len['categories_name'] if $categories_count['id'][$lang['id']] > 0
               for ($category_index = 0; $category_index < $categories_count['id'][$lang['id']]; $category_index++) {
                 if (ep_4_extend_field($categories_names_array['id'][$lang['id']][$category_index], $max_len, 'categories_name', '', array(TABLE_CATEGORIES_DESCRIPTION)) == 'continue') {
-                    $ep_error_count++;
-                    unset($lang);
-                    unset($cat_str_len);
-                    continue 3; // skip to next record don't attempt further processing of current record.
+                  $ep_error_count++;
+                  unset($lang);
+                  unset($cat_str_len);
+                  continue 3; // skip to next record don't attempt further processing of current record.
                 }
 
               }
@@ -827,10 +825,10 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
             }
             for ($category_index = 0; $category_index < $categories_count['code'][$lang['code']]; $category_index++) {
               if (ep_4_extend_field($categories_names_array['code'][$lang['code']][$category_index], $max_len, 'categories_name', '', array(TABLE_CATEGORIES_DESCRIPTION)) == 'continue') {
-                  $ep_error_count++;
-                  unset($lang);
-                  unset($cat_str_len);
-                  continue 3; // skip to next record don't attempt further processing of current record.
+                $ep_error_count++;
+                unset($lang);
+                unset($cat_str_len);
+                continue 3; // skip to next record don't attempt further processing of current record.
               }
             }
           } // foreach
