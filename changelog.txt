@@ -546,4 +546,23 @@
                                 - Increased information provided in newer messages to assist in debugging by reducing answers needed from users.
                                 - Changed version update processing to load once per session when successfully connected
                                     and the ability to disable version checking/reporting.
+4.0.39.ZC                       - Add zc_plugins installer.
+                                - Incorporate `queryFactoryEP4` class to support accessing protected member
+                                  functions of the ZC queryFactory class.
+                                - Incorpoate use of ZC 1.5.8 function `zen_define_default`.
+                                - Retain dropdown menu selections for export and most other page operations.
+                                - Incorporate language file loading process for ZC 1.5.8 language files.
+                                - Improve queries to offer `LIMIT 1` where identified and applicable.
+                                - Refactor function `getDBDelimiterList` to offer early escape and improve logic.
+                                - Refactor function `getFileDelimiter` to simplify logic and remove buried if/else
+                                - Refactor function `getFileDelimiter` to simplify logic and improve readability.
+                                - Add Basic and Detailed Attributes Filter Dropdown options for export.
+                                - Improve query joins to support further expansion and server version compliance
+                                - Revise mysql table references to align with majority of ZC query table prefixes.
+                                - Refactor to incorporate `zcDate` class use if it is present.
+                                - Support loading EP4 function files in ZC 1.5.8 and zc_plugins.
+                                - Support debug_backtrace in error logging.
+                                - Add AJAX driven markings in dropdown lists based on product and attribute presence.
+                                - Add language define constants replacing hard-coded text.
+                                - Add error checking notifications to assist understanding cause(s) of issue.
                                 
