@@ -403,7 +403,7 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists((!strstr(FILENAME_EASYPO
 //$epdlanguage_query = $db->Execute("SELECT languages_id, name FROM ".TABLE_LANGUAGES." WHERE code = '".DEFAULT_LANGUAGE."'");
   if (!defined('DEFAULT_LANGUAGE')) {
     $epdlanguage_query = ep_4_query("SELECT languages_id, code, name FROM " . TABLE_LANGUAGES . " ORDER BY languages_id LIMIT 1");
-    $epdlanguage = ($ep_uses_mysqli ? mysqli_fetch_array($epdlanguage_query) : mysql_fetch_array($epdlanguage_query));
+    $epdlanguage = $ep_4_fetch_array($epdlanguage_query);
     define('DEFAULT_LANGUAGE', $epdlanguage['code']);
   }
   $epdlanguage_query = ep_4_query("SELECT languages_id, code, name FROM " . TABLE_LANGUAGES . " WHERE code = '" . DEFAULT_LANGUAGE . "'");
