@@ -233,7 +233,7 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists((!strstr(FILENAME_EASYPO
       die("File path had to be updated, import has not occurred.  Please attempt to import again.\n\n");
     }
   }
-  if ($ep_debug_logging_all == true) {
+  if ($ep_debug_logging_all == true && is_dir($ep_debug_log_path)) {
     $fp = fopen($ep_debug_log_path . 'ep_debug_log.txt', 'w'); // new blank log file on each page impression for full testing log (too big otherwise!!)
     fclose($fp);
   }

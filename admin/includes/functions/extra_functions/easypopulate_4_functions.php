@@ -611,6 +611,9 @@ function ep_4_update_prices() {
 
 function write_debug_log_4($string) {
   global $ep_debug_log_path;
+  if (!is_dir($ep_debug_log_path)) {
+    return;
+  }
   $logFile = $ep_debug_log_path.'ep_debug_log.txt';
   $fp = fopen($logFile,'ab');
   if (function_exists('debug_backtrace')) {
