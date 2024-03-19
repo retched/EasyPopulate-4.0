@@ -175,7 +175,7 @@ $last['statusSel'] = !empty($_POST['ep_status_filter']) ? $_POST['ep_status_filt
 /* populate the variable $curver_detail using independent file to identify the version of this plugin. */
 require DIR_WS_MODULES . 'easypopulate_4_version.php'; //$curver_detail = '4.0.37.6';
 $message = '';
-if (IS_ADMIN_FLAG && function_exists('plugin_version_check_for_updates') && (!defined('SHOW_VERSION_UPDATE_IN_HEADER') || SHOW_VERSION_UPDATE_IN_HEADER) && (!defined('EASYPOPULATE_4_PLUGIN_CHECK') || EASYPOPULATE_4_PLUGIN_CHECK)) {
+if (IS_ADMIN_FLAG && function_exists('plugin_version_check_for_updates') && (!defined('SHOW_VERSION_UPDATE_IN_HEADER') || SHOW_VERSION_UPDATE_IN_HEADER == 'true') && (!defined('EASYPOPULATE_4_PLUGIN_CHECK') || EASYPOPULATE_4_PLUGIN_CHECK == '1')) {
   if (empty($_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV'])) {
     $_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV'] = plugin_version_check_for_updates(2069, $curver_detail);
   }
@@ -784,7 +784,7 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
         }
         unset($group_check);
       } else {
-        if (function_exists('plugin_version_check_for_updates') && (!defined('SHOW_VERSION_UPDATE_IN_HEADER') || SHOW_VERSION_UPDATE_IN_HEADER) && (!defined('EASYPOPULATE_4_PLUGIN_CHECK') || EASYPOPULATE_4_PLUGIN_CHECK)) {
+        if (function_exists('plugin_version_check_for_updates') && (!defined('SHOW_VERSION_UPDATE_IN_HEADER') || SHOW_VERSION_UPDATE_IN_HEADER == 'true') && (!defined('EASYPOPULATE_4_PLUGIN_CHECK') || EASYPOPULATE_4_PLUGIN_CHECK == '1')) {
           if (empty($_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_EP4V'])) {
             $_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_EP4V'] = plugin_version_check_for_updates(2069, TOOLS_EASYPOPULATE_4_VERSION);
           }
