@@ -185,7 +185,7 @@ if (IS_ADMIN_FLAG && function_exists('plugin_version_check_for_updates') && (!de
 }
 
 // Current EP Version - Modded by mc12345678 after Chadd had done so much
-$curver              = $curver_detail . ' - 05-03-2021' . $message;
+$curver              = $curver_detail . ' - 03-17-2023' . $message;
 $display_output = ''; // results of import displayed after script run
 $ep_dltype = NULL;
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
