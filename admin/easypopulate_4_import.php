@@ -1827,7 +1827,7 @@ if (!(isset($_POST['import']) && $_POST['import'] != '')) {
               INNER JOIN
               '.TABLE_PRODUCTS_TO_CATEGORIES.' ptc ON (p.products_id = ptc.products_id AND ptc.categories_id='.(int)$v_categories_id.')
               WHERE
-              p.products_id='.(int)$v_products_id);
+              p.products_id=' . (int)$v_products_id);
             $result_incategory = $ep_4_fetch_array($result_incategory);
             if (is_null($result_incategory) || !zen_not_null($result_incategory['products_id']) || count($result_incategory) <= 0 /* ($ep_uses_mysqli ? mysqli_num_rows($result_incategory) : mysql_num_rows($result_incategory)) == 0 */) { // nope, this is a new category for this product
               // Product is new to the category, category is not being changed for product, and product should be added to category
