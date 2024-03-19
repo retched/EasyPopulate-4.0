@@ -54,7 +54,7 @@ if (empty($ep4_import_file)) {
 
 // setup
 chdir( dirname(__FILE__) );
-$loaderPrefix = 'currency_cron';
+$loaderPrefix = 'epfour_cron'; // Can not use 'ep4_cron' as ZC filters for letters only
 $_SERVER['REMOTE_ADDR'] = 'cron';
 $_SERVER['REQUEST_URI'] = 'cron';
 // Define any necessary overriding defines here before loading the system.
@@ -79,6 +79,10 @@ if (!(defined('FILENAME_EASYPOPULATE_4') && file_exists((!strstr(FILENAME_EASYPO
   if (IS_CLI == 'VERBOSE') {
     echo 'Importing file: ' . $ep4_import_file . '... ' . "\n";
   }
+if (!isset($_SESSION['securityToken'])) {
+  $_SESSION['securityToken'] = md5(uniqid(rand(), true));
+}
+
 
   // assign cleansed $_POST values here instead of before loading the application_top.  If the security token is not set when application_top is executed, then $_POST values will be removed/fully cleansed.
   // $_POST['key'] = cleaning operation.
