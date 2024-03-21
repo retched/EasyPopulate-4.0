@@ -59,7 +59,24 @@ class queryFactoryEP4 extends queryFactory
      */
     public function getLink()
     {
-        return $this->db->link;
+        $link = null;
+
+        if (class_exists('ReflectionClass')) {
+            $rdb = new ReflectionClass($this->db);
+            $prop = $rdb->getProperty('link');
+            $prop->setAccessible(true);
+            $link = $prop->getValue($this->db);
+        } elseif (class_exists('Closure')) {
+          $db = $this->db;
+          $closuremethod = Closure::bind(function($db) {
+              return $db->link;
+          }, null, get_class($db));
+  // Here is the property recovered by the closure.
+          $link = $closuremethod($db);
+
+        }
+        return $link;
+//        return $this->db->link;
     }
 
 
