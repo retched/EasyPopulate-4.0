@@ -73,7 +73,6 @@ class queryFactoryEP4 extends queryFactory
           }, null, get_class($db));
   // Here is the property recovered by the closure.
           $link = $closuremethod($db);
-
         }
         return $link;
 //        return $this->db->link;
