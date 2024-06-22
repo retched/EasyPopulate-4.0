@@ -186,6 +186,7 @@ if (!function_exists('zen_define_default')) {
   $ep_4_split = function_exists('mb_split') ? 'mb_split' : 'explode';
   $ep_4_split_conv = function_exists('mb_split') ? 'preg_quote' : '';
 
+@set_time_limit($ep_execution);  // execution limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
   if (!isset($error) || !$error) {
     $upload_max_filesize = ini_get("upload_max_filesize");
     if (preg_match("/([0-9]+)K/i", $upload_max_filesize, $tempregs)) {
