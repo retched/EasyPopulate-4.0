@@ -299,7 +299,7 @@ $result = ep_4_query($filelayout_sql);
 
 $zco_notifier->notify('EP4_EXPORT_WHILE_START');
 
-while ($row = $ep_4_fetch_array($result)) {
+while ($result !== false && ($row = $ep_4_fetch_array($result))) {
 
   @set_time_limit($ep_execution);
 
@@ -697,21 +697,23 @@ while ($row = $ep_4_fetch_array($result)) {
         FROM '
             . TABLE_PRODUCTS_OPTIONS_VALUES_TO_PRODUCTS_OPTIONS . ' AS povtpo
             INNER JOIN ' . TABLE_PRODUCTS_OPTIONS_VALUES . ' AS pov ON (pov.products_options_values_id  = povtpo.products_options_values_id)
-            INNER JOIN ' . TABLE_PRODUCTS . ' AS p USING (products_id)
             INNER JOIN ' . TABLE_PRODUCTS_OPTIONS . ' AS po ON (po.language_id       = pov.language_id
                                                                 AND po.products_options_id  = povtpo.products_options_id)
-            INNER JOIN ' . TABLE_PRODUCTS_ATTRIBUTES . ' AS pa ON (pa.products_id       = p.products_id
-                                                                  AND pa.options_id        = po.products_options_id
-                                                                  AND pa.options_values_id = pov.products_options_values_id)
+            INNER JOIN ' . TABLE_PRODUCTS_ATTRIBUTES . ' AS pa ON (pa.options_id        = povtpo.products_options_id
+                                                                  AND pa.options_values_id = povtpo.products_options_values_id)
+            INNER JOIN ' . TABLE_PRODUCTS . ' AS p ON (pa.products_id       = p.products_id)
             INNER JOIN ' . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK . ' pwas ON (pwas.stock_attributes = pa.products_attributes_id)
         WHERE
         p.products_id    = :products_id: AND
-        o.language_id       = 1
+        po.language_id       = 1
         ORDER BY p.products_id ASC'; /* , a.options_id, v.products_options_values_id'; */
     $sqlAttrib = $db->bindVars($sqlAttrib, ':products_id:', $row['v_products_id'], 'integer');
     $resultAttrib = ep_4_query($sqlAttrib);
     unset($sqlAttrib);
-    $resultAttribCount = $ep_4_num_rows($resultAttrib);
+    $resultAttribCount = false;
+    if ($resultAttrib !== false) {
+      $resultAttribCount = $ep_4_num_rows($resultAttrib);
+    }
 
     if ($ep_4_SBAEnabled == '2') {
       $row['v_customid'] = '';
@@ -745,7 +747,10 @@ while ($row = $ep_4_fetch_array($result)) {
     $sqlSBA = $db->bindVars($sqlSBA, ':products_id:', $row['v_products_id'], 'integer');
     $resultSBA = ep_4_query($sqlSBA);
     unset($sqlSBA);
-    $resultSBACount = $ep_4_num_rows($resultSBA);
+    $resultSBACount = false;
+    if ($resultSBA !== false) {
+      $resultSBACount = $ep_4_num_rows($resultSBA);
+    }
 
     if ($resultSBACount !== false && $resultSBACount > 0) {
       //If product is tracked by SBA
@@ -848,6 +853,9 @@ while ($row = $ep_4_fetch_array($result)) {
             }
 //              $thetext = $row[$key];
             // remove carriage returns, newlines, and tabs - needs review
+            if ($row[$key] === null) {
+              continue;
+            }
             $thetext = str_replace($problem_chars, ' ', $row[$key]);
             // $thetext = str_replace("\r",' ',$thetext);
             // $thetext = str_replace("\n",' ',$thetext);
@@ -1015,8 +1023,10 @@ while ($row = $ep_4_fetch_array($result)) {
       $result2 = ep_4_query($sql2);
       unset($sql2);
       $row2 = $ep_4_fetch_array($result2);
-      $row['v_discount_price_' . $discount_index] = $row2['discount_price'];
-      $row['v_discount_qty_' . $discount_index] = $row2['discount_qty'];
+      if ($row2 !== null) {
+        $row['v_discount_price_' . $discount_index] = $row2['discount_price'];
+        $row['v_discount_qty_' . $discount_index] = $row2['discount_qty'];
+      }
       unset($row2);
     } //end if v_products_discount_type == 0 then there are no quantity breaks
     $discount_index++;

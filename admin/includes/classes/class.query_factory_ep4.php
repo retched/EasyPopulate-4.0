@@ -4,8 +4,8 @@
  * query_factory class extended for EP4.
  *
  * @author      mc12345678
- * @copyright   Copyright 2010-2023
- * @copyright   Copyright 2003-2023 Zen Cart Development Team
+ * @copyright   Copyright 2010-2024
+ * @copyright   Copyright 2003-2024 Zen Cart Development Team
  * @copyright   Portions Copyright 2003 osCommerce
  * @link
  * @license     http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
@@ -73,7 +73,6 @@ class queryFactoryEP4 extends queryFactory
           }, null, get_class($db));
   // Here is the property recovered by the closure.
           $link = $closuremethod($db);
-
         }
         return $link;
 //        return $this->db->link;

@@ -195,9 +195,9 @@ if (!isset($_SESSION['securityToken'])) {
     }
   }
 
-  if (class_exists('languageLoader') && file_exists($new_langfile)) {
+  if (class_exists('LanguageLoader') && file_exists($new_langfile)) {
     global $languageLoader;
-    $languageLoader->loadExtraLanguageFiles($ep4['path'] .  DIR_WS_LANGUAGES,  $_SESSION['language'], $filename, $folder);
+    $languageLoader->loadExtraLanguageFiles($ep4['path'] . DIR_WS_LANGUAGES, $_SESSION['language'], $filename, $folder);
   } elseif (file_exists($old_langfile)) {
     $tpl_old_langfile = $ep4['path'] . DIR_WS_LANGUAGES . $_SESSION['language'] . $folder .  $template_dir . '/' . $filename;
     if (file_exists($tpl_old_langfile)) {

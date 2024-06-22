@@ -175,9 +175,14 @@ $last['statusSel'] = !empty($_POST['ep_status_filter']) ? $_POST['ep_status_filt
 /* populate the variable $curver_detail using independent file to identify the version of this plugin. */
 require DIR_WS_MODULES . 'easypopulate_4_version.php'; //$curver_detail = '4.0.37.6';
 $message = '';
-if (IS_ADMIN_FLAG && function_exists('plugin_version_check_for_updates') && (!defined('SHOW_VERSION_UPDATE_IN_HEADER') || SHOW_VERSION_UPDATE_IN_HEADER == 'true') && (!defined('EASYPOPULATE_4_PLUGIN_CHECK') || EASYPOPULATE_4_PLUGIN_CHECK == '1')) {
-  if (empty($_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV'])) {
+if (IS_ADMIN_FLAG && (function_exists('plugin_version_check_for_updates') || class_exists('queryFactoryEP4') && method_exists('plugin_version_check_for_updates', 'queryFactoryEP4')) && (!defined('SHOW_VERSION_UPDATE_IN_HEADER') || SHOW_VERSION_UPDATE_IN_HEADER === 'true') && (!defined('EASYPOPULATE_4_PLUGIN_CHECK') || EASYPOPULATE_4_PLUGIN_CHECK === '1')) {
+  // minimize number of tries to retrieve the plugin version.
+  if (!isset($_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV'])) {
+    if (function_exists('plugin_version_check_for_updates')) {
     $_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV'] = plugin_version_check_for_updates(2069, $curver_detail);
+    } else {
+      $_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV'] = queryFactoryEP4::plugin_version_check_for_updates(2069, $curver_detail);
+    }
   }
   if ($_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV'] !== FALSE) {
     $message = '<span class="alert">' . ' - NOTE: A NEW VERSION OF THIS PLUGIN IS AVAILABLE. <a href="' . $_SESSION['EASYPOPULATE_4_PLUGIN_CHECK_CURV']['link'] . '" target="_blank">[Details]</a>' . '</span>';
@@ -185,7 +190,7 @@ if (IS_ADMIN_FLAG && function_exists('plugin_version_check_for_updates') && (!de
 }
 
 // Current EP Version - Modded by mc12345678 after Chadd had done so much
-$curver              = $curver_detail . ' - 03-25-2024' . $message;
+$curver              = $curver_detail . ' - 06-17-2024' . $message;
 $display_output = ''; // results of import displayed after script run
 $ep_dltype = NULL;
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
@@ -737,14 +742,19 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
 <!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html <?php echo HTML_PARAMS; ?>>
   <head>
+<?php if (is_file(DIR_WS_INCLUDES . 'admin_html_head.php')) {
+    require DIR_WS_INCLUDES . 'admin_html_head.php';
+} else { ?>
     <meta http-equiv="Content-Type" content="text/html; charset=<?php echo CHARSET; ?>">
     <title><?php echo TITLE; ?></title>
     <link rel="stylesheet" type="text/css" href="includes/stylesheet.css">
     <link rel="stylesheet" type="text/css" href="includes/cssjsmenuhover.css" media="all" id="hoverJS">
+<?php } ?>
     <?php $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK'); ?>
     <script language="javascript" type="text/javascript" src="includes/menu.js"></script>
     <script language="javascript" type="text/javascript" src="includes/general.js"></script>
     <!-- <script language="javascript" src="includes/ep4ajax.js"></script> -->
+<?php if (!is_file(DIR_WS_INCLUDES . 'admin_html_head.php')) { ?>
     <script type="text/javascript">
 <!--
    function init()
@@ -758,11 +768,16 @@ if ((!isset($error) || !$error) && (isset($_POST["delete"])) && !is_null($_SERVE
    }
 // -->
     </script>
+<?php } ?>
     <style type="text/css">
       #epfiles tbody tr:hover { background:#CCCCCC; }
     </style>
   </head>
+<?php if (!is_file(DIR_WS_INCLUDES . 'admin_html_head.php')) { ?>
   <body onLoad="init()">
+<?php } else { ?>
+  <body>
+<?php } ?>
       <?php require(DIR_WS_INCLUDES . 'header.php');
       $update = false;
       $zco_notifier->notify('EP4_ZC155_AFTER_HEADER');

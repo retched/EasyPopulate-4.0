@@ -982,6 +982,7 @@ $filelayout_sql .= '
       INNER JOIN ' . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK . ' AS pwas
         ON (
           p.products_id   = pwas.products_id
+          AND
           pa.products_attributes_id = pwas.stock_attributes
         )
       INNER JOIN ' . TABLE_PRODUCTS_DESCRIPTION .    ' AS pd
@@ -989,7 +990,7 @@ $filelayout_sql .= '
           p.products_id    = pd.products_id
         )
       WHERE
-      po.language_id       = 1 AND
+      po.language_id       = 1
       ORDER BY pa.products_id, pa.options_id, pov.products_options_values_id';
     break;
 

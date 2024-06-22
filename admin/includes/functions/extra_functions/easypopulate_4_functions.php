@@ -279,7 +279,8 @@ if (!function_exists('zen_get_sub_categories')) {
   }
 }
 
-if (!function_exists('plugin_version_check_for_updates')) {
+// Removed from extra_functions because ZC v1.5.8 made it such that as a zc_plugins program causes issues.
+if (false && !function_exists('plugin_version_check_for_updates')) {
 /**
  * plugin_support.php
  *

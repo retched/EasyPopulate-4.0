@@ -107,6 +107,7 @@ Ajax.php requires ajax file(s) to be in the actual catalog fileset.
         }
 
         $ep4['db'] = new queryFactoryEP4($db);
+        $ep4['link'] = $ep4['db']->getLink();
 
         // If require is used, then log file created that duplicate definition.
         // If remove line, then log that missing the file with the function in it.
