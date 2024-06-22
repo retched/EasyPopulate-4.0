@@ -110,16 +110,48 @@ if (!isset($_SESSION['securityToken'])) {
   $csv_delimiter = ","; // "\t" = tab AND "," = COMMA
   $csv_enclosure = '"';
   $category_delimiter = "\x5e";
+if (!function_exists('zen_define_default')) {
   if (!defined('EP4_DB_FILTER_KEY')) {
     define('EP4_DB_FILTER_KEY', 'products_model');
   }
   if (!defined('EP4_ADMIN_TEMP_DIRECTORY')) {
     define('EP4_ADMIN_TEMP_DIRECTORY', 'true');
   }
+  if (!defined('EP4_SHOW_ALL_FILETYPES')) {
+    // Intention is to force display of all file types and files for someone
+    //  that hasn't done an update on the database as part of installing this
+    //  software.  Perhaps could/need to create a default(s) file to
+    //  assist with installation/operation.  mc12345678 12/30/15
+    define('EP4_SHOW_ALL_FILETYPES', 'true');
+  }
   if (!defined('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE')) {
     define('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_id');
   }
+} else {
+  
+  // Need to define this to support use of primary key for import/export
+  //   Instead of adding an additional switch, have incorporated the conversion
+  //   of a blank product_id field to a new product in here.  Currently
+  //   expecting three choices: products_model, products_id, and blank_new
+  //   with model as default
+  zen_define_default('EP4_DB_FILTER_KEY', 'products_model'); // This could/should apply to both
+  //  import and export files, so here is a good location for it.
 
+  // Intention is to identify which file path to reference throughout instead of
+  //  storing the path in the database. If the individual wishes to use the
+  //  admin path, then this switch will direct the files to use the admin path
+  //  instead of storing the path in the database.
+  zen_define_default('EP4_ADMIN_TEMP_DIRECTORY', 'true'); // Valid Values considered (false, true)
+
+  // Intention is to force display of all file types and files for someone
+  //  that hasn't done an update on the database as part of installing this
+  //  software.  Perhaps could/need to create a default(s) file to
+  //  assist with installation/operation.  mc12345678 12/30/15
+  zen_define_default('EP4_SHOW_ALL_FILETYPES', 'true');
+
+  zen_define_default('EASYPOPULATE_4_CONFIG_IMPORT_OVERRIDE', 'language_id');
+
+}
   $tempdir = defined('EASYPOPULATE_4_CONFIG_TEMP_DIR') ? EASYPOPULATE_4_CONFIG_TEMP_DIR : 'EASYPOPULATE_4_CONFIG_TEMP_DIR'; // This ideally should not actually include the Admin Directory in the variable.
   $ep_date_format = defined('EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT') ? EASYPOPULATE_4_CONFIG_FILE_DATE_FORMAT : 'm-d-y';
   $ep_raw_time = defined('EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME') ? EASYPOPULATE_4_CONFIG_DEFAULT_RAW_TIME : '09:00:00';
